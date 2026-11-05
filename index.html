@@ -18,7 +18,7 @@ input,textarea,select{display:block;width:100%;padding:12px;margin:7px 0 12px;bo
 .list{display:grid;gap:9px}.item{padding:12px;background:var(--panel2);border-radius:10px}.social{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
 footer{text-align:center;color:var(--muted);font-size:12px;padding:24px}
 @media(min-width:650px){.hero{padding:34px}.hero p{max-width:650px}}
-</style></head>
+</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./supabase-config.js"></script></head>
 <body>
 <header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem</h1><p class="tag">A música da nossa quebrada!</p><div class="social" style="justify-content:center"><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn alt" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a></div></header>
 <main>
@@ -41,4 +41,4 @@ document.getElementById('audio').onchange=e=>{const f=e.target.files[0];if(f)doc
 let posts=[];document.getElementById('send').onclick=()=>{const who=document.getElementById('who').value.trim(),details=document.getElementById('details').value.trim(),kind=document.getElementById('kind').value;if(!who||!details){document.getElementById('status').textContent='Preencha seu nome e as informações.';return;}posts.unshift({who,details,kind});document.getElementById('feed').innerHTML=posts.map(p=>'<div class="item"><b>'+p.kind+' • '+p.who.replace(/[<>&"]/g,'')+'</b><p>'+p.details.replace(/[<>&"]/g,'')+'</p><small class="muted">Demonstração neste aparelho</small></div>').join('');document.getElementById('status').textContent='Adicionado à demonstração deste aparelho.';document.getElementById('details').value='';};
 if(window.supabase&&window.CAPITAL_SUPABASE_URL&&window.CAPITAL_SUPABASE_KEY){const sb=window.supabase.createClient(window.CAPITAL_SUPABASE_URL,window.CAPITAL_SUPABASE_KEY);sb.from('site_settings').select('setting_value').eq('setting_key','logo_url').maybeSingle().then(({data})=>{if(data&&data.setting_value)document.getElementById('site-logo').src=data.setting_value;});}
 if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
-</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./supabase-config.js"></script></body></html>
+</script></body></html>
