@@ -62,6 +62,7 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:24px}
 <label for="artist-instagram">Instagram (link ou @)</label><input id="artist-instagram" maxlength="120" placeholder="@seuperfil">
 <label for="artist-youtube">YouTube (link do canal ou vídeo)</label><input id="artist-youtube" maxlength="180" placeholder="https://youtube.com/...">
 <label for="artist-bio">Apresentação breve</label><textarea id="artist-bio" maxlength="500" placeholder="Conte um pouco sobre sua caminhada e seu trabalho"></textarea>
+<div class="notice" aria-live="polite"><strong>Prévia da apresentação</strong><p id="artist-preview" class="muted">Seu nome artístico e suas informações aparecerão aqui enquanto você preenche.</p></div>
 <button class="btn" id="artist-copy">Copiar apresentação</button><button class="btn alt" id="artist-clear" type="button">Limpar campos</button>
 <p id="artist-status" class="muted" aria-live="polite"></p></div>
 </section>
@@ -126,6 +127,22 @@ document.getElementById('clear-event').addEventListener('click',()=>{eventFieldI
   else{window.prompt('Copie a mensagem abaixo e cole no Instagram:',message);status.textContent='Copie a mensagem exibida e envie pelo Instagram junto com o cartaz.';}
  }catch(error){window.prompt('Copie a mensagem abaixo e cole no Instagram:',message);status.textContent='Copie a mensagem exibida e envie pelo Instagram junto com o cartaz.';}
 });
+// Prévia da apresentação do artista, atualizada localmente e sem interpretar HTML.
+function updateArtistPreview(){
+ const val=id=>document.getElementById(id).value.trim();
+ const name=val('artist-name'),style=val('artist-style');
+ const lines=[name||'Seu nome artístico',style||'Estilo musical'];
+ if(val('artist-city'))lines.push(val('artist-city'));
+ if(val('artist-instagram'))lines.push('Instagram: '+val('artist-instagram'));
+ if(val('artist-youtube'))lines.push('YouTube: '+val('artist-youtube'));
+ if(val('artist-bio'))lines.push(val('artist-bio'));
+ document.getElementById('artist-preview').textContent=lines.join(' • ');
+}
+['artist-name','artist-style','artist-city','artist-instagram','artist-youtube','artist-bio'].forEach(id=>{
+ const field=document.getElementById(id);
+ field.addEventListener('input',updateArtistPreview);
+ field.addEventListener('change',updateArtistPreview);
+});
 // Apresentação de artistas: prepara texto local para envio voluntário pelo Instagram.
 document.getElementById('artist-copy').addEventListener('click',async()=>{
  const val=id=>document.getElementById(id).value.trim();
@@ -135,7 +152,7 @@ document.getElementById('artist-copy').addEventListener('click',async()=>{
  try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(message);status.textContent='Apresentação copiada! Abra o Instagram e envie a mensagem para a equipe.';}else{window.prompt('Copie sua apresentação e envie pelo Instagram:',message);status.textContent='Copie a mensagem exibida e envie pelo Instagram.';}}
  catch(error){window.prompt('Copie sua apresentação e envie pelo Instagram:',message);status.textContent='Copie a mensagem exibida e envie pelo Instagram.';}
 });
-document.getElementById('artist-clear').addEventListener('click',()=>{['artist-name','artist-city','artist-instagram','artist-youtube','artist-bio'].forEach(id=>document.getElementById(id).value='');document.getElementById('artist-style').selectedIndex=0;document.getElementById('artist-status').textContent='Campos limpos.';document.getElementById('artist-name').focus();});
+document.getElementById('artist-clear').addEventListener('click',()=>{['artist-name','artist-city','artist-instagram','artist-youtube','artist-bio'].forEach(id=>document.getElementById(id).value='');document.getElementById('artist-style').selectedIndex=0;updateArtistPreview();document.getElementById('artist-status').textContent='Campos limpos.';document.getElementById('artist-name').focus();});
 document.getElementById('find-nearby').addEventListener('click',()=>{const status=document.getElementById('location-status'),mapLink=document.getElementById('nearby-map');mapLink.hidden=true;if(!navigator.geolocation){status.textContent='Este navegador não oferece acesso ao GPS. Tente abrir o site no Chrome do celular.';return;}status.textContent='Aguardando sua autorização para acessar a localização...';navigator.geolocation.getCurrentPosition(position=>{const lat=position.coords.latitude,lon=position.coords.longitude;mapLink.href='https://www.google.com/maps/search/shows+eventos+acoes+sociais/@'+lat+','+lon+',14z';mapLink.hidden=false;status.textContent='Localização encontrada! Abra o mapa para procurar opções logo ali de você. Seu endereço não será exibido no site.';},error=>{status.textContent=error.code===1?'Você não autorizou a localização. Se quiser, permita o acesso ao GPS nas configurações do navegador.':'Não foi possível encontrar sua localização agora. Confira se o GPS está ligado e tente novamente.';},{enableHighAccuracy:true,timeout:12000,maximumAge:300000});});
 
 // Compartilhar o site usando os recursos disponíveis no celular.
