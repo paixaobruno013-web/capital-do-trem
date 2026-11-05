@@ -43,7 +43,7 @@ const THEME_KEY='capitaldotrem_theme_v1';
 let posts=[];
 try{posts=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');if(!Array.isArray(posts))posts=[];}catch(e){posts=[];}
 function safeText(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
-function renderPosts(){const feed=document.getElementById('feed');if(!posts.length){feed.innerHTML='<p class="muted">Ainda não há divulgações nesta demonstração.</p>';return;}feed.innerHTML=posts.map(p=>'<div class="item"><b>'+safeText(p.kind)+' • '+safeText(p.who)+'</b><p>'+safeText(p.details).replace(/\\n/g,'<br>')+'</p><small class="muted">Salvo somente neste aparelho</small></div>').join('');}
+function renderPosts(){const feed=document.getElementById('feed');if(!posts.length){feed.innerHTML='<p class="muted">Ainda não há divulgações nesta demonstração.</p>';return;}feed.innerHTML=posts.map(p=>'<div class="item"><b>'+safeText(p.kind)+' • '+safeText(p.who)+'</b><p>'+safeText(p.details).replace(/\n/g,'<br>')+'</p><small class="muted">Salvo somente neste aparelho</small></div>').join('');}
 const savedTheme=localStorage.getItem(THEME_KEY);if(savedTheme==='light')document.body.classList.add('light');
 document.getElementById('theme').textContent=document.body.classList.contains('light')?'🌙 Escuro':'☀️ Claro';
 document.getElementById('theme').onclick=()=>{document.body.classList.toggle('light');const light=document.body.classList.contains('light');localStorage.setItem(THEME_KEY,light?'light':'dark');document.getElementById('theme').textContent=light?'🌙 Escuro':'☀️ Claro';};
