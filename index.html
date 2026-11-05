@@ -56,7 +56,7 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:24px}
 <section class="page" id="artistas">
 <div class="card"><h2>🎤 Artistas do Capital</h2><p class="muted">Um espaço para apresentar talentos da nossa cena, conhecer novos sons e fortalecer quem faz música na comunidade.</p><p class="muted">Prepare sua apresentação e envie pelo Instagram. Nesta primeira versão, o formulário apenas monta uma mensagem neste aparelho; ele ainda não cria um perfil público nem envia arquivos.</p></div>
 <div class="card"><h3>📣 Apresente seu trabalho</h3>
-<label for="artist-name">Nome artístico *</label><input id="artist-name" maxlength="70" placeholder="Como o público conhece você" required>
+<label for="artist-photo">Foto do artista (opcional)</label><input id="artist-photo" type="file" accept="image/*"><p class="muted">Escolha uma foto nítida de até 5 MB. Ela será exibida somente neste aparelho; para enviar à equipe, anexe a foto manualmente no Instagram.</p><img id="artist-photo-preview" alt="Prévia da foto do artista" hidden style="display:none;max-width:100%;max-height:280px;object-fit:contain;border-radius:12px;margin:8px 0;border:1px solid var(--line)"><p id="artist-photo-status" class="muted" aria-live="polite"></p>\n<label for="artist-name">Nome artístico *</label><input id="artist-name" maxlength="70" placeholder="Como o público conhece você" required>
 <label for="artist-style">Estilo musical *</label><select id="artist-style" required><option value="">Escolha seu estilo</option><option>Funk</option><option>Rap / Hip-hop</option><option>Trap</option><option>Pagode</option><option>Sertanejo</option><option>Forró</option><option>Pop</option><option>Outro</option></select>
 <label for="artist-city">Cidade / região</label><input id="artist-city" maxlength="80" placeholder="Ex.: Belo Horizonte e região">
 <label for="artist-instagram">Instagram (link ou @)</label><input id="artist-instagram" maxlength="120" placeholder="@seuperfil">
@@ -127,6 +127,21 @@ document.getElementById('clear-event').addEventListener('click',()=>{eventFieldI
   else{window.prompt('Copie a mensagem abaixo e cole no Instagram:',message);status.textContent='Copie a mensagem exibida e envie pelo Instagram junto com o cartaz.';}
  }catch(error){window.prompt('Copie a mensagem abaixo e cole no Instagram:',message);status.textContent='Copie a mensagem exibida e envie pelo Instagram junto com o cartaz.';}
 });
+// Prévia opcional da foto: arquivo permanece local e não é enviado nem armazenado.
+let artistPhotoObjectUrl='';
+document.getElementById('artist-photo').addEventListener('change',event=>{
+ const file=event.target.files&&event.target.files[0];
+ const preview=document.getElementById('artist-photo-preview');
+ const status=document.getElementById('artist-photo-status');
+ if(artistPhotoObjectUrl){URL.revokeObjectURL(artistPhotoObjectUrl);artistPhotoObjectUrl='';}
+ preview.removeAttribute('src');preview.hidden=true;preview.style.display='none';
+ if(!file){status.textContent='Nenhuma foto selecionada.';return;}
+ if(!file.type.startsWith('image/')){event.target.value='';status.textContent='Escolha um arquivo de imagem.';return;}
+ if(file.size>5*1024*1024){event.target.value='';status.textContent='A imagem precisa ter até 5 MB. Escolha uma foto menor.';return;}
+ artistPhotoObjectUrl=URL.createObjectURL(file);
+ preview.src=artistPhotoObjectUrl;preview.hidden=false;preview.style.display='block';
+ status.textContent='Foto selecionada para prévia neste aparelho. Para divulgar, anexe o arquivo manualmente no Instagram.';
+});
 // Prévia da apresentação do artista, atualizada localmente e sem interpretar HTML.
 function updateArtistPreview(){
  const val=id=>document.getElementById(id).value.trim();
@@ -152,7 +167,7 @@ document.getElementById('artist-copy').addEventListener('click',async()=>{
  try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(message);status.textContent='Apresentação copiada! Abra o Instagram e envie a mensagem para a equipe.';}else{window.prompt('Copie sua apresentação e envie pelo Instagram:',message);status.textContent='Copie a mensagem exibida e envie pelo Instagram.';}}
  catch(error){window.prompt('Copie sua apresentação e envie pelo Instagram:',message);status.textContent='Copie a mensagem exibida e envie pelo Instagram.';}
 });
-document.getElementById('artist-clear').addEventListener('click',()=>{['artist-name','artist-city','artist-instagram','artist-youtube','artist-bio'].forEach(id=>document.getElementById(id).value='');document.getElementById('artist-style').selectedIndex=0;updateArtistPreview();document.getElementById('artist-status').textContent='Campos limpos.';document.getElementById('artist-name').focus();});
+document.getElementById('artist-clear').addEventListener('click',()=>{const photoInput=document.getElementById('artist-photo');photoInput.value='';if(artistPhotoObjectUrl){URL.revokeObjectURL(artistPhotoObjectUrl);artistPhotoObjectUrl='';}const photoPreview=document.getElementById('artist-photo-preview');photoPreview.removeAttribute('src');photoPreview.hidden=true;photoPreview.style.display='none';document.getElementById('artist-photo-status').textContent='Foto removida.';['artist-name','artist-city','artist-instagram','artist-youtube','artist-bio'].forEach(id=>document.getElementById(id).value='');document.getElementById('artist-style').selectedIndex=0;updateArtistPreview();document.getElementById('artist-status').textContent='Campos limpos.';document.getElementById('artist-name').focus();});
 document.getElementById('find-nearby').addEventListener('click',()=>{const status=document.getElementById('location-status'),mapLink=document.getElementById('nearby-map');mapLink.hidden=true;if(!navigator.geolocation){status.textContent='Este navegador não oferece acesso ao GPS. Tente abrir o site no Chrome do celular.';return;}status.textContent='Aguardando sua autorização para acessar a localização...';navigator.geolocation.getCurrentPosition(position=>{const lat=position.coords.latitude,lon=position.coords.longitude;mapLink.href='https://www.google.com/maps/search/shows+eventos+acoes+sociais/@'+lat+','+lon+',14z';mapLink.hidden=false;status.textContent='Localização encontrada! Abra o mapa para procurar opções logo ali de você. Seu endereço não será exibido no site.';},error=>{status.textContent=error.code===1?'Você não autorizou a localização. Se quiser, permita o acesso ao GPS nas configurações do navegador.':'Não foi possível encontrar sua localização agora. Confira se o GPS está ligado e tente novamente.';},{enableHighAccuracy:true,timeout:12000,maximumAge:300000});});
 
 // Compartilhar o site usando os recursos disponíveis no celular.
