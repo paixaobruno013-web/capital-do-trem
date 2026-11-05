@@ -27,6 +27,8 @@ nav{display:flex;gap:8px;overflow:auto;padding:16px 0 8px}nav button{white-space
 input,textarea,select{display:block;width:100%;padding:12px;margin:7px 0 12px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--fg)}textarea{min-height:90px}
 .list{display:grid;gap:9px}.item{padding:12px;background:var(--panel2);border-radius:10px}.social{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
 footer{text-align:center;color:var(--muted);font-size:12px;padding:24px}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--red);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 @media(min-width:650px){.hero{padding:34px}.hero p{max-width:650px}}
 </style></head>
 <body>
@@ -236,7 +238,10 @@ installButton.addEventListener('click',async()=>{
  installPrompt=null;installButton.hidden=true;
 });
 window.addEventListener('appinstalled',()=>{installButton.hidden=true;installPrompt=null;});
-document.getElementById('audio').onchange=e=>{const f=e.target.files[0];if(f)document.getElementById('player').src=URL.createObjectURL(f);};
+let audioObjectUrl='';
+const audioInput=document.getElementById('audio'),audioPlayer=document.getElementById('player');
+audioInput.addEventListener('change',event=>{const file=event.target.files&&event.target.files[0];if(audioObjectUrl){URL.revokeObjectURL(audioObjectUrl);audioObjectUrl='';}audioPlayer.pause();audioPlayer.removeAttribute('src');audioPlayer.load();if(file){audioObjectUrl=URL.createObjectURL(file);audioPlayer.src=audioObjectUrl;audioPlayer.load();}});
+window.addEventListener('pagehide',()=>{if(audioObjectUrl){URL.revokeObjectURL(audioObjectUrl);audioObjectUrl='';}});
 const STORAGE_KEY='capitaldotrem_demo_posts_v1';
 const THEME_KEY='capitaldotrem_theme_v1';
 let posts=[];
@@ -244,6 +249,7 @@ try{posts=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');if(!Array.isArray(
 function safeText(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
 function renderPosts(){const feed=document.getElementById('feed');if(!posts.length){feed.innerHTML='<p class="muted">Ainda não há divulgações nesta demonstração.</p>';return;}feed.innerHTML=posts.map(p=>'<div class="item"><b>'+safeText(p.kind)+' • '+safeText(p.who)+'</b><p>'+safeText(p.details).replace(/\n/g,'<br>')+'</p><small class="muted">Salvo somente neste aparelho</small></div>').join('');}
 const savedTheme=localStorage.getItem(THEME_KEY);if(savedTheme==='light')document.body.classList.add('light');
+const initialLight=document.body.classList.contains('light');document.getElementById('theme').setAttribute('aria-pressed',String(initialLight));document.getElementById('theme-color').content=initialLight?'#f5f5f5':'#000000';
 document.getElementById('theme').textContent=document.body.classList.contains('light')?'🌙 Escuro':'☀️ Claro';
 document.getElementById('theme').onclick=()=>{document.body.classList.toggle('light');const light=document.body.classList.contains('light');localStorage.setItem(THEME_KEY,light?'light':'dark');document.getElementById('theme').textContent=light?'🌙 Escuro':'☀️ Claro';document.getElementById('theme').setAttribute('aria-pressed',String(light));document.getElementById('theme-color').content=light?'#f5f5f5':'#000000';};
 renderPosts();
