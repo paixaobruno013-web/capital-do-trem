@@ -30,7 +30,7 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:24px}
 @media(min-width:650px){.hero{padding:34px}.hero p{max-width:650px}}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./supabase-config.js"></script></head>
 <body>
-<header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem</h1><p class="tag">A música da nossa quebrada!</p><div class="social" style="justify-content:center"><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn alt" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a></div></header>
+<header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem</h1><p class="tag">A música da nossa quebrada!</p><div class="social" style="justify-content:center"><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn alt" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="instalar-app" type="button" hidden>＋ Instalar aplicativo</button></div></header>
 <main>
 <section class="hero"><h2>Conectando música, cultura e comunidade.</h2><p class="muted">Um espaço para valorizar artistas, divulgar lançamentos, compartilhar eventos e fortalecer iniciativas da nossa quebrada.</p><div class="social"><button class="btn" data-go="musicas">Explorar músicas</button><button class="btn alt" data-go="divulgue">Divulgar meu trabalho</button></div></section>
 <nav id="nav"><button class="active" data-page="inicio">Início</button><button data-page="musicas">Músicas</button><button data-page="eventos">Eventos</button><button data-page="social">Ação social</button><button data-page="parcerias">Parcerias</button><button data-page="divulgue">Divulgue</button></nav>
@@ -51,6 +51,29 @@ function go(id){pages.forEach(p=>p.classList.toggle('active',p.id===id));tabs.fo
 tabs.forEach(t=>t.addEventListener('click',()=>go(t.dataset.page)));document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
 document.getElementById('theme').onclick=()=>{document.body.classList.toggle('light');document.getElementById('theme').textContent=document.body.classList.contains('light')?'🌙 Escuro':'☀️ Claro';};
 document.getElementById('find-nearby').addEventListener('click',()=>{const status=document.getElementById('location-status'),mapLink=document.getElementById('nearby-map');mapLink.hidden=true;if(!navigator.geolocation){status.textContent='Este navegador não oferece acesso ao GPS. Tente abrir o site no Chrome do celular.';return;}status.textContent='Aguardando sua autorização para acessar a localização...';navigator.geolocation.getCurrentPosition(position=>{const lat=position.coords.latitude,lon=position.coords.longitude;mapLink.href='https://www.google.com/maps/search/shows+eventos+acoes+sociais/@'+lat+','+lon+',14z';mapLink.hidden=false;status.textContent='Localização encontrada! Abra o mapa para procurar opções logo ali de você. Seu endereço não será exibido no site.';},error=>{status.textContent=error.code===1?'Você não autorizou a localização. Se quiser, permita o acesso ao GPS nas configurações do navegador.':'Não foi possível encontrar sua localização agora. Confira se o GPS está ligado e tente novamente.';},{enableHighAccuracy:true,timeout:12000,maximumAge:300000});});
+
+// Compartilhar o site usando os recursos disponíveis no celular.
+document.getElementById('compartilhar-site').addEventListener('click',async()=>{
+ const shareData={title:'Capital do Trem',text:'A música da nossa quebrada! Conheça o Capital do Trem.',url:location.href};
+ try{
+  if(navigator.share){await navigator.share(shareData);}
+  else if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(shareData.url);alert('Link do Capital do Trem copiado. Agora é só compartilhar!');}
+  else{window.prompt('Copie o link do Capital do Trem:',shareData.url);}
+ }catch(error){if(error.name!=='AbortError')alert('Não foi possível compartilhar agora. Tente copiar o endereço do site.');}
+});
+// Oferece a instalação como aplicativo quando o navegador Android permitir.
+let installPrompt=null;
+const installButton=document.getElementById('instalar-app');
+window.addEventListener('beforeinstallprompt',event=>{
+ event.preventDefault();installPrompt=event;installButton.hidden=false;
+});
+installButton.addEventListener('click',async()=>{
+ if(!installPrompt){alert('Para instalar: abra o menu do Chrome (⋮) e escolha “Instalar app” ou “Adicionar à tela inicial”.');return;}
+ installPrompt.prompt();
+ await installPrompt.userChoice;
+ installPrompt=null;installButton.hidden=true;
+});
+window.addEventListener('appinstalled',()=>{installButton.hidden=true;installPrompt=null;});
 document.getElementById('audio').onchange=e=>{const f=e.target.files[0];if(f)document.getElementById('player').src=URL.createObjectURL(f);};
 const STORAGE_KEY='capitaldotrem_demo_posts_v1';
 const THEME_KEY='capitaldotrem_theme_v1';
