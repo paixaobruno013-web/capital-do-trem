@@ -38,7 +38,18 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:24px}
 <section class="page" id="musicas"><div class="card"><h2>🎵 Músicas</h2><p class="muted">Ouça os lançamentos diretamente nos canais oficiais.</p><a class="btn" href="https://youtube.com/@capitaldotrem/videos" target="_blank" rel="noopener">Abrir lançamentos no YouTube</a></div><div class="card"><h3>Player de áudio demonstrativo</h3><label>Selecione um áudio autorizado do seu aparelho</label><input id="audio" type="file" accept="audio/*"><audio id="player" controls style="width:100%"></audio><p class="muted">O áudio escolhido toca somente neste aparelho. Só compartilhe músicas que você tenha autorização para distribuir.</p></div></section>
 <section class="page" id="eventos">
 <div class="card"><h2>📍 Logo ali</h2><p class="muted">Encontre shows, bailes, encontros e ações sociais próximos de onde você está.</p><button class="btn" id="find-nearby">Usar localização do meu celular</button><p id="location-status" class="muted" aria-live="polite">Sua localização só será acessada se você tocar no botão e autorizar o GPS. As coordenadas serão usadas para abrir o Google Maps e não serão salvas pelo Capital do Trem.</p><a id="nearby-map" class="btn alt" href="#" target="_blank" rel="noopener" hidden>Abrir mapa com opções próximas</a></div>
-<div class="card"><h2>📅 Agenda do Capital do Trem</h2><p class="muted">Aqui ficarão os shows, bailes, encontros e atividades culturais, com data, horário, endereço e rota no mapa. A agenda pública ainda será conectada ao cadastro de eventos.</p><p class="muted">Quer divulgar um evento com a gente? Fale com a equipe pelo Instagram e envie cartaz, data, horário e local.</p><a class="btn" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Enviar evento para divulgação</a></div>
+<div class="card"><h2>📅 Agenda do Capital do Trem</h2><p class="muted">Aqui ficarão os shows, bailes, encontros e atividades culturais, com data, horário, endereço e rota no mapa. A agenda pública ainda será conectada ao cadastro de eventos.</p><p class="muted">Quer divulgar um evento com a gente? Prepare as informações abaixo e envie pelo Instagram junto com o cartaz.</p>
+<label for="event-name">Nome do evento</label><input id="event-name" maxlength="100" placeholder="Ex.: Baile da comunidade">
+<label for="event-date">Data</label><input id="event-date" type="date">
+<label for="event-time">Horário</label><input id="event-time" type="time">
+<label for="event-place">Local e endereço público do evento</label><input id="event-place" maxlength="180" placeholder="Rua, número, bairro e cidade">
+<label for="event-kind">Tipo de atividade</label><select id="event-kind"><option>Show / baile</option><option>Encontro cultural</option><option>Ação social</option><option>Outro</option></select>
+<label for="event-contact">Contato público do organizador (opcional)</label><input id="event-contact" maxlength="100" placeholder="Instagram ou telefone de divulgação">
+<button class="btn" id="copy-event" type="button">Copiar mensagem do evento</button>
+<p id="event-copy-status" class="muted" aria-live="polite">O formulário não publica nem envia seus dados. Ele apenas prepara uma mensagem para você copiar.</p>
+<a class="btn alt" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Abrir Instagram para enviar</a>
+<p class="muted">Lembre-se de anexar o cartaz ou a imagem do evento diretamente na conversa. Divulgue somente endereços públicos de eventos, nunca endereço residencial.</p>
+</div>
 </section>
 <section class="page" id="social"><div class="card"><h2>❤️ Ação social</h2><p>Um espaço para divulgar campanhas solidárias, arrecadações e iniciativas comunitárias.</p><p class="muted">As campanhas oficiais serão publicadas após implantação de moderação e canal administrativo. Para sugerir uma ação, envie uma apresentação com objetivo, responsável, data e local.</p><a class="btn" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Apresentar uma ação social</a></div></section>
 <section class="page" id="parcerias"><div class="card"><h2>🏆 Parcerias</h2><p>Comerciantes, marcas, produtores e apoiadores podem fortalecer o movimento.</p><a class="btn" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Fale com a equipe pelo Instagram</a></div></section>
@@ -61,6 +72,22 @@ tabs.forEach(t=>t.addEventListener('click',()=>go(t.dataset.page)));document.que
 document.getElementById('theme').onclick=()=>{document.body.classList.toggle('light');document.getElementById('theme').textContent=document.body.classList.contains('light')?'🌙 Escuro':'☀️ Claro';
 document.getElementById('theme').setAttribute('aria-pressed',String(document.body.classList.contains('light')));
 document.getElementById('theme-color').content=document.body.classList.contains('light')?'#f5f5f5':'#000000';};
+document.getElementById('copy-event').addEventListener('click',async()=>{
+ const name=document.getElementById('event-name').value.trim();
+ const date=document.getElementById('event-date').value;
+ const time=document.getElementById('event-time').value;
+ const place=document.getElementById('event-place').value.trim();
+ const kind=document.getElementById('event-kind').value;
+ const contact=document.getElementById('event-contact').value.trim();
+ const status=document.getElementById('event-copy-status');
+ if(!name||!date||!time||!place){status.textContent='Preencha nome, data, horário e local público para montar a mensagem.';return;}
+ const dateText=date.split('-').reverse().join('/');
+ const message='Olá, Capital do Trem! Gostaria de solicitar a divulgação deste evento.\n\nEvento: '+name+'\nTipo: '+kind+'\nData: '+dateText+'\nHorário: '+time+'\nLocal: '+place+(contact?'\nContato público: '+contact:'')+'\n\nVou anexar o cartaz para avaliação.\nObrigado(a)!';
+ try{
+  if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(message);status.textContent='Mensagem copiada! Agora abra o Instagram, envie a mensagem e anexe o cartaz.';}
+  else{window.prompt('Copie a mensagem abaixo e cole no Instagram:',message);status.textContent='Copie a mensagem exibida e envie pelo Instagram junto com o cartaz.';}
+ }catch(error){window.prompt('Copie a mensagem abaixo e cole no Instagram:',message);status.textContent='Copie a mensagem exibida e envie pelo Instagram junto com o cartaz.';}
+});
 document.getElementById('find-nearby').addEventListener('click',()=>{const status=document.getElementById('location-status'),mapLink=document.getElementById('nearby-map');mapLink.hidden=true;if(!navigator.geolocation){status.textContent='Este navegador não oferece acesso ao GPS. Tente abrir o site no Chrome do celular.';return;}status.textContent='Aguardando sua autorização para acessar a localização...';navigator.geolocation.getCurrentPosition(position=>{const lat=position.coords.latitude,lon=position.coords.longitude;mapLink.href='https://www.google.com/maps/search/shows+eventos+acoes+sociais/@'+lat+','+lon+',14z';mapLink.hidden=false;status.textContent='Localização encontrada! Abra o mapa para procurar opções logo ali de você. Seu endereço não será exibido no site.';},error=>{status.textContent=error.code===1?'Você não autorizou a localização. Se quiser, permita o acesso ao GPS nas configurações do navegador.':'Não foi possível encontrar sua localização agora. Confira se o GPS está ligado e tente novamente.';},{enableHighAccuracy:true,timeout:12000,maximumAge:300000});});
 
 // Compartilhar o site usando os recursos disponíveis no celular.
