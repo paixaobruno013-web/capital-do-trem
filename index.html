@@ -45,6 +45,7 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:24px}
 <label for="event-place">Local e endereço público do evento</label><input id="event-place" maxlength="180" required placeholder="Rua, número, bairro e cidade">
 <label for="event-kind">Tipo de atividade</label><select id="event-kind"><option>Show / baile</option><option>Encontro cultural</option><option>Ação social</option><option>Outro</option></select>
 <label for="event-contact">Contato público do organizador (opcional)</label><input id="event-contact" maxlength="100" placeholder="Instagram ou telefone de divulgação">
+<label for="event-poster">Cartaz do evento (opcional)</label><input id="event-poster" type="file" accept="image/*"><p class="muted">Escolha uma imagem de até 5 MB para conferir a prévia neste aparelho. Para enviar à equipe, anexe o cartaz manualmente no Instagram.</p><img id="event-poster-preview" alt="Prévia do cartaz do evento" hidden style="display:none;max-width:100%;max-height:300px;object-fit:contain;border-radius:12px;margin:8px 0;border:1px solid var(--line)"><p id="event-poster-status" class="muted" aria-live="polite">Nenhum cartaz selecionado.</p>
 <div class="item" aria-live="polite"><b>Prévia da divulgação</b><p id="event-preview" class="muted">Preencha os campos para visualizar como as informações ficarão organizadas.</p></div>
 <a id="event-map-link" class="btn alt" href="#" target="_blank" rel="noopener" hidden>Abrir endereço do evento no Google Maps</a>
 <a id="event-calendar-link" class="btn alt" href="#" target="_blank" rel="noopener" hidden>Abrir no Google Agenda</a>
@@ -134,11 +135,26 @@ eventFieldIds.forEach(id=>{
  field.addEventListener('input',updateEventPreview);
  field.addEventListener('change',updateEventPreview);
 });
+// Prévia opcional do cartaz: o arquivo permanece somente neste aparelho.
+let eventPosterObjectUrl='';
+document.getElementById('event-poster').addEventListener('change',event=>{
+ const file=event.target.files&&event.target.files[0];
+ const preview=document.getElementById('event-poster-preview');
+ const status=document.getElementById('event-poster-status');
+ if(eventPosterObjectUrl){URL.revokeObjectURL(eventPosterObjectUrl);eventPosterObjectUrl='';}
+ preview.removeAttribute('src');preview.hidden=true;preview.style.display='none';
+ if(!file){status.textContent='Nenhum cartaz selecionado.';return;}
+ if(!file.type.startsWith('image/')){event.target.value='';status.textContent='Escolha um arquivo de imagem.';return;}
+ if(file.size>5*1024*1024){event.target.value='';status.textContent='O cartaz precisa ter até 5 MB. Escolha uma imagem menor.';return;}
+ eventPosterObjectUrl=URL.createObjectURL(file);
+ preview.src=eventPosterObjectUrl;preview.hidden=false;preview.style.display='block';
+ status.textContent='Cartaz selecionado para prévia neste aparelho. Anexe-o manualmente ao enviar a solicitação pelo Instagram.';
+});
 const eventDateInput=document.getElementById('event-date');
 const today=new Date();
 const localToday=new Date(today.getTime()-today.getTimezoneOffset()*60000).toISOString().slice(0,10);
 eventDateInput.min=localToday;
-document.getElementById('clear-event').addEventListener('click',()=>{eventFieldIds.forEach(id=>{const field=document.getElementById(id);if(id==='event-kind')field.selectedIndex=0;else field.value='';});updateEventPreview();document.getElementById('event-copy-status').textContent='Formulário limpo. Você pode preparar uma nova divulgação.';document.getElementById('event-name').focus();});
+document.getElementById('clear-event').addEventListener('click',()=>{eventFieldIds.forEach(id=>{const field=document.getElementById(id);if(id==='event-kind')field.selectedIndex=0;else field.value='';});document.getElementById('event-poster').value='';if(eventPosterObjectUrl){URL.revokeObjectURL(eventPosterObjectUrl);eventPosterObjectUrl='';}const posterPreview=document.getElementById('event-poster-preview');posterPreview.removeAttribute('src');posterPreview.hidden=true;posterPreview.style.display='none';document.getElementById('event-poster-status').textContent='Nenhum cartaz selecionado.';updateEventPreview();document.getElementById('event-copy-status').textContent='Formulário limpo. Você pode preparar uma nova divulgação.';document.getElementById('event-name').focus();});
  document.getElementById('copy-event').addEventListener('click',async()=>{
  const name=document.getElementById('event-name').value.trim();
  const date=document.getElementById('event-date').value;
