@@ -47,6 +47,8 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:24px}
 <label for="event-contact">Contato público do organizador (opcional)</label><input id="event-contact" maxlength="100" placeholder="Instagram ou telefone de divulgação">
 <div class="item" aria-live="polite"><b>Prévia da divulgação</b><p id="event-preview" class="muted">Preencha os campos para visualizar como as informações ficarão organizadas.</p></div>
 <a id="event-map-link" class="btn alt" href="#" target="_blank" rel="noopener" hidden>Abrir endereço do evento no Google Maps</a>
+<a id="event-calendar-link" class="btn alt" href="#" target="_blank" rel="noopener" hidden>Abrir no Google Agenda</a>
+<p class="muted">O Google Agenda abrirá com duração inicial de 1 hora; você poderá ajustá-la antes de salvar.</p>
 <button class="btn" id="copy-event" type="button">Copiar mensagem do evento</button> <button class="btn alt" id="clear-event" type="button">Limpar formulário</button>
 <p id="event-copy-status" class="muted" aria-live="polite">O formulário não publica nem envia seus dados. Ele apenas prepara uma mensagem para você copiar.</p>
 <a class="btn alt" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Abrir Instagram para enviar</a>
@@ -109,6 +111,22 @@ function updateEventPreview(){
  }else{
   mapLink.href='#';
   mapLink.hidden=true;
+ }
+ const calendarLink=document.getElementById('event-calendar-link');
+ const eventName=value('event-name'),eventDate=value('event-date'),eventTime=value('event-time');
+ if(eventName&&eventDate&&eventTime&&place){
+  const [year,month,day]=eventDate.split('-').map(Number);
+  const [hour,minute]=eventTime.split(':').map(Number);
+  const start=new Date(year,month-1,day,hour,minute);
+  const end=new Date(start.getTime()+60*60*1000);
+  const stamp=d=>d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'T'+String(d.getHours()).padStart(2,'0')+String(d.getMinutes()).padStart(2,'0')+'00';
+  const details='Tipo: '+value('event-kind')+(value('event-contact')?'\\nContato público: '+value('event-contact'):'');
+  const params=new URLSearchParams({action:'TEMPLATE',text:eventName,dates:stamp(start)+'/'+stamp(end),details,location:place});
+  calendarLink.href='https://calendar.google.com/calendar/render?'+params.toString();
+  calendarLink.hidden=false;
+ }else{
+  calendarLink.href='#';
+  calendarLink.hidden=true;
  }
 }
 eventFieldIds.forEach(id=>{
