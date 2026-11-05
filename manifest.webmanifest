@@ -1,1 +1,19 @@
-{"name":"Capital do Trem","short_name":"Capital do Trem","start_url":".","display":"standalone","background_color":"#090909","theme_color":"#ed1c24","icons":[]}
+{
+  "name": "Capital do Trem",
+  "short_name": "Capital do Trem",
+  "description": "Música, cultura e comunidade.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#090909",
+  "theme_color": "#ed1c24",
+  "icons": [
+    {
+      "src": "./marca.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
