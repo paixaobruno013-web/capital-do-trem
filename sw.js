@@ -1,4 +1,4 @@
-const CACHE='capital-do-trem-v17';
+const CACHE='capital-do-trem-v18';
 const FILES=['./','./index.html','./admin.html','./marca.svg','./manifest.webmanifest','./privacidade.html'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)));
