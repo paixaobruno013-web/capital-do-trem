@@ -163,10 +163,6 @@ document.getElementById('event-poster').addEventListener('change',event=>{
  preview.src=eventPosterObjectUrl;preview.hidden=false;preview.style.display='block';
  status.textContent='Cartaz selecionado para prévia neste aparelho. Anexe-o manualmente ao enviar a solicitação pelo Instagram.';
 });
-const eventDateInput=document.getElementById('event-date');
-const today=new Date();
-const localToday=new Date(today.getTime()-today.getTimezoneOffset()*60000).toISOString().slice(0,10);
-eventDateInput.min=localToday;
 document.getElementById('clear-event').addEventListener('click',()=>{eventFieldIds.forEach(id=>{const field=document.getElementById(id);if(id==='event-kind')field.selectedIndex=0;else field.value='';});document.getElementById('event-poster').value='';if(eventPosterObjectUrl){URL.revokeObjectURL(eventPosterObjectUrl);eventPosterObjectUrl='';}const posterPreview=document.getElementById('event-poster-preview');posterPreview.removeAttribute('src');posterPreview.hidden=true;posterPreview.style.display='none';document.getElementById('event-poster-status').textContent='Nenhum cartaz selecionado.';updateEventPreview();document.getElementById('event-copy-status').textContent='Formulário limpo. Você pode preparar uma nova divulgação.';document.getElementById('event-name').focus();});
  // Compartilhamento voluntário do texto do evento pelo menu nativo do aparelho.
 document.getElementById('share-event').addEventListener('click',async()=>{
