@@ -56,7 +56,9 @@ footer{text-align:center;color:var(--muted);font-size:13px}
 <section class="card" id="profile-panel" hidden aria-labelledby="profile-title">
 <h2 id="profile-title">Sua área</h2>
 <p id="profile-welcome"></p>
-<p class="muted">Sua sessão está ativa. Preencha sua ficha para solicitar a publicação do seu perfil artístico.</p>
+<p class="muted">Sua sessão está ativa. Aqui você administra sua participação no Capital do Trem.</p>
+<div id="artist-profile-area" hidden>
+<h3>🎤 Minha ficha artística</h3><p class="muted">Preencha estes dados se sua conta for de artista. A ficha será enviada para análise.</p>
 <form id="artist-profile-form">
 <label for="artist-name">Nome artístico</label><input id="artist-name" maxlength="100" required>
 <label for="artist-style">Estilo musical</label><input id="artist-style" maxlength="80" placeholder="Ex.: Funk consciente, rap, pagode">
@@ -67,6 +69,7 @@ footer{text-align:center;color:var(--muted);font-size:13px}
 <button type="submit" id="save-artist">Salvar ficha para análise</button>
 <p id="artist-status" class="status" role="status" aria-live="polite"></p>
 </form>
+</div>
 <button type="button" class="secondary" id="sign-out">Sair da conta</button>
 <p id="session-status" class="status" role="status" aria-live="polite"></p>
 </section>
@@ -144,6 +147,7 @@ const profileWelcome=document.getElementById('profile-welcome');
 const sessionStatus=document.getElementById('session-status');
 const signOutButton=document.getElementById('sign-out');
 const artistForm=document.getElementById('artist-profile-form');
+const artistProfileArea=document.getElementById('artist-profile-area');
 const artistStatus=document.getElementById('artist-status');
 const eventPanel=document.getElementById('event-panel');
 const postPanel=document.getElementById('post-panel');
@@ -173,6 +177,7 @@ function showSession(session){
     if(auth){loadBasicProfile();loadArtistProfile();loadMyEvents();}
   }else{
     profilePanel.hidden=true;accessPanel.hidden=false;eventPanel.hidden=true;postPanel.hidden=true;basicProfilePanel.hidden=true;
+    if(artistProfileArea)artistProfileArea.hidden=true;
     if(artistForm)artistForm.reset();
     if(eventForm)eventForm.reset();
   }
@@ -183,10 +188,11 @@ async function loadBasicProfile(){
   const profile=await auth.getMyBasicProfile();
   document.getElementById('basic-display-name').value=profile?.display_name||'';
   document.getElementById('basic-account-type').value=profile?.account_type||'user';
+  artistProfileArea.hidden=(profile?.account_type||'user')!=='artist';
   document.getElementById('basic-city').value=profile?.city||'';
   document.getElementById('basic-bio').value=profile?.bio||'';
   document.getElementById('basic-public').checked=profile?.is_public===true;
- }catch(error){basicProfileStatus.textContent='Não foi possível carregar seu perfil básico. Confira se a atualização do banco foi aplicada.';}
+ }catch(error){artistProfileArea.hidden=true;basicProfileStatus.textContent='Não foi possível carregar seu perfil básico. Confira se a atualização do banco foi aplicada.';}
 }
 basicProfileForm.addEventListener('submit',async event=>{
  event.preventDefault();
@@ -200,6 +206,7 @@ basicProfileForm.addEventListener('submit',async event=>{
    bio:document.getElementById('basic-bio').value,
    is_public:document.getElementById('basic-public').checked
   });
+  artistProfileArea.hidden=document.getElementById('basic-account-type').value!=='artist';
   basicProfileStatus.textContent='Perfil salvo! '+(document.getElementById('basic-public').checked?'Ele poderá aparecer no diretório público.':'Ele ficará visível somente para você.');
  }catch(error){basicProfileStatus.textContent=error?.message||'Não foi possível salvar seu perfil.';}
  finally{button.disabled=false;}
