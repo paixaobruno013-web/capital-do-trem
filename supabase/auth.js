@@ -85,3 +85,43 @@ export function watchAuthChanges(callback) {
   });
   return () => data.subscription.unsubscribe();
 }
+
+
+// Perfil público do artista — sempre limitado ao usuário autenticado pelas políticas RLS.
+export async function getMyArtistProfile() {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para acessar o perfil.');
+  const { data, error } = await supabase
+    .from('artists')
+    .select('id, artist_name, style, city, instagram, youtube, bio, photo_url, status')
+    .eq('user_id', user.id)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function saveMyArtistProfile(profile) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para salvar o perfil.');
+  const payload = {
+    user_id: user.id,
+    artist_name: String(profile.artist_name || '').trim(),
+    style: String(profile.style || '').trim(),
+    city: String(profile.city || '').trim(),
+    instagram: String(profile.instagram || '').trim(),
+    youtube: String(profile.youtube || '').trim(),
+    bio: String(profile.bio || '').trim(),
+    status: 'pending'
+  };
+  const { data, error } = await supabase
+    .from('artists')
+    .upsert(payload, { onConflict: 'user_id' })
+    .select('id, artist_name, style, city, instagram, youtube, bio, photo_url, status')
+    .single();
+  if (error) throw error;
+  return data;
+}
