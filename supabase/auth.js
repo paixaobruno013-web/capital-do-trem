@@ -38,7 +38,7 @@ export async function registerAccount({ email, password, displayName, accountTyp
     email: email.trim(),
     password,
     options: {
-      data: { name: String(displayName || '').trim().slice(0, 80), account_type: accountType === 'artist' ? 'artist' : 'fan' },
+      data: { name: String(displayName || '').trim().slice(0, 80), account_type: accountType === 'artist' ? 'artist' : 'user' },
       emailRedirectTo: window.location.href
     }
   });
@@ -265,7 +265,7 @@ export async function saveMyBasicProfile(profile) {
   const payload = {
     user_id: user.id,
     display_name: String(profile.display_name || '').trim().slice(0, 80),
-    account_type: profile.account_type === 'artist' ? 'artist' : 'fan',
+    account_type: profile.account_type === 'artist' ? 'artist' : 'user',
     bio: String(profile.bio || '').trim().slice(0, 500),
     city: String(profile.city || '').trim().slice(0, 100),
     is_public: profile.is_public === true
