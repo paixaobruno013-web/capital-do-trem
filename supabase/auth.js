@@ -298,10 +298,21 @@ export async function getPublishedSongs() {
     .eq('status','published').order('created_at',{ascending:false}).limit(100);
   if (error) throw error;
   const songs = await Promise.all((data || []).map(async song => {
-    const { data: signed, error: signedError } = await supabase.storage
-      .from('capital-do-trem-audio').createSignedUrl(song.storage_path, 60 * 60);
+    const storage = supabase.storage.from('capital-do-trem-audio');
+    const [{ data: signed, error: signedError }, { data: downloadable, error: downloadError }] = await Promise.all([
+      storage.createSignedUrl(song.storage_path, 60 * 60),
+      storage.createSignedUrl(song.storage_path, 60 * 60, { download: true })
+    ]);
     if (signedError) throw signedError;
-    return { id:song.id,title:song.title,artist_name:song.artist_name,description:song.description,audio_url:signed.signedUrl };
+    if (downloadError) throw downloadError;
+    return {
+      id:song.id,
+      title:song.title,
+      artist_name:song.artist_name,
+      description:song.description,
+      audio_url:signed.signedUrl,
+      download_url:downloadable.signedUrl
+    };
   }));
   return songs;
 }
