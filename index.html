@@ -57,7 +57,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 <a id="event-map-link" class="btn alt" href="#" target="_blank" rel="noopener" hidden>Abrir endereço do evento no Google Maps</a>
 <a id="event-calendar-link" class="btn alt" href="#" target="_blank" rel="noopener" hidden>Abrir no Google Agenda</a>
 <p class="muted">O Google Agenda abrirá com duração inicial de 1 hora; você poderá ajustá-la antes de salvar.</p>
-<button class="btn" id="copy-event" type="button">Copiar mensagem do evento</button> <button class="btn alt" id="clear-event" type="button">Limpar formulário</button>
+<button class="btn" id="copy-event" type="button">Copiar mensagem do evento</button> <button class="btn alt" id="share-event" type="button">Compartilhar evento</button> <button class="btn alt" id="clear-event" type="button">Limpar formulário</button>
 <p id="event-copy-status" class="muted" aria-live="polite">O formulário não publica nem envia seus dados. Ele apenas prepara uma mensagem para você copiar.</p>
 <a class="btn alt" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Abrir Instagram para enviar</a>
 <p class="muted">Lembre-se de anexar o cartaz ou a imagem do evento diretamente na conversa. Divulgue somente endereços públicos de eventos, nunca endereço residencial.</p>
@@ -74,7 +74,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 <label for="artist-youtube">YouTube (link do canal ou vídeo)</label><input id="artist-youtube" maxlength="180" placeholder="https://youtube.com/...">
 <label for="artist-bio">Apresentação breve</label><textarea id="artist-bio" maxlength="500" placeholder="Conte um pouco sobre sua caminhada e seu trabalho"></textarea>
 <div class="notice" aria-live="polite"><strong>Prévia da apresentação</strong><p id="artist-preview" class="muted">Seu nome artístico e suas informações aparecerão aqui enquanto você preenche.</p></div>
-<button class="btn" id="artist-copy">Copiar apresentação</button><button class="btn alt" id="artist-clear" type="button">Limpar campos</button>
+<button class="btn" id="artist-copy" type="button">Copiar apresentação</button><button class="btn alt" id="share-artist" type="button">Compartilhar apresentação</button><button class="btn alt" id="artist-clear" type="button">Limpar campos</button>
 <p id="artist-status" class="muted" aria-live="polite"></p></div>
 </section>
 <section class="page" id="parcerias"><div class="card"><h2>🏆 Parcerias</h2><p>Comerciantes, marcas, produtores e apoiadores podem fortalecer o movimento.</p><a class="btn" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Fale com a equipe pelo Instagram</a></div></section>
@@ -162,7 +162,20 @@ const today=new Date();
 const localToday=new Date(today.getTime()-today.getTimezoneOffset()*60000).toISOString().slice(0,10);
 eventDateInput.min=localToday;
 document.getElementById('clear-event').addEventListener('click',()=>{eventFieldIds.forEach(id=>{const field=document.getElementById(id);if(id==='event-kind')field.selectedIndex=0;else field.value='';});document.getElementById('event-poster').value='';if(eventPosterObjectUrl){URL.revokeObjectURL(eventPosterObjectUrl);eventPosterObjectUrl='';}const posterPreview=document.getElementById('event-poster-preview');posterPreview.removeAttribute('src');posterPreview.hidden=true;posterPreview.style.display='none';document.getElementById('event-poster-status').textContent='Nenhum cartaz selecionado.';updateEventPreview();document.getElementById('event-copy-status').textContent='Formulário limpo. Você pode preparar uma nova divulgação.';document.getElementById('event-name').focus();});
- document.getElementById('copy-event').addEventListener('click',async()=>{
+ // Compartilhamento voluntário do texto do evento pelo menu nativo do aparelho.
+document.getElementById('share-event').addEventListener('click',async()=>{
+ const value=id=>document.getElementById(id).value.trim();
+ const status=document.getElementById('event-copy-status');
+ if(!document.getElementById('event-name').reportValidity()||!document.getElementById('event-date').reportValidity()||!document.getElementById('event-time').reportValidity()||!document.getElementById('event-place').reportValidity()){status.textContent='Confira os campos obrigatórios destacados.';return;}
+ const date=value('event-date').split('-').reverse().join('/');
+ const message='📣 '+value('event-name')+'\n'+value('event-kind')+'\n📅 '+date+' às '+value('event-time')+'\n📍 '+value('event-place')+(value('event-contact')?'\nContato: '+value('event-contact'):'')+'\n\nDivulgação preparada no Capital do Trem — A música da nossa quebrada!';
+ try{
+  if(navigator.share){await navigator.share({title:value('event-name'),text:message});status.textContent='Compartilhamento aberto. Escolha o aplicativo ou contato para enviar.';}
+  else if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(message);status.textContent='Texto do evento copiado! Agora é só colar no aplicativo desejado.';}
+  else{window.prompt('Copie o texto do evento:',message);status.textContent='Copie o texto exibido para compartilhar.';}
+ }catch(error){if(error.name!=='AbortError')status.textContent='Não foi possível compartilhar agora. Você pode usar “Copiar mensagem do evento”.';}
+});
+document.getElementById('copy-event').addEventListener('click',async()=>{
  const name=document.getElementById('event-name').value.trim();
  const date=document.getElementById('event-date').value;
  const time=document.getElementById('event-time').value;
@@ -210,6 +223,18 @@ function updateArtistPreview(){
  field.addEventListener('change',updateArtistPreview);
 });
 // Apresentação de artistas: prepara texto local para envio voluntário pelo Instagram.
+// Compartilhamento voluntário da apresentação do artista pelo menu nativo.
+document.getElementById('share-artist').addEventListener('click',async()=>{
+ const val=id=>document.getElementById(id).value.trim();
+ const status=document.getElementById('artist-status');
+ if(!document.getElementById('artist-name').reportValidity()||!document.getElementById('artist-style').reportValidity()){status.textContent='Informe seu nome artístico e escolha o estilo musical.';return;}
+ const message='🎤 '+val('artist-name')+' — '+val('artist-style')+(val('artist-city')?'\n📍 '+val('artist-city'):'')+(val('artist-instagram')?'\nInstagram: '+val('artist-instagram'):'')+(val('artist-youtube')?'\nYouTube: '+val('artist-youtube'):'')+(val('artist-bio')?'\n'+val('artist-bio'):'')+'\n\nConheça o Capital do Trem — A música da nossa quebrada!';
+ try{
+  if(navigator.share){await navigator.share({title:'Artista: '+val('artist-name'),text:message});status.textContent='Compartilhamento aberto. Escolha onde deseja divulgar sua apresentação.';}
+  else if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(message);status.textContent='Apresentação copiada! Agora é só colar no aplicativo desejado.';}
+  else{window.prompt('Copie sua apresentação para compartilhar:',message);status.textContent='Copie o texto exibido para compartilhar.';}
+ }catch(error){if(error.name!=='AbortError')status.textContent='Não foi possível compartilhar agora. Você ainda pode usar “Copiar apresentação”.';}
+});
 document.getElementById('artist-copy').addEventListener('click',async()=>{
  const val=id=>document.getElementById(id).value.trim();
  const name=val('artist-name'),style=val('artist-style'),status=document.getElementById('artist-status');
