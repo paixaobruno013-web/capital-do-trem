@@ -32,7 +32,7 @@ export function initSupabase() {
   return client;
 }
 
-export async function registerAccount({ email, password, displayName, accountType = 'fan' }) {
+export async function registerAccount({ email, password, displayName, accountType = 'user' }) {
   const supabase = initSupabase();
   const { data, error } = await supabase.auth.signUp({
     email: email.trim(),
