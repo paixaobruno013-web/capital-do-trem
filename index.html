@@ -362,8 +362,24 @@ updateConnectionStatus();
    const links=document.createElement('div');links.className='social';
    for(const [label,value] of [['Instagram',artist.instagram],['YouTube',artist.youtube]]){
     if(!value)continue;
-    const raw=value.trim();const href=raw.startsWith('@')?'https://www.instagram.com/'+raw.slice(1):raw.startsWith('http://')||raw.startsWith('https://')?raw:label==='Instagram'?'https://www.instagram.com/'+raw.replace(/^\\//,''):'https://www.youtube.com/results?search_query='+encodeURIComponent(raw);
-    try{const url=new URL(href);if(!['https:'].includes(url.protocol))continue;const link=document.createElement('a');link.className='btn alt';link.href=url.href;link.target='_blank';link.rel='noopener noreferrer';link.textContent=label;links.append(link);}catch{}
+    const raw=String(value).trim();
+    let href='';
+    if(label==='Instagram'){
+     const handle=raw.startsWith('@')?raw.slice(1):raw;
+     href=/^[A-Za-z0-9._]{1,30}$/.test(handle)?'https://www.instagram.com/'+handle+'/':raw;
+    }else{
+     href=/^[A-Za-z0-9_-]{3,100}$/.test(raw)?'https://www.youtube.com/results?search_query='+encodeURIComponent(raw):raw;
+    }
+    try{
+     const url=new URL(href);
+     const host=url.hostname.toLowerCase();
+     const allowed= url.protocol==='https:' && (
+      label==='Instagram' ? (host==='instagram.com'||host==='www.instagram.com') :
+      (host==='youtube.com'||host==='www.youtube.com'||host==='m.youtube.com'||host==='youtu.be')
+     );
+     if(!allowed)continue;
+     const link=document.createElement('a');link.className='btn alt';link.href=url.href;link.target='_blank';link.rel='noopener noreferrer';link.textContent=label;links.append(link);
+    }catch{}
    }
    if(links.childElementCount)card.append(links);
    container.append(card);
