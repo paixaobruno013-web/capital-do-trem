@@ -287,3 +287,17 @@ export async function getPublicProfiles() {
   if (error) throw error;
   return data || [];
 }
+
+
+// Vitrine pública: somente perfis de artistas aprovados pela equipe.
+export async function getPublishedArtists() {
+  const supabase = initSupabase();
+  const { data, error } = await supabase
+    .from('artists')
+    .select('id, artist_name, style, city, instagram, youtube, bio, photo_url')
+    .eq('status', 'published')
+    .order('artist_name', { ascending: true })
+    .limit(100);
+  if (error) throw error;
+  return data || [];
+}
