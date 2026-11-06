@@ -64,7 +64,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 </div>
 </section>
 <section class="page" id="comunidade">
-<div class="card"><h2>👥 Nossa comunidade</h2><p class="muted">Um espaço para fãs, artistas e todos que fazem parte do Capital do Trem. Cada pessoa escolhe se quer deixar seu perfil visível.</p><a class="btn" href="./conta.html">Criar minha conta / Meu perfil</a></div>
+<div class="card"><h2>👥 Nossa comunidade</h2><p class="muted">Um espaço para usuários Uai, artistas e todos que fazem parte do Capital do Trem. Cada pessoa escolhe se quer deixar seu perfil visível.</p><a class="btn" href="./conta.html">Criar minha conta / Meu perfil</a></div>
 <div class="card"><h3>Perfis públicos</h3><div id="community-profiles" class="list" aria-live="polite"><p class="muted">Os perfis públicos aparecerão aqui quando o banco estiver conectado.</p></div></div>
 </section>
 <section class="page" id="social"><div class="card"><h2>❤️ Ação social</h2><p>Um espaço para divulgar campanhas solidárias, arrecadações e iniciativas comunitárias.</p><p class="muted">As campanhas oficiais serão publicadas após implantação de moderação e canal administrativo. Para sugerir uma ação, envie uma apresentação com objetivo, responsável, data e local.</p><a class="btn" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Apresentar uma ação social</a></div></section>
@@ -337,7 +337,7 @@ updateConnectionStatus();
   for(const profile of profiles){
    const card=document.createElement('article');card.className='item';
    const name=document.createElement('strong');name.textContent=profile.display_name||'Participante do Capital do Trem';
-   const role=document.createElement('p');role.className='muted';role.textContent=profile.account_type==='artist'?'Artista':'Fã / usuário';
+   const role=document.createElement('p');role.className='muted';role.textContent=profile.account_type==='artist'?'Artista':'Usuário Uai';
    card.append(name,role);
    if(profile.city){const city=document.createElement('p');city.textContent=profile.city;card.append(city);}
    if(profile.bio){const bio=document.createElement('p');bio.textContent=profile.bio;card.append(bio);}
