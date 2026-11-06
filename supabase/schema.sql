@@ -21,7 +21,6 @@ alter table public.profiles add column if not exists account_type text not null 
 alter table public.profiles add column if not exists bio text not null default '';
 alter table public.profiles add column if not exists city text not null default '';
 alter table public.profiles add column if not exists is_public boolean not null default false;
-update public.profiles set account_type = 'user' where account_type = 'user';
 alter table public.profiles alter column account_type set default 'user';
 update public.profiles set account_type = 'user' where account_type = 'fan';
 alter table public.profiles drop constraint if exists profiles_account_type_check;
@@ -133,6 +132,7 @@ alter table public.posts enable row level security;
 
 -- Permissões de tabela: o RLS continua controlando cada linha.
 grant select, insert, update on public.profiles to authenticated;
+grant select on public.profiles to anon;
 grant select on public.events, public.artists, public.posts to anon, authenticated;
 grant insert, update, delete on public.events, public.artists, public.posts to authenticated;
 
