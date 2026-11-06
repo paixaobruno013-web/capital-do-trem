@@ -214,3 +214,32 @@ export async function getPublishedEvents() {
   if (error) throw error;
   return data || [];
 }
+
+// Envia uma divulgação autenticada para análise; novas publicações começam pendentes.
+export async function submitMyPost(content) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para enviar uma divulgação.');
+  const cleanContent = String(content || '').trim();
+  if (cleanContent.length < 1 || cleanContent.length > 1500) {
+    throw new Error('A divulgação deve ter entre 1 e 1.500 caracteres.');
+  }
+  const { data, error } = await supabase.from('posts')
+    .insert({ author_id: user.id, content: cleanContent, status: 'pending' })
+    .select('id, content, status, created_at').single();
+  if (error) throw error;
+  return data;
+}
+
+// Mural público: visitantes só recebem divulgações aprovadas.
+export async function getPublishedPosts() {
+  const supabase = initSupabase();
+  const { data, error } = await supabase.from('posts')
+    .select('id, content, created_at')
+    .eq('status', 'published')
+    .order('created_at', { ascending: false })
+    .limit(50);
+  if (error) throw error;
+  return data || [];
+}
