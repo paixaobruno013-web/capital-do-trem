@@ -234,6 +234,60 @@ create policy "posts_delete_own_pending_or_admin" on public.posts
     or (select public.is_admin())
   );
 
+-- Armazenamento público de cartazes e fotos.
+-- Os arquivos ficam em pastas com o UUID do usuário que fez o envio.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'capital-do-trem-media',
+  'capital-do-trem-media',
+  true,
+  5242880,
+  array['image/jpeg', 'image/png', 'image/webp']
+)
+on conflict (id) do update
+set public = excluded.public,
+    file_size_limit = excluded.file_size_limit,
+    allowed_mime_types = excluded.allowed_mime_types;
+
+-- Leitura pública dos arquivos do bucket (necessária para cartazes/fotos aprovados).
+drop policy if exists "media_public_read" on storage.objects;
+create policy "media_public_read" on storage.objects
+  for select to anon, authenticated
+  using (bucket_id = 'capital-do-trem-media');
+
+-- Cada usuário autenticado só pode enviar arquivos para a própria pasta.
+drop policy if exists "media_upload_own_folder" on storage.objects;
+create policy "media_upload_own_folder" on storage.objects
+  for insert to authenticated
+  with check (
+    bucket_id = 'capital-do-trem-media'
+    and (storage.foldername(name))[1] = (select auth.uid())::text
+  );
+
+-- O usuário só pode substituir ou apagar arquivos da própria pasta.
+drop policy if exists "media_update_own_folder" on storage.objects;
+create policy "media_update_own_folder" on storage.objects
+  for update to authenticated
+  using (
+    bucket_id = 'capital-do-trem-media'
+    and (storage.foldername(name))[1] = (select auth.uid())::text
+  )
+  with check (
+    bucket_id = 'capital-do-trem-media'
+    and (storage.foldername(name))[1] = (select auth.uid())::text
+  );
+
+drop policy if exists "media_delete_own_or_admin" on storage.objects;
+create policy "media_delete_own_or_admin" on storage.objects
+  for delete to authenticated
+  using (
+    bucket_id = 'capital-do-trem-media'
+    and (
+      (storage.foldername(name))[1] = (select auth.uid())::text
+      or (select public.is_admin())
+    )
+  );
+
 -- IMPORTANTE: não coloque a chave service_role no site ou no aplicativo.
 -- Cadastre o primeiro administrador manualmente em admin_users, usando o UUID
 -- do usuário já cadastrado no Supabase. Nunca permita que o cliente altere essa tabela.
