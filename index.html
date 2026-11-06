@@ -48,6 +48,17 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @keyframes intro-screen-out{0%,78%{opacity:1}100%{opacity:0;visibility:hidden}}
 @media(prefers-reduced-motion:reduce){.intro-smoke{display:none!important}}
 
+
+/* Identidade LED vermelha: brilho controlado para destacar sem cansar a leitura. */
+.brand,.hero h2,.card h3{ text-shadow:0 0 8px rgba(255,20,42,.22),0 0 18px rgba(237,28,36,.16) }
+.btn,nav button.active{box-shadow:0 0 8px rgba(255,0,32,.48),0 0 20px rgba(237,28,36,.22),inset 0 0 8px rgba(255,255,255,.08)}
+nav button.active{border-color:#ff3345}
+.btn:not(.alt):hover,nav button.active:hover{box-shadow:0 0 12px rgba(255,20,42,.7),0 0 28px rgba(237,28,36,.34)}
+input:focus,textarea:focus,select:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(237,28,36,.18),0 0 14px rgba(237,28,36,.16);outline:none}
+button:focus-visible,a:focus-visible{box-shadow:0 0 0 3px rgba(237,28,36,.22),0 0 16px rgba(237,28,36,.3)}
+.connection-status{box-shadow:0 0 12px rgba(237,28,36,.12)}
+body.light .brand,body.light .hero h2,body.light .card h3{text-shadow:0 0 10px rgba(237,28,36,.12)}
+
 </style></head>
 <body>
 <script>
