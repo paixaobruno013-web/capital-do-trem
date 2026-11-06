@@ -150,18 +150,35 @@ function makeNoiseBuffer(ctx,duration=1){
  return buffer;
 }
 function playIntroHorn(ctx,master,start){
- const filter=ctx.createBiquadFilter();filter.type='lowpass';filter.frequency.setValueAtTime(1050,start);filter.Q.value=.7;filter.connect(master);
- [[110,0],[146.83,-7],[220,5]].forEach(([frequency,detune])=>{
+ // Buzina sintetizada com mais corpo: duas notas graves, harmônicos e sopro.
+ // Mantém a vinheta leve para celulares e sem depender de arquivo externo.
+ const hornBus=ctx.createGain();
+ hornBus.gain.setValueAtTime(.0001,start);
+ hornBus.gain.linearRampToValueAtTime(.72,start+.18);
+ hornBus.gain.setValueAtTime(.72,start+1.55);
+ hornBus.gain.linearRampToValueAtTime(.0001,start+2.12);
+ const warmth=ctx.createBiquadFilter();warmth.type='lowpass';warmth.frequency.setValueAtTime(1850,start);warmth.Q.value=.55;
+ const presence=ctx.createBiquadFilter();presence.type='peaking';presence.frequency.value=680;presence.Q.value=.8;presence.gain.value=3.5;
+ hornBus.connect(warmth);warmth.connect(presence);presence.connect(master);
+ // Acorde típico de buzina ferroviária, com pequenas diferenças de afinação.
+ [[110,0,.19],[146.83,-5,.15],[164.81,4,.12],[220,-8,.045]].forEach(([frequency,detune,level],index)=>{
   const osc=ctx.createOscillator(),gain=ctx.createGain();
-  osc.type='sawtooth';osc.frequency.setValueAtTime(frequency,start);osc.detune.setValueAtTime(detune,start);
-  gain.gain.setValueAtTime(.0001,start);gain.gain.linearRampToValueAtTime(.105,start+.12);
-  gain.gain.setValueAtTime(.105,start+1.45);gain.gain.linearRampToValueAtTime(.0001,start+1.95);
-  osc.connect(gain);gain.connect(filter);osc.start(start);osc.stop(start+2.02);
+  osc.type='sawtooth';
+  osc.frequency.setValueAtTime(frequency*.985,start);
+  osc.frequency.linearRampToValueAtTime(frequency,start+.22);
+  osc.detune.setValueAtTime(detune,start);
+  gain.gain.setValueAtTime(.0001,start);
+  gain.gain.linearRampToValueAtTime(level,start+.16);
+  gain.gain.setValueAtTime(level,start+1.5);
+  gain.gain.linearRampToValueAtTime(.0001,start+2.08);
+  osc.connect(gain);gain.connect(hornBus);osc.start(start);osc.stop(start+2.1);
  });
+ // Camada de ar/ruído grave para dar sensação de sopro mecânico.
  const air=ctx.createBufferSource(),airFilter=ctx.createBiquadFilter(),airGain=ctx.createGain();
- air.buffer=makeNoiseBuffer(ctx,2);airFilter.type='lowpass';airFilter.frequency.value=520;
- airGain.gain.setValueAtTime(.0001,start);airGain.gain.linearRampToValueAtTime(.055,start+.2);airGain.gain.linearRampToValueAtTime(.0001,start+1.9);
- air.connect(airFilter);airFilter.connect(airGain);airGain.connect(master);air.start(start);air.stop(start+2);
+ air.buffer=makeNoiseBuffer(ctx,2.15);airFilter.type='bandpass';airFilter.frequency.setValueAtTime(430,start);airFilter.Q.value=.55;
+ airGain.gain.setValueAtTime(.0001,start);airGain.gain.linearRampToValueAtTime(.095,start+.22);
+ airGain.gain.setValueAtTime(.095,start+1.45);airGain.gain.linearRampToValueAtTime(.0001,start+2.05);
+ air.connect(airFilter);airFilter.connect(airGain);airGain.connect(hornBus);air.start(start);air.stop(start+2.1);
 }
 function playKick(ctx,master,at,level=1){
  const osc=ctx.createOscillator(),gain=ctx.createGain();
