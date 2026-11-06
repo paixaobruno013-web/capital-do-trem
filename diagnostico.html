@@ -75,8 +75,9 @@ button.addEventListener('click',async()=>{
   show('Armazenamento de imagens',true,'O espaço de mídia respondeu à consulta.');passed++;
  }catch(error){show('Armazenamento de imagens',false,error.message||'Espaço de mídia não encontrado ou sem acesso.');}
  try{
-  await client.storage.from('capital-do-trem-audio').list('',{limit:1});
-  show('Armazenamento de músicas','', 'Verificação de acesso ao espaço de áudio concluída.');
+  const {error}=await client.storage.from('capital-do-trem-audio').list('',{limit:1});
+  if(error) throw error;
+  show('Armazenamento de músicas',true,'O espaço privado de áudio respondeu à consulta.');passed++;
  }catch(error){show('Armazenamento de músicas',false,error.message||'Espaço de áudio não encontrado ou sem acesso.');}
  const total=checks.length+3;
  overall.textContent=passed===total?'Tudo certo: conexão, tabelas e armazenamento responderam.':'Resultado: '+passed+' de '+total+' verificações passaram. Veja os itens acima.';
