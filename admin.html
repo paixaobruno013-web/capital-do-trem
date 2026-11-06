@@ -1,39 +1,98 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#090909">
-<title>Logo e administração • Capital do Trem</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#000000"><meta name="description" content="Painel de administração do Capital do Trem.">
+<title>Administração — Capital do Trem</title>
 <style>
-:root{color-scheme:dark;--bg:#090909;--panel:#191919;--fg:#fff;--muted:#bbb;--red:#ed1c24;--line:#383838}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,Arial,sans-serif;padding:20px}
-main{max-width:620px;margin:24px auto}.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;margin:14px 0}
-h1{font-size:26px;line-height:1.2;margin:0 0 10px}p{color:var(--muted)}
-.btn{display:inline-block;padding:12px 17px;border-radius:10px;background:var(--red);color:white;font-weight:800;text-decoration:none}
-.secondary{background:#292929;border:1px solid var(--line)}
-.step{display:flex;gap:12px;margin:16px 0}.num{flex:0 0 32px;height:32px;border-radius:50%;background:var(--red);display:grid;place-items:center;font-weight:900}
-small{color:var(--muted)}
+:root{color-scheme:dark;--bg:#000;--panel:#111;--panel2:#191919;--fg:#fff;--muted:#aaa;--red:#ed1c24;--line:#333}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,Arial,sans-serif}
+main{max-width:900px;margin:auto;padding:20px}header{padding:18px 0;border-bottom:1px solid var(--line)}
+h1{margin:0;font-size:clamp(25px,5vw,36px)}h2{margin-top:0}
+.card,.item{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px;margin:15px 0}
+label{display:block;font-weight:700;margin:12px 0 5px}input{width:100%;padding:13px;border-radius:9px;border:1px solid var(--line);background:#080808;color:#fff;font:inherit}
+button,.btn{display:inline-block;min-height:44px;padding:10px 15px;border:0;border-radius:9px;background:var(--red);color:#fff;font:inherit;font-weight:800;text-decoration:none;cursor:pointer;margin:5px 5px 5px 0}
+button.secondary,.btn.secondary{background:var(--panel2);border:1px solid var(--line)}
+button:disabled{opacity:.5;cursor:not-allowed}.muted,.status{color:var(--muted)}.notice{padding:13px;background:var(--panel2);border-left:4px solid var(--red);border-radius:8px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.item p{overflow-wrap:anywhere} [hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--red);outline-offset:3px}
 </style>
 </head>
 <body><main>
-<a class="btn secondary" href="./">← Voltar ao Capital do Trem</a>
-<section class="card">
-<h1>Administração do Capital do Trem</h1>
-<p>Esta área está em uma versão simplificada. O acesso automático com senha ou link ainda não foi ativado, então não peça nem digite códigos aqui.</p>
-<div class="step"><span class="num">1</span><div><b>Quer trocar a logo?</b><p>Envie a nova imagem nesta conversa do ChatGPT e escreva: “Trocar a logo do Capital do Trem”.</p></div></div>
-<div class="step"><span class="num">2</span><div><b>A publicação será feita no site</b><p>Posso substituir o arquivo da marca diretamente no repositório conectado e atualizar a página pública.</p></div></div>
-<div class="step"><span class="num">3</span><div><b>Confira a alteração</b><p>Depois da publicação, abra novamente o site. Pode ser necessário atualizar a página do navegador.</p></div></div>
-<p><b>Importante:</b> este painel é informativo. Ele não recebe uploads, não altera eventos e não oferece login administrativo independente.</p>
+<header><a class="btn secondary" href="./">← Voltar ao site</a><h1>Painel administrativo</h1><p class="muted">Capital do Trem • análise de artistas, eventos e divulgações</p></header>
+<section class="card" id="login-panel">
+<h2>Acesso da equipe</h2><p class="notice">Entre com uma conta previamente autorizada como administradora. Criar uma conta comum não concede acesso administrativo.</p>
+<form id="login-form">
+<label for="admin-email">E-mail</label><input id="admin-email" type="email" autocomplete="username" required>
+<label for="admin-password">Senha</label><input id="admin-password" type="password" autocomplete="current-password" required>
+<button id="login-button" type="submit">Entrar no painel</button>
+<p id="login-status" class="status" role="status" aria-live="polite"></p>
+</form></section>
+<section class="card" id="dashboard" hidden>
+<div class="actions"><button id="refresh-queue" type="button">Atualizar fila</button><button id="logout" class="secondary" type="button">Sair</button></div>
+<p id="admin-welcome" class="muted"></p><p id="queue-status" class="status" role="status" aria-live="polite"></p>
+<div id="queue"></div>
 </section>
-<section class="card">
-<h2>Etapas do projeto</h2>
-<div class="step"><span class="num">✓</span><div><b>Já disponível na demonstração</b><p>Site responsivo, modo escuro e claro, navegação, player de áudio local, compartilhamento, instalação quando suportada, página de privacidade e busca “Logo Ali” com GPS autorizado pela pessoa.</p></div></div>
-<div class="step"><span class="num">2</span><div><b>Próximas etapas de desenvolvimento</b><p>Cadastro e login protegidos, perfis de artistas, painel administrativo real, envio de cartazes e fotos, agenda de eventos compartilhada e moderação de publicações.</p></div></div>
-<div class="step"><span class="num">3</span><div><b>Antes de abrir cadastros ao público</b><p>Conectar um servidor e banco de dados, configurar permissões, proteger dados pessoais e testar os fluxos de publicação e administração.</p></div></div>
-<p>As funções listadas como próximas etapas ainda não estão ativas. A demonstração atual não recebe cadastros nem publicações compartilhadas.</p>
-<a class="btn" href="https://paixaobruno013-web.github.io/capital-do-trem/">Abrir o site</a>
-<a class="btn secondary" href="./privacidade.html">Ver privacidade</a>
-</section>
-<small>Capital do Trem • Área informativa de administração</small>
-</main></body></html>
+<section class="card"><h2>Segurança</h2><p class="muted">O painel verifica a permissão de administrador no banco de dados. As ações também são protegidas pelas políticas RLS do Supabase. Não use nem publique a chave service_role no navegador.</p></section>
+<footer class="muted">Capital do Trem • painel em preparação</footer>
+</main>
+<script type="module">
+const loginPanel=document.getElementById('login-panel'),dashboard=document.getElementById('dashboard');
+const loginStatus=document.getElementById('login-status'),queueStatus=document.getElementById('queue-status');
+const queue=document.getElementById('queue'),loginForm=document.getElementById('login-form');
+let auth=null,currentUser=null;
+function node(tag,cls,text){const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;}
+function showLoggedOut(){currentUser=null;loginPanel.hidden=false;dashboard.hidden=true;}
+async function enterDashboard(user){
+ currentUser=user;
+ const allowed=await auth.isCurrentUserAdmin();
+ if(!allowed){await auth.signOutAccount();showLoggedOut();loginStatus.textContent='Esta conta não está autorizada para administrar o Capital do Trem.';return;}
+ loginPanel.hidden=true;dashboard.hidden=false;
+ document.getElementById('admin-welcome').textContent='Acesso autorizado: '+user.email;
+ await loadQueue();
+}
+async function loadQueue(){
+ queue.replaceChildren();queueStatus.textContent='Carregando publicações pendentes...';
+ try{
+  const groups=await auth.getModerationQueue();
+  let count=0;
+  for(const [kind,label] of [['artists','Artistas'],['events','Eventos e ações'],['posts','Divulgações']]){
+   const heading=node('h2','',label);queue.append(heading);
+   if(!groups[kind].length){queue.append(node('p','muted','Nenhum item aguardando análise.'));continue;}
+   for(const item of groups[kind]){
+    count++;
+    const card=node('article','item');
+    const title=node('h3','',item.title);
+    const detail=node('p','muted',item.detail);
+    const status=node('p','notice','Aguardando aprovação');
+    const actions=node('div','actions');
+    const approve=node('button','', 'Aprovar');
+    const reject=node('button','secondary','Rejeitar');
+    for(const [button,next] of [[approve,'published'],[reject,'rejected']]){
+     button.addEventListener('click',async()=>{
+      button.disabled=true;reject.disabled=true;approve.disabled=true;
+      try{await auth.moderateItem(kind,item.id,next);await loadQueue();}
+      catch(error){queueStatus.textContent=error?.message||'Não foi possível atualizar. Verifique as permissões do banco.';button.disabled=false;reject.disabled=false;approve.disabled=false;}
+     });
+    }
+    actions.append(approve,reject);card.append(title,detail,status,actions);queue.append(card);
+   }
+  }
+  queueStatus.textContent=count+' item(ns) aguardando análise.';
+ }catch(error){queueStatus.textContent='Não foi possível carregar a fila. Confira a conexão e as tabelas do banco.';}
+}
+loginForm.addEventListener('submit',async event=>{
+ event.preventDefault();const button=document.getElementById('login-button');button.disabled=true;loginStatus.textContent='Verificando acesso...';
+ try{await auth.signInAccount({email:document.getElementById('admin-email').value.trim(),password:document.getElementById('admin-password').value});const session=await auth.getCurrentSession();if(session?.user)await enterDashboard(session.user);}
+ catch(error){loginStatus.textContent=error?.message||'Não foi possível entrar.';}
+ finally{button.disabled=false;}
+});
+document.getElementById('refresh-queue').addEventListener('click',loadQueue);
+document.getElementById('logout').addEventListener('click',async()=>{await auth.signOutAccount();showLoggedOut();loginStatus.textContent='Você saiu do painel.';});
+try{
+ auth=await import('./supabase/auth.js');auth.initSupabase();
+ const session=await auth.getCurrentSession();if(session?.user)await enterDashboard(session.user);
+}catch(error){loginStatus.textContent='Painel ainda indisponível: configure as credenciais do Supabase e aplique o banco de dados.';}
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body></html>
