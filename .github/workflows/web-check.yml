@@ -36,6 +36,13 @@ jobs:
             exit 1
           fi
           echo "Proteção de envio administrativo encontrada no schema e na migração."
+          grep -q "values ('capital-do-trem-audio','capital-do-trem-audio',false" supabase/schema.sql
+          grep -q "values (" supabase/schema.sql
+          grep -q 'create policy "audio_read_published_owner_admin"' supabase/schema.sql
+          grep -q 'create policy "media_public_read"' supabase/schema.sql
+          grep -q 'create policy "media_upload_own_folder"' supabase/schema.sql
+          grep -q 'create policy "media_delete_own_or_admin"' supabase/schema.sql
+          echo "Buckets de áudio privado e mídia pública, com políticas de acesso, encontrados."
       - name: Conferir isolamento dos perfis
         run: |
           grep -q 'create policy "profile_read_own"' supabase/schema.sql
