@@ -27,6 +27,7 @@ nav{display:flex;gap:8px;overflow:auto;padding:16px 0 8px}nav button{white-space
 .page{display:none}.page.active{display:block}.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:17px;margin:12px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.card h3{margin:0 0 6px}.card p{margin:4px 0}.notice{border-left:4px solid var(--red);background:var(--panel2);padding:12px;border-radius:8px;color:var(--muted)}
 input,textarea,select{display:block;width:100%;padding:12px;margin:7px 0 12px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--fg)}textarea{min-height:90px}
 .list{display:grid;gap:9px}.item{padding:12px;background:var(--panel2);border-radius:10px}.social{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.artist-social-links{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;margin-top:14px}.artist-social-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:9px 14px;border:1px solid rgba(237,28,36,.72);border-radius:11px;background:#090909;color:#fff;text-decoration:none;font-weight:800;box-shadow:0 0 8px rgba(255,0,32,.42),0 0 18px rgba(237,28,36,.22)}.artist-social-link svg{width:22px;height:22px;flex:0 0 22px}.artist-social-link:hover{box-shadow:0 0 12px rgba(255,20,42,.75),0 0 26px rgba(237,28,36,.4)}body.light .artist-social-link{background:#fff;color:#111}
 footer{text-align:center;color:var(--muted);font-size:12px;padding:24px}
 button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--red);outline-offset:3px}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
@@ -530,8 +531,8 @@ updateConnectionStatus();
    card.append(name,style);
    if(artist.bio){const bio=document.createElement('p');bio.textContent=artist.bio;card.append(bio);}
    if(artist.photo_url){const photo=document.createElement('img');photo.src=artist.photo_url;photo.alt='Foto de '+(artist.artist_name||'artista');photo.loading='lazy';photo.style.cssText='max-width:100%;max-height:260px;object-fit:contain;border-radius:10px;margin:8px 0';card.append(photo);}
-   const links=document.createElement('div');links.className='social';
-   for(const [label,value] of [['Instagram',artist.instagram],['YouTube',artist.youtube]]){
+   const links=document.createElement('div');links.className='artist-social-links';links.setAttribute('aria-label','Redes sociais do artista');
+   for(const [label,value] of [['YouTube',artist.youtube],['Instagram',artist.instagram]]){
     if(!value)continue;
     const raw=String(value).trim();
     let href='';
@@ -539,17 +540,23 @@ updateConnectionStatus();
      const handle=raw.startsWith('@')?raw.slice(1):raw;
      href=/^[A-Za-z0-9._]{1,30}$/.test(handle)?'https://www.instagram.com/'+handle+'/':raw;
     }else{
-     href=/^[A-Za-z0-9_-]{3,100}$/.test(raw)?'https://www.youtube.com/results?search_query='+encodeURIComponent(raw):raw;
+     href=/^@?[A-Za-z0-9._-]{3,100}$/.test(raw)?'https://www.youtube.com/results?search_query='+encodeURIComponent(raw.replace(/^@/,'')):raw;
     }
     try{
      const url=new URL(href);
      const host=url.hostname.toLowerCase();
-     const allowed= url.protocol==='https:' && (
+     const allowed=url.protocol==='https:' && (
       label==='Instagram' ? (host==='instagram.com'||host==='www.instagram.com') :
       (host==='youtube.com'||host==='www.youtube.com'||host==='m.youtube.com'||host==='youtu.be')
      );
      if(!allowed)continue;
-     const link=document.createElement('a');link.className='btn alt';link.href=url.href;link.target='_blank';link.rel='noopener noreferrer';link.textContent=label;links.append(link);
+     const link=document.createElement('a');link.className='artist-social-link';link.href=url.href;link.target='_blank';link.rel='noopener noreferrer';link.setAttribute('aria-label','Abrir '+label+' de '+(artist.artist_name||'artista'));link.title='Abrir '+label;
+     if(label==='YouTube'){
+      link.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="#ff0033" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8Z"/><path fill="#fff" d="m9.6 15.8 6.2-3.8-6.2-3.8v7.6Z"/></svg>';
+     }else{
+      link.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="url(#ig-gradient)" stroke-width="2.2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="url(#ig-gradient)" stroke-width="2.2"/><circle cx="17.7" cy="6.5" r="1.35" fill="#ff426f"/><defs><linearGradient id="ig-gradient" x1="3" y1="21" x2="21" y2="3" gradientUnits="userSpaceOnUse"><stop stop-color="#ffb13b"/><stop offset=".5" stop-color="#ff356d"/><stop offset="1" stop-color="#a83bff"/></linearGradient></defs></svg>';
+     }
+     const caption=document.createElement('span');caption.textContent=label;link.append(caption);links.append(link);
     }catch{}
    }
    if(links.childElementCount)card.append(links);
