@@ -36,7 +36,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 </style></head>
 <body>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
-<header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem</h1><p class="tag">A música da nossa quebrada!</p><div class="social" style="justify-content:center"><a class="btn alt" href="./conta.html">👤 Minha conta</a><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn alt" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som de entrada: ligado</button></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Vinheta de 7 segundos • toque na tela para ouvir</p><div class="social" style="justify-content:center"></div></header>
+<header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem</h1><p class="tag">A música da nossa quebrada!</p><div class="social" style="justify-content:center"><a class="btn alt" href="./conta.html">👤 Minha conta</a><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn alt" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som de entrada: ligado</button></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Vinheta de 7 segundos • toque na tela para ouvir</p></header>
 <main id="main-content" tabindex="-1">
 <p id="connection-status" class="connection-status" role="status" aria-live="polite" hidden></p>
 <section class="hero"><h2>Conectando música, cultura e comunidade.</h2><p class="muted">Um espaço para valorizar artistas, divulgar lançamentos, compartilhar eventos e fortalecer iniciativas da nossa quebrada.</p><div class="social"><button class="btn" data-go="musicas">Explorar músicas</button><button class="btn alt" data-go="divulgue">Divulgar meu trabalho</button></div></section>
@@ -100,7 +100,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 const introToggle=document.getElementById('intro-sound-toggle');
 const introStatus=document.getElementById('intro-sound-status');
 const INTRO_SOUND_KEY='capitaldotrem_intro_sound_v1';
-let introEnabled=localStorage.getItem(INTRO_SOUND_KEY)!=='off';
+let introEnabled=true;try{introEnabled=localStorage.getItem(INTRO_SOUND_KEY)!=='off';}catch{}
 let introPlayed=false;
 let introAudioContext=null;
 let introMaster=null;
@@ -156,6 +156,7 @@ async function playCapitalIntro(){
   if(!AudioCtx)throw new Error('Áudio não disponível neste navegador');
   introAudioContext=introAudioContext||new AudioCtx();
   if(introAudioContext.state==='suspended')await introAudioContext.resume();
+  if(!introEnabled){introPlayed=false;return;}
   const ctx=introAudioContext,start=ctx.currentTime+.06;
   const master=ctx.createGain();introMaster=master;
   master.gain.setValueAtTime(.0001,start);master.gain.linearRampToValueAtTime(.78,start+.08);
