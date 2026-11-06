@@ -31,6 +31,10 @@ Depois de criar a conta do administrador pelo sistema de autenticação do Supab
 
 **Nunca coloque a chave `service_role` no HTML, JavaScript público ou aplicativo.** A integração do cliente deve usar apenas a chave pública/anon (ou publishable) e depender das políticas RLS.
 
+## Fotos e cartazes
+
+O esquema também prepara o bucket público `capital-do-trem-media`, limitado a imagens JPEG, PNG e WebP de até 5 MB. Cada usuário autenticado só pode enviar, substituir ou apagar arquivos dentro da pasta cujo primeiro nome é seu UUID. A leitura é pública para que imagens de perfis e eventos aprovados possam aparecer no site. Antes de publicar imagens, o site deverá vincular os caminhos dos arquivos aos respectivos registros e aplicar moderação.
+
 ## Próximas etapas de integração
 
 1. Criar/conferir o projeto Supabase e ativar autenticação por e-mail.
