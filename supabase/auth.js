@@ -125,3 +125,39 @@ export async function saveMyArtistProfile(profile) {
   if (error) throw error;
   return data;
 }
+ 
+// Eventos enviados pelo usuário autenticado. O RLS limita os registros ao autor.
+export async function submitMyEvent(eventData) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para enviar um evento.');
+  const payload = {
+    title: String(eventData.title || '').trim(),
+    event_date: eventData.event_date,
+    event_time: eventData.event_time || null,
+    address: String(eventData.address || '').trim(),
+    category: eventData.category || 'show',
+    description: String(eventData.description || '').trim(),
+    contact: String(eventData.contact || '').trim(),
+    created_by: user.id,
+    status: 'pending'
+  };
+  const { data, error } = await supabase.from('events').insert(payload)
+    .select('id, title, event_date, address, status').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function getMyEvents() {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para consultar seus eventos.');
+  const { data, error } = await supabase.from('events')
+    .select('id, title, event_date, address, status')
+    .eq('created_by', user.id)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
