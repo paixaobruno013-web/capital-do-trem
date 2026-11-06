@@ -34,7 +34,7 @@ Depois de criar a conta do administrador pelo sistema de autenticação do Supab
 
 ## Fotos e cartazes
 
-O esquema também prepara o bucket público `capital-do-trem-media`, limitado a imagens JPEG, PNG e WebP de até 5 MB. Cada usuário autenticado só pode enviar, substituir ou apagar arquivos dentro da pasta cujo primeiro nome é seu UUID. A leitura é pública para que imagens de perfis e eventos aprovados possam aparecer no site. Antes de publicar imagens, o site deverá vincular os caminhos dos arquivos aos respectivos registros e aplicar moderação.
+O esquema prepara o bucket público `capital-do-trem-media`, limitado a imagens JPEG, PNG e WebP de até 5 MB. Cada usuário autenticado só pode enviar, substituir ou apagar arquivos dentro da pasta cujo primeiro nome é seu UUID. A área Minha conta já integra o envio de foto artística e cartaz de evento: o arquivo é validado no navegador, enviado para a pasta do usuário e o endereço público é associado à ficha ou ao evento, que permanece pendente para análise. A leitura dos arquivos é pública para permitir exibir imagens de registros aprovados. O bucket e as políticas só entram em vigor depois que `schema.sql` for executado no Supabase; os envios ainda não foram testados contra um projeto conectado.
 
 ## Próximas etapas de integração
 
