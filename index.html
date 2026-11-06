@@ -41,7 +41,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 <p id="connection-status" class="connection-status" role="status" aria-live="polite" hidden></p>
 <section class="hero"><h2>Conectando música, cultura e comunidade.</h2><p class="muted">Um espaço para valorizar artistas, divulgar lançamentos, compartilhar eventos e fortalecer iniciativas da nossa quebrada.</p><div class="social"><button class="btn" data-go="musicas">Explorar músicas</button><button class="btn alt" data-go="divulgue">Divulgar meu trabalho</button></div></section>
 <nav id="nav" aria-label="Navegação principal"><button class="active" data-page="inicio" aria-controls="inicio" aria-current="page">Início</button><button data-page="musicas" aria-controls="musicas">Músicas</button><button data-page="eventos" aria-controls="eventos">Eventos</button><button data-page="artistas" aria-controls="artistas">Artistas</button><button data-page="social" aria-controls="social">Ação social</button><button data-page="parcerias" aria-controls="parcerias">Parcerias</button><button data-page="divulgue" aria-controls="divulgue">Divulgue</button><button data-page="duvidas" aria-controls="duvidas">Dúvidas</button></nav>
-<section class="page active" id="inicio"><div class="grid"><article class="card"><h3>🎧 Música independente</h3><p class="muted">Espaço para lançamentos, artistas e sons da cena.</p></article><article class="card"><h3>📅 Cultura e eventos</h3><p class="muted">Divulgação de encontros, bailes e atividades culturais.</p></article><article class="card"><h3>🤝 Comunidade</h3><p class="muted">Ações sociais, parcerias e informação para fortalecer a comunidade.</p></article></div><div class="card"><h3>Últimas divulgações</h3><div id="feed" class="list" aria-live="polite"><p class="muted">As divulgações salvas nesta demonstração aparecerão aqui neste aparelho.</p></div><button class="btn alt" id="clear-demo-posts" type="button" hidden>Apagar minhas divulgações deste aparelho</button> <button class="btn alt" id="backup-demo-posts" type="button" hidden>Baixar cópia das minhas divulgações</button><p id="feed-status" class="muted" aria-live="polite"></p></div><div class="notice">Esta é a primeira demonstração pública. Cadastro, perfis individuais, chat compartilhado e publicação sincronizada ainda precisam de integração com servidor.</div></section>
+<section class="page active" id="inicio"><div class="grid"><article class="card"><h3>🎧 Música independente</h3><p class="muted">Espaço para lançamentos, artistas e sons da cena.</p></article><article class="card"><h3>📅 Cultura e eventos</h3><p class="muted">Divulgação de encontros, bailes e atividades culturais.</p></article><article class="card"><h3>🤝 Comunidade</h3><p class="muted">Ações sociais, parcerias e informação para fortalecer a comunidade.</p></article></div><div class="card"><h3>📣 Mural da comunidade</h3><p class="muted">Publicações aprovadas pela equipe do Capital do Trem.</p><div id="public-posts" class="list" aria-live="polite"><p class="muted">O mural compartilhado será carregado quando o banco estiver conectado.</p></div></div><div class="card"><h3>Últimas divulgações</h3><div id="feed" class="list" aria-live="polite"><p class="muted">As divulgações salvas nesta demonstração aparecerão aqui neste aparelho.</p></div><button class="btn alt" id="clear-demo-posts" type="button" hidden>Apagar minhas divulgações deste aparelho</button> <button class="btn alt" id="backup-demo-posts" type="button" hidden>Baixar cópia das minhas divulgações</button><p id="feed-status" class="muted" aria-live="polite"></p></div><div class="notice">Esta é a primeira demonstração pública. Cadastro, perfis individuais, chat compartilhado e publicação sincronizada ainda precisam de integração com servidor.</div></section>
 <section class="page" id="musicas"><div class="card"><h2>🎵 Músicas</h2><p class="muted">Ouça os lançamentos diretamente nos canais oficiais.</p><a class="btn" href="https://youtube.com/@capitaldotrem/videos" target="_blank" rel="noopener">Abrir lançamentos no YouTube</a></div><div class="card"><h3>Player de áudio demonstrativo</h3><label for="audio">Selecione um áudio autorizado do seu aparelho</label><input id="audio" type="file" accept="audio/*"><audio id="player" controls style="width:100%"></audio><p class="muted">O áudio escolhido toca somente neste aparelho. Só compartilhe músicas que você tenha autorização para distribuir.</p></div></section>
 <section class="page" id="eventos">
 <div class="card"><h2>📍 Logo ali</h2><p class="muted">Encontre shows, bailes, encontros e ações sociais próximos de onde você está.</p><button class="btn" id="find-nearby">Usar localização do meu celular</button><p id="location-status" class="muted" aria-live="polite">Sua localização só será acessada se você tocar no botão e autorizar o GPS. As coordenadas serão usadas para abrir o Google Maps e não serão salvas pelo Capital do Trem.</p><a id="nearby-map" class="btn alt" href="#" target="_blank" rel="noopener" hidden>Abrir mapa com opções próximas</a></div>
@@ -323,6 +323,26 @@ window.addEventListener('offline',()=>updateConnectionStatus());
 window.addEventListener('online',()=>updateConnectionStatus(true));
 updateConnectionStatus();
 
+// Mural público: somente divulgações aprovadas pela equipe.
+(async()=>{
+ const container=document.getElementById('public-posts');
+ try{
+  const module=await import('./supabase/auth.js');
+  module.initSupabase();
+  const items=await module.getPublishedPosts();
+  container.replaceChildren();
+  if(!items.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Ainda não há divulgações aprovadas. Seja o primeiro a participar!';container.append(empty);return;}
+  for(const item of items){
+   const card=document.createElement('article');card.className='item';
+   const heading=document.createElement('h3');heading.textContent='Divulgação da comunidade';
+   const body=document.createElement('p');body.textContent=item.content;
+   const date=document.createElement('small');date.className='muted';date.textContent=new Date(item.created_at).toLocaleDateString('pt-BR');
+   card.append(heading,body,date);container.append(card);
+  }
+ }catch(error){
+  const message=document.createElement('p');message.className='muted';message.textContent='O mural compartilhado será ativado quando a conexão segura com o banco for concluída.';container.replaceChildren(message);
+ }
+})();
 // Agenda pública: exibe somente eventos aprovados no banco compartilhado.
 // Sem configuração Supabase, mantém a demonstração informativa sem quebrar o site.
 (async()=>{
