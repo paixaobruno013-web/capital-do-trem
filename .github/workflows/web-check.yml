@@ -44,6 +44,7 @@ jobs:
           grep -q 'create policy "media_public_read"' supabase/schema.sql
           grep -q 'create policy "media_upload_own_folder"' supabase/schema.sql
           grep -q 'create policy "media_delete_own_or_admin"' supabase/schema.sql
+          grep -q "Remover esta mensagem do bate-papo" admin.html
           echo "Buckets de áudio privado e mídia pública, com políticas de acesso, encontrados."
       - name: Conferir isolamento dos perfis
         run: |
