@@ -24,6 +24,8 @@ Este guia foi preparado para configurar o banco sem precisar criar as tabelas um
 4. Toque em **Run** (Executar).
 5. Aguarde a mensagem de conclusão. Se aparecer erro, pare e envie à equipe uma captura da mensagem; não tente executar comandos aleatórios.
 
+**Se o banco já foi configurado anteriormente:** execute também, no SQL Editor, a migração específica de segurança [2026-11-06-admin-only-song-uploads.sql](https://github.com/paixaobruno013-web/capital-do-trem/blob/main/supabase/migrations/2026-11-06-admin-only-song-uploads.sql). Ela atualiza as permissões para que somente administradores autorizados possam enviar músicas. Em uma instalação nova feita pelo `schema.sql` atualizado, essa proteção já está incluída.
+
 ## Etapa 3 — Conferir as tabelas
 
 No menu **Table Editor**, confira se aparecem, entre outras, estas tabelas:
