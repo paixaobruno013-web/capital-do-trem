@@ -8,9 +8,25 @@ create extension if not exists pgcrypto;
 create table if not exists public.profiles (
   user_id uuid primary key references auth.users(id) on delete cascade,
   display_name text not null default '' check (char_length(display_name) <= 80),
+  account_type text not null default 'fan' check (account_type in ('fan', 'artist')),
+  bio text not null default '' check (char_length(bio) <= 500),
+  city text not null default '' check (char_length(city) <= 100),
+  is_public boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Atualizações aditivas para projetos que já tenham a tabela profiles criada.
+alter table public.profiles add column if not exists account_type text not null default 'fan';
+alter table public.profiles add column if not exists bio text not null default '';
+alter table public.profiles add column if not exists city text not null default '';
+alter table public.profiles add column if not exists is_public boolean not null default false;
+alter table public.profiles drop constraint if exists profiles_account_type_check;
+alter table public.profiles add constraint profiles_account_type_check check (account_type in ('fan', 'artist'));
+alter table public.profiles drop constraint if exists profiles_bio_check;
+alter table public.profiles add constraint profiles_bio_check check (char_length(bio) <= 500);
+alter table public.profiles drop constraint if exists profiles_city_check;
+alter table public.profiles add constraint profiles_city_check check (char_length(city) <= 100);
 
 -- Lista privada de administradores. Cadastros nesta tabela são feitos
 -- manualmente pelo responsável no painel SQL, nunca pelo aplicativo.
@@ -89,10 +105,11 @@ security definer
 set search_path = ''
 as $$
 begin
-  insert into public.profiles (user_id, display_name)
+  insert into public.profiles (user_id, display_name, account_type)
   values (
     new.id,
-    left(coalesce(new.raw_user_meta_data ->> 'name', ''), 80)
+    left(coalesce(new.raw_user_meta_data ->> 'name', ''), 80),
+    case when new.raw_user_meta_data ->> 'account_type' = 'artist' then 'artist' else 'fan' end
   )
   on conflict (user_id) do nothing;
   return new;
@@ -132,6 +149,12 @@ create policy "profile_update_own" on public.profiles
   for update to authenticated
   using (user_id = (select auth.uid()))
   with check (user_id = (select auth.uid()));
+
+-- Perfis públicos: somente campos de apresentação, sem e-mail ou dados privados.
+drop policy if exists "profiles_read_public" on public.profiles;
+create policy "profiles_read_public" on public.profiles
+  for select to anon, authenticated
+  using (is_public = true);
 
 -- A tabela admin_users não recebe políticas para usuários comuns:
 -- somente operações administrativas pelo painel seguro/SQL podem alterá-la.
