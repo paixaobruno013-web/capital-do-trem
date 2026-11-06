@@ -23,6 +23,17 @@ jobs:
         run: npm run build:web
       - name: Verificar sintaxe do módulo Supabase
         run: node --input-type=module --check < supabase/auth.js
+      - name: Conferir proteção de envio de músicas
+        run: |
+          grep -q 'create policy "songs_insert_admin_only"' supabase/schema.sql
+          grep -q 'create policy "audio_upload_admin_only"' supabase/schema.sql
+          grep -q 'create policy "songs_insert_admin_only"' supabase/migrations/2026-11-06-admin-only-song-uploads.sql
+          grep -q 'create policy "audio_upload_admin_only"' supabase/migrations/2026-11-06-admin-only-song-uploads.sql
+          if grep -q 'create policy "songs_insert_own_pending"' supabase/schema.sql; then
+            echo "ERRO: política antiga permite envio sem checagem de administrador."
+            exit 1
+          fi
+          echo "Proteção de envio administrativo encontrada no schema e na migração."
       - name: Conferir arquivos essenciais
         run: |
           test -s www/index.html
