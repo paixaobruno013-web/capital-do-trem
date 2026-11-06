@@ -87,6 +87,30 @@ export function watchAuthChanges(callback) {
 }
 
 
+// Envio de mídia: arquivos privados por pasta de usuário, com validação no cliente
+// e limites reforçados pelo bucket/políticas do Supabase.
+export async function uploadMyMedia(file, category) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para enviar uma imagem.');
+  if (!(file instanceof File)) throw new Error('Selecione uma imagem.');
+  const allowed = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+  if (!allowed[file.type]) throw new Error('Use uma imagem JPG, PNG ou WebP.');
+  if (file.size < 1 || file.size > 5 * 1024 * 1024) throw new Error('A imagem deve ter até 5 MB.');
+  if (!['artist', 'event'].includes(category)) throw new Error('Tipo de imagem inválido.');
+  const path = user.id + '/' + category + '/' + crypto.randomUUID() + '.' + allowed[file.type];
+  const { error } = await supabase.storage.from('capital-do-trem-media').upload(path, file, {
+    contentType: file.type,
+    cacheControl: '3600',
+    upsert: false
+  });
+  if (error) throw error;
+  const { data } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
+  if (!data?.publicUrl) throw new Error('Não foi possível obter o endereço da imagem enviada.');
+  return data.publicUrl;
+}
+
 // Perfil público do artista — sempre limitado ao usuário autenticado pelas políticas RLS.
 export async function getMyArtistProfile() {
   const supabase = initSupabase();
@@ -132,6 +156,7 @@ export async function saveMyArtistProfile(profile) {
     instagram,
     youtube,
     bio: clean(profile.bio, 1500, 'Apresentação'),
+    photo_url: profile.photo_url || null,
     status: 'pending'
   };
   const { data, error } = await supabase
@@ -157,6 +182,7 @@ export async function submitMyEvent(eventData) {
     category: eventData.category || 'show',
     description: String(eventData.description || '').trim(),
     contact: String(eventData.contact || '').trim(),
+    poster_url: eventData.poster_url || null,
     created_by: user.id,
     status: 'pending'
   };
