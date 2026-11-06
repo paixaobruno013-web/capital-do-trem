@@ -161,11 +161,34 @@ document.getElementById('artist-photo-upload').addEventListener('change',()=>pre
 document.getElementById('event-poster-upload').addEventListener('change',()=>previewFile('event-poster-upload','event-poster-preview'));
 window.addEventListener('pagehide',()=>['artist-photo-preview','event-poster-preview'].forEach(id=>{const box=document.getElementById(id);if(box.dataset.previewUrl)URL.revokeObjectURL(box.dataset.previewUrl);}));
 
+function clearImagePreview(boxId){
+ const box=document.getElementById(boxId);
+ if(box.dataset.previewUrl){URL.revokeObjectURL(box.dataset.previewUrl);delete box.dataset.previewUrl;}
+ box.replaceChildren();
+}
+function showSavedArtistPhoto(url){
+ const box=document.getElementById('artist-photo-preview');
+ clearImagePreview('artist-photo-preview');
+ if(!url)return;
+ try{
+  const safeUrl=new URL(url);
+  if(safeUrl.protocol!=='https:')return;
+  const img=document.createElement('img');
+  img.src=safeUrl.href;
+  img.alt='Foto atualmente salva no perfil artístico';
+  img.loading='lazy';
+  const msg=document.createElement('p');
+  msg.textContent='Foto atualmente salva no seu perfil.';
+  box.append(img,msg);
+ }catch{}
+}
 function fillArtistForm(profile){
  for(const [field,id] of Object.entries(artistFields))document.getElementById(id).value=profile?.[field]||'';
  const published=profile?.status==='published';
  Object.values(artistFields).forEach(id=>document.getElementById(id).disabled=published);
+ document.getElementById('artist-photo-upload').disabled=published;
  document.getElementById('save-artist').disabled=published;
+ showSavedArtistPhoto(profile?.photo_url);
  artistStatus.textContent=published?'Seu perfil já está publicado. Para alterações, solicite atualização à equipe.':profile?'Sua ficha está salva e aguarda análise.':'Preencha os dados e envie sua ficha para análise.';
 }
 async function loadArtistProfile(){
@@ -184,6 +207,8 @@ function showSession(session){
     if(artistProfileArea)artistProfileArea.hidden=true;
     if(artistForm)artistForm.reset();
     if(eventForm)eventForm.reset();
+    clearImagePreview('artist-photo-preview');
+    clearImagePreview('event-poster-preview');
   }
 }
 
