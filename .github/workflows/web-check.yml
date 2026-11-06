@@ -59,6 +59,11 @@ jobs:
           test -s www/conta.html
           test -s www/admin.html
           test -s www/privacidade.html
+          grep -q 'Supabase Auth' privacidade.html
+          if grep -q 'Esta versão ainda não oferece cadastro' privacidade.html; then
+            echo "ERRO: política de privacidade contém informação desatualizada sobre cadastro."
+            exit 1
+          fi
           test -s www/bate-papo.html
           test -s www/diagnostico.html
           test -s www/supabase/auth.js
