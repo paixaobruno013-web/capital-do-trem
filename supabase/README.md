@@ -79,3 +79,10 @@ A página `admin.html` agora contém formulário de entrada, verificação de ad
 A página inicial agora tenta carregar os próximos eventos aprovados usando a função `getPublishedEvents()`. Visitantes recebem apenas campos públicos e registros com status `published`; a política RLS da tabela `events` continua sendo a barreira de segurança. Se a conexão Supabase ainda não estiver configurada, a página mantém uma mensagem informativa e o restante do site continua funcionando.
 
 A agenda mostra data, horário, endereço, descrição, contato público e cartaz (quando existir), além de um link para abrir o endereço no Google Maps. O envio de eventos pelo formulário da conta e a publicação pelo painel administrativo só funcionarão depois de configurar o Supabase, executar o SQL e testar as permissões.
+
+
+## Envio de divulgações da comunidade
+
+A área da conta agora inclui um formulário para enviar lançamentos, notícias, parcerias, eventos e ações sociais para análise. O texto é salvo na tabela `posts` como pendente e só aparece no mural público depois da aprovação no painel administrativo. A página inicial consulta apenas registros publicados, sem expor o identificador do autor.
+
+O formulário limita o conteúdo e exige sessão autenticada. O recurso depende da configuração Supabase, execução de `schema.sql` e testes de RLS; enquanto isso, o mural compartilhado permanece informativo e os formulários de demonstração locais continuam separados.
