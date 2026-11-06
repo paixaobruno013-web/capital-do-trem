@@ -69,7 +69,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 </section>
 <section class="page" id="social"><div class="card"><h2>❤️ Ação social</h2><p>Um espaço para divulgar campanhas solidárias, arrecadações e iniciativas comunitárias.</p><p class="muted">As campanhas oficiais serão publicadas após implantação de moderação e canal administrativo. Para sugerir uma ação, envie uma apresentação com objetivo, responsável, data e local.</p><a class="btn" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Apresentar uma ação social</a></div></section>
 <section class="page" id="artistas">
-<div class="card"><h2>🎤 Artistas do Capital</h2><p class="muted">Um espaço para apresentar talentos da nossa cena, conhecer novos sons e fortalecer quem faz música na comunidade.</p><p class="muted">Prepare sua apresentação e envie pelo Instagram. Nesta primeira versão, o formulário apenas monta uma mensagem neste aparelho; ele ainda não cria um perfil público nem envia arquivos.</p></div>
+<div class="card"><h2>🎤 Artistas do Capital</h2><p class="muted">Um espaço para apresentar talentos da nossa cena, conhecer novos sons e fortalecer quem faz música na comunidade.</p><p class="muted">Os perfis enviados pela área Minha conta poderão aparecer aqui depois da aprovação da equipe. O formulário abaixo é uma prévia local e não publica nem envia arquivos.</p><h3>Artistas em destaque</h3><div id="public-artists" class="list" aria-live="polite"><p class="muted">A vitrine de artistas será carregada quando o banco estiver conectado.</p></div></div>
 <div class="card"><h3>📣 Apresente seu trabalho</h3>
 <label for="artist-photo">Foto do artista (opcional)</label><input id="artist-photo" type="file" accept="image/*"><p class="muted">Escolha uma foto nítida de até 5 MB. Ela será exibida somente neste aparelho; para enviar à equipe, anexe a foto manualmente no Instagram.</p><img id="artist-photo-preview" alt="Prévia da foto do artista" hidden style="display:none;max-width:100%;max-height:280px;object-fit:contain;border-radius:12px;margin:8px 0;border:1px solid var(--line)"><p id="artist-photo-status" class="muted" aria-live="polite"></p>\n<label for="artist-name">Nome artístico *</label><input id="artist-name" maxlength="70" placeholder="Como o público conhece você" required>
 <label for="artist-style">Estilo musical *</label><select id="artist-style" required><option value="">Escolha seu estilo</option><option>Funk</option><option>Rap / Hip-hop</option><option>Trap</option><option>Pagode</option><option>Sertanejo</option><option>Forró</option><option>Pop</option><option>Outro</option></select>
@@ -344,6 +344,31 @@ updateConnectionStatus();
    container.append(card);
   }
  }catch(error){const message=document.createElement('p');message.className='muted';message.textContent='O diretório será ativado depois da conexão segura com o banco.';container.replaceChildren(message);}
+})();
+// Vitrine pública: mostra apenas artistas aprovados pela equipe.
+(async()=>{
+ const container=document.getElementById('public-artists');
+ try{
+  const module=await import('./supabase/auth.js');module.initSupabase();
+  const artists=await module.getPublishedArtists();container.replaceChildren();
+  if(!artists.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Ainda não há artistas publicados. Os perfis aparecerão aqui depois da aprovação da equipe.';container.append(empty);return;}
+  for(const artist of artists){
+   const card=document.createElement('article');card.className='item';
+   const name=document.createElement('h3');name.textContent=artist.artist_name||'Artista do Capital';
+   const style=document.createElement('p');style.className='muted';style.textContent=[artist.style,artist.city].filter(Boolean).join(' • ');
+   card.append(name,style);
+   if(artist.bio){const bio=document.createElement('p');bio.textContent=artist.bio;card.append(bio);}
+   if(artist.photo_url){const photo=document.createElement('img');photo.src=artist.photo_url;photo.alt='Foto de '+(artist.artist_name||'artista');photo.loading='lazy';photo.style.cssText='max-width:100%;max-height:260px;object-fit:contain;border-radius:10px;margin:8px 0';card.append(photo);}
+   const links=document.createElement('div');links.className='social';
+   for(const [label,value] of [['Instagram',artist.instagram],['YouTube',artist.youtube]]){
+    if(!value)continue;
+    const raw=value.trim();const href=raw.startsWith('@')?'https://www.instagram.com/'+raw.slice(1):raw.startsWith('http://')||raw.startsWith('https://')?raw:label==='Instagram'?'https://www.instagram.com/'+raw.replace(/^\\//,''):'https://www.youtube.com/results?search_query='+encodeURIComponent(raw);
+    try{const url=new URL(href);if(!['https:'].includes(url.protocol))continue;const link=document.createElement('a');link.className='btn alt';link.href=url.href;link.target='_blank';link.rel='noopener noreferrer';link.textContent=label;links.append(link);}catch{}
+   }
+   if(links.childElementCount)card.append(links);
+   container.append(card);
+  }
+ }catch(error){const message=document.createElement('p');message.className='muted';message.textContent='A vitrine de artistas será ativada depois da conexão segura com o banco.';container.replaceChildren(message);}
 })();
 // Mural público: somente divulgações aprovadas pela equipe.
 (async()=>{
