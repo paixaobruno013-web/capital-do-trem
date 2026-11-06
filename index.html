@@ -176,9 +176,16 @@ document.getElementById('share-event').addEventListener('click',async()=>{
  const date=value('event-date').split('-').reverse().join('/');
  const message='📣 '+value('event-name')+'\n'+value('event-kind')+'\n📅 '+date+' às '+value('event-time')+'\n📍 '+value('event-place')+(value('event-contact')?'\nContato: '+value('event-contact'):'')+'\n\nDivulgação preparada no Capital do Trem — A música da nossa quebrada!';
  try{
-  if(navigator.share){await navigator.share({title:value('event-name'),text:message});status.textContent='Compartilhamento aberto. Escolha o aplicativo ou contato para enviar.';}
-  else if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(message);status.textContent='Texto do evento copiado! Agora é só colar no aplicativo desejado.';}
-  else{window.prompt('Copie o texto do evento:',message);status.textContent='Copie o texto exibido para compartilhar.';}
+  const poster=document.getElementById('event-poster').files[0];
+  const canSharePoster=poster&&navigator.canShare&&navigator.canShare({files:[poster]});
+  if(navigator.share){
+   const data={title:value('event-name'),text:message};
+   if(canSharePoster)data.files=[poster];
+   await navigator.share(data);
+   status.textContent=canSharePoster?'Evento e cartaz enviados ao menu de compartilhamento.':'Compartilhamento aberto. Selecione onde enviar o texto do evento.';
+  }
+  else if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(message);status.textContent='Texto do evento copiado! Anexe o cartaz manualmente no aplicativo desejado.';}
+  else{window.prompt('Copie o texto do evento:',message);status.textContent='Copie o texto exibido e anexe o cartaz manualmente.';}
  }catch(error){if(error.name!=='AbortError')status.textContent='Não foi possível compartilhar agora. Você pode usar “Copiar mensagem do evento”.';}
 });
 document.getElementById('copy-event').addEventListener('click',async()=>{
@@ -236,9 +243,16 @@ document.getElementById('share-artist').addEventListener('click',async()=>{
  if(!document.getElementById('artist-name').reportValidity()||!document.getElementById('artist-style').reportValidity()){status.textContent='Informe seu nome artístico e escolha o estilo musical.';return;}
  const message='🎤 '+val('artist-name')+' — '+val('artist-style')+(val('artist-city')?'\n📍 '+val('artist-city'):'')+(val('artist-instagram')?'\nInstagram: '+val('artist-instagram'):'')+(val('artist-youtube')?'\nYouTube: '+val('artist-youtube'):'')+(val('artist-bio')?'\n'+val('artist-bio'):'')+'\n\nConheça o Capital do Trem — A música da nossa quebrada!';
  try{
-  if(navigator.share){await navigator.share({title:'Artista: '+val('artist-name'),text:message});status.textContent='Compartilhamento aberto. Escolha onde deseja divulgar sua apresentação.';}
-  else if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(message);status.textContent='Apresentação copiada! Agora é só colar no aplicativo desejado.';}
-  else{window.prompt('Copie sua apresentação para compartilhar:',message);status.textContent='Copie o texto exibido para compartilhar.';}
+  const photo=document.getElementById('artist-photo').files[0];
+  const canSharePhoto=photo&&navigator.canShare&&navigator.canShare({files:[photo]});
+  if(navigator.share){
+   const data={title:'Artista: '+val('artist-name'),text:message};
+   if(canSharePhoto)data.files=[photo];
+   await navigator.share(data);
+   status.textContent=canSharePhoto?'Apresentação e foto enviados ao menu de compartilhamento.':'Compartilhamento aberto. Escolha onde divulgar sua apresentação.';
+  }
+  else if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(message);status.textContent='Apresentação copiada! Anexe sua foto manualmente no aplicativo desejado.';}
+  else{window.prompt('Copie sua apresentação para compartilhar:',message);status.textContent='Copie o texto exibido e anexe sua foto manualmente.';}
  }catch(error){if(error.name!=='AbortError')status.textContent='Não foi possível compartilhar agora. Você ainda pode usar “Copiar apresentação”.';}
 });
 document.getElementById('artist-copy').addEventListener('click',async()=>{
