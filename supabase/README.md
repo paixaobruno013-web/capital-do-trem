@@ -98,3 +98,20 @@ A tabela `profiles` recebe campos novos de forma aditiva, com políticas RLS par
 ## Vitrine pública de artistas
 
 A página inicial consulta `getPublishedArtists()` para mostrar somente registros da tabela `artists` com status `published`. A consulta não retorna e-mail nem dados de login. A equipe precisa aprovar o perfil no painel administrativo; perfis pendentes ou rejeitados não aparecem na vitrine. A vitrine só funcionará depois de configurar as credenciais públicas e executar o schema SQL no projeto Supabase.
+
+
+## Checklist de liberação pública
+
+Antes de divulgar o cadastro ao público, confirme todos os itens:
+
+- [ ] Configurar a URL do projeto Supabase e somente a chave pública (publishable/anon) em `supabase/auth.js`.
+- [ ] Executar o `schema.sql` atualizado no projeto correto e conferir se todas as tabelas, políticas RLS e o bucket `capital-do-trem-media` foram criados.
+- [ ] Criar uma conta de teste do tipo Usuário Uai e outra do tipo Artista.
+- [ ] Confirmar login, saída, recuperação de senha e confirmação de e-mail.
+- [ ] Confirmar que perfis privados não aparecem no diretório público.
+- [ ] Enviar foto e cartaz de teste; conferir limite de 5 MB e aprovação antes da publicação.
+- [ ] Enviar evento e publicação; confirmar que começam pendentes e só aparecem após aprovação administrativa.
+- [ ] Testar o painel administrativo com uma conta explicitamente autorizada em `admin_users`.
+- [ ] Testar em Android, conexão lenta e modo offline; conferir se mensagens de erro são claras.
+
+**Não anunciar o cadastro como disponível antes de concluir os testes.** O site estático pode abrir enquanto o backend permanece desconfigurado; isso não significa que as contas ou publicações estejam operacionais.
