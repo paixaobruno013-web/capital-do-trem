@@ -293,7 +293,7 @@ basicProfileForm.addEventListener('submit',async event=>{
    bio:document.getElementById('basic-bio').value,
    is_public:document.getElementById('basic-public').checked
   });
-  artistProfileArea.hidden=document.getElementById('basic-account-type').value!=='artist';
+  artistProfileArea.hidden=document.getElementById('basic-account-type').value!=='artist';songPanel.hidden=document.getElementById('basic-account-type').value!=='artist';if(!songPanel.hidden)loadMySongs();
   basicProfileStatus.textContent='Perfil salvo! '+(document.getElementById('basic-public').checked?'Ele poderá aparecer no diretório público.':'Ele ficará visível somente para você.');
  }catch(error){basicProfileStatus.textContent=error?.message||'Não foi possível salvar seu perfil.';}
  finally{button.disabled=false;}
