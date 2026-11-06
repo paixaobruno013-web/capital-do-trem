@@ -182,13 +182,22 @@ create policy "artists_insert_own_pending" on public.artists
 drop policy if exists "artists_update_own_or_admin" on public.artists;
 create policy "artists_update_own_or_admin" on public.artists
   for update to authenticated
-  using (user_id = (select auth.uid()) or (select public.is_admin()))
-  with check (user_id = (select auth.uid()) or (select public.is_admin()));
+  using (
+    (user_id = (select auth.uid()) and status = 'pending')
+    or (select public.is_admin())
+  )
+  with check (
+    (user_id = (select auth.uid()) and status = 'pending')
+    or (select public.is_admin())
+  );
 
 drop policy if exists "artists_delete_own_or_admin" on public.artists;
 create policy "artists_delete_own_or_admin" on public.artists
   for delete to authenticated
-  using (user_id = (select auth.uid()) or (select public.is_admin()));
+  using (
+    (user_id = (select auth.uid()) and status = 'pending')
+    or (select public.is_admin())
+  );
 
 -- Mural: publicações aguardam aprovação; autor pode corrigir as próprias pendentes.
 drop policy if exists "posts_read_published_or_owner_or_admin" on public.posts;
