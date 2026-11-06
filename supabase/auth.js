@@ -207,7 +207,8 @@ export async function getPublishedEvents() {
     .from('events')
     .select('id, title, event_date, event_time, address, description, contact, poster_url')
     .eq('status', 'published')
-    .gte('event_date', new Date().toISOString().slice(0, 10))
+    // Usa a data local do aparelho para não antecipar/atrasar a agenda por causa do UTC.
+    .gte('event_date', (() => { const now = new Date(); return [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-'); })())
     .order('event_date', { ascending: true })
     .order('event_time', { ascending: true })
     .limit(50);
