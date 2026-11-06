@@ -65,7 +65,7 @@ footer{text-align:center;color:var(--muted);font-size:13px}
 <label for="artist-city">Cidade</label><input id="artist-city" maxlength="100">
 <label for="artist-instagram">Instagram</label><input id="artist-instagram" maxlength="120" placeholder="@seuperfil">
 <label for="artist-youtube">YouTube</label><input id="artist-youtube" maxlength="240" placeholder="Link do canal">
-<label for="artist-bio">Sobre o artista</label><textarea id="artist-bio" maxlength="1500" rows="4" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
+<label for="artist-photo-upload">Foto do artista (JPG, PNG ou WebP, até 5 MB)</label><input id="artist-photo-upload" type="file" accept="image/jpeg,image/png,image/webp"><p class="muted">A foto será enviada para o armazenamento do Capital do Trem quando você salvar a ficha.</p><label for="artist-bio">Sobre o artista</label><textarea id="artist-bio" maxlength="1500" rows="4" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
 <button type="submit" id="save-artist">Salvar ficha para análise</button>
 <p id="artist-status" class="status" role="status" aria-live="polite"></p>
 </form>
@@ -121,7 +121,7 @@ footer{text-align:center;color:var(--muted);font-size:13px}
 <label for="event-address">Endereço público</label><input id="event-address" maxlength="240" required>
 <label for="event-category">Tipo</label><select id="event-category" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="show">Show</option><option value="evento">Evento</option><option value="acao-social">Ação social</option><option value="outro">Outro</option></select>
 <label for="event-description">Descrição</label><textarea id="event-description" maxlength="2000" rows="4" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
-<label for="event-contact">Contato público (opcional)</label><input id="event-contact" maxlength="120">
+<label for="event-contact">Contato público (opcional)</label><input id="event-contact" maxlength="120"><label for="event-poster-upload">Cartaz do evento (JPG, PNG ou WebP, até 5 MB)</label><input id="event-poster-upload" type="file" accept="image/jpeg,image/png,image/webp"><p class="muted">O cartaz será enviado junto com o evento para análise.</p>
 <button type="submit" id="submit-event">Enviar para análise</button>
 <p id="event-status" class="status" role="status" aria-live="polite"></p>
 </form>
@@ -274,7 +274,10 @@ artistForm.addEventListener('submit',async event=>{
  saveButton.disabled=true;artistStatus.textContent='Salvando sua ficha...';
  const profile={};
  for(const [field,id] of Object.entries(artistFields))profile[field]=document.getElementById(id).value;
- try{const saved=await auth.saveMyArtistProfile(profile);fillArtistForm(saved);artistStatus.textContent='Ficha enviada e salva. Ela ficará pendente até a aprovação da equipe.';}
+ try{
+  const photo=document.getElementById('artist-photo-upload').files[0];
+  if(photo){artistStatus.textContent='Enviando foto segura...';profile.photo_url=await auth.uploadMyMedia(photo,'artist');}
+  const saved=await auth.saveMyArtistProfile(profile);fillArtistForm(saved);artistStatus.textContent='Ficha enviada e salva. Ela ficará pendente até a aprovação da equipe.';}
  catch(error){artistStatus.textContent=error?.message||'Não foi possível salvar. Verifique os dados e tente novamente.';}
  finally{if(!document.getElementById('artist-name').disabled)saveButton.disabled=false;}
 });
@@ -316,7 +319,10 @@ eventForm.addEventListener('submit',async event=>{
  if(!chosen||chosen<today){eventStatus.textContent='Escolha uma data de hoje em diante.';return;}
  const payload={title:document.getElementById('event-name').value.trim(),event_date:date,event_time:document.getElementById('event-time').value||null,address:document.getElementById('event-address').value.trim(),category:document.getElementById('event-category').value,description:document.getElementById('event-description').value.trim(),contact:document.getElementById('event-contact').value.trim()};
  button.disabled=true;eventStatus.textContent='Enviando para análise...';
- try{await auth.submitMyEvent(payload);eventForm.reset();eventStatus.textContent='Evento enviado! Ele ficará pendente até a aprovação da equipe.';await loadMyEvents();}
+ try{
+  const poster=document.getElementById('event-poster-upload').files[0];
+  if(poster){eventStatus.textContent='Enviando cartaz seguro...';payload.poster_url=await auth.uploadMyMedia(poster,'event');}
+  await auth.submitMyEvent(payload);eventForm.reset();eventStatus.textContent='Evento enviado! Ele ficará pendente até a aprovação da equipe.';await loadMyEvents();}
  catch(error){eventStatus.textContent=error?.message||'Não foi possível enviar. Verifique a conexão e tente novamente.';}
  finally{button.disabled=false;}
 });
