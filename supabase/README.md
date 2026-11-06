@@ -88,7 +88,7 @@ A área da conta agora inclui um formulário para enviar lançamentos, notícias
 O formulário limita o conteúdo e exige sessão autenticada. O recurso depende da configuração Supabase, execução de `schema.sql` e testes de RLS; enquanto isso, o mural compartilhado permanece informativo e os formulários de demonstração locais continuam separados.
 
 
-## Contas abertas para fãs e artistas
+## Contas abertas para Usuários Uai e artistas
 
 O cadastro agora oferece duas opções: Usuário Uai ou artista. Todos usam a mesma conta e podem acessar as áreas abertas (músicas, eventos, agenda, mural e comunidade). A ficha básica permite nome de exibição, cidade e apresentação curta. O perfil público é opcional: somente quem marcar a opção de aparecer será listado no diretório, e a consulta pública retorna apenas nome, tipo de conta, cidade e apresentação — nunca e-mail.
 
