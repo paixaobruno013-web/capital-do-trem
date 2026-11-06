@@ -45,7 +45,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 <section class="page" id="musicas"><div class="card"><h2>🎵 Músicas</h2><p class="muted">Ouça os lançamentos diretamente nos canais oficiais.</p><a class="btn" href="https://youtube.com/@capitaldotrem/videos" target="_blank" rel="noopener">Abrir lançamentos no YouTube</a></div><div class="card"><h3>Player de áudio demonstrativo</h3><label for="audio">Selecione um áudio autorizado do seu aparelho</label><input id="audio" type="file" accept="audio/*"><audio id="player" controls style="width:100%"></audio><p class="muted">O áudio escolhido toca somente neste aparelho. Só compartilhe músicas que você tenha autorização para distribuir.</p></div></section>
 <section class="page" id="eventos">
 <div class="card"><h2>📍 Logo ali</h2><p class="muted">Encontre shows, bailes, encontros e ações sociais próximos de onde você está.</p><button class="btn" id="find-nearby">Usar localização do meu celular</button><p id="location-status" class="muted" aria-live="polite">Sua localização só será acessada se você tocar no botão e autorizar o GPS. As coordenadas serão usadas para abrir o Google Maps e não serão salvas pelo Capital do Trem.</p><a id="nearby-map" class="btn alt" href="#" target="_blank" rel="noopener" hidden>Abrir mapa com opções próximas</a></div>
-<div class="card"><h2>📅 Agenda do Capital do Trem</h2><p class="muted">Aqui ficarão os shows, bailes, encontros e atividades culturais, com data, horário, endereço e rota no mapa. A agenda pública ainda será conectada ao cadastro de eventos.</p><p class="muted">Quer divulgar um evento com a gente? Prepare as informações abaixo e envie pelo Instagram junto com o cartaz.</p>
+<div class="card"><h2>📅 Agenda do Capital do Trem</h2><p class="muted">Shows, bailes, encontros e atividades culturais aprovadas pela equipe.</p><div id="public-events" aria-live="polite"><p class="muted">A agenda compartilhada será carregada quando o banco estiver conectado.</p></div><p class="muted">Quer divulgar um evento com a gente? Prepare as informações abaixo e envie pelo Instagram junto com o cartaz.</p>
 <label for="event-name">Nome do evento</label><input id="event-name" maxlength="100" required placeholder="Ex.: Baile da comunidade">
 <label for="event-date">Data</label><input id="event-date" type="date" required>
 <label for="event-time">Horário</label><input id="event-time" type="time" required>
@@ -322,5 +322,34 @@ function updateConnectionStatus(isReconnect=false){
 window.addEventListener('offline',()=>updateConnectionStatus());
 window.addEventListener('online',()=>updateConnectionStatus(true));
 updateConnectionStatus();
+
+// Agenda pública: exibe somente eventos aprovados no banco compartilhado.
+// Sem configuração Supabase, mantém a demonstração informativa sem quebrar o site.
+(async()=>{
+ const container=document.getElementById('public-events');
+ try{
+  const module=await import('./supabase/auth.js');
+  module.initSupabase();
+  const events=await module.getPublishedEvents();
+  container.replaceChildren();
+  if(!events.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Ainda não há eventos aprovados na agenda. Volte em breve!';container.append(empty);return;}
+  for(const item of events){
+   const card=document.createElement('article');card.className='item';card.style.margin='12px 0';
+   const title=document.createElement('h3');title.textContent=item.title;
+   const date=document.createElement('p');date.className='muted';
+   const dateValue=new Date(item.event_date+'T00:00:00');
+   date.textContent=dateValue.toLocaleDateString('pt-BR')+(item.event_time?' • '+String(item.event_time).slice(0,5):'');
+   const address=document.createElement('p');address.textContent=item.address;
+   card.append(title,date,address);
+   if(item.description){const description=document.createElement('p');description.textContent=item.description;card.append(description);}
+   if(item.contact){const contact=document.createElement('p');contact.textContent='Contato: '+item.contact;card.append(contact);}
+   const map=document.createElement('a');map.className='btn alt';map.target='_blank';map.rel='noopener';map.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(item.address);map.textContent='Ver localização no mapa';card.append(map);
+   if(item.poster_url){const image=document.createElement('img');image.src=item.poster_url;image.alt='Cartaz de '+item.title;image.loading='lazy';image.style.cssText='max-width:100%;max-height:320px;object-fit:contain;border-radius:10px;margin-top:10px';card.append(image);}
+   container.append(card);
+  }
+ }catch(error){
+  const message=document.createElement('p');message.className='muted';message.textContent='A agenda pública compartilhada será ativada quando a conexão segura com o banco for concluída.';container.replaceChildren(message);
+ }
+})();
 if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 </script></body></html>
