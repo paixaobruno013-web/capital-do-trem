@@ -663,7 +663,7 @@ updateConnectionStatus();
    card.append(title,artist);
    if(song.description){const desc=document.createElement('p');desc.textContent=song.description;card.append(desc);}
    const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=song.audio_url;audio.style.cssText='width:100%;margin:8px 0';audio.setAttribute('aria-label','Ouvir '+song.title);card.append(audio);
-   const download=document.createElement('a');download.className='btn alt';download.href=song.audio_url;download.target='_blank';download.rel='noopener';download.textContent='⬇ Baixar música';download.style.display='inline-block';download.style.margin='4px 0';card.append(download);
+   const download=document.createElement('a');download.className='btn alt';download.href=song.download_url||song.audio_url;download.textContent='⬇ Baixar música';download.setAttribute('aria-label','Baixar '+song.title);download.style.display='inline-block';download.style.margin='4px 0';card.append(download);
    const social=document.createElement('div');social.className='social';social.style.alignItems='center';
    const like=document.createElement('button');like.className='btn alt';like.type='button';like.textContent='❤️ Curtir';
    const count=document.createElement('span');count.className='muted';count.textContent='Curtidas: …';
