@@ -654,6 +654,7 @@ updateConnectionStatus();
  const container=document.getElementById('published-song-catalog');
  try{
   const api=await import('./supabase/auth.js');api.initSupabase();
+  const session=await api.getCurrentSession();
   const songs=await api.getPublishedSongs();container.replaceChildren();
   if(!songs.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='As músicas aprovadas pela equipe aparecerão aqui.';container.append(empty);return;}
   for(const song of songs){
@@ -664,6 +665,12 @@ updateConnectionStatus();
    if(song.description){const desc=document.createElement('p');desc.textContent=song.description;card.append(desc);}
    const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=song.audio_url;audio.style.cssText='width:100%;margin:8px 0';audio.setAttribute('aria-label','Ouvir '+song.title);card.append(audio);
    const download=document.createElement('a');download.className='btn alt';download.href=song.download_url||song.audio_url;download.textContent='⬇ Baixar música';download.setAttribute('aria-label','Baixar '+song.title);download.style.display='inline-block';download.style.margin='4px 0';card.append(download);
+   if(!session){
+    const access=document.createElement('div');access.className='notice';access.style.marginTop='12px';
+    const message=document.createElement('p');message.textContent='Entre na sua conta para curtir, comentar e acompanhar a conversa desta música.';
+    const login=document.createElement('a');login.className='btn alt';login.href='./conta.html';login.textContent='Entrar ou criar conta';login.style.display='inline-block';login.style.marginTop='6px';
+    access.append(message,login);card.append(access);container.append(card);continue;
+   }
    const social=document.createElement('div');social.className='social';social.style.alignItems='center';
    const like=document.createElement('button');like.className='btn alt';like.type='button';like.textContent='❤️ Curtir';
    const count=document.createElement('span');count.className='muted';count.textContent='Curtidas: …';
