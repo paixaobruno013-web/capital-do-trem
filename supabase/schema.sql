@@ -8,7 +8,7 @@ create extension if not exists pgcrypto;
 create table if not exists public.profiles (
   user_id uuid primary key references auth.users(id) on delete cascade,
   display_name text not null default '' check (char_length(display_name) <= 80),
-  account_type text not null default 'fan' check (account_type in ('fan', 'artist')),
+  account_type text not null default 'user' check (account_type in ('user', 'artist')),
   bio text not null default '' check (char_length(bio) <= 500),
   city text not null default '' check (char_length(city) <= 100),
   is_public boolean not null default false,
@@ -17,12 +17,14 @@ create table if not exists public.profiles (
 );
 
 -- Atualizações aditivas para projetos que já tenham a tabela profiles criada.
-alter table public.profiles add column if not exists account_type text not null default 'fan';
+alter table public.profiles add column if not exists account_type text not null default 'user';
 alter table public.profiles add column if not exists bio text not null default '';
 alter table public.profiles add column if not exists city text not null default '';
 alter table public.profiles add column if not exists is_public boolean not null default false;
+update public.profiles set account_type = 'user' where account_type = 'fan';
+alter table public.profiles alter column account_type set default 'user';
 alter table public.profiles drop constraint if exists profiles_account_type_check;
-alter table public.profiles add constraint profiles_account_type_check check (account_type in ('fan', 'artist'));
+alter table public.profiles add constraint profiles_account_type_check check (account_type in ('user', 'artist'));
 alter table public.profiles drop constraint if exists profiles_bio_check;
 alter table public.profiles add constraint profiles_bio_check check (char_length(bio) <= 500);
 alter table public.profiles drop constraint if exists profiles_city_check;
@@ -109,7 +111,7 @@ begin
   values (
     new.id,
     left(coalesce(new.raw_user_meta_data ->> 'name', ''), 80),
-    case when new.raw_user_meta_data ->> 'account_type' = 'artist' then 'artist' else 'fan' end
+    case when new.raw_user_meta_data ->> 'account_type' = 'artist' then 'artist' else 'user' end
   )
   on conflict (user_id) do nothing;
   return new;
