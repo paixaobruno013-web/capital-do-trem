@@ -72,3 +72,10 @@ A versão atual do esquema permite que o próprio artista edite uma ficha que es
 A página `admin.html` agora contém formulário de entrada, verificação de administrador por `public.is_admin()`, fila de itens pendentes (artistas, eventos e divulgações) e ações de aprovar/rejeitar. As alterações são feitas com a sessão autenticada e dependem das políticas RLS. O painel não concede privilégios por si só.
 
 **Este painel ainda não pode ser usado em produção:** a URL/chave pública do Supabase continuam como marcadores, o esquema SQL ainda não foi aplicado e nenhuma conta foi autorizada como administrador. Não compartilhe credenciais administrativas nem use a chave `service_role` no navegador.
+
+
+## Agenda pública compartilhada
+
+A página inicial agora tenta carregar os próximos eventos aprovados usando a função `getPublishedEvents()`. Visitantes recebem apenas campos públicos e registros com status `published`; a política RLS da tabela `events` continua sendo a barreira de segurança. Se a conexão Supabase ainda não estiver configurada, a página mantém uma mensagem informativa e o restante do site continua funcionando.
+
+A agenda mostra data, horário, endereço, descrição, contato público e cartaz (quando existir), além de um link para abrir o endereço no Google Maps. O envio de eventos pelo formulário da conta e a publicação pelo painel administrativo só funcionarão depois de configurar o Supabase, executar o SQL e testar as permissões.
