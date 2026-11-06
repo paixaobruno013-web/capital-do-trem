@@ -26,4 +26,4 @@ Essa estrutura ainda não significa que os aplicativos estejam compilados ou pub
 
 ## Etapa atual
 
-Este repositório foi criado para organizar o desenvolvimento do Capital do Trem. A criação deste arquivo é apenas o primeiro passo; a aplicação completa ainda precisa ser adicionada e publicada.
+A demonstração web já está disponível no GitHub Pages. O empacotamento nativo para Android e iOS começou, mas ainda faltam gerar os projetos nativos, testar em aparelhos, conectar os serviços de backend e concluir os processos de publicação nas lojas.
