@@ -41,7 +41,7 @@ footer{text-align:center;color:var(--muted);font-size:13px}
 </section>
 <section class="card" id="basic-profile-panel" hidden aria-labelledby="basic-profile-title">
 <h2 id="basic-profile-title">👤 Meu perfil na comunidade</h2>
-<p class="muted">Todo mundo pode participar: fã, artista ou apoiador. Escolha se deseja aparecer no diretório público.</p>
+<p class="muted">Todo mundo pode participar: usuário Uai, artista ou apoiador. Escolha se deseja aparecer no diretório público.</p>
 <form id="basic-profile-form">
 <label for="basic-display-name">Nome que será exibido</label><input id="basic-display-name" maxlength="80" required>
 <label for="basic-account-type">Como deseja participar?</label>
@@ -82,7 +82,7 @@ footer{text-align:center;color:var(--muted);font-size:13px}
 <label for="display-name">Nome artístico ou nome de exibição</label>
 <input id="display-name" name="display-name" maxlength="80" autocomplete="name" disabled>
 <label for="register-type">Tipo de conta</label>
-<select id="register-type" name="register-type" disabled style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="fan">Fã / usuário</option><option value="artist">Artista</option></select>
+<select id="register-type" name="register-type" disabled style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="user">Usuário Uai</option><option value="artist">Artista</option></select>
 </div>
 <label for="email">E-mail</label>
 <input id="email" name="email" type="email" maxlength="254" autocomplete="email" required disabled>
@@ -182,7 +182,7 @@ async function loadBasicProfile(){
  try{
   const profile=await auth.getMyBasicProfile();
   document.getElementById('basic-display-name').value=profile?.display_name||'';
-  document.getElementById('basic-account-type').value=profile?.account_type||'fan';
+  document.getElementById('basic-account-type').value=profile?.account_type||'user';
   document.getElementById('basic-city').value=profile?.city||'';
   document.getElementById('basic-bio').value=profile?.bio||'';
   document.getElementById('basic-public').checked=profile?.is_public===true;
