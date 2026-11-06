@@ -93,3 +93,8 @@ O formulário limita o conteúdo e exige sessão autenticada. O recurso depende 
 O cadastro agora oferece duas opções: Usuário Uai ou artista. Todos usam a mesma conta e podem acessar as áreas abertas (músicas, eventos, agenda, mural e comunidade). A ficha básica permite nome de exibição, cidade e apresentação curta. O perfil público é opcional: somente quem marcar a opção de aparecer será listado no diretório, e a consulta pública retorna apenas nome, tipo de conta, cidade e apresentação — nunca e-mail.
 
 A tabela `profiles` recebe campos novos de forma aditiva, com políticas RLS para que cada pessoa edite somente o próprio perfil e visitantes consultem apenas perfis com `is_public = true`. O perfil artístico detalhado aparece somente para contas do tipo Artista e continua sendo uma ficha separada, submetida à análise da equipe. Contas Usuário Uai não veem campos de ficha artística; ambas podem participar do mural e enviar eventos. Para ativar em um projeto já existente, é necessário executar a versão atualizada de `schema.sql` no SQL Editor e testar com contas de Usuário Uai e artista.
+
+
+## Vitrine pública de artistas
+
+A página inicial consulta `getPublishedArtists()` para mostrar somente registros da tabela `artists` com status `published`. A consulta não retorna e-mail nem dados de login. A equipe precisa aprovar o perfil no painel administrativo; perfis pendentes ou rejeitados não aparecem na vitrine. A vitrine só funcionará depois de configurar as credenciais públicas e executar o schema SQL no projeto Supabase.
