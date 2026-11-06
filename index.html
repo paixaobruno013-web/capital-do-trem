@@ -40,7 +40,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 <main id="main-content" tabindex="-1">
 <p id="connection-status" class="connection-status" role="status" aria-live="polite" hidden></p>
 <section class="hero"><h2>Conectando música, cultura e comunidade.</h2><p class="muted">Um espaço para valorizar artistas, divulgar lançamentos, compartilhar eventos e fortalecer iniciativas da nossa quebrada.</p><div class="social"><button class="btn" data-go="musicas">Explorar músicas</button><button class="btn alt" data-go="divulgue">Divulgar meu trabalho</button></div></section>
-<nav id="nav" aria-label="Navegação principal"><button class="active" data-page="inicio" aria-controls="inicio" aria-current="page">Início</button><button data-page="musicas" aria-controls="musicas">Músicas</button><button data-page="eventos" aria-controls="eventos">Eventos</button><button data-page="artistas" aria-controls="artistas">Artistas</button><button data-page="social" aria-controls="social">Ação social</button><button data-page="parcerias" aria-controls="parcerias">Parcerias</button><button data-page="divulgue" aria-controls="divulgue">Divulgue</button><button data-page="duvidas" aria-controls="duvidas">Dúvidas</button></nav>
+<nav id="nav" aria-label="Navegação principal"><button class="active" data-page="inicio" aria-controls="inicio" aria-current="page">Início</button><button data-page="musicas" aria-controls="musicas">Músicas</button><button data-page="eventos" aria-controls="eventos">Eventos</button><button data-page="artistas" aria-controls="artistas">Artistas</button><button data-page="comunidade" aria-controls="comunidade">Comunidade</button><button data-page="social" aria-controls="social">Ação social</button><button data-page="parcerias" aria-controls="parcerias">Parcerias</button><button data-page="divulgue" aria-controls="divulgue">Divulgue</button><button data-page="duvidas" aria-controls="duvidas">Dúvidas</button></nav>
 <section class="page active" id="inicio"><div class="grid"><article class="card"><h3>🎧 Música independente</h3><p class="muted">Espaço para lançamentos, artistas e sons da cena.</p></article><article class="card"><h3>📅 Cultura e eventos</h3><p class="muted">Divulgação de encontros, bailes e atividades culturais.</p></article><article class="card"><h3>🤝 Comunidade</h3><p class="muted">Ações sociais, parcerias e informação para fortalecer a comunidade.</p></article></div><div class="card"><h3>📣 Mural da comunidade</h3><p class="muted">Publicações aprovadas pela equipe do Capital do Trem.</p><div id="public-posts" class="list" aria-live="polite"><p class="muted">O mural compartilhado será carregado quando o banco estiver conectado.</p></div></div><div class="card"><h3>Últimas divulgações</h3><div id="feed" class="list" aria-live="polite"><p class="muted">As divulgações salvas nesta demonstração aparecerão aqui neste aparelho.</p></div><button class="btn alt" id="clear-demo-posts" type="button" hidden>Apagar minhas divulgações deste aparelho</button> <button class="btn alt" id="backup-demo-posts" type="button" hidden>Baixar cópia das minhas divulgações</button><p id="feed-status" class="muted" aria-live="polite"></p></div><div class="notice">Esta é a primeira demonstração pública. Cadastro, perfis individuais, chat compartilhado e publicação sincronizada ainda precisam de integração com servidor.</div></section>
 <section class="page" id="musicas"><div class="card"><h2>🎵 Músicas</h2><p class="muted">Ouça os lançamentos diretamente nos canais oficiais.</p><a class="btn" href="https://youtube.com/@capitaldotrem/videos" target="_blank" rel="noopener">Abrir lançamentos no YouTube</a></div><div class="card"><h3>Player de áudio demonstrativo</h3><label for="audio">Selecione um áudio autorizado do seu aparelho</label><input id="audio" type="file" accept="audio/*"><audio id="player" controls style="width:100%"></audio><p class="muted">O áudio escolhido toca somente neste aparelho. Só compartilhe músicas que você tenha autorização para distribuir.</p></div></section>
 <section class="page" id="eventos">
@@ -62,6 +62,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 <a class="btn alt" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Abrir Instagram para enviar</a>
 <p class="muted">Lembre-se de anexar o cartaz ou a imagem do evento diretamente na conversa. Divulgue somente endereços públicos de eventos, nunca endereço residencial.</p>
 </div>
+</section>
+<section class="page" id="comunidade">
+<div class="card"><h2>👥 Nossa comunidade</h2><p class="muted">Um espaço para fãs, artistas e todos que fazem parte do Capital do Trem. Cada pessoa escolhe se quer deixar seu perfil visível.</p><a class="btn" href="./conta.html">Criar minha conta / Meu perfil</a></div>
+<div class="card"><h3>Perfis públicos</h3><div id="community-profiles" class="list" aria-live="polite"><p class="muted">Os perfis públicos aparecerão aqui quando o banco estiver conectado.</p></div></div>
 </section>
 <section class="page" id="social"><div class="card"><h2>❤️ Ação social</h2><p>Um espaço para divulgar campanhas solidárias, arrecadações e iniciativas comunitárias.</p><p class="muted">As campanhas oficiais serão publicadas após implantação de moderação e canal administrativo. Para sugerir uma ação, envie uma apresentação com objetivo, responsável, data e local.</p><a class="btn" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Apresentar uma ação social</a></div></section>
 <section class="page" id="artistas">
@@ -323,6 +327,24 @@ window.addEventListener('offline',()=>updateConnectionStatus());
 window.addEventListener('online',()=>updateConnectionStatus(true));
 updateConnectionStatus();
 
+// Diretório de perfis: lista apenas participantes que optaram por visibilidade pública.
+(async()=>{
+ const container=document.getElementById('community-profiles');
+ try{
+  const module=await import('./supabase/auth.js');module.initSupabase();
+  const profiles=await module.getPublicProfiles();container.replaceChildren();
+  if(!profiles.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Ainda não há perfis públicos. Crie sua conta e escolha aparecer na comunidade!';container.append(empty);return;}
+  for(const profile of profiles){
+   const card=document.createElement('article');card.className='item';
+   const name=document.createElement('strong');name.textContent=profile.display_name||'Participante do Capital do Trem';
+   const role=document.createElement('p');role.className='muted';role.textContent=profile.account_type==='artist'?'Artista':'Fã / usuário';
+   card.append(name,role);
+   if(profile.city){const city=document.createElement('p');city.textContent=profile.city;card.append(city);}
+   if(profile.bio){const bio=document.createElement('p');bio.textContent=profile.bio;card.append(bio);}
+   container.append(card);
+  }
+ }catch(error){const message=document.createElement('p');message.className='muted';message.textContent='O diretório será ativado depois da conexão segura com o banco.';container.replaceChildren(message);}
+})();
 // Mural público: somente divulgações aprovadas pela equipe.
 (async()=>{
  const container=document.getElementById('public-posts');
