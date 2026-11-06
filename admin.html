@@ -65,7 +65,7 @@ async function loadQueue(){
  try{
   const groups=await auth.getModerationQueue();
   let count=0;
-  for(const [kind,label] of [['artists','Artistas'],['events','Eventos e ações'],['posts','Divulgações']]){
+  for(const [kind,label] of [['artists','Artistas'],['events','Eventos e ações'],['posts','Divulgações'],['songs','Músicas']]){
    const heading=node('h2','',label);queue.append(heading);
    if(!groups[kind].length){queue.append(node('p','muted','Nenhum item aguardando análise.'));continue;}
    for(const item of groups[kind]){
