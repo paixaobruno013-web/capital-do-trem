@@ -41,6 +41,8 @@ input:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(237,28,36,.18),0 0
 <div class="actions"><button id="refresh-queue" type="button">Atualizar fila</button><button id="logout" class="secondary" type="button">Sair</button></div>
 <p id="admin-welcome" class="muted"></p><p id="queue-status" class="status" role="status" aria-live="polite"></p>
 <div id="queue"></div>
+<hr style="border:0;border-top:1px solid var(--line);margin:24px 0">
+<h2>Moderação do bate-papo</h2><p class="muted">Revise as mensagens recentes e remova conteúdos ofensivos, spam ou informações impróprias.</p><div id="chat-moderation"></div>
 </section>
 <section class="card"><h2>Segurança</h2><p class="muted">O painel verifica a permissão de administrador no banco de dados. As ações também são protegidas pelas políticas RLS do Supabase. Não use nem publique a chave service_role no navegador.</p></section>
 <footer class="muted">Capital do Trem • painel em preparação</footer>
@@ -59,6 +61,7 @@ async function enterDashboard(user){
  loginPanel.hidden=true;dashboard.hidden=false;
  document.getElementById('admin-welcome').textContent='Acesso autorizado: '+user.email;
  await loadQueue();
+ await loadChatModeration();
 }
 async function loadQueue(){
  queue.replaceChildren();queueStatus.textContent='Carregando publicações pendentes...';
@@ -89,6 +92,28 @@ async function loadQueue(){
   }
   queueStatus.textContent=count+' item(ns) aguardando análise.';
  }catch(error){queueStatus.textContent='Não foi possível carregar a fila. Confira a conexão e as tabelas do banco.';}
+}
+async function loadChatModeration(){
+ const area=document.getElementById('chat-moderation');
+ area.replaceChildren(node('p','muted','Carregando mensagens recentes…'));
+ try{
+  const messages=await auth.getRecentChatMessagesForAdmin(100);
+  area.replaceChildren();
+  if(!messages.length){area.append(node('p','muted','Nenhuma mensagem no bate-papo ainda.'));return;}
+  for(const message of messages){
+   const card=node('article','item');
+   const author=node('strong','',message.author_name||'Usuário Uai');
+   const date=node('small','muted',new Date(message.created_at).toLocaleString('pt-BR'));
+   const content=node('p','',message.content);
+   const remove=node('button','secondary','Remover mensagem');
+   remove.addEventListener('click',async()=>{
+    remove.disabled=true;
+    try{await auth.deleteChatMessage(message.id);card.remove();if(!area.querySelector('.item'))area.append(node('p','muted','Nenhuma mensagem para moderar.'));}
+    catch(error){queueStatus.textContent=error?.message||'Não foi possível remover a mensagem.';remove.disabled=false;}
+   });
+   card.append(author,date,content,remove);area.append(card);
+  }
+ }catch(error){area.replaceChildren(node('p','muted','A moderação do bate-papo ficará disponível depois de aplicar a atualização social no Supabase.'));}
 }
 loginForm.addEventListener('submit',async event=>{
  event.preventDefault();const button=document.getElementById('login-button');button.disabled=true;loginStatus.textContent='Verificando acesso...';
