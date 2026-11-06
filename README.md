@@ -18,6 +18,12 @@ O Capital do Trem é um projeto de comunidade e divulgação da cultura musical,
 - Instagram: https://www.instagram.com/capital.do.trem?cplk=bHFubGZqNG5ua2Q4
 - YouTube: https://youtube.com/@capitaldotrem?si=3UPziMb7JOMzvLlm
 
+## Aplicativos Android e iOS
+
+A estrutura inicial para empacotar o site como aplicativo nativo foi adicionada com Capacitor 8. Consulte [MOBILE-APP.md](./MOBILE-APP.md) para requisitos, comandos de preparação e etapas de publicação.
+
+Essa estrutura ainda não significa que os aplicativos estejam compilados ou publicados. A geração e os testes nativos dependem de Android Studio para Android e de macOS com Xcode para iOS.
+
 ## Etapa atual
 
 Este repositório foi criado para organizar o desenvolvimento do Capital do Trem. A criação deste arquivo é apenas o primeiro passo; a aplicação completa ainda precisa ser adicionada e publicada.
