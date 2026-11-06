@@ -86,3 +86,10 @@ A agenda mostra data, horário, endereço, descrição, contato público e carta
 A área da conta agora inclui um formulário para enviar lançamentos, notícias, parcerias, eventos e ações sociais para análise. O texto é salvo na tabela `posts` como pendente e só aparece no mural público depois da aprovação no painel administrativo. A página inicial consulta apenas registros publicados, sem expor o identificador do autor.
 
 O formulário limita o conteúdo e exige sessão autenticada. O recurso depende da configuração Supabase, execução de `schema.sql` e testes de RLS; enquanto isso, o mural compartilhado permanece informativo e os formulários de demonstração locais continuam separados.
+
+
+## Contas abertas para fãs e artistas
+
+O cadastro agora oferece duas opções: fã/usuário ou artista. Todos usam a mesma conta e podem acessar as áreas abertas (músicas, eventos, agenda, mural e comunidade). A ficha básica permite nome de exibição, cidade e apresentação curta. O perfil público é opcional: somente quem marcar a opção de aparecer será listado no diretório, e a consulta pública retorna apenas nome, tipo de conta, cidade e apresentação — nunca e-mail.
+
+A tabela `profiles` recebe campos novos de forma aditiva, com políticas RLS para que cada pessoa edite somente o próprio perfil e visitantes consultem apenas perfis com `is_public = true`. O perfil artístico detalhado continua sendo uma ficha separada, submetida à análise da equipe. Para ativar em um projeto já existente, é necessário executar a versão atualizada de `schema.sql` no SQL Editor e testar com contas de fã e artista.
