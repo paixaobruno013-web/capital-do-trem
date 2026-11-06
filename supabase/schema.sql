@@ -183,7 +183,7 @@ drop policy if exists "artists_update_own_or_admin" on public.artists;
 create policy "artists_update_own_or_admin" on public.artists
   for update to authenticated
   using (
-    (user_id = (select auth.uid()) and status = 'pending')
+    (user_id = (select auth.uid()) and status in ('pending', 'rejected'))
     or (select public.is_admin())
   )
   with check (
