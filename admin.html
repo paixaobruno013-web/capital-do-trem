@@ -108,6 +108,7 @@ async function loadChatModeration(){
    const content=node('p','',message.content);
    const remove=node('button','secondary','Remover mensagem');
    remove.addEventListener('click',async()=>{
+    if(!window.confirm('Remover esta mensagem do bate-papo? Esta ação não pode ser desfeita.'))return;
     remove.disabled=true;
     try{await auth.deleteChatMessage(message.id);card.remove();if(!area.querySelector('.item'))area.append(node('p','muted','Nenhuma mensagem para moderar.'));}
     catch(error){queueStatus.textContent=error?.message||'Não foi possível remover a mensagem.';remove.disabled=false;}
