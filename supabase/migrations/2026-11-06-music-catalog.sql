@@ -46,10 +46,14 @@ on conflict (id) do update set public=false, file_size_limit=excluded.file_size_
   allowed_mime_types=excluded.allowed_mime_types;
 
 drop policy if exists "audio_upload_own_folder" on storage.objects;
-create policy "audio_upload_own_folder" on storage.objects
+drop policy if exists "audio_upload_admin_only" on storage.objects;
+create policy "audio_upload_admin_only" on storage.objects
   for insert to authenticated
-  with check (bucket_id='capital-do-trem-audio'
-    and (storage.foldername(name))[1]=(select auth.uid())::text);
+  with check (
+    bucket_id='capital-do-trem-audio'
+    and (storage.foldername(name))[1]=(select auth.uid())::text
+    and (select public.is_admin())
+  );
 
 drop policy if exists "audio_read_published_owner_admin" on storage.objects;
 create policy "audio_read_published_owner_admin" on storage.objects
