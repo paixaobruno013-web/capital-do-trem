@@ -19,7 +19,7 @@ function addMessage(m){
  if(!m||!m.id||seen.has(m.id))return;
  const wasNearBottom=list.scrollHeight-list.scrollTop-list.clientHeight<90;
  seen.add(m.id);
- const box=document.createElement('article');box.className='message';box.dataset.createdAt=m.created_at||'';
+ const box=document.createElement('article');box.className='message';box.dataset.createdAt=m.created_at||'';box.dataset.messageId=m.id;
  const name=document.createElement('strong');name.textContent=m.author_name||'Usuário Uai';
  const body=document.createElement('div');body.textContent=m.content||'';
  const time=document.createElement('time');const d=new Date(m.created_at);
