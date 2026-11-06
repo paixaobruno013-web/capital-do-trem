@@ -82,6 +82,7 @@ async function loadQueue(){
     const reject=node('button','secondary','Rejeitar');
     for(const [button,next] of [[approve,'published'],[reject,'rejected']]){
      button.addEventListener('click',async()=>{
+      if(next==='rejected'&&!window.confirm('Tem certeza de que deseja rejeitar este item?'))return;
       button.disabled=true;reject.disabled=true;approve.disabled=true;
       try{await auth.moderateItem(kind,item.id,next);await loadQueue();}
       catch(error){queueStatus.textContent=error?.message||'Não foi possível atualizar. Verifique as permissões do banco.';button.disabled=false;reject.disabled=false;approve.disabled=false;}
