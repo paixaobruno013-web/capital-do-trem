@@ -57,3 +57,8 @@ O arquivo `supabase/auth.js` prepara funções para cadastro com confirmação p
 5. Só então integre o módulo à interface e valide o acesso com duas contas diferentes.
 
 A URL e a chave publicável são destinadas ao cliente; a chave `service_role` é secreta e nunca deve ser publicada. Não cole credenciais em conversas ou em arquivos públicos.
+
+
+## Reenvio de perfil recusado
+
+A versão atual do esquema permite que o próprio artista edite uma ficha que esteja pendente ou recusada, mas exige que ela volte a ficar com status `pending` ao salvar. Perfis já publicados não podem ser alterados diretamente pelo artista; isso evita que uma ficha aprovada mude sem nova análise. Se este banco já tiver sido criado com a política anterior, aplique no SQL Editor a atualização da política `artists_update_own_or_admin` presente na versão atual de `schema.sql`.
