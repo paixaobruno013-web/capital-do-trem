@@ -107,14 +107,31 @@ export async function saveMyArtistProfile(profile) {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para salvar o perfil.');
+
+  const clean = (value, max, label) => {
+    const result = String(value || '').trim();
+    if (result.length > max) throw new Error(label + ' ultrapassa o limite de ' + max + ' caracteres.');
+    return result;
+  };
+  const instagram = clean(profile.instagram, 120, 'Instagram');
+  const youtube = clean(profile.youtube, 240, 'YouTube');
+  const validInstagram = !instagram || /^@?[A-Za-z0-9._]{1,30}$/.test(instagram) ||
+    /^https:\/\/(www\.)?instagram\.com\/[A-Za-z0-9._]+\/?$/.test(instagram);
+  const validYouTube = !youtube || /^@?[A-Za-z0-9._-]{1,100}$/.test(youtube) ||
+    /^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//.test(youtube);
+  if (!validInstagram) throw new Error('Informe um @ do Instagram ou um link https://instagram.com válido.');
+  if (!validYouTube) throw new Error('Informe um canal do YouTube ou um link https://youtube.com válido.');
+
+  const artistName = clean(profile.artist_name, 100, 'Nome artístico');
+  if (artistName.length < 2) throw new Error('O nome artístico precisa ter pelo menos 2 caracteres.');
   const payload = {
     user_id: user.id,
-    artist_name: String(profile.artist_name || '').trim(),
-    style: String(profile.style || '').trim(),
-    city: String(profile.city || '').trim(),
-    instagram: String(profile.instagram || '').trim(),
-    youtube: String(profile.youtube || '').trim(),
-    bio: String(profile.bio || '').trim(),
+    artist_name: artistName,
+    style: clean(profile.style, 80, 'Estilo musical'),
+    city: clean(profile.city, 100, 'Cidade'),
+    instagram,
+    youtube,
+    bio: clean(profile.bio, 1500, 'Apresentação'),
     status: 'pending'
   };
   const { data, error } = await supabase
