@@ -252,6 +252,7 @@ export async function uploadMySong({ file, title, artistName, description = '' }
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para enviar uma música.');
+  if (!(await isCurrentUserAdmin())) throw new Error('O envio de músicas é exclusivo da equipe autorizada do Capital do Trem.');
   if (!(file instanceof File)) throw new Error('Selecione um arquivo de áudio.');
   const mime = file.type.toLowerCase();
   const allowed = ['audio/mpeg','audio/mp4','audio/aac','audio/wav','audio/x-wav','audio/ogg'];
@@ -406,4 +407,89 @@ export async function getPublishedArtists() {
     .limit(100);
   if (error) throw error;
   return data || [];
+}
+
+
+// Interações do catálogo: curtidas e comentários ficam vinculados à conta.
+export async function getSongSocial(songId) {
+  const supabase = initSupabase();
+  const [likes, comments] = await Promise.all([
+    supabase.from('song_likes').select('user_id', { count: 'exact', head: true }).eq('song_id', songId),
+    supabase.from('song_comments').select('id, song_id, author_id, author_name, content, created_at').eq('song_id', songId).order('created_at', { ascending: true }).limit(100)
+  ]);
+  if (likes.error) throw likes.error;
+  if (comments.error) throw comments.error;
+  const { data: { user } } = await supabase.auth.getUser();
+  let liked = false;
+  if (user) {
+    const { data, error } = await supabase.from('song_likes').select('song_id').eq('song_id', songId).eq('user_id', user.id).maybeSingle();
+    if (error) throw error;
+    liked = !!data;
+  }
+  return { likeCount: likes.count || 0, liked, comments: comments.data || [] };
+}
+
+export async function toggleSongLike(songId) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para curtir uma música.');
+  const { data: existing, error: lookupError } = await supabase.from('song_likes')
+    .select('song_id').eq('song_id', songId).eq('user_id', user.id).maybeSingle();
+  if (lookupError) throw lookupError;
+  if (existing) {
+    const { error } = await supabase.from('song_likes').delete().eq('song_id', songId).eq('user_id', user.id);
+    if (error) throw error;
+    return false;
+  }
+  const { error } = await supabase.from('song_likes').insert({ song_id: songId, user_id: user.id });
+  if (error) throw error;
+  return true;
+}
+
+export async function addSongComment(songId, content) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para comentar.');
+  const cleanContent = String(content || '').trim();
+  if (!cleanContent || cleanContent.length > 1000) throw new Error('O comentário deve ter entre 1 e 1.000 caracteres.');
+  const { data, error } = await supabase.from('song_comments')
+    .insert({ song_id: songId, author_id: user.id, content: cleanContent })
+    .select('id, song_id, author_id, author_name, content, created_at').single();
+  if (error) throw error;
+  return data;
+}
+
+// Bate-papo geral em tempo real para todos os usuários autenticados.
+export async function getChatMessages(limit = 60) {
+  const supabase = initSupabase();
+  const { data, error } = await supabase.from('chat_messages')
+    .select('id, author_id, author_name, content, created_at')
+    .order('created_at', { ascending: true }).limit(Math.min(Math.max(Number(limit) || 60, 1), 100));
+  if (error) throw error;
+  return data || [];
+}
+
+export async function sendChatMessage(content) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para participar do bate-papo.');
+  const cleanContent = String(content || '').trim();
+  if (!cleanContent || cleanContent.length > 1000) throw new Error('A mensagem deve ter entre 1 e 1.000 caracteres.');
+  const { data, error } = await supabase.from('chat_messages')
+    .insert({ author_id: user.id, content: cleanContent })
+    .select('id, author_id, author_name, content, created_at').single();
+  if (error) throw error;
+  return data;
+}
+
+export function subscribeChatMessages(onMessage) {
+  const supabase = initSupabase();
+  const channel = supabase.channel('capital-do-trem-chat')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, payload => {
+      if (typeof onMessage === 'function') onMessage(payload.new);
+    }).subscribe();
+  return () => { supabase.removeChannel(channel); };
 }
