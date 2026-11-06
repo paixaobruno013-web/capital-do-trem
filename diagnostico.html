@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#000000">
+<title>Verificação do banco — Capital do Trem</title>
+<style>
+:root{color-scheme:dark;--bg:#000;--panel:#111;--fg:#fff;--muted:#aaa;--red:#ed1c24;--line:#333}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,Arial,sans-serif}
+main{max-width:720px;margin:auto;padding:20px}header{text-align:center;padding:18px 0;border-bottom:1px solid var(--line)}
+h1{font-size:clamp(24px,6vw,34px);margin:8px 0;text-shadow:0 0 12px #ed1c2444}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:17px;margin:16px 0}
+button,a{font:inherit}button,.btn{display:inline-block;min-height:46px;padding:11px 16px;border:0;border-radius:10px;background:var(--red);color:#fff;font-weight:800;text-decoration:none;cursor:pointer}
+button:disabled{opacity:.6}.muted{color:var(--muted)}.result{padding:12px;margin:9px 0;border:1px solid var(--line);border-radius:9px;overflow-wrap:anywhere}
+.good{border-left:4px solid #26a269}.bad{border-left:4px solid #e05252}.wait{border-left:4px solid #d49b36}
+#overall{font-weight:800}.actions{display:flex;gap:10px;flex-wrap:wrap}
+:focus-visible{outline:3px solid var(--red);outline-offset:3px}
+</style>
+</head>
+<body><main>
+<header>
+<p class="muted">🚂 CAPITAL DO TREM</p>
+<h1>Verificação do banco de dados</h1>
+<p class="muted">Esta página faz apenas consultas de leitura. Não cria, altera nem apaga dados.</p>
+</header>
+<section class="card">
+<p>Toque no botão para verificar se as tabelas principais estão acessíveis no Supabase.</p>
+<div class="actions"><button id="check" type="button">Verificar agora</button><a class="btn" href="./">Voltar ao aplicativo</a></div>
+<p id="overall" class="muted" role="status" aria-live="polite">Aguardando verificação.</p>
+<div id="results"></div>
+</section>
+<section class="card">
+<strong>Privacidade e segurança</strong>
+<p class="muted">A verificação não mostra cadastros, e-mails, senhas ou chaves secretas. A chave publicável já usada pelo aplicativo é própria para consultas no navegador, desde que as políticas de segurança do banco estejam configuradas.</p>
+</section>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const URL='https://zmjxkfjzrbbxyvgkwirv.supabase.co';
+const KEY='sb_publishable_FLbDg6UCePQHb7s0wkywng_J9pNKlsP';
+const client=createClient(URL,KEY,{auth:{persistSession:false,autoRefreshToken:false}});
+const button=document.getElementById('check'),overall=document.getElementById('overall'),results=document.getElementById('results');
+const checks=[
+ ['profiles','user_id'],
+ ['artists','id'],
+ ['events','id'],
+ ['posts','id']
+];
+function show(label,ok,detail){
+ const item=document.createElement('div');item.className='result '+(ok?'good':'bad');
+ const strong=document.createElement('strong');strong.textContent=(ok?'✓ ':'✕ ')+label;
+ const p=document.createElement('p');p.className='muted';p.textContent=detail;
+ item.append(strong,p);results.append(item);
+}
+button.addEventListener('click',async()=>{
+ button.disabled=true;results.replaceChildren();overall.textContent='Verificando conexão e tabelas...';overall.className='wait';
+ let passed=0;
+ try{
+  const {error}=await client.auth.getSession();
+  if(error) throw error;
+  show('Conexão com Supabase',true,'O projeto respondeu à solicitação.');
+  passed++;
+ }catch(error){show('Conexão com Supabase',false,error.message||'Não foi possível conectar.');overall.textContent='Não foi possível concluir a verificação. Confira sua conexão com a internet.';overall.className='bad';button.disabled=false;return;}
+ for(const [table,column] of checks){
+  try{
+   const {error}=await client.from(table).select(column).limit(1);
+   if(error) throw error;
+   show('Tabela '+table,true,'Encontrada e acessível para consulta.');passed++;
+  }catch(error){show('Tabela '+table,false,error.message||'Não foi possível consultar esta tabela.');}
+ }
+ try{
+  const {data,error}=await client.storage.from('capital-do-trem-media').list('',{limit:1});
+  if(error) throw error;
+  show('Armazenamento de imagens',true,'O espaço de mídia respondeu à consulta.');passed++;
+ }catch(error){show('Armazenamento de imagens',false,error.message||'Espaço de mídia não encontrado ou sem acesso.');}
+ const total=checks.length+2;
+ overall.textContent=passed===total?'Tudo certo: conexão, tabelas e armazenamento responderam.':'Resultado: '+passed+' de '+total+' verificações passaram. Veja os itens acima.';
+ overall.className=passed===total?'good':'wait';
+ button.disabled=false;
+});
+</script>
+</main></body></html>
