@@ -493,3 +493,23 @@ export function subscribeChatMessages(onMessage) {
     }).subscribe();
   return () => { supabase.removeChannel(channel); };
 }
+
+
+// Ferramentas de moderação do bate-papo (somente equipe autorizada).
+export async function getRecentChatMessagesForAdmin(limit = 100) {
+  const supabase = initSupabase();
+  if (!(await isCurrentUserAdmin())) throw new Error('Acesso administrativo não autorizado.');
+  const { data, error } = await supabase.from('chat_messages')
+    .select('id, author_id, author_name, content, created_at')
+    .order('created_at', { ascending: false })
+    .limit(Math.min(Math.max(Number(limit) || 100, 1), 200));
+  if (error) throw error;
+  return data || [];
+}
+
+export async function deleteChatMessage(messageId) {
+  const supabase = initSupabase();
+  if (!(await isCurrentUserAdmin())) throw new Error('Acesso administrativo não autorizado.');
+  const { error } = await supabase.from('chat_messages').delete().eq('id', messageId);
+  if (error) throw error;
+}
