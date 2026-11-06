@@ -23,7 +23,7 @@ button:disabled{opacity:.5;cursor:not-allowed}.secondary{background:var(--panel2
 .notice{padding:13px;border-left:4px solid var(--red);background:var(--panel2);border-radius:8px}
 .status{min-height:1.5em;color:var(--muted)}[hidden]{display:none!important}
 a{color:var(--fg)}:focus-visible{outline:3px solid var(--red);outline-offset:3px}
-footer{text-align:center;color:var(--muted);font-size:13px}
+footer{text-align:center;color:var(--muted);font-size:13px}.image-preview{display:flex;align-items:center;gap:12px;margin:8px 0 14px;padding:10px;border:1px dashed var(--line);border-radius:10px}.image-preview img{width:112px;height:112px;object-fit:cover;border-radius:8px}.image-preview:empty{display:none}
 </style>
 </head>
 <body>
@@ -65,7 +65,7 @@ footer{text-align:center;color:var(--muted);font-size:13px}
 <label for="artist-city">Cidade</label><input id="artist-city" maxlength="100">
 <label for="artist-instagram">Instagram</label><input id="artist-instagram" maxlength="120" placeholder="@seuperfil">
 <label for="artist-youtube">YouTube</label><input id="artist-youtube" maxlength="240" placeholder="Link do canal">
-<label for="artist-photo-upload">Foto do artista (JPG, PNG ou WebP, até 5 MB)</label><input id="artist-photo-upload" type="file" accept="image/jpeg,image/png,image/webp"><p class="muted">A foto será enviada para o armazenamento do Capital do Trem quando você salvar a ficha.</p><label for="artist-bio">Sobre o artista</label><textarea id="artist-bio" maxlength="1500" rows="4" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
+<label for="artist-photo-upload">Foto do artista (JPG, PNG ou WebP, até 5 MB)</label><input id="artist-photo-upload" type="file" accept="image/jpeg,image/png,image/webp"><div id="artist-photo-preview" class="image-preview" aria-live="polite"></div><p class="muted">A foto será enviada para o armazenamento do Capital do Trem quando você salvar a ficha.</p><label for="artist-bio">Sobre o artista</label><textarea id="artist-bio" maxlength="1500" rows="4" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
 <button type="submit" id="save-artist">Salvar ficha para análise</button>
 <p id="artist-status" class="status" role="status" aria-live="polite"></p>
 </form>
@@ -121,7 +121,7 @@ footer{text-align:center;color:var(--muted);font-size:13px}
 <label for="event-address">Endereço público</label><input id="event-address" maxlength="240" required>
 <label for="event-category">Tipo</label><select id="event-category" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="show">Show</option><option value="evento">Evento</option><option value="acao-social">Ação social</option><option value="outro">Outro</option></select>
 <label for="event-description">Descrição</label><textarea id="event-description" maxlength="2000" rows="4" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
-<label for="event-contact">Contato público (opcional)</label><input id="event-contact" maxlength="120"><label for="event-poster-upload">Cartaz do evento (JPG, PNG ou WebP, até 5 MB)</label><input id="event-poster-upload" type="file" accept="image/jpeg,image/png,image/webp"><p class="muted">O cartaz será enviado junto com o evento para análise.</p>
+<label for="event-contact">Contato público (opcional)</label><input id="event-contact" maxlength="120"><label for="event-poster-upload">Cartaz do evento (JPG, PNG ou WebP, até 5 MB)</label><input id="event-poster-upload" type="file" accept="image/jpeg,image/png,image/webp"><div id="event-poster-preview" class="image-preview" aria-live="polite"></div><p class="muted">O cartaz será enviado junto com o evento para análise.</p>
 <button type="submit" id="submit-event">Enviar para análise</button>
 <p id="event-status" class="status" role="status" aria-live="polite"></p>
 </form>
@@ -156,7 +156,10 @@ const postStatus=document.getElementById('post-status');
 const eventForm=document.getElementById('event-form');
 const eventStatus=document.getElementById('event-status');
 const myEvents=document.getElementById('my-events');
-const artistFields={artist_name:'artist-name',style:'artist-style',city:'artist-city',instagram:'artist-instagram',youtube:'artist-youtube',bio:'artist-bio'};
+const artistFields={artist_name:'artist-name',style:'artist-style',city:'artist-city',instagram:'artist-instagram',youtube:'artist-youtube',bio:'artist-bio'};function previewFile(inputId,boxId){const input=document.getElementById(inputId);const box=document.getElementById(boxId);box.replaceChildren();const file=input.files&&input.files[0];if(!file)return;if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5242880||file.size===0){input.value='';const msg=document.createElement('p');msg.textContent='Escolha JPG, PNG ou WebP de até 5 MB.';box.append(msg);return;}const img=document.createElement('img');img.src=URL.createObjectURL(file);img.alt='Prévia da imagem selecionada';const msg=document.createElement('p');msg.textContent='Prévia da imagem antes do envio.';box.append(img,msg);}
+document.getElementById('artist-photo-upload').addEventListener('change',()=>previewFile('artist-photo-upload','artist-photo-preview'));
+document.getElementById('event-poster-upload').addEventListener('change',()=>previewFile('event-poster-upload','event-poster-preview'));
+
 function fillArtistForm(profile){
  for(const [field,id] of Object.entries(artistFields))document.getElementById(id).value=profile?.[field]||'';
  const published=profile?.status==='published';
