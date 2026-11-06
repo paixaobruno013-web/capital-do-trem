@@ -166,7 +166,11 @@ create policy "profiles_read_public" on public.profiles
 drop policy if exists "events_read_published_or_admin" on public.events;
 create policy "events_read_published_or_admin" on public.events
   for select to anon, authenticated
-  using (status = 'published' or (select public.is_admin()));
+  using (
+    status = 'published'
+    or created_by = (select auth.uid())
+    or (select public.is_admin())
+  );
 
 drop policy if exists "events_submit_pending" on public.events;
 create policy "events_submit_pending" on public.events
