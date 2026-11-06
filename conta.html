@@ -338,6 +338,7 @@ function setMode(next){
  document.getElementById('submit-account').textContent=mode==='register'?'Criar minha conta':mode==='reset'?'Enviar link de recuperação':'Entrar';
  status.textContent='';
 }
+setMode('login');
 Object.entries(tabs).forEach(([key,button])=>button.addEventListener('click',()=>setMode(key)));
 form.addEventListener('submit',async event=>{
  event.preventDefault();
