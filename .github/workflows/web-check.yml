@@ -1,0 +1,32 @@
+name: Verificar preparação do aplicativo
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  preparar-versao-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Instalar dependências
+        run: npm install
+      - name: Preparar arquivos do aplicativo
+        run: npm run build:web
+      - name: Conferir arquivos essenciais
+        run: |
+          test -s www/index.html
+          test -s www/conta.html
+          test -s www/admin.html
+          test -s www/privacidade.html
+          test -s www/supabase/auth.js
+          test -s www/manifest.webmanifest
+          echo "Preparação web concluída: arquivos essenciais encontrados."
