@@ -8,6 +8,7 @@ Este diretório contém a primeira estrutura de banco de dados para a futura ver
 - Eventos, shows e ações sociais com aprovação antes da publicação.
 - Perfis de artistas com aprovação antes de aparecerem publicamente.
 - Mural de divulgações com aprovação.
+- Painel administrativo com verificação de função no banco e fila de moderação para artistas, eventos e divulgações.
 - Regras de acesso por usuário e uma lista privada de administradores.
 
 ## Situação atual
@@ -42,7 +43,9 @@ O esquema também prepara o bucket público `capital-do-trem-media`, limitado a 
 3. Integrar cadastro, login, sessão e recuperação de senha no site.
 4. Integrar formulários de eventos, artistas e divulgações.
 5. Criar armazenamento de imagens com regras de acesso e limites de tamanho.
-6. Criar o painel administrativo protegido e testar permissões com contas diferentes.
+6. Configurar o primeiro administrador manualmente na tabela `admin_users`.
+7. Abrir `admin.html`, entrar com a conta autorizada e testar aprovação/rejeição de cada tipo de publicação.
+8. Testar permissões com contas comuns e administrativas diferentes.
 
 ## Módulo inicial de autenticação
 
@@ -62,3 +65,10 @@ A URL e a chave publicável são destinadas ao cliente; a chave `service_role` �
 ## Reenvio de perfil recusado
 
 A versão atual do esquema permite que o próprio artista edite uma ficha que esteja pendente ou recusada, mas exige que ela volte a ficar com status `pending` ao salvar. Perfis já publicados não podem ser alterados diretamente pelo artista; isso evita que uma ficha aprovada mude sem nova análise. Se este banco já tiver sido criado com a política anterior, aplique no SQL Editor a atualização da política `artists_update_own_or_admin` presente na versão atual de `schema.sql`.
+
+
+## Painel administrativo preparado
+
+A página `admin.html` agora contém formulário de entrada, verificação de administrador por `public.is_admin()`, fila de itens pendentes (artistas, eventos e divulgações) e ações de aprovar/rejeitar. As alterações são feitas com a sessão autenticada e dependem das políticas RLS. O painel não concede privilégios por si só.
+
+**Este painel ainda não pode ser usado em produção:** a URL/chave pública do Supabase continuam como marcadores, o esquema SQL ainda não foi aplicado e nenhuma conta foi autorizada como administrador. Não compartilhe credenciais administrativas nem use a chave `service_role` no navegador.
