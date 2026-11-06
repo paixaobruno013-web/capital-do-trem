@@ -500,3 +500,19 @@ begin
     alter publication supabase_realtime add table public.chat_messages;
   end if;
 end $$;
+
+
+-- Moderação do bate-papo: somente administradores podem remover mensagens.
+grant delete on public.chat_messages to authenticated;
+drop policy if exists "chat_messages_delete_admin" on public.chat_messages;
+create policy "chat_messages_delete_admin" on public.chat_messages
+  for delete to authenticated using ((select public.is_admin()));
+
+-- Curtidas somente em músicas já publicadas.
+drop policy if exists "song_likes_insert_self" on public.song_likes;
+create policy "song_likes_insert_self" on public.song_likes
+  for insert to authenticated
+  with check (
+    user_id = (select auth.uid())
+    and exists (select 1 from public.songs s where s.id = song_id and s.status = 'published')
+  );
