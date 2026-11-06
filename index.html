@@ -99,6 +99,12 @@ document.getElementById('theme').setAttribute('aria-pressed',String(document.bod
 document.getElementById('theme-color').content=document.body.classList.contains('light')?'#f5f5f5':'#000000';};
 // Prévia local: os dados permanecem no aparelho e não são enviados ao site.
 const eventFieldIds=['event-name','event-date','event-time','event-place','event-kind','event-contact'];
+// Impede selecionar datas passadas no calendário do evento (data local do aparelho).
+const eventDateInput=document.getElementById('event-date');
+const nowForEvent=new Date();
+const localToday=nowForEvent.getFullYear()+'-'+String(nowForEvent.getMonth()+1).padStart(2,'0')+'-'+String(nowForEvent.getDate()).padStart(2,'0');
+eventDateInput.min=localToday;
+
 function updateEventPreview(){
  const value=id=>document.getElementById(id).value.trim();
  const date=value('event-date');
