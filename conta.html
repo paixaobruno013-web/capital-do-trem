@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#000000">
+<meta name="description" content="Área de acesso do Capital do Trem.">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Minha conta — Capital do Trem</title>
+<style>
+:root{color-scheme:dark;--bg:#000;--panel:#101010;--panel2:#181818;--fg:#fff;--muted:#aaa;--red:#ed1c24;--line:#303030}
+body.light{color-scheme:light;--bg:#f5f5f5;--panel:#fff;--panel2:#eee;--fg:#111;--muted:#555;--line:#ddd}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,Arial,sans-serif}
+header,main,footer{max-width:720px;margin:auto;padding:18px}
+header{text-align:center;border-bottom:1px solid var(--line)}
+.logo{width:76px;height:76px}h1{font-size:clamp(24px,6vw,34px);margin:6px 0}.muted{color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px;margin:16px 0}
+label{display:block;font-weight:700;margin-top:12px}
+input{display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit}
+button,.btn{min-height:46px;padding:11px 15px;border:0;border-radius:10px;background:var(--red);color:#fff;font:inherit;font-weight:800;text-decoration:none;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}.secondary{background:var(--panel2);color:var(--fg);border:1px solid var(--line)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}.tabs button[aria-pressed=true]{background:var(--red);color:white}
+.notice{padding:13px;border-left:4px solid var(--red);background:var(--panel2);border-radius:8px}
+.status{min-height:1.5em;color:var(--muted)}[hidden]{display:none!important}
+a{color:var(--fg)}:focus-visible{outline:3px solid var(--red);outline-offset:3px}
+footer{text-align:center;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+<img class="logo" src="marca.svg" alt="Marca Capital do Trem">
+<h1>Minha conta</h1>
+<p class="muted">A música da nossa quebrada!</p>
+<a href="./index.html">← Voltar ao Capital do Trem</a>
+</header>
+<main>
+<section class="card">
+<h2>Bem-vindo à área do artista</h2>
+<p class="muted">Estamos preparando o acesso individual para artistas e participantes da comunidade.</p>
+<div id="setup-message" class="notice" role="status">O cadastro ainda não está ativado. A conexão segura com o serviço de contas precisa ser configurada antes de receber usuários.</div>
+</section>
+<section class="card" aria-labelledby="access-title">
+<h2 id="access-title">Acesso à conta</h2>
+<div class="tabs" role="group" aria-label="Tipo de acesso">
+<button type="button" class="secondary" id="tab-login" aria-pressed="true" disabled>Entrar</button>
+<button type="button" class="secondary" id="tab-register" aria-pressed="false" disabled>Criar conta</button>
+<button type="button" class="secondary" id="tab-reset" aria-pressed="false" disabled>Recuperar senha</button>
+</div>
+<form id="account-form">
+<div id="name-wrap" hidden>
+<label for="display-name">Nome artístico ou nome de exibição</label>
+<input id="display-name" name="display-name" maxlength="80" autocomplete="name" disabled>
+</div>
+<label for="email">E-mail</label>
+<input id="email" name="email" type="email" maxlength="254" autocomplete="email" required disabled>
+<div id="password-wrap">
+<label for="password">Senha</label>
+<input id="password" name="password" type="password" minlength="8" autocomplete="current-password" required disabled>
+<p class="muted">Use uma senha com pelo menos 8 caracteres.</p>
+</div>
+<button id="submit-account" type="submit" disabled>Cadastro em preparação</button>
+<p id="account-status" class="status" role="status" aria-live="polite"></p>
+</form>
+</section>
+<section class="card">
+<h2>Privacidade e segurança</h2>
+<p class="muted">Não compartilhe sua senha. O Capital do Trem nunca pedirá sua senha por mensagem. A área de conta só será liberada depois dos testes de autenticação e das permissões do banco de dados.</p>
+</section>
+</main>
+<footer><a href="./privacidade.html">Política de privacidade</a></footer>
+<script type="module">
+const setupMessage=document.getElementById('setup-message');
+const form=document.getElementById('account-form');
+const status=document.getElementById('account-status');
+const controls=[...form.querySelectorAll('input,button'),...document.querySelectorAll('.tabs button')];
+let auth=null;
+try{
+  const module=await import('./supabase/auth.js');
+  auth=module;
+  module.initSupabase();
+  controls.forEach(control=>control.disabled=false);
+  setupMessage.textContent='Serviço de contas configurado. Faça um teste antes de divulgar o cadastro ao público.';
+}catch(error){
+  setupMessage.textContent='Cadastro ainda indisponível: falta configurar a URL e a chave pública do projeto Supabase e concluir os testes de segurança. Nenhum dado foi enviado.';
+}
+let mode='login';
+const tabs={
+ login:document.getElementById('tab-login'),
+ register:document.getElementById('tab-register'),
+ reset:document.getElementById('tab-reset')
+};
+function setMode(next){
+ mode=next;
+ Object.entries(tabs).forEach(([key,button])=>button.setAttribute('aria-pressed',String(key===mode)));
+ document.getElementById('name-wrap').hidden=mode!=='register';
+ document.getElementById('password-wrap').hidden=mode==='reset';
+ document.getElementById('display-name').required=mode==='register';
+ document.getElementById('password').required=mode!=='reset';
+ document.getElementById('password').autocomplete=mode==='register'?'new-password':'current-password';
+ document.getElementById('submit-account').textContent=mode==='register'?'Criar minha conta':mode==='reset'?'Enviar link de recuperação':'Entrar';
+ status.textContent='';
+}
+Object.entries(tabs).forEach(([key,button])=>button.addEventListener('click',()=>setMode(key)));
+form.addEventListener('submit',async event=>{
+ event.preventDefault();
+ if(!auth){status.textContent='O acesso ainda não está configurado. Tente novamente mais tarde.';return;}
+ const email=document.getElementById('email').value.trim();
+ const password=document.getElementById('password').value;
+ const displayName=document.getElementById('display-name').value.trim();
+ const submit=document.getElementById('submit-account');
+ submit.disabled=true;status.textContent='Aguarde...';
+ try{
+  if(mode==='register'){
+   const result=await auth.registerAccount({email,password,displayName});
+   status.textContent=result.user?.identities?.length===0?'Este e-mail já possui cadastro.':'Cadastro enviado. Confira seu e-mail para confirmar a conta.';
+  }else if(mode==='reset'){
+   await auth.sendPasswordReset(email);
+   status.textContent='Se o endereço estiver cadastrado, você receberá um link para redefinir a senha.';
+  }else{
+   await auth.signInAccount({email,password});
+   status.textContent='Acesso realizado. A área de perfil será liberada após a integração completa.';
+  }
+ }catch(error){
+  status.textContent=error?.message||'Não foi possível concluir. Confira os dados e tente novamente.';
+ }finally{submit.disabled=false;}
+});
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body>
+</html>
