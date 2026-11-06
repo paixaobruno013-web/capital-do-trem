@@ -8,6 +8,8 @@ const files = [
   'conta.html',
   'admin.html',
   'privacidade.html',
+  'bate-papo.html',
+  'diagnostico.html',
   'marca.svg',
   'manifest.webmanifest',
   'sw.js',
