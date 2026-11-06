@@ -394,20 +394,7 @@ create policy "media_delete_own_or_admin" on storage.objects
 -- Execute depois da migration 2026-11-06-music-catalog.sql.
 -- Todas as interações exigem conta autenticada; mensagens usam nome público do perfil.
 
--- Corrige o envio de músicas: somente administradores autorizados podem enviar.
-drop policy if exists "songs_insert_own_pending" on public.songs;
-create policy "songs_insert_own_pending" on public.songs
-  for insert to authenticated
-  with check (user_id = (select auth.uid()) and status = 'pending' and (select public.is_admin()));
-
-drop policy if exists "audio_upload_own_folder" on storage.objects;
-create policy "audio_upload_own_folder" on storage.objects
-  for insert to authenticated
-  with check (
-    bucket_id = 'capital-do-trem-audio'
-    and (storage.foldername(name))[1] = (select auth.uid())::text
-    and (select public.is_admin())
-  );
+-- As políticas administrativas de envio já são definidas na seção do catálogo acima.
 
 create table if not exists public.song_likes (
   song_id uuid not null references public.songs(id) on delete cascade,
