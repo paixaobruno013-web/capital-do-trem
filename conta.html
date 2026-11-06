@@ -39,6 +39,20 @@ footer{text-align:center;color:var(--muted);font-size:13px}
 <p class="muted">Estamos preparando o acesso individual para artistas e participantes da comunidade.</p>
 <div id="setup-message" class="notice" role="status">O cadastro ainda não está ativado. A conexão segura com o serviço de contas precisa ser configurada antes de receber usuários.</div>
 </section>
+<section class="card" id="basic-profile-panel" hidden aria-labelledby="basic-profile-title">
+<h2 id="basic-profile-title">👤 Meu perfil na comunidade</h2>
+<p class="muted">Todo mundo pode participar: fã, artista ou apoiador. Escolha se deseja aparecer no diretório público.</p>
+<form id="basic-profile-form">
+<label for="basic-display-name">Nome que será exibido</label><input id="basic-display-name" maxlength="80" required>
+<label for="basic-account-type">Como deseja participar?</label>
+<select id="basic-account-type" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="fan">Sou fã / usuário</option><option value="artist">Sou artista</option></select>
+<label for="basic-city">Cidade (opcional)</label><input id="basic-city" maxlength="100">
+<label for="basic-bio">Sobre você (opcional)</label><textarea id="basic-bio" maxlength="500" rows="3" placeholder="Conte um pouco sobre você..." style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
+<label style="display:flex;gap:10px;align-items:center"><input id="basic-public" type="checkbox" style="width:auto"> Quero que meu perfil apareça no diretório público</label>
+<button type="submit" id="save-basic-profile">Salvar meu perfil</button>
+<p id="basic-profile-status" class="status" role="status" aria-live="polite"></p>
+</form>
+</section>
 <section class="card" id="profile-panel" hidden aria-labelledby="profile-title">
 <h2 id="profile-title">Sua área</h2>
 <p id="profile-welcome"></p>
@@ -67,6 +81,8 @@ footer{text-align:center;color:var(--muted);font-size:13px}
 <div id="name-wrap" hidden>
 <label for="display-name">Nome artístico ou nome de exibição</label>
 <input id="display-name" name="display-name" maxlength="80" autocomplete="name" disabled>
+<label for="register-type">Tipo de conta</label>
+<select id="register-type" name="register-type" disabled style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="fan">Fã / usuário</option><option value="artist">Artista</option></select>
 </div>
 <label for="email">E-mail</label>
 <input id="email" name="email" type="email" maxlength="254" autocomplete="email" required disabled>
@@ -121,6 +137,9 @@ const status=document.getElementById('account-status');
 const controls=[...form.querySelectorAll('input,button'),...document.querySelectorAll('.tabs button')];
 const accessPanel=document.getElementById('access-panel');
 const profilePanel=document.getElementById('profile-panel');
+const basicProfilePanel=document.getElementById('basic-profile-panel');
+const basicProfileForm=document.getElementById('basic-profile-form');
+const basicProfileStatus=document.getElementById('basic-profile-status');
 const profileWelcome=document.getElementById('profile-welcome');
 const sessionStatus=document.getElementById('session-status');
 const signOutButton=document.getElementById('sign-out');
@@ -150,14 +169,42 @@ function showSession(session){
     const user=session.user;
     const displayName=user.user_metadata?.name;
     profileWelcome.textContent=displayName?`Olá, ${displayName}! (${user.email})`:`Conta conectada: ${user.email}`;
-    profilePanel.hidden=false;accessPanel.hidden=true;eventPanel.hidden=false;postPanel.hidden=false;
-    if(auth){loadArtistProfile();loadMyEvents();}
+    profilePanel.hidden=false;accessPanel.hidden=true;eventPanel.hidden=false;postPanel.hidden=false;basicProfilePanel.hidden=false;
+    if(auth){loadBasicProfile();loadArtistProfile();loadMyEvents();}
   }else{
-    profilePanel.hidden=true;accessPanel.hidden=false;eventPanel.hidden=true;postPanel.hidden=true;
+    profilePanel.hidden=true;accessPanel.hidden=false;eventPanel.hidden=true;postPanel.hidden=true;basicProfilePanel.hidden=true;
     if(artistForm)artistForm.reset();
     if(eventForm)eventForm.reset();
   }
 }
+
+async function loadBasicProfile(){
+ try{
+  const profile=await auth.getMyBasicProfile();
+  document.getElementById('basic-display-name').value=profile?.display_name||'';
+  document.getElementById('basic-account-type').value=profile?.account_type||'fan';
+  document.getElementById('basic-city').value=profile?.city||'';
+  document.getElementById('basic-bio').value=profile?.bio||'';
+  document.getElementById('basic-public').checked=profile?.is_public===true;
+ }catch(error){basicProfileStatus.textContent='Não foi possível carregar seu perfil básico. Confira se a atualização do banco foi aplicada.';}
+}
+basicProfileForm.addEventListener('submit',async event=>{
+ event.preventDefault();
+ const button=document.getElementById('save-basic-profile');
+ button.disabled=true;basicProfileStatus.textContent='Salvando seu perfil...';
+ try{
+  await auth.saveMyBasicProfile({
+   display_name:document.getElementById('basic-display-name').value,
+   account_type:document.getElementById('basic-account-type').value,
+   city:document.getElementById('basic-city').value,
+   bio:document.getElementById('basic-bio').value,
+   is_public:document.getElementById('basic-public').checked
+  });
+  basicProfileStatus.textContent='Perfil salvo! '+(document.getElementById('basic-public').checked?'Ele poderá aparecer no diretório público.':'Ele ficará visível somente para você.');
+ }catch(error){basicProfileStatus.textContent=error?.message||'Não foi possível salvar seu perfil.';}
+ finally{button.disabled=false;}
+});
+
 let auth=null;
 try{
   const module=await import('./supabase/auth.js');
@@ -182,6 +229,8 @@ function setMode(next){
  document.getElementById('name-wrap').hidden=mode!=='register';
  document.getElementById('password-wrap').hidden=mode==='reset';
  document.getElementById('display-name').required=mode==='register';
+ document.getElementById('register-type').required=mode==='register';
+ document.getElementById('register-type').hidden=mode!=='register';
  document.getElementById('password').required=mode!=='reset';
  document.getElementById('password').autocomplete=mode==='register'?'new-password':'current-password';
  document.getElementById('submit-account').textContent=mode==='register'?'Criar minha conta':mode==='reset'?'Enviar link de recuperação':'Entrar';
@@ -194,11 +243,12 @@ form.addEventListener('submit',async event=>{
  const email=document.getElementById('email').value.trim();
  const password=document.getElementById('password').value;
  const displayName=document.getElementById('display-name').value.trim();
+ const accountType=document.getElementById('register-type').value;
  const submit=document.getElementById('submit-account');
  submit.disabled=true;status.textContent='Aguarde...';
  try{
   if(mode==='register'){
-   const result=await auth.registerAccount({email,password,displayName});
+   const result=await auth.registerAccount({email,password,displayName,accountType});
    status.textContent=result.user?.identities?.length===0?'Este e-mail já possui cadastro.':'Cadastro enviado. Confira seu e-mail para confirmar a conta.';
   }else if(mode==='reset'){
    await auth.sendPasswordReset(email);
