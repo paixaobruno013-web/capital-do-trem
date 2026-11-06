@@ -156,7 +156,8 @@ const postStatus=document.getElementById('post-status');
 const eventForm=document.getElementById('event-form');
 const eventStatus=document.getElementById('event-status');
 const myEvents=document.getElementById('my-events');
-const artistFields={artist_name:'artist-name',style:'artist-style',city:'artist-city',instagram:'artist-instagram',youtube:'artist-youtube',bio:'artist-bio'};function previewFile(inputId,boxId){const input=document.getElementById(inputId);const box=document.getElementById(boxId);if(box.dataset.previewUrl){URL.revokeObjectURL(box.dataset.previewUrl);delete box.dataset.previewUrl;}box.replaceChildren();const file=input.files&&input.files[0];if(!file)return;if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5242880||file.size===0){input.value='';const msg=document.createElement('p');msg.textContent='Escolha JPG, PNG ou WebP de até 5 MB.';box.append(msg);return;}const url=URL.createObjectURL(file);box.dataset.previewUrl=url;const img=document.createElement('img');img.src=url;img.alt='Prévia da imagem selecionada';const msg=document.createElement('p');msg.textContent='Prévia da imagem antes do envio.';box.append(img,msg);}
+const artistFields={artist_name:'artist-name',style:'artist-style',city:'artist-city',instagram:'artist-instagram',youtube:'artist-youtube',bio:'artist-bio'};
+let currentArtistPhotoUrl=null;function previewFile(inputId,boxId){const input=document.getElementById(inputId);const box=document.getElementById(boxId);if(box.dataset.previewUrl){URL.revokeObjectURL(box.dataset.previewUrl);delete box.dataset.previewUrl;}box.replaceChildren();const file=input.files&&input.files[0];if(!file)return;if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5242880||file.size===0){input.value='';const msg=document.createElement('p');msg.textContent='Escolha JPG, PNG ou WebP de até 5 MB.';box.append(msg);return;}const url=URL.createObjectURL(file);box.dataset.previewUrl=url;const img=document.createElement('img');img.src=url;img.alt='Prévia da imagem selecionada';const msg=document.createElement('p');msg.textContent='Prévia da imagem antes do envio.';box.append(img,msg);}
 document.getElementById('artist-photo-upload').addEventListener('change',()=>previewFile('artist-photo-upload','artist-photo-preview'));
 document.getElementById('event-poster-upload').addEventListener('change',()=>previewFile('event-poster-upload','event-poster-preview'));
 window.addEventListener('pagehide',()=>['artist-photo-preview','event-poster-preview'].forEach(id=>{const box=document.getElementById(id);if(box.dataset.previewUrl)URL.revokeObjectURL(box.dataset.previewUrl);}));
@@ -183,6 +184,7 @@ function showSavedArtistPhoto(url){
  }catch{}
 }
 function fillArtistForm(profile){
+ currentArtistPhotoUrl=profile?.photo_url||null;
  for(const [field,id] of Object.entries(artistFields))document.getElementById(id).value=profile?.[field]||'';
  const published=profile?.status==='published';
  Object.values(artistFields).forEach(id=>document.getElementById(id).disabled=published);
@@ -304,9 +306,13 @@ artistForm.addEventListener('submit',async event=>{
  const profile={};
  for(const [field,id] of Object.entries(artistFields))profile[field]=document.getElementById(id).value;
  try{
+  profile.photo_url=currentArtistPhotoUrl;
   const photo=document.getElementById('artist-photo-upload').files[0];
   if(photo){artistStatus.textContent='Enviando foto segura...';profile.photo_url=await auth.uploadMyMedia(photo,'artist');}
-  const saved=await auth.saveMyArtistProfile(profile);fillArtistForm(saved);artistStatus.textContent='Ficha enviada e salva. Ela ficará pendente até a aprovação da equipe.';}
+  const saved=await auth.saveMyArtistProfile(profile);
+  document.getElementById('artist-photo-upload').value='';
+  fillArtistForm(saved);
+  artistStatus.textContent='Ficha enviada e salva. Ela ficará pendente até a aprovação da equipe.';}
  catch(error){artistStatus.textContent=error?.message||'Não foi possível salvar. Verifique os dados e tente novamente.';}
  finally{if(!document.getElementById('artist-name').disabled)saveButton.disabled=false;}
 });
@@ -351,7 +357,7 @@ eventForm.addEventListener('submit',async event=>{
  try{
   const poster=document.getElementById('event-poster-upload').files[0];
   if(poster){eventStatus.textContent='Enviando cartaz seguro...';payload.poster_url=await auth.uploadMyMedia(poster,'event');}
-  await auth.submitMyEvent(payload);eventForm.reset();eventStatus.textContent='Evento enviado! Ele ficará pendente até a aprovação da equipe.';await loadMyEvents();}
+  await auth.submitMyEvent(payload);eventForm.reset();clearImagePreview('event-poster-preview');eventStatus.textContent='Evento enviado! Ele ficará pendente até a aprovação da equipe.';await loadMyEvents();}
  catch(error){eventStatus.textContent=error?.message||'Não foi possível enviar. Verifique a conexão e tente novamente.';}
  finally{button.disabled=false;}
 });
