@@ -7,10 +7,10 @@ let failed = false;
 
 for (const file of files) {
   const html = await readFile(file, 'utf8');
-  const scripts = [...html.matchAll(/<script\\b([^>]*)>([\\s\\S]*?)<\\/script>/gi)];
+  const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)];
   for (let index = 0; index < scripts.length; index += 1) {
     const [, attributes, source] = scripts[index];
-    if (/\\bsrc\\s*=/.test(attributes) || !source.trim()) continue;
+    if (/\bsrc\s*=/.test(attributes) || !source.trim()) continue;
     const result = spawnSync(process.execPath, ['--check', '--input-type=module'], {
       input: source,
       encoding: 'utf8'
@@ -18,8 +18,8 @@ for (const file of files) {
     checked += 1;
     if (result.status !== 0) {
       failed = true;
-      process.stderr.write('Erro de sintaxe em ' + file + ', script inline ' + (index + 1) + ':\\n');
-      process.stderr.write(result.stderr || result.stdout || 'Falha desconhecida\\n');
+      process.stderr.write('Erro de sintaxe em ' + file + ', script inline ' + (index + 1) + ':\n');
+      process.stderr.write(result.stderr || result.stdout || 'Falha desconhecida\n');
     }
   }
 }
