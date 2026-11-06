@@ -18,7 +18,7 @@ O Capital do Trem é um projeto de comunidade e divulgação da cultura musical,
 - Instagram: https://www.instagram.com/capital.do.trem?cplk=bHFubGZqNG5ua2Q4
 - YouTube: https://youtube.com/@capitaldotrem?si=3UPziMb7JOMzvLlm
 
-## Aplicativos Android e iOS
+## Configurar o banco de dados\n\nConsulte [SUPABASE-SETUP.md](./SUPABASE-SETUP.md) para abrir o SQL original, evitar tradução automática no celular e configurar o Supabase com segurança.\n\n## Aplicativos Android e iOS
 
 A estrutura inicial para empacotar o site como aplicativo nativo foi adicionada com Capacitor 8. Consulte [MOBILE-APP.md](./MOBILE-APP.md) para requisitos, comandos de preparação e etapas de publicação.
 
