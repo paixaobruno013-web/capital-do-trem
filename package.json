@@ -1,0 +1,22 @@
+{
+  "name": "capital-do-trem",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Aplicativo Capital do Trem para Android e iOS",
+  "scripts": {
+    "build:web": "node scripts/prepare-web.mjs",
+    "cap:sync": "npm run build:web && cap sync",
+    "cap:add:android": "cap add android",
+    "cap:add:ios": "cap add ios",
+    "android": "npm run cap:sync && cap open android",
+    "ios": "npm run cap:sync && cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/ios": "^8.6.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.0"
+  }
+}
