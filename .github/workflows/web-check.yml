@@ -21,6 +21,8 @@ jobs:
         run: npm install
       - name: Preparar arquivos do aplicativo
         run: npm run build:web
+      - name: Verificar sintaxe do módulo Supabase
+        run: node --input-type=module --check < supabase/auth.js
       - name: Conferir arquivos essenciais
         run: |
           test -s www/index.html
@@ -28,5 +30,7 @@ jobs:
           test -s www/admin.html
           test -s www/privacidade.html
           test -s www/supabase/auth.js
+          test -s supabase/schema.sql
+          test -s supabase/migrations/2026-11-06-music-catalog.sql
           test -s www/manifest.webmanifest
           echo "Preparação web concluída: arquivos essenciais encontrados."
