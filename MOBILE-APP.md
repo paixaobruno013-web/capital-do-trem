@@ -22,7 +22,7 @@ O comando `build:web` copia as páginas e os recursos necessários para a pasta 
 
 ## Android
 
-Requisitos: Android Studio e Android SDK instalados.
+Requisitos: Android Studio 2025.2.1 ou superior e Android SDK instalados.
 
 ```bash
 npm run cap:add:android
@@ -33,7 +33,7 @@ No Android Studio, configurar a assinatura de lançamento, testar em aparelhos r
 
 ## iOS
 
-Requisitos: computador Mac com Xcode instalado.
+Requisitos: computador Mac com Xcode 26.0 ou superior instalado.
 
 ```bash
 npm run cap:add:ios
