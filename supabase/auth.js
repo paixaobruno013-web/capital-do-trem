@@ -199,3 +199,18 @@ export async function moderateItem(table, id, status) {
   const { error } = await supabase.from(table).update({status}).eq('id',id);
   if (error) throw error;
 }
+
+// Agenda pública: o RLS permite leitura somente de eventos aprovados para visitantes.
+export async function getPublishedEvents() {
+  const supabase = initSupabase();
+  const { data, error } = await supabase
+    .from('events')
+    .select('id, title, event_date, event_time, address, description, contact, poster_url')
+    .eq('status', 'published')
+    .gte('event_date', new Date().toISOString().slice(0, 10))
+    .order('event_date', { ascending: true })
+    .order('event_time', { ascending: true })
+    .limit(50);
+  if (error) throw error;
+  return data || [];
+}
