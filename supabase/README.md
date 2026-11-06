@@ -43,3 +43,17 @@ O esquema também prepara o bucket público `capital-do-trem-media`, limitado a 
 4. Integrar formulários de eventos, artistas e divulgações.
 5. Criar armazenamento de imagens com regras de acesso e limites de tamanho.
 6. Criar o painel administrativo protegido e testar permissões com contas diferentes.
+
+## Módulo inicial de autenticação
+
+O arquivo `supabase/auth.js` prepara funções para cadastro com confirmação por e-mail, login, logout, recuperação de senha e acompanhamento da sessão. Ele usa o SDK oficial Supabase JS v2 por CDN.
+
+**Ainda não está conectado à página pública.** Antes de importá-lo na interface:
+
+1. Substitua os dois valores de configuração no início de `auth.js` pela URL do projeto e pela chave pública (publishable/anon) do Supabase.
+2. No painel Supabase, configure a URL pública do site em **Authentication → URL Configuration** e adicione também a URL de redirecionamento usada para confirmação e recuperação de senha.
+3. Em **Authentication → Providers → Email**, mantenha confirmação de e-mail habilitada para novos cadastros.
+4. Teste cadastro, confirmação, login, logout e recuperação com uma conta de teste.
+5. Só então integre o módulo à interface e valide o acesso com duas contas diferentes.
+
+A URL e a chave publicável são destinadas ao cliente; a chave `service_role` é secreta e nunca deve ser publicada. Não cole credenciais em conversas ou em arquivos públicos.
