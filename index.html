@@ -472,7 +472,7 @@ audioInput.addEventListener('change',event=>{
  if(file){
   audioObjectUrl=URL.createObjectURL(file);audioPlayer.src=audioObjectUrl;audioPlayer.load();
   audioStatus.textContent='Pronto para ouvir: '+file.name;
-  if('mediaSession' in navigator){try{navigator.mediaSession.metadata=new MediaMetadata({title:file.name.replace(/\\.[^.]+$/,''),artist:'Capital do Trem',album:'Player do Capital do Trem',artwork:[{src:'./marca.svg',sizes:'any',type:'image/svg+xml'}]});}catch{}}
+  if('mediaSession' in navigator){try{navigator.mediaSession.metadata=new MediaMetadata({title:file.name.replace(/\.[^.]+$/,''),artist:'Capital do Trem',album:'Player do Capital do Trem',artwork:[{src:'./marca.svg',sizes:'any',type:'image/svg+xml'}]});}catch{}}
  }else{audioStatus.textContent='Selecione um áudio para ouvir e baixar nesta demonstração.';}
 });
 downloadAudio.addEventListener('click',()=>{
