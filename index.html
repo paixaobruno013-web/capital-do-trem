@@ -464,16 +464,31 @@ let audioObjectUrl='';
 const audioInput=document.getElementById('audio'),audioPlayer=document.getElementById('player');
 const downloadAudio=document.getElementById('download-audio'),audioStatus=document.getElementById('audio-status');
 let selectedAudioFile=null;
+const MAX_AUDIO_SIZE=100*1024*1024;
+const formatAudioSize=bytes=>bytes>=1024*1024?(bytes/1024/1024).toFixed(1)+' MB':Math.max(1,Math.round(bytes/1024))+' KB';
+const formatAudioTime=seconds=>{if(!Number.isFinite(seconds))return '';const m=Math.floor(seconds/60),s=Math.floor(seconds%60);return m+':'+String(s).padStart(2,'0');};
 audioInput.addEventListener('change',event=>{
  const file=event.target.files&&event.target.files[0];
  if(audioObjectUrl){URL.revokeObjectURL(audioObjectUrl);audioObjectUrl='';}
  audioPlayer.pause();audioPlayer.removeAttribute('src');audioPlayer.load();
- selectedAudioFile=file||null;downloadAudio.disabled=!file;
- if(file){
-  audioObjectUrl=URL.createObjectURL(file);audioPlayer.src=audioObjectUrl;audioPlayer.load();
-  audioStatus.textContent='Pronto para ouvir: '+file.name;
-  if('mediaSession' in navigator){try{navigator.mediaSession.metadata=new MediaMetadata({title:file.name.replace(/\.[^.]+$/,''),artist:'Capital do Trem',album:'Player do Capital do Trem',artwork:[{src:'./marca.svg',sizes:'any',type:'image/svg+xml'}]});}catch{}}
- }else{audioStatus.textContent='Selecione um áudio para ouvir e baixar nesta demonstração.';}
+ selectedAudioFile=null;downloadAudio.disabled=true;
+ if(!file){audioStatus.textContent='Selecione um áudio para ouvir e baixar nesta demonstração.';return;}
+ if(!file.type.startsWith('audio/')){
+  audioInput.value='';audioStatus.textContent='Esse arquivo não parece ser um áudio. Escolha MP3, WAV, M4A ou outro formato de áudio.';return;
+ }
+ if(file.size>MAX_AUDIO_SIZE){
+  audioInput.value='';audioStatus.textContent='Esse áudio ultrapassa o limite de 100 MB desta demonstração. Escolha um arquivo menor.';return;
+ }
+ selectedAudioFile=file;downloadAudio.disabled=false;
+ audioObjectUrl=URL.createObjectURL(file);audioPlayer.src=audioObjectUrl;audioPlayer.load();
+ audioStatus.textContent='Carregando: '+file.name+' · '+formatAudioSize(file.size);
+ if('mediaSession' in navigator){try{navigator.mediaSession.metadata=new MediaMetadata({title:file.name.replace(/\.[^.]+$/,''),artist:'Capital do Trem',album:'Player do Capital do Trem',artwork:[{src:'./marca.svg',sizes:'any',type:'image/svg+xml'}]});}catch{}}
+});
+audioPlayer.addEventListener('loadedmetadata',()=>{
+ if(selectedAudioFile)audioStatus.textContent='Pronto para ouvir: '+selectedAudioFile.name+' · '+formatAudioSize(selectedAudioFile.size)+(Number.isFinite(audioPlayer.duration)?' · '+formatAudioTime(audioPlayer.duration):'');
+});
+audioPlayer.addEventListener('error',()=>{
+ if(selectedAudioFile){downloadAudio.disabled=false;audioStatus.textContent='O navegador não conseguiu reproduzir este formato. Você ainda pode tentar baixar o arquivo.';}
 });
 downloadAudio.addEventListener('click',()=>{
  if(!selectedAudioFile||!audioObjectUrl)return;
