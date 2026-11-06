@@ -57,6 +57,8 @@ jobs:
           test -s www/conta.html
           test -s www/admin.html
           test -s www/privacidade.html
+          test -s www/bate-papo.html
+          test -s www/diagnostico.html
           test -s www/supabase/auth.js
           test -s supabase/schema.sql
           test -s supabase/migrations/2026-11-06-music-catalog.sql
