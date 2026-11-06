@@ -37,7 +37,7 @@ jobs:
           fi
           echo "Proteção de envio administrativo encontrada no schema e na migração."
           grep -q "values ('capital-do-trem-audio','capital-do-trem-audio',false" supabase/schema.sql
-          grep -q "values (" supabase/schema.sql
+          grep -q "'capital-do-trem-media'" supabase/schema.sql
           grep -q 'create policy "audio_read_published_owner_admin"' supabase/schema.sql
           grep -q 'create policy "media_public_read"' supabase/schema.sql
           grep -q 'create policy "media_upload_own_folder"' supabase/schema.sql
