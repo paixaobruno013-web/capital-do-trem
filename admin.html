@@ -16,6 +16,15 @@ button.secondary,.btn.secondary{background:var(--panel2);border:1px solid var(--
 button:disabled{opacity:.5;cursor:not-allowed}.muted,.status{color:var(--muted)}.notice{padding:13px;background:var(--panel2);border-left:4px solid var(--red);border-radius:8px}
 .actions{display:flex;gap:8px;flex-wrap:wrap}.item p{overflow-wrap:anywhere} [hidden]{display:none!important}
 :focus-visible{outline:3px solid var(--red);outline-offset:3px}
+
+/* Identidade LED vermelha no painel administrativo. */
+h1,h2{ text-shadow:0 0 9px rgba(255,20,42,.22),0 0 18px rgba(237,28,36,.15) }
+button:not(.secondary),.btn{box-shadow:0 0 9px rgba(255,0,32,.48),0 0 20px rgba(237,28,36,.2),inset 0 0 8px rgba(255,255,255,.08)}
+button:not(.secondary):hover,.btn:hover{box-shadow:0 0 13px rgba(255,20,42,.7),0 0 28px rgba(237,28,36,.32)}
+input:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(237,28,36,.18),0 0 14px rgba(237,28,36,.16);outline:none}
+.notice{box-shadow:inset 3px 0 12px rgba(237,28,36,.08)}
+:focus-visible{box-shadow:0 0 0 3px rgba(237,28,36,.2),0 0 15px rgba(237,28,36,.28)}
+
 </style>
 </head>
 <body><main>
