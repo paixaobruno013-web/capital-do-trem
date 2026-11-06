@@ -1,5 +1,5 @@
-const CACHE='capital-do-trem-v35';
-const FILES=['./','./index.html','./admin.html','./marca.svg','./manifest.webmanifest','./privacidade.html'];
+const CACHE='capital-do-trem-v36';
+const FILES=['./','./index.html','./admin.html','./marca.svg','./manifest.webmanifest','./privacidade.html','./conta.html','./supabase/auth.js'];
 
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)));
