@@ -142,11 +142,17 @@ form.addEventListener('submit',async event=>{
    status.textContent='Se o endereço estiver cadastrado, você receberá um link para redefinir a senha.';
   }else{
    await auth.signInAccount({email,password});
-   status.textContent='Acesso realizado. A área de perfil será liberada após a integração completa.';
+   status.textContent='Acesso realizado. Sua área de conta está aberta.';
   }
  }catch(error){
   status.textContent=error?.message||'Não foi possível concluir. Confira os dados e tente novamente.';
  }finally{submit.disabled=false;}
+});
+signOutButton.addEventListener('click',async()=>{
+ signOutButton.disabled=true;sessionStatus.textContent='Saindo da conta...';
+ try{await auth.signOutAccount();showSession(null);sessionStatus.textContent='Você saiu da sua conta com segurança.';}
+ catch(error){sessionStatus.textContent=error?.message||'Não foi possível sair. Tente novamente.';}
+ finally{signOutButton.disabled=false;}
 });
 if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 </script>
