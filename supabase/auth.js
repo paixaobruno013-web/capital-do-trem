@@ -220,27 +220,89 @@ export async function isCurrentUserAdmin() {
 export async function getModerationQueue() {
   const supabase = initSupabase();
   if (!(await isCurrentUserAdmin())) throw new Error('Acesso administrativo não autorizado.');
-  const [artists, events, posts] = await Promise.all([
+  const [artists, events, posts, songs] = await Promise.all([
     supabase.from('artists').select('id, artist_name, style, city, bio, status, created_at').eq('status','pending').order('created_at',{ascending:true}),
     supabase.from('events').select('id, title, event_date, event_time, address, category, description, status, created_at').eq('status','pending').order('created_at',{ascending:true}),
-    supabase.from('posts').select('id, content, status, created_at').eq('status','pending').order('created_at',{ascending:true})
+    supabase.from('posts').select('id, content, status, created_at').eq('status','pending').order('created_at',{ascending:true}),
+    supabase.from('songs').select('id,title,artist_name,description,status,created_at').eq('status','pending').order('created_at',{ascending:true})
   ]);
-  for (const result of [artists,events,posts]) if (result.error) throw result.error;
+  for (const result of [artists,events,posts,songs]) if (result.error) throw result.error;
   return {
     artists: (artists.data||[]).map(item=>({id:item.id,title:item.artist_name,detail:[item.style,item.city,item.bio].filter(Boolean).join(' • ')})),
     events: (events.data||[]).map(item=>({id:item.id,title:item.title,detail:[item.category,item.event_date,item.event_time,item.address,item.description].filter(Boolean).join(' • ')})),
-    posts: (posts.data||[]).map(item=>({id:item.id,title:'Divulgação da comunidade',detail:item.content}))
+    posts: (posts.data||[]).map(item=>({id:item.id,title:'Divulgação da comunidade',detail:item.content})),
+    songs: (songs.data||[]).map(item=>({id:item.id,title:item.title,detail:[item.artist_name,item.description].filter(Boolean).join(' • ')}))
   };
 }
 
 export async function moderateItem(table, id, status) {
-  const allowedTables = ['artists','events','posts'];
+  const allowedTables = ['artists','events','posts','songs'];
   if (!allowedTables.includes(table)) throw new Error('Tipo de publicação inválido.');
   if (!['published','rejected'].includes(status)) throw new Error('Ação de moderação inválida.');
   const supabase = initSupabase();
   if (!(await isCurrentUserAdmin())) throw new Error('Acesso administrativo não autorizado.');
   const { error } = await supabase.from(table).update({status}).eq('id',id);
   if (error) throw error;
+}
+
+
+ // Envio de música para análise. O arquivo permanece privado até aprovação.
+export async function uploadMySong({ file, title, artistName, description = '' }) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para enviar uma música.');
+  if (!(file instanceof File)) throw new Error('Selecione um arquivo de áudio.');
+  const mime = file.type.toLowerCase();
+  const allowed = ['audio/mpeg','audio/mp4','audio/aac','audio/wav','audio/x-wav','audio/ogg'];
+  if (!allowed.includes(mime)) throw new Error('Formato não aceito. Use MP3, M4A, AAC, WAV ou OGG.');
+  if (file.size < 1 || file.size > 50 * 1024 * 1024) throw new Error('A música deve ter até 50 MB.');
+  const cleanTitle = String(title || '').trim();
+  const cleanArtist = String(artistName || '').trim();
+  const cleanDescription = String(description || '').trim();
+  if (cleanTitle.length < 1 || cleanTitle.length > 120) throw new Error('O título deve ter até 120 caracteres.');
+  if (cleanArtist.length < 2 || cleanArtist.length > 100) throw new Error('Informe o nome artístico (até 100 caracteres).');
+  if (cleanDescription.length > 1000) throw new Error('A descrição deve ter até 1.000 caracteres.');
+  const extension = ({'audio/mpeg':'mp3','audio/mp4':'m4a','audio/aac':'aac','audio/wav':'wav','audio/x-wav':'wav','audio/ogg':'ogg'})[mime];
+  const path = user.id + '/songs/' + crypto.randomUUID() + '.' + extension;
+  const { error: uploadError } = await supabase.storage.from('capital-do-trem-audio').upload(path,file,{contentType:mime,cacheControl:'3600',upsert:false});
+  if (uploadError) throw uploadError;
+  const { data, error } = await supabase.from('songs').insert({
+    user_id:user.id,title:cleanTitle,artist_name:cleanArtist,description:cleanDescription,
+    storage_path:path,mime_type:mime,file_size:file.size,status:'pending'
+  }).select('id,title,artist_name,status,created_at').single();
+  if (error) {
+    await supabase.storage.from('capital-do-trem-audio').remove([path]);
+    throw error;
+  }
+  return data;
+}
+
+export async function getMySongs() {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para consultar suas músicas.');
+  const { data, error } = await supabase.from('songs')
+    .select('id,title,artist_name,description,status,created_at')
+    .eq('user_id',user.id).order('created_at',{ascending:false});
+  if (error) throw error;
+  return data || [];
+}
+
+export async function getPublishedSongs() {
+  const supabase = initSupabase();
+  const { data, error } = await supabase.from('songs')
+    .select('id,title,artist_name,description,storage_path')
+    .eq('status','published').order('created_at',{ascending:false}).limit(100);
+  if (error) throw error;
+  const songs = await Promise.all((data || []).map(async song => {
+    const { data: signed, error: signedError } = await supabase.storage
+      .from('capital-do-trem-audio').createSignedUrl(song.storage_path, 60 * 60);
+    if (signedError) throw signedError;
+    return { id:song.id,title:song.title,artist_name:song.artist_name,description:song.description,audio_url:signed.signedUrl };
+  }));
+  return songs;
 }
 
 // Agenda pública: o RLS permite leitura somente de eventos aprovados para visitantes.
