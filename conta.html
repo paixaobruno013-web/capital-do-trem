@@ -79,6 +79,22 @@ footer{text-align:center;color:var(--muted);font-size:13px}
 <p id="account-status" class="status" role="status" aria-live="polite"></p>
 </form>
 </section>
+<section class="card" id="event-panel" hidden aria-labelledby="event-title">
+<h2 id="event-title">Enviar evento, show ou ação social</h2>
+<p class="muted">Cadastre as informações para análise da equipe. A publicação só aparece na agenda depois da aprovação.</p>
+<form id="event-form">
+<label for="event-name">Nome do evento</label><input id="event-name" maxlength="120" required>
+<label for="event-date">Data</label><input id="event-date" type="date" required>
+<label for="event-time">Horário</label><input id="event-time" type="time">
+<label for="event-address">Endereço público</label><input id="event-address" maxlength="240" required>
+<label for="event-category">Tipo</label><select id="event-category" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="show">Show</option><option value="evento">Evento</option><option value="acao-social">Ação social</option><option value="outro">Outro</option></select>
+<label for="event-description">Descrição</label><textarea id="event-description" maxlength="2000" rows="4" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
+<label for="event-contact">Contato público (opcional)</label><input id="event-contact" maxlength="120">
+<button type="submit" id="submit-event">Enviar para análise</button>
+<p id="event-status" class="status" role="status" aria-live="polite"></p>
+</form>
+<h3>Meus envios</h3><div id="my-events" class="muted" aria-live="polite">Seus eventos aparecerão aqui.</div>
+</section>
 <section class="card">
 <h2>Privacidade e segurança</h2>
 <p class="muted">Não compartilhe sua senha. O Capital do Trem nunca pedirá sua senha por mensagem. A área de conta só será liberada depois dos testes de autenticação e das permissões do banco de dados.</p>
@@ -97,6 +113,10 @@ const sessionStatus=document.getElementById('session-status');
 const signOutButton=document.getElementById('sign-out');
 const artistForm=document.getElementById('artist-profile-form');
 const artistStatus=document.getElementById('artist-status');
+const eventPanel=document.getElementById('event-panel');
+const eventForm=document.getElementById('event-form');
+const eventStatus=document.getElementById('event-status');
+const myEvents=document.getElementById('my-events');
 const artistFields={artist_name:'artist-name',style:'artist-style',city:'artist-city',instagram:'artist-instagram',youtube:'artist-youtube',bio:'artist-bio'};
 function fillArtistForm(profile){
  for(const [field,id] of Object.entries(artistFields))document.getElementById(id).value=profile?.[field]||'';
@@ -114,11 +134,12 @@ function showSession(session){
     const user=session.user;
     const displayName=user.user_metadata?.name;
     profileWelcome.textContent=displayName?`Olá, ${displayName}! (${user.email})`:`Conta conectada: ${user.email}`;
-    profilePanel.hidden=false;accessPanel.hidden=true;
-    if(auth)loadArtistProfile();
+    profilePanel.hidden=false;accessPanel.hidden=true;eventPanel.hidden=false;
+    if(auth){loadArtistProfile();loadMyEvents();}
   }else{
-    profilePanel.hidden=true;accessPanel.hidden=false;
+    profilePanel.hidden=true;accessPanel.hidden=false;eventPanel.hidden=true;
     if(artistForm)artistForm.reset();
+    if(eventForm)eventForm.reset();
   }
 }
 let auth=null;
@@ -183,6 +204,33 @@ artistForm.addEventListener('submit',async event=>{
  try{const saved=await auth.saveMyArtistProfile(profile);fillArtistForm(saved);artistStatus.textContent='Ficha enviada e salva. Ela ficará pendente até a aprovação da equipe.';}
  catch(error){artistStatus.textContent=error?.message||'Não foi possível salvar. Verifique os dados e tente novamente.';}
  finally{if(!document.getElementById('artist-name').disabled)saveButton.disabled=false;}
+});
+async function loadMyEvents(){
+ try{
+  const events=await auth.getMyEvents();
+  if(!events.length){myEvents.textContent='Você ainda não enviou eventos.';return;}
+  myEvents.replaceChildren();
+  for(const item of events){
+   const card=document.createElement('div');card.className='notice';card.style.margin='10px 0';
+   const title=document.createElement('strong');title.textContent=item.title;
+   const detail=document.createElement('p');detail.textContent=new Date(item.event_date+'T00:00:00').toLocaleDateString('pt-BR')+' • '+item.address;
+   const state=document.createElement('p');state.textContent='Situação: '+(item.status==='published'?'Publicado':item.status==='rejected'?'Precisa de ajustes':'Aguardando análise');
+   card.append(title,detail,state);myEvents.append(card);
+  }
+ }catch(error){myEvents.textContent='Não foi possível consultar seus envios. Confirme se o banco foi configurado.';}
+}
+eventForm.addEventListener('submit',async event=>{
+ event.preventDefault();
+ const button=document.getElementById('submit-event');
+ const date=document.getElementById('event-date').value;
+ const today=new Date();today.setHours(0,0,0,0);
+ const chosen=date?new Date(date+'T00:00:00'):null;
+ if(!chosen||chosen<today){eventStatus.textContent='Escolha uma data de hoje em diante.';return;}
+ const payload={title:document.getElementById('event-name').value.trim(),event_date:date,event_time:document.getElementById('event-time').value||null,address:document.getElementById('event-address').value.trim(),category:document.getElementById('event-category').value,description:document.getElementById('event-description').value.trim(),contact:document.getElementById('event-contact').value.trim()};
+ button.disabled=true;eventStatus.textContent='Enviando para análise...';
+ try{await auth.submitMyEvent(payload);eventForm.reset();eventStatus.textContent='Evento enviado! Ele ficará pendente até a aprovação da equipe.';await loadMyEvents();}
+ catch(error){eventStatus.textContent=error?.message||'Não foi possível enviar. Verifique a conexão e tente novamente.';}
+ finally{button.disabled=false;}
 });
 signOutButton.addEventListener('click',async()=>{
  signOutButton.disabled=true;sessionStatus.textContent='Saindo da conta...';
