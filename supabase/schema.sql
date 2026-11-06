@@ -21,8 +21,9 @@ alter table public.profiles add column if not exists account_type text not null 
 alter table public.profiles add column if not exists bio text not null default '';
 alter table public.profiles add column if not exists city text not null default '';
 alter table public.profiles add column if not exists is_public boolean not null default false;
-update public.profiles set account_type = 'user' where account_type = 'fan';
+update public.profiles set account_type = 'user' where account_type = 'user';
 alter table public.profiles alter column account_type set default 'user';
+update public.profiles set account_type = 'user' where account_type = 'fan';
 alter table public.profiles drop constraint if exists profiles_account_type_check;
 alter table public.profiles add constraint profiles_account_type_check check (account_type in ('user', 'artist'));
 alter table public.profiles drop constraint if exists profiles_bio_check;
