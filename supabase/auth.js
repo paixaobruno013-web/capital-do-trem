@@ -477,9 +477,10 @@ export async function getChatMessages(limit = 60) {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('chat_messages')
     .select('id, author_id, author_name, content, created_at')
-    .order('created_at', { ascending: true }).limit(Math.min(Math.max(Number(limit) || 60, 1), 100));
+    .order('created_at', { ascending: false }).limit(Math.min(Math.max(Number(limit) || 60, 1), 100));
   if (error) throw error;
-  return data || [];
+  // Busca as mensagens mais recentes e as apresenta em ordem cronológica.
+  return (data || []).reverse();
 }
 
 export async function sendChatMessage(content) {
