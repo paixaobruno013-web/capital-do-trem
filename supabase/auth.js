@@ -32,13 +32,13 @@ export function initSupabase() {
   return client;
 }
 
-export async function registerAccount({ email, password, displayName }) {
+export async function registerAccount({ email, password, displayName, accountType = 'fan' }) {
   const supabase = initSupabase();
   const { data, error } = await supabase.auth.signUp({
     email: email.trim(),
     password,
     options: {
-      data: { name: String(displayName || '').trim().slice(0, 80) },
+      data: { name: String(displayName || '').trim().slice(0, 80), account_type: accountType === 'artist' ? 'artist' : 'fan' },
       emailRedirectTo: window.location.href
     }
   });
@@ -240,6 +240,50 @@ export async function getPublishedPosts() {
     .eq('status', 'published')
     .order('created_at', { ascending: false })
     .limit(50);
+  if (error) throw error;
+  return data || [];
+}
+
+// Perfil básico para qualquer participante. A visibilidade pública é opcional.
+export async function getMyBasicProfile() {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para acessar seu perfil.');
+  const { data, error } = await supabase.from('profiles')
+    .select('user_id, display_name, account_type, bio, city, is_public')
+    .eq('user_id', user.id).maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function saveMyBasicProfile(profile) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para salvar seu perfil.');
+  const payload = {
+    user_id: user.id,
+    display_name: String(profile.display_name || '').trim().slice(0, 80),
+    account_type: profile.account_type === 'artist' ? 'artist' : 'fan',
+    bio: String(profile.bio || '').trim().slice(0, 500),
+    city: String(profile.city || '').trim().slice(0, 100),
+    is_public: profile.is_public === true
+  };
+  const { data, error } = await supabase.from('profiles')
+    .upsert(payload, { onConflict: 'user_id' })
+    .select('user_id, display_name, account_type, bio, city, is_public').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function getPublicProfiles() {
+  const supabase = initSupabase();
+  const { data, error } = await supabase.from('profiles')
+    .select('user_id, display_name, account_type, bio, city')
+    .eq('is_public', true)
+    .order('display_name', { ascending: true })
+    .limit(100);
   if (error) throw error;
   return data || [];
 }
