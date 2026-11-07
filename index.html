@@ -272,9 +272,23 @@ updateIntroControl();
 const pages=[...document.querySelectorAll('.page')],tabs=[...document.querySelectorAll('[data-page]')];
 function go(id){pages.forEach(p=>p.classList.toggle('active',p.id===id));tabs.forEach(t=>{const active=t.dataset.page===id;t.classList.toggle('active',active);if(active)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current');});window.scrollTo({top:document.querySelector('nav').offsetTop-8,behavior:'smooth'});}
 tabs.forEach(t=>t.addEventListener('click',()=>go(t.dataset.page)));document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
-document.getElementById('theme').onclick=()=>{document.body.classList.toggle('light');document.getElementById('theme').textContent=document.body.classList.contains('light')?'🌙 Escuro':'☀️ Claro';
-document.getElementById('theme').setAttribute('aria-pressed',String(document.body.classList.contains('light')));
-document.getElementById('theme-color').content=document.body.classList.contains('light')?'#f5f5f5':'#000000';};
+const themeButton=document.getElementById('theme');
+const THEME_KEY='capitaldotrem_theme_v1';
+function applyTheme(theme){
+ const light=theme==='light';
+ document.body.classList.toggle('light',light);
+ themeButton.textContent=light?'🌙 Escuro':'☀️ Claro';
+ themeButton.setAttribute('aria-pressed',String(light));
+ document.getElementById('theme-color').content=light?'#f5f5f5':'#000000';
+}
+let savedTheme='dark';
+try{savedTheme=localStorage.getItem(THEME_KEY)==='light'?'light':'dark';}catch{}
+applyTheme(savedTheme);
+themeButton.addEventListener('click',()=>{
+ const nextTheme=document.body.classList.contains('light')?'dark':'light';
+ applyTheme(nextTheme);
+ try{localStorage.setItem(THEME_KEY,nextTheme);}catch{}
+});
 // Prévia local: os dados permanecem no aparelho e não são enviados ao site.
 const eventFieldIds=['event-name','event-date','event-time','event-place','event-kind','event-contact'];
 // Impede selecionar datas passadas no calendário do evento (data local do aparelho).
