@@ -294,9 +294,20 @@ themeButton.addEventListener('click',()=>{
 const eventFieldIds=['event-name','event-date','event-time','event-place','event-kind','event-contact'];
 // Impede selecionar datas passadas no calendário do evento (data local do aparelho).
 const eventDateInput=document.getElementById('event-date');
-const nowForEvent=new Date();
-const localToday=nowForEvent.getFullYear()+'-'+String(nowForEvent.getMonth()+1).padStart(2,'0')+'-'+String(nowForEvent.getDate()).padStart(2,'0');
-eventDateInput.min=localToday;
+function refreshEventDateMinimum(){
+ const now=new Date();
+ const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+ eventDateInput.min=today;
+ if(eventDateInput.value&&eventDateInput.value<today){
+  eventDateInput.value='';
+  updateEventPreview();
+  const status=document.getElementById('event-copy-status');
+  if(status)status.textContent='A data escolhida já passou. Selecione hoje ou uma data futura.';
+ }
+}
+refreshEventDateMinimum();
+eventDateInput.addEventListener('focus',refreshEventDateMinimum);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshEventDateMinimum();});
 
 function updateEventPreview(){
  const value=id=>document.getElementById(id).value.trim();
