@@ -40,6 +40,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .intro-smoke__brand img{width:clamp(92px,24vw,150px);height:auto;max-height:150px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(255,255,255,.18))}
 .intro-smoke__brand strong{color:#fff;font-size:clamp(23px,6vw,38px);font-weight:950;letter-spacing:clamp(2px,1vw,5px);text-shadow:0 2px 18px #777}
 .intro-smoke__brand span{color:#c7c7c7;font-size:12px;letter-spacing:2px}
+.intro-smoke__signature{position:absolute;z-index:3;left:0;right:0;bottom:calc(12px + env(safe-area-inset-bottom,0px));padding:0 12px;text-align:center;color:#d8d8d8;font-size:12px;font-weight:700;letter-spacing:2.5px;text-shadow:0 0 9px rgba(255,255,255,.35),0 0 15px rgba(237,28,36,.35);opacity:0;animation:intro-signature-in 3.7s ease-out forwards;pointer-events:none}
+@keyframes intro-signature-in{0%,28%{opacity:0;transform:translateY(5px)}48%,78%{opacity:.9;transform:translateY(0)}100%{opacity:0;transform:translateY(-3px)}}
 .intro-smoke__cloud{position:absolute;z-index:1;left:-65%;top:22%;width:125%;height:58%;opacity:0;filter:blur(22px);background:radial-gradient(ellipse at 18% 52%,rgba(225,225,225,0) 0 12%,rgba(225,225,225,.35) 22%,rgba(190,190,190,.22) 34%,transparent 53%),radial-gradient(ellipse at 38% 35%,rgba(245,245,245,.32) 0 9%,rgba(190,190,190,.2) 25%,transparent 49%),radial-gradient(ellipse at 60% 62%,rgba(220,220,220,.28) 0 12%,rgba(160,160,160,.16) 29%,transparent 52%);animation:intro-smoke-pass 3.45s cubic-bezier(.2,.65,.3,1) forwards}
 .intro-smoke__cloud:before,.intro-smoke__cloud:after{content:"";position:absolute;inset:-18% 8%;border-radius:50%;background:radial-gradient(ellipse,rgba(210,210,210,.2),transparent 68%);filter:blur(28px)}
 .intro-smoke__cloud:after{inset:12% -8% 0 28%;background:radial-gradient(ellipse,rgba(245,245,245,.18),transparent 70%)}
@@ -73,6 +75,7 @@ body.light .brand,body.light .hero h2,body.light .card h3{text-shadow:0 0 10px r
 <div class="intro-smoke" id="intro-smoke" aria-hidden="true">
  <div class="intro-smoke__cloud"></div>
  <div class="intro-smoke__brand"><img src="marca.svg" alt=""><strong>CAPITAL DO TREM</strong><span>A MÚSICA DA NOSSA QUEBRADA!</span></div>
+ <div class="intro-smoke__signature">BRUNO CHOCK</div>
 </div>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
 <header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem</h1><p class="tag">A música da nossa quebrada!</p><div class="social" style="justify-content:center"><a class="btn alt" href="./conta.html">👤 Minha conta</a><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn alt" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som de entrada: ligado</button></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Vinheta de 7 segundos • toque na tela para ouvir</p></header>
