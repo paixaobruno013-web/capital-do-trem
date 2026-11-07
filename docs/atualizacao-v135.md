@@ -1,6 +1,7 @@
-# Capital do Trem — revisão da versão 141
+# Capital do Trem — revisão da versão 142
 
 ## Alterações registradas
+- Reorganizado o alerta offline em formato vertical: emblema maior com locomotiva saindo do triângulo no topo, “ALERTA” grande em branco e “VOCE TÁ OFFLINE” logo abaixo; controle da corneta permanece acessível.
 - Refinado o símbolo do alerta offline: agora representa a frente de uma locomotiva, com cabine, janelas, faróis e detalhes ferroviários dentro do triângulo vermelho.
 - Personalizado o alerta offline com um símbolo vetorial: um trem dentro de um triângulo de contorno vermelho, inspirado na identidade visual do Capital do Trem.
 - Criado o alerta visual característico **ALERTA: VOCÊ TÁ OFFLINE!**, com corneta eletrônica original sintetizada no próprio aparelho, botão para ligar/desligar o som e aviso de conexão restabelecida.
@@ -9,7 +10,7 @@
 - Criada uma página offline dedicada, com identidade visual do Capital do Trem, instruções claras, botão para tentar novamente e retorno à página inicial.
 - Incluída `offline.html` no núcleo obrigatório do cache do aplicativo instalado; quando uma navegação falha sem internet, o service worker prioriza a página offline armazenada, com uma resposta mínima de reserva.
 - Adicionado o atalho **Minhas conversas** aos atalhos do aplicativo instalado (manifesto PWA).
-- Atualizado o nome do cache do service worker para `capital-do-trem-v141`, para que a instalação atualize os recursos pré-armazenados.
+- Atualizado o nome do cache do service worker para `capital-do-trem-v142`, para que a instalação atualize os recursos pré-armazenados.
 - Ampliado o diagnóstico somente de leitura para conferir também `chat_messages`, `song_likes` e `song_comments` (8 tabelas, conexão e 2 espaços de mídia).
 - Adicionado na área Minha conta um atalho direto para a página de diagnóstico do sistema.
 - Mantidas as estratégias existentes: páginas HTML priorizam a rede e recorrem ao cache quando offline; arquivos estáticos podem ser servidos do cache e atualizados em segundo plano.
