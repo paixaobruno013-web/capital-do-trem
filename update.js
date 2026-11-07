@@ -17,6 +17,10 @@
  alertBox.setAttribute('role','alert');
  alertBox.setAttribute('aria-live','assertive');
  alertBox.style.cssText='position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:12px;right:12px;z-index:10002;max-width:560px;margin-inline:auto;display:none;align-items:center;gap:12px;flex-wrap:wrap;padding:15px 16px;background:linear-gradient(135deg,#26090b,#111);color:#fff;border:2px solid #ed1c24;border-radius:15px;box-shadow:0 8px 30px #000b,0 0 18px #ed1c2455;font:700 14px/1.4 system-ui,Arial,sans-serif';
+ const trainMark=document.createElement('div');
+ trainMark.setAttribute('aria-hidden','true');
+ trainMark.style.cssText='width:58px;height:58px;flex:0 0 58px;display:grid;place-items:center';
+ trainMark.innerHTML='<svg viewBox="0 0 64 64" width="58" height="58" xmlns="http://www.w3.org/2000/svg"><path d="M32 4 60 56H4L32 4Z" fill="#16090a" stroke="#ed1c24" stroke-width="3.5" stroke-linejoin="round"/><path d="M19 25h26v16H19z" fill="#fff" stroke="#fff" stroke-width="1.5"/><path d="M23 29h7v6h-7zm11 0h7v6h-7z" fill="#ed1c24"/><path d="M16 43h32l-4 5H20z" fill="#ed1c24"/><circle cx="25" cy="43" r="2.5" fill="#fff"/><circle cx="39" cy="43" r="2.5" fill="#fff"/></svg>';
  const alertText=document.createElement('div');
  alertText.style.cssText='flex:1;min-width:180px';
  const alertTitle=document.createElement('strong');
@@ -88,7 +92,7 @@
   updateHornButton();
   if(hornEnabled){await unlockHorn();if(document.documentElement.classList.contains('app-offline')){playedThisOutage=true;playTrainHorn();}}
  });
- alertBox.append(alertText,hornButton);
+ alertBox.append(trainMark,alertText,hornButton);
  updateHornButton();
  const addTrainAlert=()=>{if(!alertBox.isConnected)document.body.append(alertBox);if(!navigator.onLine||document.documentElement.dataset.offlineFallback==='true')showOffline();};
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addTrainAlert,{once:true});
