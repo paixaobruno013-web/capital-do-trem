@@ -13,9 +13,12 @@ body.light{color-scheme:light;--bg:#f5f5f5;--panel:#fff;--fg:#111;--muted:#555;-
 main{max-width:760px;margin:20px auto}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;margin:14px 0}
 h1{line-height:1.2}h2{font-size:19px;margin-bottom:6px}.muted{color:var(--muted)}
 a{color:var(--fg)}.btn{display:inline-block;background:var(--red);padding:10px 15px;border-radius:9px;text-decoration:none;font-weight:800;color:#fff}.theme{float:right;border:1px solid var(--line);background:var(--panel);color:var(--fg);padding:9px 12px;border-radius:20px;min-height:42px;cursor:pointer}:focus-visible{outline:3px solid var(--red);outline-offset:3px}
+
+.skip-link{position:fixed;top:10px;left:10px;z-index:20000;transform:translateY(-160%);padding:12px 16px;border-radius:9px;background:var(--red);color:#fff;font-weight:800;text-decoration:none;box-shadow:0 4px 18px #0008}.skip-link:focus{transform:translateY(0);outline:3px solid var(--fg);outline-offset:3px}
 </style>
 </head>
-<body><main>
+<body>
+<a class="skip-link" href="#main-content">Pular para o conteúdo principal</a><main id="main-content">
 <button class="theme" id="theme-toggle" type="button" aria-pressed="false">☀️ Claro</button><a class="btn" href="./">← Voltar ao Capital do Trem</a>
 <section class="card">
 <h1>Privacidade no Capital do Trem</h1>
