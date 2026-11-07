@@ -90,7 +90,7 @@
  });
  alertBox.append(alertText,hornButton);
  updateHornButton();
- const addTrainAlert=()=>{if(!alertBox.isConnected)document.body.append(alertBox);if(!navigator.onLine)showOffline();};
+ const addTrainAlert=()=>{if(!alertBox.isConnected)document.body.append(alertBox);if(!navigator.onLine||document.documentElement.dataset.offlineFallback==='true')showOffline();};
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addTrainAlert,{once:true});
  else addTrainAlert();
  window.addEventListener('offline',showOffline);
