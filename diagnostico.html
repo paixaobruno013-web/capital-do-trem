@@ -31,7 +31,7 @@ button:disabled{opacity:.6}.theme{float:right;background:var(--panel);border:1px
 <p class="muted">Esta página faz apenas consultas de leitura. Não cria, altera nem apaga dados.</p>
 </header>
 <section class="card">
-<p>Toque no botão para verificar se as tabelas principais estão acessíveis no Supabase.</p>
+<p>Toque no botão para verificar conexão, perfis, artistas, eventos, divulgações, músicas, bate-papo, curtidas, comentários e espaços de mídia. A verificação é somente leitura.</p>
 <div class="actions"><button id="check" type="button">Verificar agora</button><a class="btn" href="./">Voltar ao aplicativo</a></div>
 <p id="overall" class="muted" role="status" aria-live="polite">Aguardando verificação.</p>
 <div id="results"></div>
@@ -51,7 +51,10 @@ const checks=[
  ['artists','id'],
  ['events','id'],
  ['posts','id'],
- ['songs','id']
+ ['songs','id'],
+ ['chat_messages','id'],
+ ['song_likes','song_id'],
+ ['song_comments','id']
 ];
 function show(label,ok,detail){
  const item=document.createElement('div');item.className='result '+(ok?'good':'bad');
