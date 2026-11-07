@@ -35,16 +35,19 @@ input:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(237,28,36,.18),0 0
 :focus-visible{box-shadow:0 0 0 3px rgba(237,28,36,.2),0 0 15px rgba(237,28,36,.28)}
 body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 
+
+.skip-link{position:fixed;top:10px;left:10px;z-index:20000;transform:translateY(-160%);padding:12px 16px;border-radius:9px;background:var(--red);color:#fff;font-weight:800;text-decoration:none;box-shadow:0 4px 18px #0008}.skip-link:focus{transform:translateY(0);outline:3px solid var(--fg);outline-offset:3px}
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
 <header>
 <img class="logo" src="marca.svg" alt="Marca Capital do Trem">
 <h1>Minha conta</h1>
 <p class="muted">A música da nossa quebrada!</p>
 <div style="display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap"><a href="./index.html">← Voltar ao Capital do Trem</a><button type="button" id="theme-toggle" class="secondary" aria-pressed="false">☀️ Claro</button></div>
 </header>
-<main>
+<main id="main-content">
 <section class="card">
 <h2>Bem-vindo ao Capital do Trem</h2>
 <p class="muted">Um espaço para artistas e Usuários Uai criarem seus perfis, descobrirem músicas e participarem da comunidade.</p>
