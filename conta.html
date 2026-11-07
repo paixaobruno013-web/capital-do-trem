@@ -312,7 +312,7 @@ function showSession(session){
   if(session?.user){
     activeUserEmail=session.user.email||null;
     if(isAccountLocked()){
-      profilePanel.hidden=true;accessPanel.hidden=true;basicProfilePanel.hidden=true;
+      profilePanel.hidden=true;accessPanel.hidden=true;basicProfilePanel.hidden=true;eventPanel.hidden=true;postPanel.hidden=true;
       lockPanel.hidden=false;window.clearTimeout(lockTimer);return;
     }
     lockPanel.hidden=true;
@@ -378,7 +378,7 @@ function lockAccount(reason='Por segurança, sua área foi bloqueada após um pe
  if(!activeUserEmail)return;
  try{localStorage.setItem(ACCOUNT_LOCK_KEY,'1');}catch{}
  window.clearTimeout(lockTimer);
- profilePanel.hidden=true;basicProfilePanel.hidden=true;lockPanel.hidden=false;
+ profilePanel.hidden=true;basicProfilePanel.hidden=true;eventPanel.hidden=true;postPanel.hidden=true;lockPanel.hidden=false;
  unlockPassword.value='';unlockStatus.textContent=reason;unlockPassword.focus();
 }
 function scheduleAccountLock(){
