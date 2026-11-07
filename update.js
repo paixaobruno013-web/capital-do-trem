@@ -17,7 +17,7 @@
   connectionBanner.id='app-connection-banner';
   connectionBanner.setAttribute('role','status');
   connectionBanner.setAttribute('aria-live','polite');
-  connectionBanner.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:10000;display:none;padding:13px 15px;background:#211719;color:#fff;border:1px solid #ed1c24;border-radius:12px;box-shadow:0 8px 24px #0008;font:600 14px/1.4 system-ui,Arial,sans-serif';
+  connectionBanner.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:10000;max-width:560px;margin-inline:auto;display:none;padding:13px 15px;background:#211719;color:#fff;border:1px solid #ed1c24;border-radius:12px;box-shadow:0 8px 24px #0008;font:600 14px/1.4 system-ui,Arial,sans-serif';
   let reconnectTimer;
   const showConnection=(message)=>{
    connectionBanner.textContent=message;
@@ -43,12 +43,14 @@
  banner.id='app-update-banner';
  banner.setAttribute('role','status');
  banner.setAttribute('aria-live','polite');
- banner.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:10001;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;background:#111;color:#fff;border:1px solid #ed1c24;border-radius:14px;box-shadow:0 8px 30px #0009;font:600 14px/1.4 system-ui,Arial,sans-serif';
+ banner.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:10001;max-width:560px;margin-inline:auto;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;background:#111;color:#fff;border:1px solid #ed1c24;border-radius:14px;box-shadow:0 8px 30px #0009;font:600 14px/1.4 system-ui,Arial,sans-serif';
  const message=document.createElement('span');
  message.textContent='Uma nova versão do Capital do Trem está pronta.';
  const button=document.createElement('button');
- button.type='button';button.textContent='Atualizar agora';
- button.style.cssText='border:0;border-radius:9px;padding:10px 14px;background:#ed1c24;color:#fff;font-weight:800;cursor:pointer';
+ button.type='button';button.textContent='Atualizar agora';button.setAttribute('aria-label','Atualizar o Capital do Trem para a versão mais recente');
+ button.style.cssText='min-height:44px;border:0;border-radius:9px;padding:10px 16px;background:#ed1c24;color:#fff;font-weight:800;cursor:pointer';
+ button.addEventListener('focus',()=>{button.style.outline='3px solid #fff';button.style.outlineOffset='3px';});
+ button.addEventListener('blur',()=>{button.style.outline='none';});
  button.addEventListener('click',()=>{
   if(!registration?.waiting)return;
   button.disabled=true;button.textContent='Atualizando…';
