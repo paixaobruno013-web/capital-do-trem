@@ -8,14 +8,15 @@
 <title>Privacidade • Capital do Trem</title>
 <style>
 :root{color-scheme:dark;--bg:#000;--panel:#101010;--fg:#fff;--muted:#bbb;--red:#ed1c24;--line:#303030}
+body.light{color-scheme:light;--bg:#f5f5f5;--panel:#fff;--fg:#111;--muted:#555;--line:#ddd}
 *{box-sizing:border-box}body{margin:0;padding:20px;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,Arial,sans-serif}
 main{max-width:760px;margin:20px auto}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;margin:14px 0}
 h1{line-height:1.2}h2{font-size:19px;margin-bottom:6px}.muted{color:var(--muted)}
-a{color:#fff}.btn{display:inline-block;background:var(--red);padding:10px 15px;border-radius:9px;text-decoration:none;font-weight:800}
+a{color:var(--fg)}.btn{display:inline-block;background:var(--red);padding:10px 15px;border-radius:9px;text-decoration:none;font-weight:800;color:#fff}.theme{float:right;border:1px solid var(--line);background:var(--panel);color:var(--fg);padding:9px 12px;border-radius:20px;min-height:42px;cursor:pointer}:focus-visible{outline:3px solid var(--red);outline-offset:3px}
 </style>
 </head>
 <body><main>
-<a class="btn" href="./">← Voltar ao Capital do Trem</a>
+<button class="theme" id="theme-toggle" type="button" aria-pressed="false">☀️ Claro</button><a class="btn" href="./">← Voltar ao Capital do Trem</a>
 <section class="card">
 <h1>Privacidade no Capital do Trem</h1>
 <p class="muted">Informações sobre esta primeira versão demonstrativa do site.</p>
@@ -48,4 +49,6 @@ a{color:#fff}.btn{display:inline-block;background:var(--red);padding:10px 15px;b
 <a href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Instagram do Capital do Trem</a>
 </section>
 <p class="muted">Capital do Trem • Página informativa da versão demonstrativa.</p>
-</main></body></html>
+</main>
+<script>const themeButton=document.getElementById('theme-toggle');const themeKey='capitaldotrem_theme_v1';function setTheme(value){const light=value==='light';document.body.classList.toggle('light',light);themeButton.textContent=light?'🌙 Escuro':'☀️ Claro';themeButton.setAttribute('aria-pressed',String(light));document.querySelector('meta[name="theme-color"]').content=light?'#f5f5f5':'#000000';}let initial='dark';try{initial=localStorage.getItem(themeKey)==='light'?'light':'dark';}catch{}setTheme(initial);themeButton.addEventListener('click',()=>{const next=document.body.classList.contains('light')?'dark':'light';setTheme(next);try{localStorage.setItem(themeKey,next);}catch{}});window.addEventListener('storage',event=>{if(event.key===themeKey)setTheme(event.newValue==='light'?'light':'dark');});</script>
+</body></html>
