@@ -65,7 +65,7 @@
    if(!AudioContextClass)return;
    if(!audioContext)audioContext=new AudioContextClass();
    await audioContext.resume();audioUnlocked=audioContext.state==='running';
-   if(!playedThisOutage&&document.documentElement.classList.contains('app-offline')){playedThisOutage=true;playTrainHorn();}
+   if(hornEnabled&&!playedThisOutage&&document.documentElement.classList.contains('app-offline')){playedThisOutage=true;playTrainHorn();}
   }catch(error){audioUnlocked=false;}
  }
  document.addEventListener('pointerdown',unlockHorn,{once:true,passive:true});
@@ -92,7 +92,7 @@
   hornEnabled=!hornEnabled;
   try{localStorage.setItem(preferenceKey,hornEnabled?'on':'off');}catch{}
   updateHornButton();
-  if(hornEnabled){await unlockHorn();if(document.documentElement.classList.contains('app-offline')){playedThisOutage=true;playTrainHorn();}}
+  if(hornEnabled){await unlockHorn();}
  });
  alertBox.append(trainMark,alertText,hornButton);
  updateHornButton();
