@@ -37,6 +37,12 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 
 
 .skip-link{position:fixed;top:10px;left:10px;z-index:20000;transform:translateY(-160%);padding:12px 16px;border-radius:9px;background:var(--red);color:#fff;font-weight:800;text-decoration:none;box-shadow:0 4px 18px #0008}.skip-link:focus{transform:translateY(0);outline:3px solid var(--fg);outline-offset:3px}
+#account-lock{position:fixed;inset:0;z-index:30000;display:grid;place-items:center;padding:20px;background:rgba(0,0,0,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+#account-lock[hidden]{display:none!important}
+.account-lock-card{width:min(100%,430px);padding:24px;background:var(--panel);color:var(--fg);border:1px solid var(--red);border-radius:18px;box-shadow:0 0 28px rgba(237,28,36,.24)}
+.account-lock-card h2{margin-top:0;text-shadow:0 0 12px rgba(237,28,36,.28)}
+.account-lock-card button{width:100%;margin-top:8px}
+.account-lock-card input{font-size:18px}
 
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
@@ -101,7 +107,7 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 </form>
 <h3>Histórico dos meus envios</h3><div id="my-songs" class="muted" aria-live="polite">Suas músicas aparecerão aqui.</div>
 </section>
-<button type="button" class="secondary" id="sign-out">Sair da conta</button>
+<div style="display:flex;gap:9px;flex-wrap:wrap"><button type="button" class="secondary" id="lock-account">🔒 Bloquear agora</button><button type="button" class="secondary" id="sign-out">Sair da conta</button></div>
 <p id="session-status" class="status" role="status" aria-live="polite"></p>
 </section>
 <section class="card" id="access-panel" aria-labelledby="access-title">
@@ -163,9 +169,23 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 <p class="muted">Não compartilhe sua senha. O Capital do Trem nunca pedirá sua senha por mensagem. A área de conta só será liberada depois dos testes de autenticação e das permissões do banco de dados.</p>
 </section>
 </main>
+<section id="account-lock" hidden role="dialog" aria-modal="true" aria-labelledby="account-lock-title">
+ <div class="account-lock-card">
+  <h2 id="account-lock-title">🔒 Área protegida</h2>
+  <p class="muted">Sua conta foi bloqueada por segurança. Digite novamente a senha da sua conta para continuar.</p>
+  <form id="account-unlock-form">
+   <label for="account-unlock-password">Senha da conta</label>
+   <input id="account-unlock-password" type="password" autocomplete="current-password" required>
+   <button type="submit" id="account-unlock-submit">Desbloquear com segurança</button>
+  </form>
+  <p id="account-lock-status" class="status" role="status" aria-live="polite"></p>
+  <button type="button" id="account-lock-signout" class="secondary">Sair desta conta</button>
+ </div>
+</section>
 <footer><a href="./privacidade.html">Política de privacidade</a></footer>
 <script type="module">
 const THEME_KEY='capitaldotrem_theme_v1';
+const ACCOUNT_LOCK_KEY='capitaldotrem_account_locked_v1';
 const themeToggle=document.getElementById('theme-toggle');
 function setTheme(theme){const light=theme==='light';document.body.classList.toggle('light',light);themeToggle.textContent=light?'🌙 Escuro':'☀️ Claro';themeToggle.setAttribute('aria-pressed',String(light));document.querySelector('meta[name="theme-color"]').content=light?'#f5f5f5':'#000000';}
 let savedTheme='dark';try{savedTheme=localStorage.getItem(THEME_KEY)==='light'?'light':'dark';}catch{}setTheme(savedTheme);themeToggle.addEventListener('click',()=>{const next=document.body.classList.contains('light')?'dark':'light';setTheme(next);try{localStorage.setItem(THEME_KEY,next);}catch{}});window.addEventListener('storage',event=>{if(event.key===THEME_KEY)setTheme(event.newValue==='light'?'light':'dark');});
@@ -290,12 +310,21 @@ async function loadArtistProfile(){
 }
 function showSession(session){
   if(session?.user){
+    activeUserEmail=session.user.email||null;
+    if(isAccountLocked()){
+      profilePanel.hidden=true;accessPanel.hidden=true;basicProfilePanel.hidden=true;
+      lockPanel.hidden=false;window.clearTimeout(lockTimer);return;
+    }
+    lockPanel.hidden=true;
     const user=session.user;
     const displayName=user.user_metadata?.name;
     profileWelcome.textContent=displayName?`Olá, ${displayName}! (${user.email})`:`Conta conectada: ${user.email}`;
     profilePanel.hidden=false;accessPanel.hidden=true;eventPanel.hidden=false;postPanel.hidden=false;basicProfilePanel.hidden=false;
+    scheduleAccountLock();
     if(auth){loadBasicProfile();loadArtistProfile();loadMyEvents();loadAdminSongAccess();}
   }else{
+    activeUserEmail=null;lockPanel.hidden=true;window.clearTimeout(lockTimer);
+    try{localStorage.removeItem(ACCOUNT_LOCK_KEY);}catch{}
     profilePanel.hidden=true;accessPanel.hidden=false;eventPanel.hidden=true;postPanel.hidden=true;basicProfilePanel.hidden=true;
     if(artistProfileArea)artistProfileArea.hidden=true;
     if(artistForm)artistForm.reset();
@@ -332,6 +361,69 @@ basicProfileForm.addEventListener('submit',async event=>{
   basicProfileStatus.textContent='Perfil salvo! '+(document.getElementById('basic-public').checked?'Ele poderá aparecer no diretório público.':'Ele ficará visível somente para você.');
  }catch(error){basicProfileStatus.textContent=error?.message||'Não foi possível salvar seu perfil.';}
  finally{button.disabled=false;}
+});
+
+const lockPanel=document.getElementById('account-lock');
+const unlockForm=document.getElementById('account-unlock-form');
+const unlockPassword=document.getElementById('account-unlock-password');
+const unlockStatus=document.getElementById('account-lock-status');
+const unlockSubmit=document.getElementById('account-unlock-submit');
+const manualLockButton=document.getElementById('lock-account');
+const lockSignOutButton=document.getElementById('account-lock-signout');
+const IDLE_LOCK_MS=5*60*1000;
+const HIDDEN_LOCK_MS=2*60*1000;
+let activeUserEmail=null,lockTimer=null,hiddenAt=null;
+function isAccountLocked(){try{return localStorage.getItem(ACCOUNT_LOCK_KEY)==='1';}catch{return false;}}
+function lockAccount(reason='Por segurança, sua área foi bloqueada após um período sem atividade.'){
+ if(!activeUserEmail)return;
+ try{localStorage.setItem(ACCOUNT_LOCK_KEY,'1');}catch{}
+ window.clearTimeout(lockTimer);
+ profilePanel.hidden=true;basicProfilePanel.hidden=true;lockPanel.hidden=false;
+ unlockPassword.value='';unlockStatus.textContent=reason;unlockPassword.focus();
+}
+function scheduleAccountLock(){
+ window.clearTimeout(lockTimer);
+ if(!activeUserEmail||!lockPanel.hidden)return;
+ lockTimer=window.setTimeout(()=>lockAccount(),IDLE_LOCK_MS);
+}
+function recordAccountActivity(){if(activeUserEmail&&!isAccountLocked())scheduleAccountLock();}
+['pointerdown','keydown','touchstart','scroll'].forEach(type=>window.addEventListener(type,recordAccountActivity,{passive:true}));
+document.addEventListener('visibilitychange',()=>{
+ if(document.hidden){hiddenAt=Date.now();return;}
+ if(hiddenAt&&Date.now()-hiddenAt>=HIDDEN_LOCK_MS&&activeUserEmail)lockAccount('Sua área foi bloqueada porque o aplicativo ficou em segundo plano por mais de 2 minutos.');
+ hiddenAt=null;if(!isAccountLocked())scheduleAccountLock();
+});
+window.addEventListener('storage',event=>{
+ if(event.key===ACCOUNT_LOCK_KEY&&event.newValue==='1'&&activeUserEmail)lockAccount('Sua conta foi bloqueada em outra aba deste aparelho.');
+});
+manualLockButton.addEventListener('click',()=>lockAccount('Bloqueio manual ativado. Digite sua senha para continuar.'));
+unlockForm.addEventListener('submit',async event=>{
+ event.preventDefault();
+ if(!auth||!activeUserEmail){unlockStatus.textContent='Não foi possível confirmar a conta. Saia e entre novamente.';return;}
+ const password=unlockPassword.value;if(!password)return;
+ unlockSubmit.disabled=true;unlockStatus.textContent='Verificando sua senha...';
+ try{
+  await auth.signInAccount({email:activeUserEmail,password});
+  try{localStorage.removeItem(ACCOUNT_LOCK_KEY);}catch{}
+  unlockPassword.value='';showSession(await auth.getCurrentSession());unlockStatus.textContent='';
+ }catch(error){
+  unlockPassword.value='';unlockStatus.textContent='Senha não confirmada. Confira e tente novamente.';unlockPassword.focus();
+ }finally{unlockSubmit.disabled=false;}
+});
+lockSignOutButton.addEventListener('click',async()=>{
+ lockSignOutButton.disabled=true;unlockStatus.textContent='Saindo da conta...';
+ try{await auth.signOutAccount();showSession(null);status.textContent='Você saiu da sua conta com segurança.';}
+ catch(error){unlockStatus.textContent='Não foi possível sair. Tente novamente.';}
+ finally{lockSignOutButton.disabled=false;}
+});
+lockPanel.addEventListener('keydown',event=>{
+ if(event.key==='Escape'){event.preventDefault();return;}
+ if(event.key!=='Tab')return;
+ const focusable=[...lockPanel.querySelectorAll('input:not(:disabled),button:not(:disabled)')];
+ if(!focusable.length)return;
+ const first=focusable[0],last=focusable[focusable.length-1];
+ if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+ else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
 });
 
 let auth=null;
