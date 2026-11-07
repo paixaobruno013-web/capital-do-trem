@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050505"><meta name="description" content="Área de conversas privadas do Capital do Trem.">
+<link rel="manifest" href="./manifest.webmanifest"><title>Minhas conversas — Capital do Trem</title>
+<style>
+:root{color-scheme:dark;--bg:#050505;--panel:#111;--panel2:#191919;--fg:#fff;--muted:#aaa;--red:#ed1c24;--line:#303030}
+body.light{color-scheme:light;--bg:#f5f5f5;--panel:#fff;--panel2:#eee;--fg:#111;--muted:#555;--line:#ddd}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,Arial,sans-serif}header{text-align:center;padding:20px 14px;border-bottom:1px solid var(--line)}header img{width:62px;height:62px;object-fit:contain}h1{margin:5px 0;font-size:clamp(24px,5vw,32px);text-shadow:0 0 14px #ed1c2455}main{max-width:760px;margin:auto;padding:16px 12px 36px}.muted{color:var(--muted)}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin:14px 0}.actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}a,button{font:inherit}a.btn,button{min-height:44px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--fg);text-decoration:none;font-weight:750;cursor:pointer}a.primary{background:var(--red);border-color:var(--red);color:white}.notice{border-left:4px solid var(--red);background:var(--panel2);padding:13px;border-radius:9px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.tab{padding:9px 12px;border:1px solid var(--line);border-radius:999px;color:var(--muted)}.tab.active{background:var(--red);border-color:var(--red);color:white}.empty{text-align:center;padding:28px 12px}.empty .symbol{font-size:42px}.feature{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}.feature:first-of-type{border-top:0}.feature .ico{font-size:24px}button:disabled{opacity:.55;cursor:not-allowed}:focus-visible{outline:3px solid var(--red);outline-offset:3px}.skip{position:fixed;top:8px;left:8px;transform:translateY(-150%);background:var(--red);color:white;padding:10px;z-index:5}.skip:focus{transform:none}
+</style></head>
+<body><a class="skip" href="#main">Pular para o conteúdo</a>
+<header><img src="./marca.svg" alt="Capital do Trem"><h1>Minhas conversas</h1><p class="muted">Seu espaço reservado para conversas individuais.</p><div class="actions"><a class="btn" href="./index.html">Início</a><a class="btn" href="./bate-papo.html">Bate-papo geral</a><a class="btn" href="./conta.html">Minha conta</a><button id="theme" type="button">☀️ Claro</button></div></header>
+<main id="main">
+<section class="panel"><h2>✉️ Conversas privadas</h2><p class="muted">Converse individualmente com artistas e Usuários Uai. As mensagens privadas não aparecem na sala geral.</p>
+<div class="notice" role="status"><strong>Área em preparação</strong><br>Estamos preparando a conexão segura entre as contas. As conversas ainda não estão ativadas; nenhuma mensagem será enviada ou armazenada por esta tela.</div>
+<div class="tabs" aria-label="Categorias"><span class="tab active">Todas</span><span class="tab">Não lidas</span><span class="tab">Convites</span></div>
+<div class="empty"><div class="symbol" aria-hidden="true">💬</div><h3>Suas conversas aparecerão aqui</h3><p class="muted">Quando a função estiver conectada, você poderá aceitar convites, responder mensagens e retomar parcerias.</p></div>
+</section>
+<section class="panel"><h2>O que estamos preparando</h2>
+<div class="feature"><span class="ico" aria-hidden="true">🎵</span><div><strong>Convites musicais</strong><div class="muted">Chamar alguém para feat, gravação, composição ou produção.</div></div></div>
+<div class="feature"><span class="ico" aria-hidden="true">🤝</span><div><strong>Convites pessoais</strong><div class="muted">Combinar encontros e eventos com respeito e consentimento.</div></div></div>
+<div class="feature"><span class="ico" aria-hidden="true">🛡️</span><div><strong>Privacidade e segurança</strong><div class="muted">Aceitar ou recusar pedidos, bloquear e denunciar usuários, controlar quem pode chamar você.</div></div></div>
+<div class="feature"><span class="ico" aria-hidden="true">🎙️</span><div><strong>Áudios e imagens</strong><div class="muted">Compartilhar ideias e referências com limites de tamanho e proteção contra abuso.</div></div></div>
+</section>
+<p class="muted" style="text-align:center;font-size:13px">Capital do Trem • A música da nossa quebrada!</p>
+</main>
+<script>
+const theme=document.getElementById('theme');try{if(localStorage.getItem('capitaldotrem_theme_v1')==='light')document.body.classList.add('light')}catch{}function updateTheme(){const light=document.body.classList.contains('light');theme.textContent=light?'🌙 Escuro':'☀️ Claro';theme.setAttribute('aria-pressed',String(light));document.querySelector('meta[name="theme-color"]').content=light?'#f5f5f5':'#050505'}updateTheme();theme.addEventListener('click',()=>{const light=!document.body.classList.contains('light');document.body.classList.toggle('light',light);try{localStorage.setItem('capitaldotrem_theme_v1',light?'light':'dark')}catch{}updateTheme()});window.addEventListener('storage',e=>{if(e.key==='capitaldotrem_theme_v1'){document.body.classList.toggle('light',e.newValue==='light');updateTheme()}});
+</script><script src="./update.js" defer></script></body></html>
