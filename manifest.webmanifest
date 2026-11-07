@@ -61,6 +61,19 @@
           "type": "image/svg+xml"
         }
       ]
+    },
+    {
+      "name": "Minhas conversas",
+      "short_name": "Conversas",
+      "description": "Acesse sua área de conversas privadas.",
+      "url": "./mensagens.html",
+      "icons": [
+        {
+          "src": "./marca.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
     }
   ]
 }
