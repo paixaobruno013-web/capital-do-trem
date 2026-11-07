@@ -736,6 +736,6 @@ function safeHttpsUrl(value){try{const url=new URL(value);return url.protocol===
   }
  }catch(error){container.replaceChildren();const message=document.createElement('p');message.className='muted';message.textContent='O catálogo será carregado quando a atualização do Supabase estiver aplicada e houver músicas aprovadas.';container.append(message);}
 })();
-// Registro e aviso de atualização centralizados.
-const updateScript=document.createElement('script');updateScript.src='./update.js';updateScript.defer=true;document.body.append(updateScript);
-</script></body></html>
+
+</script><script src="./update.js" defer></script>
+</body></html>
