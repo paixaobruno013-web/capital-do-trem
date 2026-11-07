@@ -138,7 +138,7 @@ try{
  auth=await import('./supabase/auth.js');auth.initSupabase();
  const session=await auth.getCurrentSession();if(session?.user)await enterDashboard(session.user);
 }catch(error){loginStatus.textContent='Painel ainda indisponível: configure as credenciais do Supabase e aplique o banco de dados.';}
-if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+
 </script>
 <script src="./update.js" defer></script>
 </body></html>
