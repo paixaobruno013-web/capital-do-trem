@@ -48,6 +48,19 @@
           "type": "image/svg+xml"
         }
       ]
+    },
+    {
+      "name": "Meu avatar",
+      "short_name": "Meu avatar",
+      "description": "Personalize sua foto ou personagem no Capital do Trem.",
+      "url": "./avatar.html",
+      "icons": [
+        {
+          "src": "./marca.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
     }
   ]
 }
