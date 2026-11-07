@@ -1,20 +1,33 @@
 // Atualizações do Capital do Trem: avisa quando uma nova versão estiver pronta.
 (()=>{
  if(!/^https?:$/.test(location.protocol))return;
- // Aviso de conexão: funciona mesmo em navegadores sem suporte a Service Worker.
- const connectionBanner=document.createElement('aside');
- connectionBanner.id='app-connection-banner';
- connectionBanner.setAttribute('role','status');
- connectionBanner.setAttribute('aria-live','polite');
- connectionBanner.textContent='Você está sem conexão com a internet. Algumas funções podem ficar indisponíveis.';
- connectionBanner.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:10000;display:none;padding:13px 15px;background:#211719;color:#fff;border:1px solid #ed1c24;border-radius:12px;box-shadow:0 8px 24px #0008;font:600 14px/1.4 system-ui,Arial,sans-serif';
- const updateConnectionNotice=()=>{connectionBanner.style.display=navigator.onLine?'none':'block';};
- window.addEventListener('offline',updateConnectionNotice);
- window.addEventListener('online',updateConnectionNotice);
- updateConnectionNotice();
- const addConnectionBanner=()=>{if(!connectionBanner.isConnected)document.body.append(connectionBanner);updateConnectionNotice();};
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addConnectionBanner,{once:true});
- else addConnectionBanner();
+ // Aviso de conexão nas páginas que ainda não têm um indicador próprio.
+ // A página inicial já possui um aviso mais completo; evitamos duplicá-lo.
+ if(!document.getElementById('connection-status')){
+  const connectionBanner=document.createElement('aside');
+  connectionBanner.id='app-connection-banner';
+  connectionBanner.setAttribute('role','status');
+  connectionBanner.setAttribute('aria-live','polite');
+  connectionBanner.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:10000;display:none;padding:13px 15px;background:#211719;color:#fff;border:1px solid #ed1c24;border-radius:12px;box-shadow:0 8px 24px #0008;font:600 14px/1.4 system-ui,Arial,sans-serif';
+  let reconnectTimer;
+  const showConnection=(message)=>{
+   connectionBanner.textContent=message;
+   connectionBanner.style.display='block';
+  };
+  const addConnectionBanner=()=>{if(!connectionBanner.isConnected)document.body.append(connectionBanner);};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addConnectionBanner,{once:true});
+  else addConnectionBanner();
+  window.addEventListener('offline',()=>{
+   clearTimeout(reconnectTimer);
+   showConnection('Você está sem conexão com a internet. Algumas funções podem ficar indisponíveis.');
+  });
+  window.addEventListener('online',()=>{
+   showConnection('Conexão restabelecida. Você já pode tentar novamente.');
+   clearTimeout(reconnectTimer);
+   reconnectTimer=setTimeout(()=>{connectionBanner.style.display='none';},6500);
+  });
+  if(!navigator.onLine)showConnection('Você está sem conexão com a internet. Algumas funções podem ficar indisponíveis.');
+ }
  if(!('serviceWorker' in navigator))return;
  let registration=null,reloading=false;
  const banner=document.createElement('aside');
