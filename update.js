@@ -3,7 +3,7 @@
  if(!/^https?:$/.test(location.protocol))return;
  // Escurece suavemente a interface inteira enquanto o aparelho estiver sem internet.
  const offlineStyle=document.createElement('style');
- offlineStyle.textContent='html.app-offline::after{content:"";position:fixed;inset:0;background:rgba(0,0,0,.28);backdrop-filter:saturate(.68);-webkit-backdrop-filter:saturate(.68);pointer-events:none;z-index:9000}html{transition:filter .25s ease}';
+ offlineStyle.textContent='html.app-offline::after{content:"";position:fixed;inset:0;background:rgba(0,0,0,.28);backdrop-filter:saturate(.68);-webkit-backdrop-filter:saturate(.68);pointer-events:none;z-index:9000}html{transition:filter .25s ease}@media(prefers-reduced-motion:reduce){html{transition:none!important}}';
  (document.head||document.documentElement).append(offlineStyle);
  const markOffline=()=>document.documentElement.classList.add('app-offline');
  const markOnline=()=>document.documentElement.classList.remove('app-offline');
