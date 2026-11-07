@@ -73,7 +73,11 @@
   });
   const check=()=>{if(navigator.onLine)reg.update().catch(()=>{});};
   window.addEventListener('focus',check);
+  window.addEventListener('pageshow',check);
+  window.addEventListener('online',check);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)check();});
+  // Confere atualizações periodicamente enquanto o app permanece aberto.
+  window.setInterval(check,6*60*60*1000);
   check();
  }).catch(()=>{});
  const addBanner=()=>{if(!banner.isConnected)document.body.append(banner);};
