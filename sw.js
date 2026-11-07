@@ -1,4 +1,4 @@
-const CACHE='capital-do-trem-v108';
+const CACHE='capital-do-trem-v109';
 const FILES=['./','./index.html','./admin.html','./marca.svg','./manifest.webmanifest','./privacidade.html','./conta.html','./supabase/auth.js','./update.js','./diagnostico.html','./bate-papo.html'];
 
 self.addEventListener('install',event=>{
