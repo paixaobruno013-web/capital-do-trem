@@ -1,8 +1,10 @@
-# Capital do Trem — revisão da versão 137
+# Capital do Trem — revisão da versão 138
 
 ## Alterações registradas
+- Criada uma página offline dedicada, com identidade visual do Capital do Trem, instruções claras, botão para tentar novamente e retorno à página inicial.
+- Incluída `offline.html` no núcleo obrigatório do cache do aplicativo instalado; quando uma navegação falha sem internet, o service worker prioriza a página offline armazenada, com uma resposta mínima de reserva.
 - Adicionado o atalho **Minhas conversas** aos atalhos do aplicativo instalado (manifesto PWA).
-- Atualizado o nome do cache do service worker para `capital-do-trem-v137`, para que a instalação atualize os recursos pré-armazenados.
+- Atualizado o nome do cache do service worker para `capital-do-trem-v138`, para que a instalação atualize os recursos pré-armazenados.
 - Ampliado o diagnóstico somente de leitura para conferir também `chat_messages`, `song_likes` e `song_comments` (8 tabelas, conexão e 2 espaços de mídia).
 - Adicionado na área Minha conta um atalho direto para a página de diagnóstico do sistema.
 - Mantidas as estratégias existentes: páginas HTML priorizam a rede e recorrem ao cache quando offline; arquivos estáticos podem ser servidos do cache e atualizados em segundo plano.
