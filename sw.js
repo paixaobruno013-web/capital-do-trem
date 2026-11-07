@@ -1,14 +1,17 @@
-const CACHE='capital-do-trem-v120';
-const FILES=['./','./index.html','./admin.html','./marca.svg','./manifest.webmanifest','./privacidade.html','./conta.html','./supabase/auth.js','./update.js','./diagnostico.html','./bate-papo.html'];
+const CACHE='capital-do-trem-v121';
+const CORE_FILES=['./','./index.html','./marca.svg','./manifest.webmanifest','./update.js'];
+const OPTIONAL_FILES=['./admin.html','./privacidade.html','./conta.html','./supabase/auth.js','./diagnostico.html','./bate-papo.html'];
 
 self.addEventListener('install',event=>{
-  // Um arquivo opcional indisponível não deve impedir a instalação do app inteiro.
-  event.waitUntil(caches.open(CACHE).then(cache=>Promise.all(
-    FILES.map(file=>cache.add(file).catch(error=>{
-      console.warn('Não foi possível armazenar no cache:',file,error);
+  // O núcleo do app precisa estar disponível para preservar uma instalação offline íntegra.
+  // Páginas e módulos complementares são armazenados individualmente: uma falha isolada não bloqueia o app.
+  event.waitUntil(caches.open(CACHE).then(async cache=>{
+    await cache.addAll(CORE_FILES);
+    await Promise.all(OPTIONAL_FILES.map(file=>cache.add(file).catch(error=>{
+      console.warn('Não foi possível armazenar no cache (arquivo complementar):',file,error);
       return null;
-    }))
-  )));
+    })));
+  }));
 });
 
 self.addEventListener('message',event=>{
