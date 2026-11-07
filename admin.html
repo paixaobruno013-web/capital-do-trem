@@ -53,7 +53,9 @@ body.light h1,body.light h2{text-shadow:0 0 8px rgba(237,28,36,.1)}
 const THEME_KEY='capitaldotrem_theme_v1';
 const themeToggle=document.getElementById('theme-toggle');
 function setTheme(theme){const light=theme==='light';document.body.classList.toggle('light',light);themeToggle.textContent=light?'🌙 Escuro':'☀️ Claro';themeToggle.setAttribute('aria-pressed',String(light));document.querySelector('meta[name="theme-color"]').content=light?'#f5f5f5':'#000000';}
-let savedTheme='dark';try{savedTheme=localStorage.getItem(THEME_KEY)==='light'?'light':'dark';}catch{}setTheme(savedTheme);themeToggle.addEventListener('click',()=>{const next=document.body.classList.contains('light')?'dark':'light';setTheme(next);try{localStorage.setItem(THEME_KEY,next);}catch{}});
+let savedTheme='dark';try{savedTheme=localStorage.getItem(THEME_KEY)==='light'?'light':'dark';}catch{}setTheme(savedTheme);
+window.addEventListener('storage',event=>{if(event.key===THEME_KEY)setTheme(event.newValue==='light'?'light':'dark');});
+themeToggle.addEventListener('click',()=>{const next=document.body.classList.contains('light')?'dark':'light';setTheme(next);try{localStorage.setItem(THEME_KEY,next);}catch{}});
 
 const loginPanel=document.getElementById('login-panel'),dashboard=document.getElementById('dashboard');
 const loginStatus=document.getElementById('login-status'),queueStatus=document.getElementById('queue-status');
