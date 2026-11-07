@@ -1,9 +1,10 @@
-# Capital do Trem — revisão da versão 136
+# Capital do Trem — revisão da versão 137
 
 ## Alterações registradas
 - Adicionado o atalho **Minhas conversas** aos atalhos do aplicativo instalado (manifesto PWA).
-- Atualizado o nome do cache do service worker para `capital-do-trem-v136`, para que a instalação atualize os recursos pré-armazenados.
+- Atualizado o nome do cache do service worker para `capital-do-trem-v137`, para que a instalação atualize os recursos pré-armazenados.
 - Ampliado o diagnóstico somente de leitura para conferir também `chat_messages`, `song_likes` e `song_comments` (8 tabelas, conexão e 2 espaços de mídia).
+- Adicionado na área Minha conta um atalho direto para a página de diagnóstico do sistema.
 - Mantidas as estratégias existentes: páginas HTML priorizam a rede e recorrem ao cache quando offline; arquivos estáticos podem ser servidos do cache e atualizados em segundo plano.
 
 ## Itens revisados
