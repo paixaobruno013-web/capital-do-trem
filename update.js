@@ -72,8 +72,8 @@
  document.addEventListener('keydown',unlockHorn,{once:true});
  function showOffline(){
   clearTimeout(reconnectTimer);document.documentElement.classList.add('app-offline');
-  alertTitle.textContent='🚨 ALERTA: VOCÊ TÁ OFFLINE!';
-  alertDetail.textContent='A conexão caiu. O trem está aguardando a internet voltar.';
+  alertTitle.textContent='ALERTA';
+  alertDetail.textContent='VOCE TÁ OFFLINE';
   alertBox.style.borderColor='#ed1c24';alertBox.style.display='flex';
   if(!offlineFeedbackSent){offlineFeedbackSent=true;try{if('vibrate' in navigator)navigator.vibrate(3000);}catch(error){/* Vibração depende do suporte do aparelho e navegador. */}}
   if(!playedThisOutage&&audioUnlocked){playedThisOutage=true;playTrainHorn();}
