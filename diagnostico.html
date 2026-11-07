@@ -7,12 +7,13 @@
 <title>Verificação do banco — Capital do Trem</title>
 <style>
 :root{color-scheme:dark;--bg:#000;--panel:#111;--fg:#fff;--muted:#aaa;--red:#ed1c24;--line:#333}
+body.light{color-scheme:light;--bg:#f5f5f5;--panel:#fff;--fg:#111;--muted:#555;--line:#ddd}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,Arial,sans-serif}
 main{max-width:720px;margin:auto;padding:20px}header{text-align:center;padding:18px 0;border-bottom:1px solid var(--line)}
 h1{font-size:clamp(24px,6vw,34px);margin:8px 0;text-shadow:0 0 12px #ed1c2444}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:17px;margin:16px 0}
 button,a{font:inherit}button,.btn{display:inline-block;min-height:46px;padding:11px 16px;border:0;border-radius:10px;background:var(--red);color:#fff;font-weight:800;text-decoration:none;cursor:pointer}
-button:disabled{opacity:.6}.muted{color:var(--muted)}.result{padding:12px;margin:9px 0;border:1px solid var(--line);border-radius:9px;overflow-wrap:anywhere}
+button:disabled{opacity:.6}.theme{float:right;background:var(--panel);border:1px solid var(--line);color:var(--fg);border-radius:22px;padding:8px 12px}.muted{color:var(--muted)}.result{padding:12px;margin:9px 0;border:1px solid var(--line);border-radius:9px;overflow-wrap:anywhere}
 .good{border-left:4px solid #26a269}.bad{border-left:4px solid #e05252}.wait{border-left:4px solid #d49b36}
 #overall{font-weight:800}.actions{display:flex;gap:10px;flex-wrap:wrap}
 :focus-visible{outline:3px solid var(--red);outline-offset:3px}
@@ -20,7 +21,7 @@ button:disabled{opacity:.6}.muted{color:var(--muted)}.result{padding:12px;margin
 </head>
 <body><main>
 <header>
-<p class="muted">🚂 CAPITAL DO TREM</p>
+<button class="theme" id="theme-toggle" type="button" aria-pressed="false">☀️ Claro</button><p class="muted">🚂 CAPITAL DO TREM</p>
 <h1>Verificação do banco de dados</h1>
 <p class="muted">Esta página faz apenas consultas de leitura. Não cria, altera nem apaga dados.</p>
 </header>
@@ -84,5 +85,7 @@ button.addEventListener('click',async()=>{
  overall.className=passed===total?'good':'wait';
  button.disabled=false;
 });
+
+const themeButton=document.getElementById('theme-toggle');const themeKey='capitaldotrem_theme_v1';function setTheme(value){const light=value==='light';document.body.classList.toggle('light',light);themeButton.textContent=light?'🌙 Escuro':'☀️ Claro';themeButton.setAttribute('aria-pressed',String(light));document.querySelector('meta[name="theme-color"]').content=light?'#f5f5f5':'#000000';}let initial='dark';try{initial=localStorage.getItem(themeKey)==='light'?'light':'dark';}catch{}setTheme(initial);themeButton.addEventListener('click',()=>{const next=document.body.classList.contains('light')?'dark':'light';setTheme(next);try{localStorage.setItem(themeKey,next);}catch{}});window.addEventListener('storage',event=>{if(event.key===themeKey)setTheme(event.newValue==='light'?'light':'dark');});
 </script>
 </main></body></html>
