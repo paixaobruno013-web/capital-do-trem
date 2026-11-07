@@ -17,6 +17,7 @@ header{text-align:center;border-bottom:1px solid var(--line)}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px;margin:16px 0}
 label{display:block;font-weight:700;margin-top:12px}
 input{display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit}
+.password-row{display:flex;align-items:stretch;gap:8px}.password-row input{flex:1;min-width:0}.password-row button{min-height:44px;padding:8px 13px;white-space:nowrap;align-self:flex-start;margin:6px 0 12px}
 button,.btn{min-height:46px;padding:11px 15px;border:0;border-radius:10px;background:var(--red);color:#fff;font:inherit;font-weight:800;text-decoration:none;cursor:pointer}
 button:disabled{opacity:.5;cursor:not-allowed}.secondary{background:var(--panel2);color:var(--fg);border:1px solid var(--line)}
 .tabs{display:flex;gap:8px;flex-wrap:wrap}.tabs button[aria-pressed=true]{background:var(--red);color:white}
@@ -116,7 +117,7 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 <input id="email" name="email" type="email" maxlength="254" autocomplete="email" required disabled>
 <div id="password-wrap">
 <label for="password">Senha</label>
-<input id="password" name="password" type="password" minlength="8" autocomplete="current-password" required disabled>
+<div class="password-row"><input id="password" name="password" type="password" minlength="8" autocomplete="current-password" required disabled><button type="button" class="secondary" id="toggle-password" aria-controls="password" aria-pressed="false" disabled>Mostrar</button></div>
 <p class="muted">Use uma senha com pelo menos 8 caracteres.</p>
 </div>
 <button id="submit-account" type="submit" disabled>Cadastro em preparação</button>
@@ -165,6 +166,9 @@ function setTheme(theme){const light=theme==='light';document.body.classList.tog
 let savedTheme='dark';try{savedTheme=localStorage.getItem(THEME_KEY)==='light'?'light':'dark';}catch{}setTheme(savedTheme);themeToggle.addEventListener('click',()=>{const next=document.body.classList.contains('light')?'dark':'light';setTheme(next);try{localStorage.setItem(THEME_KEY,next);}catch{}});window.addEventListener('storage',event=>{if(event.key===THEME_KEY)setTheme(event.newValue==='light'?'light':'dark');});
 
 const setupMessage=document.getElementById('setup-message');
+const passwordInput=document.getElementById('password');
+const passwordToggle=document.getElementById('toggle-password');
+passwordToggle.addEventListener('click',()=>{const visible=passwordInput.type==='password';passwordInput.type=visible?'text':'password';passwordToggle.textContent=visible?'Ocultar':'Mostrar';passwordToggle.setAttribute('aria-pressed',String(visible));});
 const form=document.getElementById('account-form');
 const status=document.getElementById('account-status');
 const controls=[...form.querySelectorAll('input,button,select,textarea'),...document.querySelectorAll('.tabs button')];
@@ -339,7 +343,7 @@ function setMode(next){
  document.getElementById('register-type').required=mode==='register';
  document.getElementById('register-type').hidden=mode!=='register';
  document.getElementById('password').required=mode!=='reset';
- document.getElementById('password').autocomplete=mode==='register'?'new-password':'current-password';
+ passwordInput.type='password';passwordToggle.textContent='Mostrar';passwordToggle.setAttribute('aria-pressed','false');document.getElementById('password').autocomplete=mode==='register'?'new-password':'current-password';
  document.getElementById('submit-account').textContent=mode==='register'?'Criar minha conta':mode==='reset'?'Enviar link de recuperação':'Entrar';
  status.textContent='';
 }
