@@ -1,4 +1,4 @@
-const CACHE='capital-do-trem-v123';
+const CACHE='capital-do-trem-v124';
 const CORE_FILES=['./','./index.html','./marca.svg','./manifest.webmanifest','./update.js'];
 const OPTIONAL_FILES=['./admin.html','./privacidade.html','./conta.html','./supabase/auth.js','./diagnostico.html','./bate-papo.html'];
 
