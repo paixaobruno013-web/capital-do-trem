@@ -497,12 +497,14 @@ export async function sendChatMessage(content) {
   return data;
 }
 
-export function subscribeChatMessages(onMessage) {
+export function subscribeChatMessages(onMessage, onStatus) {
   const supabase = initSupabase();
   const channel = supabase.channel('capital-do-trem-chat')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, payload => {
       if (typeof onMessage === 'function') onMessage(payload.new);
-    }).subscribe();
+    }).subscribe(status => {
+      if (typeof onStatus === 'function') onStatus(status);
+    });
   return () => { supabase.removeChannel(channel); };
 }
 
