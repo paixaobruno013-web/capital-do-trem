@@ -15,5 +15,39 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
+  ],
+  "lang": "pt-BR",
+  "categories": [
+    "music",
+    "social",
+    "entertainment"
+  ],
+  "shortcuts": [
+    {
+      "name": "Minha conta",
+      "short_name": "Minha conta",
+      "description": "Acesse seu perfil no Capital do Trem.",
+      "url": "./conta.html",
+      "icons": [
+        {
+          "src": "./marca.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Bate-papo",
+      "short_name": "Bate-papo",
+      "description": "Abra o bate-papo da comunidade.",
+      "url": "./bate-papo.html",
+      "icons": [
+        {
+          "src": "./marca.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
   ]
 }
