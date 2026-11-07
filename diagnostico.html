@@ -60,7 +60,7 @@ button.addEventListener('click',async()=>{
  try{
   const {error}=await client.auth.getSession();
   if(error) throw error;
-  show('Conexão com Supabase',true,'O projeto respondeu à solicitação.');
+  show('Cliente Supabase',true,'A biblioteca foi inicializada. As verificações das tabelas e dos espaços abaixo confirmam o acesso real aos serviços.');
   passed++;
  }catch(error){show('Conexão com Supabase',false,error.message||'Não foi possível conectar.');overall.textContent='Não foi possível concluir a verificação. Confira sua conexão com a internet.';overall.className='bad';button.disabled=false;return;}
  for(const [table,column] of checks){
