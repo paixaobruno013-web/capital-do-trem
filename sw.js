@@ -1,4 +1,4 @@
-const CACHE='capital-do-trem-v121';
+const CACHE='capital-do-trem-v122';
 const CORE_FILES=['./','./index.html','./marca.svg','./manifest.webmanifest','./update.js'];
 const OPTIONAL_FILES=['./admin.html','./privacidade.html','./conta.html','./supabase/auth.js','./diagnostico.html','./bate-papo.html'];
 
@@ -19,12 +19,13 @@ self.addEventListener('message',event=>{
 });
 
 self.addEventListener('activate',event=>{
-  event.waitUntil(
+  // Aguarda a limpeza dos caches antigos e a tomada de controle das páginas abertas.
+  event.waitUntil(Promise.all([
     caches.keys().then(keys=>Promise.all(
       keys.filter(key=>key.startsWith('capital-do-trem-')&&key!==CACHE).map(key=>caches.delete(key))
-    ))
-  );
-  self.clients.claim();
+    )),
+    self.clients.claim()
+  ]));
 });
 
 self.addEventListener('fetch',event=>{
