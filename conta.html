@@ -454,7 +454,8 @@ signOutButton.addEventListener('click',async()=>{
  catch(error){sessionStatus.textContent=error?.message||'Não foi possível sair. Tente novamente.';}
  finally{signOutButton.disabled=false;}
 });
-if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+// Registro e aviso de atualização centralizados.
+const updateScript=document.createElement('script');updateScript.src='./update.js';updateScript.defer=true;document.body.append(updateScript);
 </script>
 </body>
 </html>
