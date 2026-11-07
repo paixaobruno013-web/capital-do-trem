@@ -5,12 +5,12 @@
 <meta name="theme-color" content="#000000"><meta name="description" content="Painel de administração do Capital do Trem.">
 <title>Administração — Capital do Trem</title>
 <style>
-:root{color-scheme:dark;--bg:#000;--panel:#111;--panel2:#191919;--fg:#fff;--muted:#aaa;--red:#ed1c24;--line:#333}
+:root{color-scheme:dark;--bg:#000;--panel:#111;--panel2:#191919;--fg:#fff;--muted:#aaa;--red:#ed1c24;--line:#333}\nbody.light{color-scheme:light;--bg:#f5f5f5;--panel:#fff;--panel2:#eee;--fg:#111;--muted:#555;--line:#ddd}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,Arial,sans-serif}
 main{max-width:900px;margin:auto;padding:20px}header{padding:18px 0;border-bottom:1px solid var(--line)}
 h1{margin:0;font-size:clamp(25px,5vw,36px)}h2{margin-top:0}
 .card,.item{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px;margin:15px 0}
-label{display:block;font-weight:700;margin:12px 0 5px}input{width:100%;padding:13px;border-radius:9px;border:1px solid var(--line);background:#080808;color:#fff;font:inherit}
+label{display:block;font-weight:700;margin:12px 0 5px}input{width:100%;padding:13px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit}
 button,.btn{display:inline-block;min-height:44px;padding:10px 15px;border:0;border-radius:9px;background:var(--red);color:#fff;font:inherit;font-weight:800;text-decoration:none;cursor:pointer;margin:5px 5px 5px 0}
 button.secondary,.btn.secondary{background:var(--panel2);border:1px solid var(--line)}
 button:disabled{opacity:.5;cursor:not-allowed}.muted,.status{color:var(--muted)}.notice{padding:13px;background:var(--panel2);border-left:4px solid var(--red);border-radius:8px}
@@ -25,10 +25,10 @@ input:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(237,28,36,.18),0 0
 .notice{box-shadow:inset 3px 0 12px rgba(237,28,36,.08)}
 :focus-visible{box-shadow:0 0 0 3px rgba(237,28,36,.2),0 0 15px rgba(237,28,36,.28)}
 
-</style>
+body.light h1,body.light h2{text-shadow:0 0 8px rgba(237,28,36,.1)}\n</style>
 </head>
 <body><main>
-<header><a class="btn secondary" href="./">← Voltar ao site</a><h1>Painel administrativo</h1><p class="muted">Capital do Trem • análise de artistas, eventos e divulgações</p></header>
+<header><div class="actions"><a class="btn secondary" href="./">← Voltar ao site</a><button class="secondary" type="button" id="theme-toggle" aria-pressed="false">☀️ Claro</button></div><h1>Painel administrativo</h1><p class="muted">Capital do Trem • análise de artistas, eventos e divulgações</p></header>
 <section class="card" id="login-panel">
 <h2>Acesso da equipe</h2><p class="notice">Entre com uma conta previamente autorizada como administradora. Criar uma conta comum não concede acesso administrativo.</p>
 <form id="login-form">
@@ -48,6 +48,11 @@ input:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(237,28,36,.18),0 0
 <footer class="muted">Capital do Trem • painel em preparação</footer>
 </main>
 <script type="module">
+const THEME_KEY='capitaldotrem_theme_v1';
+const themeToggle=document.getElementById('theme-toggle');
+function setTheme(theme){const light=theme==='light';document.body.classList.toggle('light',light);themeToggle.textContent=light?'🌙 Escuro':'☀️ Claro';themeToggle.setAttribute('aria-pressed',String(light));document.querySelector('meta[name="theme-color"]').content=light?'#f5f5f5':'#000000';}
+let savedTheme='dark';try{savedTheme=localStorage.getItem(THEME_KEY)==='light'?'light':'dark';}catch{}setTheme(savedTheme);themeToggle.addEventListener('click',()=>{const next=document.body.classList.contains('light')?'dark':'light';setTheme(next);try{localStorage.setItem(THEME_KEY,next);}catch{}});
+
 const loginPanel=document.getElementById('login-panel'),dashboard=document.getElementById('dashboard');
 const loginStatus=document.getElementById('login-status'),queueStatus=document.getElementById('queue-status');
 const queue=document.getElementById('queue'),loginForm=document.getElementById('login-form');
