@@ -707,7 +707,17 @@ function safeHttpsUrl(value){try{const url=new URL(value);return url.protocol===
    card.append(title,artist);
    if(song.description){const desc=document.createElement('p');desc.textContent=song.description;card.append(desc);}
    const audioUrl=safeHttpsUrl(song.audio_url);const downloadUrl=safeHttpsUrl(song.download_url)||audioUrl;
-   if(audioUrl){const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=audioUrl;audio.style.cssText='width:100%;margin:8px 0';audio.setAttribute('aria-label','Ouvir '+song.title);card.append(audio);}else{const unavailable=document.createElement('p');unavailable.className='muted';unavailable.textContent='Áudio temporariamente indisponível.';card.append(unavailable);}
+   if(audioUrl){
+    const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=audioUrl;audio.style.cssText='width:100%;margin:8px 0';audio.setAttribute('aria-label','Ouvir '+song.title);
+    if('mediaSession' in navigator){
+     const updateMediaPlayback=()=>{try{if(navigator.mediaSession.playbackState)navigator.mediaSession.playbackState=audio.paused?'paused':'playing';}catch{}};
+     audio.addEventListener('play',()=>{
+      try{if('MediaMetadata' in window)navigator.mediaSession.metadata=new MediaMetadata({title:song.title,artist:song.artist_name||'Capital do Trem',album:'Capital do Trem',artwork:[{src:'./marca.svg',sizes:'any',type:'image/svg+xml'}]});navigator.mediaSession.playbackState='playing';}catch{}
+     });
+     audio.addEventListener('pause',updateMediaPlayback);audio.addEventListener('ended',()=>{try{navigator.mediaSession.playbackState='none';}catch{}});
+    }
+    card.append(audio);
+   }else{const unavailable=document.createElement('p');unavailable.className='muted';unavailable.textContent='Áudio temporariamente indisponível.';card.append(unavailable);}
    if(downloadUrl){const download=document.createElement('a');download.className='btn alt';download.href=downloadUrl;download.rel='noopener';download.textContent='⬇ Baixar música';download.setAttribute('aria-label','Baixar '+song.title);download.style.display='inline-block';download.style.margin='4px 0';card.append(download);}
    if(!session){
     const access=document.createElement('div');access.className='notice';access.style.marginTop='12px';
