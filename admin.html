@@ -27,9 +27,12 @@ input:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(237,28,36,.18),0 0
 :focus-visible{box-shadow:0 0 0 3px rgba(237,28,36,.2),0 0 15px rgba(237,28,36,.28)}
 
 body.light h1,body.light h2{text-shadow:0 0 8px rgba(237,28,36,.1)}
+
+.skip-link{position:fixed;top:10px;left:10px;z-index:20000;transform:translateY(-160%);padding:12px 16px;border-radius:9px;background:var(--red);color:#fff;font-weight:800;text-decoration:none;box-shadow:0 4px 18px #0008}.skip-link:focus{transform:translateY(0);outline:3px solid var(--fg);outline-offset:3px}
 </style>
 </head>
-<body><main>
+<body>
+<a class="skip-link" href="#main-content">Pular para o conteúdo principal</a><main id="main-content">
 <header><div class="actions"><a class="btn secondary" href="./">← Voltar ao site</a><button class="secondary" type="button" id="theme-toggle" aria-pressed="false">☀️ Claro</button></div><h1>Painel administrativo</h1><p class="muted">Capital do Trem • análise de artistas, eventos e divulgações</p></header>
 <section class="card" id="login-panel">
 <h2>Acesso da equipe</h2><p class="notice">Entre com uma conta previamente autorizada como administradora. Criar uma conta comum não concede acesso administrativo.</p>
