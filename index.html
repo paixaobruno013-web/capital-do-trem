@@ -672,13 +672,14 @@ updateConnectionStatus();
    if(item.description){const description=document.createElement('p');description.textContent=item.description;card.append(description);}
    if(item.contact){const contact=document.createElement('p');contact.textContent='Contato: '+item.contact;card.append(contact);}
    const map=document.createElement('a');map.className='btn alt';map.target='_blank';map.rel='noopener';map.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(item.address);map.textContent='Ver localização no mapa';card.append(map);
-   if(item.poster_url){const image=document.createElement('img');image.src=item.poster_url;image.alt='Cartaz de '+item.title;image.loading='lazy';image.style.cssText='max-width:100%;max-height:320px;object-fit:contain;border-radius:10px;margin-top:10px';card.append(image);}
+   const posterUrl=safeHttpsUrl(item.poster_url);if(posterUrl){const image=document.createElement('img');image.src=posterUrl;image.alt='Cartaz de '+item.title;image.loading='lazy';image.decoding='async';image.style.cssText='max-width:100%;max-height:320px;object-fit:contain;border-radius:10px;margin-top:10px';card.append(image);}
    container.append(card);
   }
  }catch(error){
   const message=document.createElement('p');message.className='muted';message.textContent='A agenda pública compartilhada será ativada quando a conexão segura com o banco for concluída.';container.replaceChildren(message);
  }
 })();
+function safeHttpsUrl(value){try{const url=new URL(value);return url.protocol==='https:'?url.href:null;}catch{return null;}}
 // Catálogo musical compartilhado com reprodução, download, curtidas e comentários.
 (async()=>{
  const container=document.getElementById('published-song-catalog');
@@ -693,8 +694,9 @@ updateConnectionStatus();
    const artist=document.createElement('p');artist.className='muted';artist.textContent=song.artist_name;
    card.append(title,artist);
    if(song.description){const desc=document.createElement('p');desc.textContent=song.description;card.append(desc);}
-   const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=song.audio_url;audio.style.cssText='width:100%;margin:8px 0';audio.setAttribute('aria-label','Ouvir '+song.title);card.append(audio);
-   const download=document.createElement('a');download.className='btn alt';download.href=song.download_url||song.audio_url;download.textContent='⬇ Baixar música';download.setAttribute('aria-label','Baixar '+song.title);download.style.display='inline-block';download.style.margin='4px 0';card.append(download);
+   const audioUrl=safeHttpsUrl(song.audio_url);const downloadUrl=safeHttpsUrl(song.download_url)||audioUrl;
+   if(audioUrl){const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=audioUrl;audio.style.cssText='width:100%;margin:8px 0';audio.setAttribute('aria-label','Ouvir '+song.title);card.append(audio);}else{const unavailable=document.createElement('p');unavailable.className='muted';unavailable.textContent='Áudio temporariamente indisponível.';card.append(unavailable);}
+   if(downloadUrl){const download=document.createElement('a');download.className='btn alt';download.href=downloadUrl;download.rel='noopener';download.textContent='⬇ Baixar música';download.setAttribute('aria-label','Baixar '+song.title);download.style.display='inline-block';download.style.margin='4px 0';card.append(download);}
    if(!session){
     const access=document.createElement('div');access.className='notice';access.style.marginTop='12px';
     const message=document.createElement('p');message.textContent='Entre na sua conta para curtir, comentar e acompanhar a conversa desta música.';
