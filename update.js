@@ -73,7 +73,13 @@
     if(worker.state==='installed'&&navigator.serviceWorker.controller)showUpdate();
    });
   });
-  const check=()=>{if(navigator.onLine)reg.update().catch(()=>{});};
+  let checkingUpdate=false;
+  const check=async()=>{
+   if(!navigator.onLine||document.hidden||checkingUpdate)return;
+   checkingUpdate=true;
+   try{await reg.update();}catch(error){/* Falha temporária de rede: a próxima verificação tentará novamente. */}
+   finally{checkingUpdate=false;}
+  };
   window.addEventListener('focus',check);
   window.addEventListener('pageshow',check);
   window.addEventListener('online',check);
