@@ -28,7 +28,7 @@ nav{display:flex;gap:8px;overflow:auto;padding:16px 0 8px}nav button{white-space
 input,textarea,select{display:block;width:100%;padding:12px;margin:7px 0 12px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--fg)}textarea{min-height:90px}
 .list{display:grid;gap:9px}.item{padding:12px;background:var(--panel2);border-radius:10px}.social{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
 .header-action-groups{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:14px}.header-action-row{display:flex;justify-content:center;gap:8px;width:100%;max-width:440px}.header-action-row .btn{display:flex;flex:1;min-width:0;min-height:44px;align-items:center;justify-content:center;text-align:center;padding:7px 7px;font-size:13px;line-height:1.2;white-space:nowrap}@media(max-width:360px){.header-action-row .btn{font-size:11px;padding:7px 4px;white-space:normal;line-height:1.15}}
-.artist-social-links{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;margin-top:14px}.artist-social-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:9px 14px;border:1px solid rgba(237,28,36,.72);border-radius:11px;background:#090909;color:#fff;text-decoration:none;font-weight:800;box-shadow:0 0 8px rgba(255,0,32,.42),0 0 18px rgba(237,28,36,.22)}.artist-social-link svg{width:22px;height:22px;flex:0 0 22px}.artist-social-link:hover{box-shadow:0 0 12px rgba(255,20,42,.75),0 0 26px rgba(237,28,36,.4)}body.light .artist-social-link{background:#fff;color:#111}
+.public-artist-card{padding:16px!important;border:1px solid rgba(237,28,36,.35)!important;border-radius:14px!important;background:linear-gradient(145deg,var(--panel2),var(--panel))!important;box-shadow:0 8px 24px rgba(0,0,0,.18)}.public-artist-head{display:flex;align-items:center;gap:14px;min-width:0}.public-artist-avatar{width:88px;height:88px;flex:0 0 88px;object-fit:cover;border-radius:50%;border:2px solid var(--red);background:var(--bg);box-shadow:0 0 12px rgba(237,28,36,.25)}.public-artist-copy{min-width:0}.public-artist-copy h3{margin:0 0 5px;overflow-wrap:anywhere}.public-artist-copy p{margin:0}.public-artist-bio{margin:14px 0 0;line-height:1.55;overflow-wrap:anywhere}.artist-social-links{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;margin-top:14px}.artist-social-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:9px 14px;border:1px solid rgba(237,28,36,.72);border-radius:11px;background:#090909;color:#fff;text-decoration:none;font-weight:800;box-shadow:0 0 8px rgba(255,0,32,.42),0 0 18px rgba(237,28,36,.22)}.artist-social-link svg{width:22px;height:22px;flex:0 0 22px}.artist-social-link:hover{box-shadow:0 0 12px rgba(255,20,42,.75),0 0 26px rgba(237,28,36,.4)}body.light .artist-social-link{background:#fff;color:#111}
 footer{text-align:center;color:var(--muted);font-size:12px;padding:24px}
 button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--red);outline-offset:3px}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
@@ -579,12 +579,21 @@ updateConnectionStatus();
   const artists=await module.getPublishedArtists();container.replaceChildren();
   if(!artists.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Ainda não há artistas publicados. Os perfis aparecerão aqui depois da aprovação da equipe.';container.append(empty);return;}
   for(const artist of artists){
-   const card=document.createElement('article');card.className='item';
+   const card=document.createElement('article');card.className='item public-artist-card';
+   const head=document.createElement('div');head.className='public-artist-head';
    const name=document.createElement('h3');name.textContent=artist.artist_name||'Artista do Capital';
-   const style=document.createElement('p');style.className='muted';style.textContent=[artist.style,artist.city].filter(Boolean).join(' • ');
-   card.append(name,style);
-   if(artist.bio){const bio=document.createElement('p');bio.textContent=artist.bio;card.append(bio);}
-   if(artist.photo_url){const photo=document.createElement('img');photo.src=artist.photo_url;photo.alt='Foto de '+(artist.artist_name||'artista');photo.loading='lazy';photo.style.cssText='max-width:100%;max-height:260px;object-fit:contain;border-radius:10px;margin:8px 0';card.append(photo);}
+   const style=document.createElement('p');style.className='muted';style.textContent=[artist.style,artist.city].filter(Boolean).join(' • ')||'Artista da comunidade';
+   const copy=document.createElement('div');copy.className='public-artist-copy';copy.append(name,style);
+   if(artist.photo_url){
+    try{
+     const photoUrl=new URL(artist.photo_url);
+     if(photoUrl.protocol==='https:'){
+      const photo=document.createElement('img');photo.className='public-artist-avatar';photo.src=photoUrl.href;photo.alt='Foto de '+(artist.artist_name||'artista');photo.loading='lazy';photo.decoding='async';photo.referrerPolicy='no-referrer';photo.addEventListener('error',()=>photo.remove(),{once:true});head.append(photo);
+     }
+    }catch{}
+   }
+   head.append(copy);card.append(head);
+   if(artist.bio){const bio=document.createElement('p');bio.className='public-artist-bio';bio.textContent=artist.bio;card.append(bio);}
    const links=document.createElement('div');links.className='artist-social-links';links.setAttribute('aria-label','Redes sociais do artista');
    for(const [label,value] of [['YouTube',artist.youtube],['Instagram',artist.instagram]]){
     if(!value)continue;
