@@ -325,9 +325,13 @@ function updateEventPreview(){
  const place=value('event-place');
  if(place){
   mapLink.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(place);
+  mapLink.setAttribute('aria-label','Abrir no Google Maps: '+place);
+  mapLink.title='Ver no Google Maps: '+place;
   mapLink.hidden=false;
  }else{
   mapLink.href='#';
+  mapLink.removeAttribute('aria-label');
+  mapLink.removeAttribute('title');
   mapLink.hidden=true;
  }
  const calendarLink=document.getElementById('event-calendar-link');
