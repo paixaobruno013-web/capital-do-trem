@@ -41,7 +41,7 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 <img class="logo" src="marca.svg" alt="Marca Capital do Trem">
 <h1>Minha conta</h1>
 <p class="muted">A música da nossa quebrada!</p>
-<a href="./index.html">← Voltar ao Capital do Trem</a>
+<div style="display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap"><a href="./index.html">← Voltar ao Capital do Trem</a><button type="button" id="theme-toggle" class="secondary" aria-pressed="false">☀️ Claro</button></div>
 </header>
 <main>
 <section class="card">
@@ -159,6 +159,11 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 </main>
 <footer><a href="./privacidade.html">Política de privacidade</a></footer>
 <script type="module">
+const THEME_KEY='capitaldotrem_theme_v1';
+const themeToggle=document.getElementById('theme-toggle');
+function setTheme(theme){const light=theme==='light';document.body.classList.toggle('light',light);themeToggle.textContent=light?'🌙 Escuro':'☀️ Claro';themeToggle.setAttribute('aria-pressed',String(light));document.querySelector('meta[name="theme-color"]').content=light?'#f5f5f5':'#000000';}
+let savedTheme='dark';try{savedTheme=localStorage.getItem(THEME_KEY)==='light'?'light':'dark';}catch{}setTheme(savedTheme);themeToggle.addEventListener('click',()=>{const next=document.body.classList.contains('light')?'dark':'light';setTheme(next);try{localStorage.setItem(THEME_KEY,next);}catch{}});
+
 const setupMessage=document.getElementById('setup-message');
 const form=document.getElementById('account-form');
 const status=document.getElementById('account-status');
