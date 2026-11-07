@@ -29,7 +29,7 @@ header{text-align:center;padding:18px 12px;border-bottom:1px solid var(--line)}h
 </main>
 <script>
 const $=id=>document.getElementById(id),preview=$('avatar-preview'),status=$('status');
-let mode='character',photoData='',savedConfig=null;
+let mode='character',photoData='';
 const defaults={gender:'male',skin:'#8d5524',hair:'#171313',shirt:'#ed1c24'};
 function config(){return {gender:$('gender').value,skin:$('skin').value,hair:$('hair').value,shirt:$('shirt').value};}
 function characterData(c){
@@ -46,6 +46,8 @@ $('clear-photo').addEventListener('click',()=>{photoData='';$('photo').value='';
 $('randomize').addEventListener('click',()=>{const pick=id=>{const el=$(id);el.selectedIndex=Math.floor(Math.random()*el.options.length);};['gender','skin','hair','shirt'].forEach(pick);mode='character';setMode(mode);status.textContent='Novo personagem criado!';});
 $('save').addEventListener('click',()=>{try{const data=mode==='photo'&&photoData?{mode,photo:photoData}:{mode:'character',character:config()};localStorage.setItem('capitaldotrem_avatar_preview_v1',JSON.stringify(data));status.textContent='Prévia salva neste aparelho. A sincronização com sua conta virá após a configuração do Supabase.';}catch(e){status.textContent='Não foi possível salvar. Tente uma foto menor ou use um personagem.';}});
 $('reset').addEventListener('click',()=>{photoData='';$('photo').value='';Object.entries(defaults).forEach(([k,v])=>$(k).value=v);try{localStorage.removeItem('capitaldotrem_avatar_preview_v1');}catch{}setMode('character');status.textContent='Avatar padrão restaurado.';});
-try{const stored=JSON.parse(localStorage.getItem('capitaldotrem_avatar_preview_v1')||'null');if(stored?.mode==='photo'&&typeof stored.photo==='string'&&stored.photo.startsWith('data:image/')){photoData=stored.photo;setMode('photo');}else if(stored?.mode==='character'&&stored.character){for(const [k,v] of Object.entries(stored.character))if($(k))$(k).value=v;setMode('character');}}catch{}
+function applyStoredAvatar(raw){try{const stored=JSON.parse(raw||'null');if(stored?.mode==='photo'&&typeof stored.photo==='string'&&/^data:image\\/(jpeg|png|webp);base64,/.test(stored.photo)){photoData=stored.photo;setMode('photo');}else if(stored?.mode==='character'&&stored.character&&typeof stored.character==='object'){for(const [k,v] of Object.entries(defaults))if(typeof stored.character[k]==='string'&&$(k).querySelector('option[value="'+stored.character[k]+'"]'))$(k).value=stored.character[k];photoData='';setMode('character');}}catch{}}
+try{applyStoredAvatar(localStorage.getItem('capitaldotrem_avatar_preview_v1'));}catch{}
 const theme=$('theme');try{if(localStorage.getItem('capitaldotrem_theme_v1')==='light')document.body.classList.add('light');}catch{}function themeLabel(){const light=document.body.classList.contains('light');theme.textContent=light?'🌙 Escuro':'☀️ Claro';theme.setAttribute('aria-pressed',String(light));document.querySelector('meta[name="theme-color"]')?.setAttribute('content',light?'#f5f5f5':'#050505');}themeLabel();theme.addEventListener('click',()=>{const light=!document.body.classList.contains('light');document.body.classList.toggle('light',light);try{localStorage.setItem('capitaldotrem_theme_v1',light?'light':'dark');}catch{}themeLabel();});
+window.addEventListener('storage',event=>{if(event.key==='capitaldotrem_theme_v1'){document.body.classList.toggle('light',event.newValue==='light');themeLabel();}if(event.key==='capitaldotrem_avatar_preview_v1'){applyStoredAvatar(event.newValue);status.textContent=event.newValue?'Avatar atualizado em outra aba deste aparelho.':'Avatar removido em outra aba deste aparelho.';}});
 </script><script src="./update.js" defer></script></body></html>
