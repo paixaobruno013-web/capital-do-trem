@@ -284,6 +284,7 @@ function applyTheme(theme){
 let savedTheme='dark';
 try{savedTheme=localStorage.getItem(THEME_KEY)==='light'?'light':'dark';}catch{}
 applyTheme(savedTheme);
+window.addEventListener('storage',event=>{if(event.key===THEME_KEY){const next=event.newValue==='light'?'light':'dark';applyTheme(next);}});
 themeButton.addEventListener('click',()=>{
  const nextTheme=document.body.classList.contains('light')?'dark':'light';
  applyTheme(nextTheme);
