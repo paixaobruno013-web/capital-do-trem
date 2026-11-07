@@ -1,6 +1,6 @@
-const CACHE='capital-do-trem-v131';
+const CACHE='capital-do-trem-v132';
 const CORE_FILES=['./','./index.html','./marca.svg','./manifest.webmanifest','./update.js'];
-const OPTIONAL_FILES=['./admin.html','./privacidade.html','./conta.html','./supabase/auth.js','./diagnostico.html','./bate-papo.html','./avatar.html'];
+const OPTIONAL_FILES=['./admin.html','./privacidade.html','./conta.html','./supabase/auth.js','./diagnostico.html','./bate-papo.html','./avatar.html','./mensagens.html'];
 
 self.addEventListener('install',event=>{
   // O núcleo do app precisa estar disponível para preservar uma instalação offline íntegra.
