@@ -34,7 +34,7 @@
  hornButton.type='button';
  hornButton.style.cssText='min-height:44px;padding:9px 16px;border:1px solid #ed1c24;border-radius:10px;background:#ed1c24;color:#fff;font-weight:800;cursor:pointer';
  const preferenceKey='capitaldotrem_train_horn_v1';
- let hornEnabled=true,audioContext=null,audioUnlocked=false,playedThisOutage=false,reconnectTimer=null;
+ let hornEnabled=true,audioContext=null,audioUnlocked=false,playedThisOutage=false,offlineFeedbackSent=false,reconnectTimer=null;
  try{hornEnabled=localStorage.getItem(preferenceKey)!=='off';}catch{}
  function updateHornButton(){hornButton.textContent=hornEnabled?'🔊 Corneta ligada':'🔇 Corneta desligada';hornButton.setAttribute('aria-pressed',String(hornEnabled));}
  function playTrainHorn(){
@@ -75,6 +75,7 @@
   alertTitle.textContent='🚨 ALERTA: VOCÊ TÁ OFFLINE!';
   alertDetail.textContent='A conexão caiu. O trem está aguardando a internet voltar.';
   alertBox.style.borderColor='#ed1c24';alertBox.style.display='flex';
+  if(!offlineFeedbackSent){offlineFeedbackSent=true;try{if('vibrate' in navigator)navigator.vibrate(3000);}catch(error){/* Vibração depende do suporte do aparelho e navegador. */}}
   if(!playedThisOutage&&audioUnlocked){playedThisOutage=true;playTrainHorn();}
  }
  function showOnline(){
@@ -83,7 +84,8 @@
   alertTitle.textContent='🚂 CONEXÃO RESTABELECIDA!';
   alertDetail.textContent='A internet voltou. O Capital do Trem está conectado novamente.';
   alertBox.style.borderColor='#269b65';alertBox.style.display='flex';
-  playedThisOutage=false;
+  playedThisOutage=false;offlineFeedbackSent=false;
+  try{if('vibrate' in navigator)navigator.vibrate(0);}catch(error){}
   reconnectTimer=window.setTimeout(()=>{alertBox.style.display='none';},5500);
  }
  hornButton.addEventListener('click',async()=>{
