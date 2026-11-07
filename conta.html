@@ -188,6 +188,9 @@ const postPanel=document.getElementById('post-panel');
 const postForm=document.getElementById('community-post-form');
 const postStatus=document.getElementById('post-status');
 const eventForm=document.getElementById('event-form');
+const eventDateInput=document.getElementById('event-date');
+function localDateValue(date=new Date()){const year=date.getFullYear();const month=String(date.getMonth()+1).padStart(2,'0');const day=String(date.getDate()).padStart(2,'0');return `${year}-${month}-${day}`;}
+eventDateInput.min=localDateValue();
 const eventStatus=document.getElementById('event-status');
 const myEvents=document.getElementById('my-events');
 const artistFields={artist_name:'artist-name',style:'artist-style',city:'artist-city',instagram:'artist-instagram',youtube:'artist-youtube',bio:'artist-bio'};
@@ -422,10 +425,10 @@ postForm.addEventListener('submit',async event=>{
 eventForm.addEventListener('submit',async event=>{
  event.preventDefault();
  const button=document.getElementById('submit-event');
- const date=document.getElementById('event-date').value;
- const today=new Date();today.setHours(0,0,0,0);
- const chosen=date?new Date(date+'T00:00:00'):null;
- if(!chosen||chosen<today){eventStatus.textContent='Escolha uma data de hoje em diante.';return;}
+ const date=eventDateInput.value;
+ const today=localDateValue();
+ eventDateInput.min=today;
+ if(!date||date<today){eventStatus.textContent='Escolha uma data de hoje em diante.';eventDateInput.focus();return;}
  const payload={title:document.getElementById('event-name').value.trim(),event_date:date,event_time:document.getElementById('event-time').value||null,address:document.getElementById('event-address').value.trim(),category:document.getElementById('event-category').value,description:document.getElementById('event-description').value.trim(),contact:document.getElementById('event-contact').value.trim()};
  button.disabled=true;eventStatus.textContent='Enviando para análise...';
  try{
