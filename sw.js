@@ -2,7 +2,13 @@ const CACHE='capital-do-trem-v119';
 const FILES=['./','./index.html','./admin.html','./marca.svg','./manifest.webmanifest','./privacidade.html','./conta.html','./supabase/auth.js','./update.js','./diagnostico.html','./bate-papo.html'];
 
 self.addEventListener('install',event=>{
-  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)));
+  // Um arquivo opcional indisponível não deve impedir a instalação do app inteiro.
+  event.waitUntil(caches.open(CACHE).then(cache=>Promise.all(
+    FILES.map(file=>cache.add(file).catch(error=>{
+      console.warn('Não foi possível armazenar no cache:',file,error);
+      return null;
+    }))
+  )));
 });
 
 self.addEventListener('message',event=>{
