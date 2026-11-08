@@ -509,7 +509,7 @@ export async function saveMyBasicProfile(profile) {
 export async function getPublicProfiles() {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('profiles')
-    .select('user_id, display_name, account_type, bio, city')
+    .select('user_id, display_name, account_type, bio, city, avatar_type, avatar_url, avatar_data')
     .eq('is_public', true)
     .order('display_name', { ascending: true })
     .limit(100);
