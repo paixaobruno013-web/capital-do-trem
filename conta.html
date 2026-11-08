@@ -95,7 +95,7 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 </div>
 <section class="card" id="admin-songs-panel" hidden aria-labelledby="admin-songs-title">
 <h3 id="admin-songs-title">🎵 Envio e histórico de músicas — equipe</h3>
-<p class="muted">Área exclusiva da equipe autorizada. Envie arquivos em MP3, M4A, AAC, WAV ou OGG (até 50 MB). Cada envio fica privado até a aprovação para o catálogo público.</p>
+<p class="muted">Área exclusiva da equipe autorizada. Envie arquivos em MP3, M4A, AAC, WAV ou OGG (até 50 MB). Depois de tocar em Postar, a música entra diretamente no catálogo público. O envio é exclusivo da equipe autorizada.</p>
 <form id="artist-song-form">
 <label for="song-title">Nome da música</label><input id="song-title" maxlength="120" required>
 <label for="song-artist-name">Nome artístico</label><input id="song-artist-name" maxlength="100" required>
@@ -171,7 +171,7 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 <label for="event-address">Endereço público</label><input id="event-address" maxlength="240" required>
 <label for="event-category">Tipo</label><select id="event-category" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="show">Show</option><option value="evento">Evento</option><option value="acao-social">Ação social</option><option value="outro">Outro</option></select>
 <label for="event-description">Descrição</label><textarea id="event-description" maxlength="2000" rows="4" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
-<label for="event-contact">Contato público (opcional)</label><input id="event-contact" maxlength="120"><label for="event-poster-upload">Cartaz do evento (JPG, PNG ou WebP, até 5 MB)</label><input id="event-poster-upload" type="file" accept="image/jpeg,image/png,image/webp"><div id="event-poster-preview" class="image-preview" aria-live="polite"></div><p class="muted">O cartaz será enviado junto com o evento para análise.</p>
+<label for="event-contact">Contato público (opcional)</label><input id="event-contact" maxlength="120"><label for="event-poster-upload">Cartaz do evento (JPG, PNG ou WebP, até 5 MB)</label><input id="event-poster-upload" type="file" accept="image/jpeg,image/png,image/webp"><div id="event-poster-preview" class="image-preview" aria-live="polite"></div><p class="muted">O cartaz será enviado junto com o evento na hora da publicação.</p>
 <button type="submit" id="submit-event">📅 Postar evento</button>
 <p id="event-status" class="status" role="status" aria-live="polite"></p>
 </form>
