@@ -123,6 +123,31 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
+-- Permitir que o próprio usuário escolha entre Usuário Uai e Artista.
+-- A administração continua exclusivamente na tabela admin_users.
+create or replace function public.protect_profile_account_type()
+returns trigger
+language plpgsql
+security invoker
+set search_path = ''
+as $
+begin
+  if new.account_type is null or new.account_type not in ('user', 'artist') then
+    if tg_op = 'UPDATE' then
+      new.account_type := old.account_type;
+    else
+      new.account_type := 'user';
+    end if;
+  end if;
+  return new;
+end;
+$;
+
+drop trigger if exists profiles_protect_account_type on public.profiles;
+create trigger profiles_protect_account_type
+  before insert or update of account_type on public.profiles
+  for each row execute function public.protect_profile_account_type();
+
 -- Ativar proteção por linha em todas as tabelas.
 alter table public.profiles enable row level security;
 alter table public.admin_users enable row level security;
