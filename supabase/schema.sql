@@ -81,8 +81,13 @@ create table if not exists public.posts (
   created_at timestamptz not null default now()
 );
 
--- Função segura para verificar administradores sem expor a lista.
-create or replace function public.is_admin()
+-- Helpers privilegiados fora do schema exposto pela API.
+create schema if not exists private;
+revoke all on schema private from public;
+grant usage on schema private to anon, authenticated;
+
+-- Verificação administrativa interna usada pelas políticas RLS.
+create or replace function private.is_admin()
 returns boolean
 language sql
 stable
@@ -95,9 +100,21 @@ as $$
     where user_id = (select auth.uid())
   );
 $$;
+revoke all on function private.is_admin() from public;
+grant execute on function private.is_admin() to anon, authenticated;
 
-revoke all on function public.is_admin() from public;
-grant execute on function public.is_admin() to anon, authenticated;
+-- RPC pública sem privilégios elevados; a verificação real fica no schema privado.
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security invoker
+set search_path = ''
+as $$
+  select private.is_admin();
+$$;
+revoke all on function private.is_admin() from public;
+grant execute on function private.is_admin() to authenticated;
 
 -- Criar automaticamente um perfil quando alguém se cadastrar.
 create or replace function public.handle_new_user()
@@ -194,7 +211,7 @@ create policy "events_read_published_or_admin" on public.events
   using (
     status = 'published'
     or created_by = (select auth.uid())
-    or (select public.is_admin())
+    or (select private.is_admin())
   );
 
 drop policy if exists "events_submit_pending" on public.events;
@@ -207,17 +224,17 @@ create policy "events_edit_own_pending_or_admin" on public.events
   for update to authenticated
   using (
     (created_by = (select auth.uid()) and status = 'pending')
-    or (select public.is_admin())
+    or (select private.is_admin())
   )
   with check (
     (created_by = (select auth.uid()) and status = 'pending')
-    or (select public.is_admin())
+    or (select private.is_admin())
   );
 
 drop policy if exists "events_delete_admin" on public.events;
 create policy "events_delete_admin" on public.events
   for delete to authenticated
-  using ((select public.is_admin()));
+  using ((select private.is_admin()));
 
 -- Artistas: artista gerencia o próprio perfil; público vê perfis aprovados.
 drop policy if exists "artists_read_published_or_owner_or_admin" on public.artists;
@@ -226,7 +243,7 @@ create policy "artists_read_published_or_owner_or_admin" on public.artists
   using (
     status = 'published'
     or user_id = (select auth.uid())
-    or (select public.is_admin())
+    or (select private.is_admin())
   );
 
 drop policy if exists "artists_insert_own_pending" on public.artists;
@@ -239,11 +256,11 @@ create policy "artists_update_own_or_admin" on public.artists
   for update to authenticated
   using (
     (user_id = (select auth.uid()) and status in ('pending', 'rejected'))
-    or (select public.is_admin())
+    or (select private.is_admin())
   )
   with check (
     (user_id = (select auth.uid()) and status = 'pending')
-    or (select public.is_admin())
+    or (select private.is_admin())
   );
 
 drop policy if exists "artists_delete_own_or_admin" on public.artists;
@@ -251,7 +268,7 @@ create policy "artists_delete_own_or_admin" on public.artists
   for delete to authenticated
   using (
     (user_id = (select auth.uid()) and status = 'pending')
-    or (select public.is_admin())
+    or (select private.is_admin())
   );
 
 -- Mural: publicações aguardam aprovação; autor pode corrigir as próprias pendentes.
@@ -261,7 +278,7 @@ create policy "posts_read_published_or_owner_or_admin" on public.posts
   using (
     status = 'published'
     or author_id = (select auth.uid())
-    or (select public.is_admin())
+    or (select private.is_admin())
   );
 
 drop policy if exists "posts_submit_pending" on public.posts;
@@ -274,11 +291,11 @@ create policy "posts_edit_own_pending_or_admin" on public.posts
   for update to authenticated
   using (
     (author_id = (select auth.uid()) and status = 'pending')
-    or (select public.is_admin())
+    or (select private.is_admin())
   )
   with check (
     (author_id = (select auth.uid()) and status = 'pending')
-    or (select public.is_admin())
+    or (select private.is_admin())
   );
 
 drop policy if exists "posts_delete_own_pending_or_admin" on public.posts;
@@ -286,7 +303,7 @@ create policy "posts_delete_own_pending_or_admin" on public.posts
   for delete to authenticated
   using (
     (author_id = (select auth.uid()) and status = 'pending')
-    or (select public.is_admin())
+    or (select private.is_admin())
   );
 
 
@@ -310,21 +327,21 @@ grant select on public.songs to anon;
 drop policy if exists "songs_read_published_owner_admin" on public.songs;
 create policy "songs_read_published_owner_admin" on public.songs
   for select to anon, authenticated
-  using (status='published' or user_id=(select auth.uid()) or (select public.is_admin()));
+  using (status='published' or user_id=(select auth.uid()) or (select private.is_admin()));
 drop policy if exists "songs_insert_own_pending" on public.songs;
 drop policy if exists "songs_insert_admin_only" on public.songs;
 create policy "songs_insert_admin_only" on public.songs
   for insert to authenticated
-  with check (user_id=(select auth.uid()) and (select public.is_admin()));
+  with check (user_id=(select auth.uid()) and (select private.is_admin()));
 drop policy if exists "songs_update_own_pending_admin" on public.songs;
 create policy "songs_update_own_pending_admin" on public.songs
   for update to authenticated
-  using ((user_id=(select auth.uid()) and status in ('pending','rejected')) or (select public.is_admin()))
-  with check ((user_id=(select auth.uid()) and status='pending') or (select public.is_admin()));
+  using ((user_id=(select auth.uid()) and status in ('pending','rejected')) or (select private.is_admin()))
+  with check ((user_id=(select auth.uid()) and status='pending') or (select private.is_admin()));
 drop policy if exists "songs_delete_own_pending_admin" on public.songs;
 create policy "songs_delete_own_pending_admin" on public.songs
   for delete to authenticated
-  using ((user_id=(select auth.uid()) and status='pending') or (select public.is_admin()));
+  using ((user_id=(select auth.uid()) and status='pending') or (select private.is_admin()));
 
 insert into storage.buckets (id,name,public,file_size_limit,allowed_mime_types)
 values ('capital-do-trem-audio','capital-do-trem-audio',false,52428800,
@@ -338,7 +355,7 @@ create policy "audio_upload_admin_only" on storage.objects
   with check (
     bucket_id='capital-do-trem-audio'
     and (storage.foldername(name))[1]=(select auth.uid())::text
-    and (select public.is_admin())
+    and (select private.is_admin())
   );
 drop policy if exists "audio_read_published_owner_admin" on storage.objects;
 create policy "audio_read_published_owner_admin" on storage.objects
@@ -346,13 +363,13 @@ create policy "audio_read_published_owner_admin" on storage.objects
   using (bucket_id='capital-do-trem-audio' and (
     exists (select 1 from public.songs s where s.storage_path=storage.objects.name and s.status='published')
     or (storage.foldername(name))[1]=(select auth.uid())::text
-    or (select public.is_admin())
+    or (select private.is_admin())
   ));
 drop policy if exists "audio_delete_owner_admin" on storage.objects;
 create policy "audio_delete_owner_admin" on storage.objects
   for delete to authenticated
   using (bucket_id='capital-do-trem-audio' and (
-    (storage.foldername(name))[1]=(select auth.uid())::text or (select public.is_admin())
+    (storage.foldername(name))[1]=(select auth.uid())::text or (select private.is_admin())
   ));
 
 -- Armazenamento público de cartazes e fotos.
@@ -405,7 +422,7 @@ create policy "media_delete_own_or_admin" on storage.objects
     bucket_id = 'capital-do-trem-media'
     and (
       (storage.foldername(name))[1] = (select auth.uid())::text
-      or (select public.is_admin())
+      or (select private.is_admin())
     )
   );
 
@@ -464,7 +481,7 @@ create policy "song_likes_insert_self" on public.song_likes
   for insert to authenticated with check (user_id = (select auth.uid()));
 drop policy if exists "song_likes_delete_self_or_admin" on public.song_likes;
 create policy "song_likes_delete_self_or_admin" on public.song_likes
-  for delete to authenticated using (user_id = (select auth.uid()) or (select public.is_admin()));
+  for delete to authenticated using (user_id = (select auth.uid()) or (select private.is_admin()));
 
 drop policy if exists "song_comments_read_signed_in" on public.song_comments;
 create policy "song_comments_read_signed_in" on public.song_comments
@@ -478,7 +495,7 @@ create policy "song_comments_insert_self" on public.song_comments
   );
 drop policy if exists "song_comments_delete_self_or_admin" on public.song_comments;
 create policy "song_comments_delete_self_or_admin" on public.song_comments
-  for delete to authenticated using (author_id = (select auth.uid()) or (select public.is_admin()));
+  for delete to authenticated using (author_id = (select auth.uid()) or (select private.is_admin()));
 
 drop policy if exists "chat_messages_read_authenticated" on public.chat_messages;
 create policy "chat_messages_read_authenticated" on public.chat_messages
@@ -524,7 +541,7 @@ end $$;
 grant delete on public.chat_messages to authenticated;
 drop policy if exists "chat_messages_delete_admin" on public.chat_messages;
 create policy "chat_messages_delete_admin" on public.chat_messages
-  for delete to authenticated using ((select public.is_admin()));
+  for delete to authenticated using ((select private.is_admin()));
 
 -- Curtidas somente em músicas já publicadas.
 drop policy if exists "song_likes_insert_self" on public.song_likes;
