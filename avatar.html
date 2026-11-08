@@ -11,7 +11,7 @@ body.light{color-scheme:light;--bg:#f5f5f5;--panel:#fff;--fg:#111;--muted:#555;-
 header{text-align:center;padding:18px 12px;border-bottom:1px solid var(--line)}header img{width:62px;height:62px;object-fit:contain}h1{margin:5px 0;font-size:clamp(23px,5vw,32px)}main{max-width:760px;margin:auto;padding:16px 12px 36px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}.muted{color:var(--muted)}.actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}button,a.btn{font:inherit;border:0;border-radius:10px;padding:11px 15px;background:var(--red);color:#fff;text-decoration:none;font-weight:750;cursor:pointer;min-height:44px}button.alt,a.alt{background:transparent;border:1px solid var(--line);color:var(--fg)}button:disabled{opacity:.5}.preview{display:grid;place-items:center;min-height:220px;background:radial-gradient(circle,#292929,#101010 70%);border:1px solid var(--line);border-radius:14px;margin:12px 0}.preview img{width:170px;height:170px;border-radius:50%;object-fit:cover;border:4px solid var(--red);background:#222}.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.field{display:grid;gap:5px;margin:12px 0}.field label{font-weight:700}.field select,.field input{width:100%;min-height:44px;padding:10px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit}.notice{padding:12px;border:1px solid #9b741e;border-radius:10px;background:#6b4c161c}.status{min-height:22px;color:var(--muted)}:focus-visible{outline:3px solid var(--red);outline-offset:3px}.skip{position:fixed;top:8px;left:8px;transform:translateY(-150%);background:var(--red);color:#fff;padding:10px;z-index:5}.skip:focus{transform:none}@media(max-width:480px){.choices{grid-template-columns:1fr}}
 </style></head>
 <body><a class="skip" href="#main">Pular para o conteúdo principal</a>
-<header><img src="./marca.svg" alt="Capital do Trem"><h1>Personalize seu avatar</h1><p class="muted">Monte uma prévia do seu avatar. A sincronização com o perfil e o bate-papo ainda está em preparação.</p><div class="actions"><a class="btn alt" href="./conta.html">Minha conta</a><a class="btn alt" href="./bate-papo.html">Bate-papo</a><a class="btn alt" href="./mensagens.html">✉️ Minhas conversas</a><button class="alt" id="theme" type="button">☀️ Claro</button></div></header>
+<header><img src="./marca.svg" alt="Capital do Trem"><h1>Personalize seu avatar</h1><p class="muted">Personalize seu avatar e sincronize com seu perfil e com o CHAMA 🔥.</p><div class="actions"><a class="btn alt" href="./conta.html">Minha conta</a><a class="btn alt" href="./bate-papo.html">Bate-papo</a><a class="btn alt" href="./mensagens.html">✉️ Minhas conversas</a><button class="alt" id="theme" type="button">☀️ Claro</button></div></header>
 <main id="main">
 <section class="panel"><h2>Como você quer aparecer?</h2><div class="actions"><button id="photo-mode" type="button">📷 Usar minha foto</button><button id="character-mode" class="alt" type="button">🎭 Criar personagem</button></div>
 <div class="preview"><img id="avatar-preview" alt="Prévia do seu avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Ccircle cx='60' cy='60' r='58' fill='%23333'/%3E%3Ctext x='60' y='78' text-anchor='middle' font-size='58'%3E🙂%3C/text%3E%3C/svg%3E"></div>
@@ -23,13 +23,13 @@ header{text-align:center;padding:18px 12px;border-bottom:1px solid var(--line)}h
 <div class="field"><label for="shirt">Roupa</label><select id="shirt"><option value="#ed1c24">Vermelha</option><option value="#111111">Preta</option><option value="#eeeeee">Branca</option><option value="#2465a8">Azul</option><option value="#21834a">Verde</option><option value="#7a42a6">Roxa</option></select></div>
 </div><button id="randomize" class="alt" type="button">🎲 Surpreenda-me</button></div>
 <p class="status" id="status" role="status" aria-live="polite"></p>
-<div class="actions"><button id="save" type="button">Salvar prévia neste aparelho</button><button id="reset" class="alt" type="button">Voltar ao padrão</button></div>
+<div class="actions"><button id="save" type="button">Salvar avatar na minha conta</button><button id="reset" class="alt" type="button">Voltar ao padrão</button></div>
 </section>
-<section class="panel notice"><strong>Importante nesta primeira etapa:</strong> esta página já permite testar a foto e montar um personagem. Por enquanto, a prévia fica salva somente neste aparelho. Para sincronizar o avatar na conta e mostrá-lo a todos os participantes do bate-papo, ainda precisamos concluir a configuração do Supabase. Nenhuma foto é enviada ao servidor por esta página.</section>
+<section class="panel notice" id="sync-note"><strong>Sincronização:</strong> entre na sua conta para salvar o avatar no perfil e exibi-lo nas próximas mensagens do CHAMA 🔥. Sem login, a prévia continua disponível somente neste aparelho.</section>
 </main>
 <script>
 const $=id=>document.getElementById(id),preview=$('avatar-preview'),status=$('status');
-let mode='character',photoData='';
+let mode='character',photoData='',api=null,signedIn=false,savedAvatarPath=null;
 const defaults={gender:'male',skin:'#8d5524',hair:'#171313',shirt:'#ed1c24'};
 function config(){return {gender:$('gender').value,skin:$('skin').value,hair:$('hair').value,shirt:$('shirt').value};}
 function characterData(c){
@@ -39,15 +39,67 @@ function characterData(c){
 }
 function render(){if(mode==='photo'&&photoData){preview.src=photoData;return;}preview.src=characterData(config());}
 function setMode(next){mode=next;$('photo-options').hidden=next!=='photo';$('character-options').hidden=next!=='character';$('photo-mode').classList.toggle('alt',next!=='photo');$('character-mode').classList.toggle('alt',next!=='character');render();}
-$('photo-mode').addEventListener('click',()=>setMode('photo'));$('character-mode').addEventListener('click',()=>setMode('character'));
+function applyStoredAvatar(raw){
+ try{const stored=JSON.parse(raw||'null');if(stored?.mode==='photo'&&typeof stored.photo==='string'&&/^(data:image\/(jpeg|png|webp);base64,|https:\/\/)/.test(stored.photo)){photoData=stored.photo;setMode('photo');}else if(stored?.mode==='character'&&stored.character&&typeof stored.character==='object'){for(const [k,v] of Object.entries(defaults))if(typeof stored.character[k]==='string'&&[...$(k).options].some(option=>option.value===stored.character[k]))$(k).value=stored.character[k];photoData='';setMode('character');}}catch{}
+}
+function dataUrlToFile(dataUrl,name){
+ const parts=dataUrl.split(','),mime=(parts[0].match(/:(.*?);/)||[])[1]||'image/jpeg',binary=atob(parts[1]),bytes=new Uint8Array(binary.length);
+ for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+ return new File([bytes],name,{type:mime});
+}
+$('photo-mode').addEventListener('click',()=>setMode('photo'));
+$('character-mode').addEventListener('click',()=>setMode('character'));
 ['gender','skin','hair','shirt'].forEach(id=>$(id).addEventListener('change',()=>{mode='character';render();}));
-$('photo').addEventListener('change',()=>{const file=$('photo').files[0];if(!file)return;if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){status.textContent='Escolha JPG, PNG ou WebP com até 5 MB.';$('photo').value='';return;}const reader=new FileReader();reader.onload=()=>{const source=String(reader.result||'');const image=new Image();image.onload=()=>{try{const max=640,scale=Math.min(1,max/Math.max(image.naturalWidth,image.naturalHeight));const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(image.naturalWidth*scale));canvas.height=Math.max(1,Math.round(image.naturalHeight*scale));const ctx=canvas.getContext('2d');if(!ctx)throw new Error('Canvas indisponível');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(image,0,0,canvas.width,canvas.height);photoData=canvas.toDataURL('image/jpeg',.82);setMode('photo');status.textContent='Foto otimizada e carregada. A imagem foi reduzida para facilitar o salvamento no aparelho.';}catch(error){status.textContent='Não foi possível otimizar essa foto. Tente outra imagem.';}};image.onerror=()=>status.textContent='Não foi possível abrir essa foto.';image.src=source;};reader.onerror=()=>status.textContent='Não foi possível abrir essa foto.';reader.readAsDataURL(file);});
-$('clear-photo').addEventListener('click',()=>{photoData='';$('photo').value='';setMode('character');status.textContent='Foto removida da prévia.';});
+$('photo').addEventListener('change',()=>{
+ const file=$('photo').files[0];if(!file)return;
+ if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){status.textContent='Escolha JPG, PNG ou WebP com até 5 MB.';$('photo').value='';return;}
+ const reader=new FileReader();reader.onload=()=>{const source=String(reader.result||''),image=new Image();image.onload=()=>{try{const max=640,scale=Math.min(1,max/Math.max(image.naturalWidth,image.naturalHeight)),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(image.naturalWidth*scale));canvas.height=Math.max(1,Math.round(image.naturalHeight*scale));const ctx=canvas.getContext('2d');if(!ctx)throw new Error('Canvas indisponível');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(image,0,0,canvas.width,canvas.height);photoData=canvas.toDataURL('image/jpeg',.82);savedAvatarPath=null;setMode('photo');status.textContent='Foto otimizada e pronta para salvar.';}catch(error){status.textContent='Não foi possível otimizar essa foto. Tente outra imagem.';}};image.onerror=()=>status.textContent='Não foi possível abrir essa foto.';image.src=source;};reader.onerror=()=>status.textContent='Não foi possível abrir essa foto.';reader.readAsDataURL(file);
+});
+$('clear-photo').addEventListener('click',()=>{photoData='';savedAvatarPath=null;$('photo').value='';setMode('character');status.textContent='Foto removida da prévia. Salve para atualizar também sua conta.';});
 $('randomize').addEventListener('click',()=>{const pick=id=>{const el=$(id);el.selectedIndex=Math.floor(Math.random()*el.options.length);};['gender','skin','hair','shirt'].forEach(pick);mode='character';setMode(mode);status.textContent='Novo personagem criado!';});
-$('save').addEventListener('click',()=>{try{const data=mode==='photo'&&photoData?{mode,photo:photoData}:{mode:'character',character:config()};localStorage.setItem('capitaldotrem_avatar_preview_v1',JSON.stringify(data));status.textContent='Prévia salva neste aparelho. A sincronização com sua conta virá após a configuração do Supabase.';}catch(e){status.textContent='Não foi possível salvar. Tente uma foto menor ou use um personagem.';}});
-$('reset').addEventListener('click',()=>{photoData='';$('photo').value='';Object.entries(defaults).forEach(([k,v])=>$(k).value=v);try{localStorage.removeItem('capitaldotrem_avatar_preview_v1');}catch{}setMode('character');status.textContent='Avatar padrão restaurado.';});
-function applyStoredAvatar(raw){try{const stored=JSON.parse(raw||'null');if(stored?.mode==='photo'&&typeof stored.photo==='string'&&/^data:image\/(jpeg|png|webp);base64,/.test(stored.photo)){photoData=stored.photo;setMode('photo');}else if(stored?.mode==='character'&&stored.character&&typeof stored.character==='object'){for(const [k,v] of Object.entries(defaults))if(typeof stored.character[k]==='string'&&[...$(k).options].some(option=>option.value===stored.character[k]))$(k).value=stored.character[k];photoData='';setMode('character');}}catch{}}
+$('save').addEventListener('click',async()=>{
+ const button=$('save');button.disabled=true;status.textContent='Salvando avatar…';
+ try{
+  const localData=mode==='photo'&&photoData?{mode,photo:photoData}:{mode:'character',character:config()};
+  try{localStorage.setItem('capitaldotrem_avatar_preview_v1',JSON.stringify(localData));}catch{}
+  if(!api||!signedIn){status.textContent='Prévia salva neste aparelho. Entre na sua conta para sincronizar com o perfil e o CHAMA 🔥.';return;}
+  if(mode==='photo'){
+   let path=savedAvatarPath;
+   if(photoData.startsWith('data:image/')){const uploaded=await api.uploadMyAvatar(dataUrlToFile(photoData,'avatar.jpg'));path=uploaded.path;}
+   if(!path)throw new Error('Selecione uma foto antes de salvar.');
+   const saved=await api.saveMyAvatar({type:'photo',path});savedAvatarPath=saved.avatar_path;photoData=saved.avatar_url;preview.src=photoData;
+  }else{
+   await api.saveMyAvatar({type:'character',data:config()});savedAvatarPath=null;
+  }
+  status.textContent='Avatar salvo na sua conta! Ele será usado nas próximas mensagens do CHAMA 🔥.';
+ }catch(error){status.textContent=error.message||'Não foi possível sincronizar o avatar. Tente novamente.';}
+ finally{button.disabled=false;}
+});
+$('reset').addEventListener('click',async()=>{
+ const button=$('reset');button.disabled=true;
+ try{
+  if(api&&signedIn)await api.resetMyAvatar();
+  photoData='';savedAvatarPath=null;$('photo').value='';Object.entries(defaults).forEach(([k,v])=>$(k).value=v);
+  try{localStorage.removeItem('capitaldotrem_avatar_preview_v1');}catch{}
+  setMode('character');status.textContent=api&&signedIn?'Avatar padrão restaurado na sua conta.':'Avatar padrão restaurado neste aparelho.';
+ }catch(error){status.textContent=error.message||'Não foi possível restaurar o avatar.';}
+ finally{button.disabled=false;}
+});
+async function loadAccountAvatar(){
+ try{
+  api=await import('./supabase/auth.js');api.initSupabase();const session=await api.getCurrentSession();signedIn=!!session?.user;
+  if(!signedIn){$('sync-note').innerHTML='<strong>Sincronização:</strong> entre na sua conta para salvar o avatar no perfil e exibi-lo nas próximas mensagens do CHAMA 🔥. <a href="./conta.html">Entrar ou criar conta</a>. Sem login, a prévia fica somente neste aparelho.';return;}
+  const saved=await api.getMyAvatar();
+  if(saved.avatar_type==='photo'&&saved.avatar_url){photoData=saved.avatar_url;savedAvatarPath=saved.avatar_path;setMode('photo');status.textContent='Avatar da sua conta carregado.';}
+  else if(saved.avatar_type==='character'&&saved.avatar_data){for(const [k,v] of Object.entries(defaults))if(typeof saved.avatar_data[k]==='string'&&[...$(k).options].some(option=>option.value===saved.avatar_data[k]))$(k).value=saved.avatar_data[k];photoData='';savedAvatarPath=null;setMode('character');status.textContent='Personagem sincronizado com sua conta.';}
+  else {try{applyStoredAvatar(localStorage.getItem('capitaldotrem_avatar_preview_v1'));}catch{}}
+  $('sync-note').innerHTML='<strong>Conta conectada:</strong> ao salvar, seu avatar será sincronizado com o perfil e aparecerá nas próximas mensagens do CHAMA 🔥.';
+ }catch(error){try{applyStoredAvatar(localStorage.getItem('capitaldotrem_avatar_preview_v1'));}catch{}status.textContent='Prévia disponível. Para sincronizar, entre na sua conta e tente novamente.';}
+}
 try{applyStoredAvatar(localStorage.getItem('capitaldotrem_avatar_preview_v1'));}catch{}
-const theme=$('theme');try{if(localStorage.getItem('capitaldotrem_theme_v1')==='light')document.body.classList.add('light');}catch{}function themeLabel(){const light=document.body.classList.contains('light');theme.textContent=light?'🌙 Escuro':'☀️ Claro';theme.setAttribute('aria-pressed',String(light));document.querySelector('meta[name="theme-color"]')?.setAttribute('content',light?'#f5f5f5':'#050505');}themeLabel();theme.addEventListener('click',()=>{const light=!document.body.classList.contains('light');document.body.classList.toggle('light',light);try{localStorage.setItem('capitaldotrem_theme_v1',light?'light':'dark');}catch{}themeLabel();});
-window.addEventListener('storage',event=>{if(event.key==='capitaldotrem_theme_v1'){document.body.classList.toggle('light',event.newValue==='light');themeLabel();}if(event.key==='capitaldotrem_avatar_preview_v1'){applyStoredAvatar(event.newValue);status.textContent=event.newValue?'Avatar atualizado em outra aba deste aparelho.':'Avatar removido em outra aba deste aparelho.';}});
+loadAccountAvatar();
+const theme=$('theme');try{if(localStorage.getItem('capitaldotrem_theme_v1')==='light')document.body.classList.add('light');}catch{}
+function themeLabel(){const light=document.body.classList.contains('light');theme.textContent=light?'🌙 Escuro':'☀️ Claro';theme.setAttribute('aria-pressed',String(light));document.querySelector('meta[name="theme-color"]')?.setAttribute('content',light?'#f5f5f5':'#050505');}
+themeLabel();theme.addEventListener('click',()=>{const light=!document.body.classList.contains('light');document.body.classList.toggle('light',light);try{localStorage.setItem('capitaldotrem_theme_v1',light?'light':'dark');}catch{}themeLabel();});
+window.addEventListener('storage',event=>{if(event.key==='capitaldotrem_theme_v1'){document.body.classList.toggle('light',event.newValue==='light');themeLabel();}if(event.key==='capitaldotrem_avatar_preview_v1'&&!signedIn){applyStoredAvatar(event.newValue);status.textContent=event.newValue?'Avatar atualizado em outra aba deste aparelho.':'Avatar removido em outra aba deste aparelho.';}});
 </script><script src="./update.js" defer></script></body></html>
