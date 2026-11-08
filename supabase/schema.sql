@@ -103,6 +103,41 @@ $$;
 revoke all on function private.is_admin() from public;
 grant execute on function private.is_admin() to anon, authenticated;
 
+-- Primeiro administrador: somente o e-mail proprietário pode inicializar a conta.
+create or replace function private.bootstrap_first_admin()
+returns boolean
+language plpgsql
+security definer
+set search_path = ''
+as $
+declare
+  current_user_id uuid := (select auth.uid());
+  current_email text := lower(coalesce((select auth.jwt() ->> 'email'), ''));
+begin
+  if current_user_id is null or current_email <> 'capitaldotrem07@gmail.com' then
+    raise exception 'Conta não autorizada para configurar o primeiro administrador.';
+  end if;
+  if exists (select 1 from public.admin_users) then
+    return exists (select 1 from public.admin_users where user_id = current_user_id);
+  end if;
+  insert into public.admin_users(user_id) values (current_user_id)
+  on conflict (user_id) do nothing;
+  return exists (select 1 from public.admin_users where user_id = current_user_id);
+end;
+$;
+revoke all on function private.bootstrap_first_admin() from public;
+grant execute on function private.bootstrap_first_admin() to authenticated;
+
+create or replace function public.bootstrap_first_admin()
+returns boolean
+language sql
+security invoker
+set search_path = ''
+as $ select private.bootstrap_first_admin(); $;
+revoke all on function public.bootstrap_first_admin() from public;
+grant execute on function public.bootstrap_first_admin() to authenticated;
+
+
 -- RPC pública sem privilégios elevados; a verificação real fica no schema privado.
 create or replace function public.is_admin()
 returns boolean
@@ -113,8 +148,9 @@ set search_path = ''
 as $$
   select private.is_admin();
 $$;
-revoke all on function private.is_admin() from public;
-grant execute on function private.is_admin() to authenticated;
+revoke all on function public.is_admin() from public;
+revoke execute on function public.is_admin() from anon;
+grant execute on function public.is_admin() to authenticated;
 
 -- Criar automaticamente um perfil quando alguém se cadastrar.
 create or replace function public.handle_new_user()
