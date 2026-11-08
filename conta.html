@@ -504,7 +504,13 @@ form.addEventListener('submit',async event=>{
  try{
   if(mode==='register'){
    const result=await auth.registerAccount({email,password,displayName,accountType});
-   status.textContent=result.user?.identities?.length===0?'Este e-mail já possui cadastro.':'Cadastro enviado. Confira seu e-mail para confirmar a conta.';
+   if(result.user?.identities?.length===0){
+    status.textContent='Este e-mail já possui cadastro. Entre na sua conta ou use Recuperar senha.';
+   }else if(result.session?.user){
+    status.textContent='Conta criada e acesso iniciado. Complete seu perfil para participar do Capital do Trem.';
+   }else{
+    status.textContent='Cadastro recebido. Abra o e-mail de confirmação enviado pelo serviço de contas antes de entrar. Confira também spam e lixo eletrônico.';
+   }
   }else if(mode==='reset'){
    await auth.sendPasswordReset(email);
    status.textContent='Se o endereço estiver cadastrado, você receberá um link para redefinir a senha. Confira também o spam e o lixo eletrônico.';
