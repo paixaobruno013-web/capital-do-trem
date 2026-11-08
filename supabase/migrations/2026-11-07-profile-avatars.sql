@@ -1,6 +1,15 @@
 -- Capital do Trem: avatar sincronizado com a conta e exibido no bate-papo.
 -- Aplicar depois de supabase/schema.sql. Usa o bucket público já existente
 -- capital-do-trem-media; fotos de avatar são públicas para os participantes.
+-- Garante perfil para contas criadas antes do trigger de perfil estar ativo.
+insert into public.profiles (user_id, display_name, account_type)
+select
+  u.id,
+  left(coalesce(u.raw_user_meta_data ->> 'name', ''), 80),
+  case when u.raw_user_meta_data ->> 'account_type' = 'artist' then 'artist' else 'user' end
+from auth.users u
+on conflict (user_id) do nothing;
+
 alter table public.profiles
   add column if not exists avatar_type text not null default 'default'
     check (avatar_type in ('default','photo','character')),
