@@ -189,7 +189,7 @@ async function loadChatModeration(){
    });
    card.append(author,date,content,remove);area.append(card);
   }
- }catch(error){area.replaceChildren(node('p','muted','A moderação do bate-papo ficará disponível depois de aplicar a atualização social no Supabase.'));}
+ }catch(error){area.replaceChildren(node('p','muted','Não foi possível carregar a moderação do CHAMA agora. Confira a conexão e as permissões do banco e tente atualizar a fila.'));}
 }
 loginForm.addEventListener('submit',async event=>{
  event.preventDefault();const button=document.getElementById('login-button');button.disabled=true;loginStatus.textContent='Verificando acesso...';
