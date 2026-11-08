@@ -747,3 +747,43 @@ export async function blockPrivateUser(otherUserId) {
   const {error}=await supabase.from('private_blocks').insert({blocker_id:user.id,blocked_id:otherUserId});
   if(error&&error.code!=='23505')throw error;
 }
+
+
+// Identidade visual oficial do aplicativo: leitura pública e gravação exclusiva de administradores.
+export async function getPublicBranding() {
+  const supabase = initSupabase();
+  const { data, error } = await supabase.from('site_settings')
+    .select('setting_key, setting_value')
+    .in('setting_key', ['official_profile_image_url', 'app_opening_image_url']);
+  if (error) throw error;
+  const settings = Object.fromEntries((data || []).map(row => [row.setting_key, row.setting_value]));
+  return {
+    profileImageUrl: settings.official_profile_image_url || '',
+    openingImageUrl: settings.app_opening_image_url || ''
+  };
+}
+
+export async function saveAdminBrandingImage(kind, file) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode alterar a identidade visual.');
+  const keys = { profile: 'official_profile_image_url', opening: 'app_opening_image_url' };
+  if (!Object.hasOwn(keys, kind)) throw new Error('Tipo de imagem inválido.');
+  if (!(file instanceof File)) throw new Error('Escolha uma imagem na galeria do celular.');
+  const allowed = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+  if (!allowed[file.type]) throw new Error('Use uma imagem JPG, PNG ou WebP.');
+  if (file.size < 1 || file.size > 5 * 1024 * 1024) throw new Error('A imagem deve ter até 5 MB.');
+  const path = user.id + '/branding/' + kind + '-' + crypto.randomUUID() + '.' + allowed[file.type];
+  const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, {
+    contentType: file.type, cacheControl: '3600', upsert: false
+  });
+  if (uploadError) throw uploadError;
+  const { data: publicData } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
+  if (!publicData?.publicUrl) throw new Error('Não foi possível gerar o endereço público da imagem.');
+  const { error: saveError } = await supabase.from('site_settings').upsert({
+    setting_key: keys[kind], setting_value: publicData.publicUrl, updated_at: new Date().toISOString()
+  }, { onConflict: 'setting_key' });
+  if (saveError) throw saveError;
+  return publicData.publicUrl;
+}
