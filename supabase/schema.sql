@@ -208,11 +208,14 @@ alter table public.events enable row level security;
 alter table public.artists enable row level security;
 alter table public.posts enable row level security;
 
--- Permissões de tabela: o RLS continua controlando cada linha.
+-- Permissões mínimas para a API; RLS continua controlando cada linha.
+revoke all privileges on all tables in schema public from anon, authenticated;
+grant select on public.artists, public.events, public.posts, public.profiles, public.site_settings, public.songs to anon;
+grant select on public.admin_users to authenticated;
 grant select, insert, update on public.profiles to authenticated;
-grant select on public.profiles to anon;
-grant select on public.events, public.artists, public.posts to anon, authenticated;
-grant insert, update, delete on public.events, public.artists, public.posts to authenticated;
+grant select, insert, update, delete on public.artists, public.events, public.posts to authenticated;
+grant select, insert, delete on public.chat_messages, public.song_comments, public.song_likes to authenticated;
+grant select, insert, update, delete on public.site_settings, public.songs to authenticated;
 
 -- Perfis: cada usuário vê e altera apenas o próprio registro.
 drop policy if exists "profile_read_own" on public.profiles;
