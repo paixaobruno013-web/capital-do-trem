@@ -24,36 +24,37 @@ a{color:var(--fg)}.btn{display:inline-block;background:var(--red);padding:10px 1
 <button class="theme" id="theme-toggle" type="button" aria-pressed="false">☀️ Claro</button><a class="btn" href="./">← Voltar ao Capital do Trem</a>
 <section class="card">
 <h1>Privacidade no Capital do Trem</h1>
-<p class="muted">Informações sobre esta primeira versão demonstrativa do site.</p>
+<p class="muted">Esta página explica quais informações podem ser usadas quando você navega, cria uma conta, envia conteúdo ou participa da comunidade.</p>
 <h2>Localização — LOGO ALI</h2>
-<p>O site só solicita a localização do celular quando a pessoa toca no botão e autoriza o navegador. Nesta versão, as coordenadas são usadas para abrir uma busca no Google Maps. O Capital do Trem não recebe nem salva essas coordenadas.</p>
-<h2>Formulário de divulgação</h2>
-<p>O formulário geral de divulgação é apenas uma demonstração: as informações ficam armazenadas no navegador e aparelho usados, por meio do armazenamento local. Elas não são enviadas à equipe nem publicadas para outras pessoas. Na seção “Últimas divulgações”, a pessoa pode usar “Apagar minhas divulgações deste aparelho” para remover os registros locais; o site pedirá confirmação antes de apagar.</p>
-<h2>Preparação de mensagem para eventos</h2>
-<p>Os campos da agenda são usados somente para montar uma mensagem no próprio navegador. Ao tocar em “Copiar mensagem do evento”, o texto é copiado para a área de transferência do aparelho (ou exibido para cópia manual). O Capital do Trem não recebe nem armazena essas informações. O endereço público digitado só é enviado ao Google Maps quando a pessoa toca no link para abrir o mapa; a consulta passa a seguir as políticas do Google. Ao tocar em “Abrir no Google Agenda”, os dados do evento são enviados ao serviço do Google para preencher um novo compromisso, e passam a seguir as políticas do Google. A pessoa decide se deseja colar e enviar o texto pelo Instagram, e deve anexar o cartaz diretamente por lá.</p>
-<h2>Cartaz de evento</h2>
-<p>A imagem selecionada no formulário de eventos é exibida apenas como prévia temporária no aparelho, por meio do navegador. O arquivo não é enviado ao Capital do Trem nem armazenado pelo site. Ao limpar o formulário ou selecionar outro cartaz, a prévia anterior é removida. Para solicitar divulgação, a pessoa deve anexar a imagem diretamente na conversa do Instagram.</p>
-<h2>Apresentação de artistas</h2>
-<p>O formulário “Artistas do Capital” monta uma apresentação no próprio navegador. As informações digitadas não são enviadas nem salvas pelo Capital do Trem. Quando a pessoa escolhe copiar, o texto é colocado na área de transferência do aparelho ou exibido para cópia manual. O envio pelo Instagram é uma decisão da própria pessoa.</p>
-<h2>Foto para apresentação de artistas</h2>
-<p>A foto escolhida no formulário de artistas é exibida apenas como prévia temporária no aparelho, por meio do navegador. Ela não é enviada ao Capital do Trem nem armazenada pelo site. Ao limpar o formulário, a prévia é removida. Para compartilhar a foto com a equipe, a pessoa deve anexá-la diretamente na conversa do Instagram.</p>
-<h2>Áudio</h2>
-<p>O áudio selecionado no player demonstrativo é reproduzido localmente no aparelho. Não é enviado ao site.</p>
-<h2>Compartilhamento e links externos</h2>
-<p>Os botões de compartilhar eventos e apresentações de artistas podem preparar o texto e, quando o navegador e o aplicativo escolhido permitem, incluir também o cartaz ou a foto selecionada. Isso só acontece depois que a pessoa toca em compartilhar e escolhe o destino no menu do aparelho. O arquivo é repassado diretamente pelo recurso de compartilhamento do sistema; o Capital do Trem não recebe nem armazena essa imagem. Se o aparelho não aceitar o envio da imagem, será possível compartilhar o texto e anexar a foto manualmente no aplicativo escolhido. Links para serviços externos, como Instagram, YouTube e Google Maps, seguem as políticas desses serviços.</p>
+<p>O site só solicita a localização do celular quando a pessoa toca no botão e autoriza o navegador. Nesta função, as coordenadas são usadas para abrir uma busca no Google Maps. O Capital do Trem não recebe nem salva essas coordenadas.</p>
 <h2>Conta e autenticação</h2>
-<p>A área de conta utiliza o Supabase Auth para cadastro, entrada e recuperação de senha. Quando a pessoa cria uma conta ou entra, o e-mail e a senha são enviados diretamente ao serviço de autenticação do Supabase para processar a solicitação. O nome de exibição e o tipo de conta escolhidos no cadastro também são enviados como informações de perfil. A sessão pode permanecer salva no aparelho para permitir o acesso contínuo. O Capital do Trem não deve solicitar que a pessoa envie sua senha por mensagens ou para integrantes da equipe.</p>
-<h2>Perfis, publicações e recursos em implantação</h2>
-<p>O site contém telas e código preparados para fichas de artistas, perfis da comunidade, eventos, divulgações, envio de imagens, catálogo de músicas, curtidas, comentários e bate-papo. Esses recursos dependem da configuração e da aplicação das tabelas, regras de segurança e armazenamento no banco de dados. Enquanto essa etapa não estiver concluída e testada, não considere esses recursos como plenamente disponíveis. Quando forem ativados, os dados enviados por esses formulários poderão ser armazenados no projeto Supabase do Capital do Trem para executar as funções solicitadas, respeitando as permissões e regras de acesso configuradas.</p>
-<h2>Serviços externos e armazenamento</h2>
-<p>A autenticação é processada pelo Supabase. Os recursos de banco de dados e armazenamento de arquivos também foram preparados para usar esse serviço, mas dependem da configuração técnica mencionada acima. Serviços externos, como Google Maps, Google Agenda, Instagram e YouTube, seguem suas próprias políticas quando a pessoa decide abrir ou compartilhar conteúdo com eles.</p>
+<p>Cadastro, entrada e recuperação de senha usam o Supabase Auth. O e-mail e a senha são enviados diretamente ao serviço para processar a autenticação. O Capital do Trem não vê nem solicita que você envie sua senha à equipe. O nome de exibição e o tipo de conta escolhido também são usados para criar seu perfil. A sessão pode permanecer salva no aparelho para manter o acesso.</p>
+<h2>Perfil da comunidade</h2>
+<p>O perfil básico pode incluir nome de exibição, tipo de participação, cidade e apresentação. A pessoa escolhe se quer aparecer no diretório público. Somente os dados de perfis marcados como públicos são apresentados na área da comunidade. A ficha artística é enviada separadamente para análise e só aparece na vitrine depois da aprovação da equipe.</p>
+<h2>Envio de artistas e imagens</h2>
+<p>Ao enviar uma ficha artística pela página Minha conta, os dados do artista são armazenados no banco de dados do Capital do Trem e ficam pendentes até a análise da equipe. Fotos de artistas e cartazes enviados pelos formulários oficiais são armazenados no serviço de mídia do Supabase. Esse espaço de mídia é público: envie somente imagens que você tenha intenção de divulgar e não inclua documentos, dados pessoais ou imagens privadas. A aprovação da ficha ou do evento controla a exibição nas áreas públicas do aplicativo, mas não transforma o arquivo armazenado em mídia privada.</p>
+<p>O formulário de apresentação na página “Artistas” é apenas uma ferramenta local para preparar e compartilhar um texto. Para enviar oficialmente sua ficha e foto, use Minha conta.</p>
+<h2>Eventos e localização pública</h2>
+<p>O formulário de prévia na página Eventos prepara uma mensagem no próprio aparelho. Para enviar um evento à equipe, use o formulário oficial em Minha conta. Nome, data, horário, endereço público, descrição, contato e cartaz enviado podem ser armazenados no Supabase para análise. Eventos só aparecem na agenda depois da aprovação. Ao abrir um endereço no Google Maps ou preencher um compromisso no Google Agenda, os dados necessários são enviados diretamente ao serviço escolhido e passam a seguir as políticas dele. Não informe endereço residencial como local de evento.</p>
+<h2>Divulgações e mural</h2>
+<p>As divulgações enviadas pela área Minha conta são armazenadas no banco de dados do Capital do Trem, associadas à conta que fez o envio e mantidas pendentes até a análise. Somente publicações aprovadas aparecem no mural público. O formulário da área “Divulgue” direciona para o envio autenticado; ele não guarda uma cópia local de demonstração.</p>
+<h2>Músicas e arquivos de áudio</h2>
+<p>O áudio escolhido no player local da página Músicas é reproduzido no próprio aparelho e não é enviado ao site. Os arquivos enviados pela equipe para o catálogo ficam em um espaço privado de armazenamento. Quando uma música é aprovada, o aplicativo cria links temporários para reprodução e download. Envie somente músicas das quais você tenha autorização para distribuir.</p>
+<h2>Bate-papo CHAMA 🔥</h2>
+<p>As mensagens enviadas na sala CHAMA 🔥 são armazenadas no Supabase e ficam disponíveis aos participantes autenticados com acesso à sala. A equipe pode moderar e remover mensagens. Não compartilhe senhas, códigos, documentos, dados bancários, endereço residencial ou outras informações sensíveis no bate-papo.</p>
+<h2>Avatar e conversas privadas</h2>
+<p>A página Meu avatar, nesta etapa, cria uma prévia salva somente no aparelho; ela ainda não sincroniza a imagem com o perfil ou com o bate-papo. A área Minhas conversas privadas ainda está em preparação e não envia nem armazena mensagens privadas.</p>
+<h2>Compartilhamento e links externos</h2>
+<p>Quando você toca em compartilhar, o texto e, se compatível, a imagem escolhida podem ser encaminhados ao aplicativo de destino por meio do recurso de compartilhamento do aparelho. Links para Instagram, YouTube, Google Maps e Google Agenda seguem as políticas desses serviços.</p>
+<h2>Serviços e armazenamento</h2>
+<p>O Supabase é usado para autenticação, banco de dados e armazenamento de arquivos. O acesso às informações é controlado por permissões e políticas de segurança do projeto. O Capital do Trem não deve solicitar sua senha por mensagem ou compartilhá-la com integrantes da equipe.</p>
 <h2>Seus pedidos e direitos</h2>
-<p>A pessoa pode solicitar informações sobre seus dados, correção ou exclusão, conforme a legislação aplicável. Para encaminhar um pedido à equipe do Capital do Trem, utilize o perfil oficial informado nesta página. Não envie senha ou documentos pessoais desnecessários por mensagem. Os pedidos serão avaliados pela equipe e poderão exigir confirmação de titularidade.</p>
+<p>Você pode solicitar informações, correção ou exclusão de dados, conforme a legislação aplicável. Para encaminhar um pedido à equipe, utilize o perfil oficial do Capital do Trem no Instagram. Não envie senha nem documentos pessoais desnecessários por mensagem. A equipe poderá pedir uma confirmação razoável de titularidade antes de atender à solicitação.</p>
 <h2>Contato</h2>
 <p>Para falar com a equipe, use o perfil oficial:</p>
-<a href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Instagram do Capital do Trem</a>
+<a href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener noreferrer">Instagram do Capital do Trem</a>
 </section>
-<p class="muted">Capital do Trem • Página informativa da versão demonstrativa.</p>
+<p class="muted">Capital do Trem • Política de privacidade</p>
 </main>
 <script>const themeButton=document.getElementById('theme-toggle');const themeKey='capitaldotrem_theme_v1';function setTheme(value){const light=value==='light';document.body.classList.toggle('light',light);themeButton.textContent=light?'🌙 Escuro':'☀️ Claro';themeButton.setAttribute('aria-pressed',String(light));document.querySelector('meta[name="theme-color"]').content=light?'#f5f5f5':'#000000';}let initial='dark';try{initial=localStorage.getItem(themeKey)==='light'?'light':'dark';}catch{}setTheme(initial);themeButton.addEventListener('click',()=>{const next=document.body.classList.contains('light')?'dark':'light';setTheme(next);try{localStorage.setItem(themeKey,next);}catch{}});window.addEventListener('storage',event=>{if(event.key===themeKey)setTheme(event.newValue==='light'?'light':'dark');});</script>
 <script src="./update.js" defer></script>
