@@ -309,6 +309,27 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
 .intro-smoke__brand.custom-opening-image img{position:relative;inset:auto;width:clamp(220px,66vw,420px);height:auto;aspect-ratio:1/1;max-height:none;object-fit:cover;object-position:center;border-radius:50%;border:3px solid #ed1c24;background:#000;box-shadow:0 0 16px rgba(237,28,36,.8),0 0 42px rgba(237,28,36,.32);filter:none}
 .intro-smoke__brand.custom-opening-image strong,.intro-smoke__brand.custom-opening-image span{display:none}
 @media(max-width:759px){#site-logo{width:84px;height:84px}}
+
+/* FIX DEFINITIVO: recorte circular forçado, inclusive contra estilos antigos. */
+#site-logo,
+.intro-smoke__brand img,
+.intro-smoke__brand.custom-opening-image img,
+#branding-profile-preview{
+  display:block !important;
+  border-radius:50% !important;
+  clip-path:circle(50% at 50% 50%) !important;
+  -webkit-clip-path:circle(50% at 50% 50%) !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  overflow:hidden !important;
+  aspect-ratio:1 / 1 !important;
+}
+#site-logo{width:112px !important;height:112px !important;border:3px solid #ed1c24 !important;box-shadow:0 0 12px #ed1c24,0 0 26px #ed1c2455 !important}
+.intro-smoke__brand.custom-opening-image{width:100% !important;height:100% !important;display:flex !important;align-items:center !important;justify-content:center !important;background:#000 !important}
+.intro-smoke__brand img,
+.intro-smoke__brand.custom-opening-image img{position:relative !important;inset:auto !important;width:clamp(220px,66vw,420px) !important;height:clamp(220px,66vw,420px) !important;max-height:none !important;border:4px solid #ed1c24 !important;box-shadow:0 0 16px #ed1c24,0 0 42px #ed1c2455 !important;filter:none !important}
+.intro-smoke__brand strong,.intro-smoke__brand span{display:none !important}
+@media(max-width:759px){#site-logo{width:84px !important;height:84px !important}}
 </style></head>
 <body>
 <script>
