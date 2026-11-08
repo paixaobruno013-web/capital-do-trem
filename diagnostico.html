@@ -44,14 +44,16 @@ button:disabled{opacity:.6}.theme{float:right;background:var(--panel);border:1px
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 const URL='https://zmjxkfjzrbbxyvgkwirv.supabase.co';
 const KEY='sb_publishable_FLbDg6UCePQHb7s0wkywng_J9pNKlsP';
-const client=createClient(URL,KEY,{auth:{persistSession:false,autoRefreshToken:false}});
+const client=createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const button=document.getElementById('check'),overall=document.getElementById('overall'),results=document.getElementById('results');
-const checks=[
+const publicChecks=[
  ['profiles','user_id'],
  ['artists','id'],
  ['events','id'],
  ['posts','id'],
- ['songs','id'],
+ ['songs','id']
+];
+const signedInChecks=[
  ['chat_messages','id'],
  ['song_likes','song_id'],
  ['song_comments','id']
@@ -68,15 +70,25 @@ button.addEventListener('click',async()=>{
  try{
   const {error}=await client.auth.getSession();
   if(error) throw error;
-  show('Cliente Supabase',true,'A biblioteca foi inicializada. As verificações das tabelas e dos espaços abaixo confirmam o acesso real aos serviços.');
+  show('Cliente Supabase',true,'A biblioteca foi inicializada e a conexão com o serviço respondeu.');
   passed++;
+  const {data:{session}}=await client.auth.getSession();
+  window.__diagnosticSession=!!session;
  }catch(error){show('Conexão com Supabase',false,error.message||'Não foi possível conectar.');overall.textContent='Não foi possível concluir a verificação. Confira sua conexão com a internet.';overall.className='bad';button.disabled=false;return;}
- for(const [table,column] of checks){
+ for(const [table,column] of publicChecks){
   try{
    const {error}=await client.from(table).select(column).limit(1);
    if(error) throw error;
    show('Tabela '+table,true,'Encontrada e acessível para consulta.');passed++;
   }catch(error){show('Tabela '+table,false,error.message||'Não foi possível consultar esta tabela.');}
+ }
+ if(!window.__diagnosticSession){
+  for(const [table] of signedInChecks) show('Tabela '+table,true,'Protegida para usuários autenticados. Entre na sua conta para testar esta área.');
+ }else{
+  for(const [table,column] of signedInChecks){
+   try{const {error}=await client.from(table).select(column).limit(1);if(error)throw error;show('Tabela '+table,true,'Acesso autenticado confirmado.');passed++;}
+   catch(error){show('Tabela '+table,false,error.message||'Não foi possível consultar esta tabela.');}
+  }
  }
  try{
   const {data,error}=await client.storage.from('capital-do-trem-media').list('',{limit:1});
@@ -88,7 +100,7 @@ button.addEventListener('click',async()=>{
   if(error) throw error;
   show('Armazenamento de músicas',true,'O espaço privado de áudio respondeu à consulta.');passed++;
  }catch(error){show('Armazenamento de músicas',false,error.message||'Espaço de áudio não encontrado ou sem acesso.');}
- const total=checks.length+3;
+ const total=publicChecks.length+3+(window.__diagnosticSession?signedInChecks.length:0);
  overall.textContent=passed===total?'Tudo certo: conexão, tabelas e armazenamento responderam.':'Resultado: '+passed+' de '+total+' verificações passaram. Veja os itens acima.';
  overall.className=passed===total?'good':'wait';
  button.disabled=false;
