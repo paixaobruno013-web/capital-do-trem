@@ -120,3 +120,34 @@ drop policy if exists private_blocks_insert_own on public.private_blocks;
 create policy private_blocks_insert_own on public.private_blocks for insert to authenticated with check(blocker_id=(select auth.uid()));
 drop policy if exists private_blocks_delete_own on public.private_blocks;
 create policy private_blocks_delete_own on public.private_blocks for delete to authenticated using(blocker_id=(select auth.uid()));
+
+
+
+-- Função privada verifica bloqueio nos dois sentidos sem expor a lista de bloqueios.
+create or replace function private.private_users_blocked(user_a uuid,user_b uuid)
+returns boolean language sql stable security definer set search_path=''
+as $$ select exists(select 1 from public.private_blocks b where (b.blocker_id=user_a and b.blocked_id=user_b) or (b.blocker_id=user_b and b.blocked_id=user_a)); $$;
+revoke all on function private.private_users_blocked(uuid,uuid) from public;
+revoke execute on function private.private_users_blocked(uuid,uuid) from anon;
+grant execute on function private.private_users_blocked(uuid,uuid) to authenticated;
+drop policy if exists private_conversations_request_public_user on public.private_conversations;
+create policy private_conversations_request_public_user on public.private_conversations for insert to authenticated with check(
+ initiated_by=(select auth.uid()) and (select auth.uid()) in(participant_one,participant_two)
+ and exists(select 1 from public.profiles p where p.user_id=case when participant_one=(select auth.uid()) then participant_two else participant_one end and p.is_public=true)
+ and not private.private_users_blocked((select auth.uid()),case when participant_one=(select auth.uid()) then participant_two else participant_one end)
+);
+drop policy if exists private_messages_read_accepted_participants on public.private_messages;
+create policy private_messages_read_accepted_participants on public.private_messages for select to authenticated using(
+ exists(select 1 from public.private_conversations c where c.id=conversation_id and c.status='accepted' and (select auth.uid()) in(c.participant_one,c.participant_two))
+ and not exists(select 1 from public.private_conversations c where c.id=conversation_id and private.private_users_blocked((select auth.uid()),case when c.participant_one=(select auth.uid()) then c.participant_two else c.participant_one end))
+);
+drop policy if exists private_messages_insert_accepted_participants on public.private_messages;
+create policy private_messages_insert_accepted_participants on public.private_messages for insert to authenticated with check(
+ sender_id=(select auth.uid()) and exists(select 1 from public.private_conversations c where c.id=conversation_id and c.status='accepted'
+ and (select auth.uid()) in(c.participant_one,c.participant_two)
+ and not private.private_users_blocked((select auth.uid()),case when c.participant_one=(select auth.uid()) then c.participant_two else c.participant_one end))
+);
+drop policy if exists private_conversations_touch_accepted on public.private_conversations;
+create policy private_conversations_touch_accepted on public.private_conversations for update to authenticated
+ using(status='accepted' and (select auth.uid()) in(participant_one,participant_two))
+ with check(status='accepted' and (select auth.uid()) in(participant_one,participant_two));
