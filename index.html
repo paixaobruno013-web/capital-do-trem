@@ -535,7 +535,8 @@ document.getElementById('copy-event').addEventListener('click',async()=>{
  const status=document.getElementById('event-copy-status');
  if(!document.getElementById('event-name').reportValidity()||!document.getElementById('event-date').reportValidity()||!document.getElementById('event-time').reportValidity()||!document.getElementById('event-place').reportValidity()){status.textContent='Confira os campos obrigatórios destacados.';return;}
  const dateText=date.split('-').reverse().join('/');
- const mapUrl='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(place);\n const message='Olá, Capital do Trem! Gostaria de solicitar a divulgação deste evento.\n\nEvento: '+name+'\nTipo: '+kind+'\nData: '+dateText+'\nHorário: '+time+'\nLocal: '+place+'\nLocalização no Google Maps: '+mapUrl+(contact?'\nContato público: '+contact:'')+'\n\nVou anexar o cartaz para avaliação.\nObrigado(a)!';
+ const mapUrl='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(place);
+ const message='Olá, Capital do Trem! Gostaria de solicitar a divulgação deste evento.\n\nEvento: '+name+'\nTipo: '+kind+'\nData: '+dateText+'\nHorário: '+time+'\nLocal: '+place+'\nLocalização no Google Maps: '+mapUrl+(contact?'\nContato público: '+contact:'')+'\n\nVou anexar o cartaz para avaliação.\nObrigado(a)!';
  try{
   if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(message);status.textContent='Mensagem copiada! Agora abra o Instagram, envie a mensagem e anexe o cartaz.';}
   else{window.prompt('Copie a mensagem abaixo e cole no Instagram:',message);status.textContent='Copie a mensagem exibida e envie pelo Instagram junto com o cartaz.';}
