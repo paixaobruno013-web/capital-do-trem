@@ -39,6 +39,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .intro-smoke{position:fixed;inset:0;z-index:9998;display:grid;place-items:center;overflow:hidden;background:#000;pointer-events:none;animation:intro-screen-out 7s ease-in-out forwards}
 .intro-smoke__brand{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;opacity:0;animation:intro-brand-in 6.7s ease-out forwards}
 .intro-smoke__brand img{width:clamp(92px,24vw,150px);height:auto;max-height:150px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(255,255,255,.18))}
+.intro-smoke__brand.custom-opening-image{width:100%;height:100%;justify-content:center;gap:0}
+.intro-smoke__brand.custom-opening-image img{position:absolute;inset:0;width:100vw;height:100vh;max-height:none;object-fit:cover;filter:none}
+.intro-smoke__brand.custom-opening-image strong,.intro-smoke__brand.custom-opening-image span{position:relative;z-index:2;text-shadow:0 2px 12px #000,0 0 18px #000}
+.intro-smoke__brand.custom-opening-image strong{margin-top:auto;margin-bottom:8px}
+.intro-smoke__brand.custom-opening-image span{margin-bottom:70px}
+
 .intro-smoke__brand strong{color:#fff;font-size:clamp(23px,6vw,38px);font-weight:950;letter-spacing:clamp(2px,1vw,5px);text-shadow:0 2px 18px #777}
 .intro-smoke__brand span{color:#c7c7c7;font-size:12px;letter-spacing:2px}
 .intro-smoke__signature{position:absolute;z-index:9999;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:6cm;max-width:calc(100vw - 24px);min-height:38px;padding:7px 5px;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;font-size:18px;font-weight:1000;letter-spacing:2.2px;line-height:1.2;text-shadow:0 1px 3px #000,0 0 10px #ed1c24,0 0 22px #ed1c24;background:rgba(0,0,0,.94);border:2px solid #ed1c24;border-radius:9px;box-shadow:0 0 10px rgba(237,28,36,.9),0 0 24px rgba(237,28,36,.55);opacity:1;visibility:visible;pointer-events:none}
@@ -989,7 +995,7 @@ function safeHttpsUrl(value){try{const url=new URL(value);return url.protocol===
   const safeUrl=value=>typeof value==='string'&&value.startsWith('https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/')?value:'';
   const profile=safeUrl(branding.profileImageUrl),opening=safeUrl(branding.openingImageUrl);
   if(profile){const logo=document.getElementById('site-logo');if(logo)logo.src=profile;}
-  if(opening){const intro=document.querySelector('.intro-smoke__brand img');if(intro)intro.src=opening;}
+  if(opening){const intro=document.querySelector('.intro-smoke__brand img');if(intro){intro.src=opening;intro.closest('.intro-smoke__brand')?.classList.add('custom-opening-image');}}
  }catch(error){console.warn('Identidade visual padrão mantida.',error);}
 })();
 </script>
