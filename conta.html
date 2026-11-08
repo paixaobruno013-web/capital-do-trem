@@ -118,6 +118,8 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 <button type="button" class="secondary" id="tab-reset" aria-pressed="false" disabled>Recuperar senha</button>
 </div>
 <form id="account-form">
+<button type="button" id="google-sign-in" class="secondary" disabled>Continuar com Google</button>
+<p class="muted">Ou entre com seu e-mail e senha:</p>
 <div id="name-wrap" hidden>
 <label for="display-name">Nome artístico ou nome de exibição</label>
 <input id="display-name" name="display-name" maxlength="80" autocomplete="name" disabled>
@@ -196,7 +198,8 @@ const passwordToggle=document.getElementById('toggle-password');
 passwordToggle.addEventListener('click',()=>{const visible=passwordInput.type==='password';passwordInput.type=visible?'text':'password';passwordToggle.textContent=visible?'Ocultar':'Mostrar';passwordToggle.setAttribute('aria-pressed',String(visible));});
 const form=document.getElementById('account-form');
 const status=document.getElementById('account-status');
-const controls=[...form.querySelectorAll('input,button,select,textarea'),...document.querySelectorAll('.tabs button')];
+const googleSignInButton=document.getElementById('google-sign-in');
+const controls=[...form.querySelectorAll('input,button,select,textarea'),...document.querySelectorAll('.tabs button'),googleSignInButton];
 const accessPanel=document.getElementById('access-panel');
 const profilePanel=document.getElementById('profile-panel');
 const basicProfilePanel=document.getElementById('basic-profile-panel');
@@ -447,6 +450,13 @@ try{
   setupMessage.textContent='Não foi possível iniciar o cadastro: '+(error?.message||'falha ao carregar o serviço de autenticação')+'. Atualize a página e tente novamente. Nenhum cadastro foi enviado.';
   console.error('Falha ao iniciar autenticação do Capital do Trem:',error);
 }
+googleSignInButton.addEventListener('click',async()=>{
+ if(!auth){status.textContent='O serviço de contas ainda não está disponível.';return;}
+ googleSignInButton.disabled=true;status.textContent='Abrindo a autenticação segura do Google...';
+ try{await auth.signInWithGoogle();}
+ catch(error){status.textContent=error?.message||'Não foi possível iniciar o acesso com Google.';googleSignInButton.disabled=false;}
+});
+
 let mode='login';
 const tabs={
  login:document.getElementById('tab-login'),
