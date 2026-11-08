@@ -53,7 +53,11 @@ jobs:
           grep -q 'create policy "profile_update_own"' supabase/schema.sql
           grep -q 'create policy "profiles_read_public"' supabase/schema.sql
           grep -q 'create policy "artists_update_own_or_admin"' supabase/schema.sql
-          echo "Políticas de acesso próprio e moderação de perfis encontradas."
+          grep -q 'create or replace function public.protect_profile_account_type' supabase/schema.sql
+          grep -q "new.raw_user_meta_data ->> 'account_type' = 'artist'" supabase/schema.sql
+          grep -q 'profiles_protect_account_type' supabase/schema.sql
+          test -s supabase/migrations/2026-11-08-artist-account-type.sql
+          echo "Políticas de perfil, escolha de categoria Artista e proteção administrativa encontradas."
       - name: Conferir arquivos essenciais
         run: |
           test -s www/index.html
