@@ -2,7 +2,17 @@
 // Este módulo só deve ser importado pela interface depois de configurar os dados públicos.
 // Nunca inserir a chave service_role neste arquivo.
 
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+// O aplicativo pode ser aberto dentro de navegadores móveis com bloqueios pontuais de CDN.
+let createClient;
+try {
+  ({ createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'));
+} catch (primaryError) {
+  try {
+    ({ createClient } = await import('https://esm.sh/@supabase/supabase-js@2'));
+  } catch (fallbackError) {
+    throw new Error('Não foi possível carregar a biblioteca segura de autenticação. Verifique a conexão e tente novamente.');
+  }
+}
 
 const SUPABASE_URL = 'https://zmjxkfjzrbbxyvgkwirv.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_FLbDg6UCePQHb7s0wkywng_J9pNKlsP';
