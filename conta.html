@@ -310,6 +310,14 @@ async function loadArtistProfile(){
 function showSession(session){
   if(session?.user){
     activeUserEmail=session.user.email||null;
+    // A RPC valida novamente o e-mail no banco e só permite ocupar a primeira vaga administrativa.
+    if(activeUserEmail&&activeUserEmail.toLowerCase()==='capitaldotrem07@gmail.com'&&auth?.bootstrapFirstAdmin){
+      auth.bootstrapFirstAdmin().then(isAdmin=>{
+        if(isAdmin)sessionStatus.textContent='Conta proprietária reconhecida como administradora do Capital do Trem.';
+      }).catch(error=>{
+        console.warn('Configuração inicial de administrador ainda não concluída:',error?.message||error);
+      });
+    }
     if(isAccountLocked()){
       profilePanel.hidden=true;accessPanel.hidden=true;basicProfilePanel.hidden=true;eventPanel.hidden=true;postPanel.hidden=true;
       lockPanel.hidden=false;window.clearTimeout(lockTimer);return;
