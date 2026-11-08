@@ -109,6 +109,16 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 </section>
 <div style="display:flex;gap:9px;flex-wrap:wrap"><button type="button" class="secondary" id="lock-account">🔒 Bloquear agora</button><button type="button" class="secondary" id="sign-out">Sair da conta</button></div>
 <p id="session-status" class="status" role="status" aria-live="polite"></p>
+<form id="set-password-form" class="card" style="margin-top:16px">
+<h3>🔐 Definir senha do aplicativo</h3>
+<p class="muted">Crie uma senha exclusiva para entrar no Capital do Trem. Ela será diferente da senha do banco de dados. Use pelo menos 8 caracteres.</p>
+<label for="new-app-password">Nova senha do aplicativo</label>
+<input id="new-app-password" type="password" minlength="8" autocomplete="new-password" required>
+<label for="confirm-app-password">Confirme a nova senha</label>
+<input id="confirm-app-password" type="password" minlength="8" autocomplete="new-password" required>
+<button type="submit" id="save-app-password">Salvar senha do aplicativo</button>
+<p id="set-password-status" class="status" role="status" aria-live="polite"></p>
+</form>
 </section>
 <section class="card" id="access-panel" aria-labelledby="access-title">
 <h2 id="access-title">Acesso à conta</h2>
@@ -436,6 +446,25 @@ lockPanel.addEventListener('keydown',event=>{
 });
 
 let auth=null;
+const setPasswordForm=document.getElementById('set-password-form');
+setPasswordForm.addEventListener('submit',async event=>{
+ event.preventDefault();
+ const first=document.getElementById('new-app-password').value;
+ const second=document.getElementById('confirm-app-password').value;
+ const message=document.getElementById('set-password-status');
+ const button=document.getElementById('save-app-password');
+ if(first.length<8){message.textContent='A senha precisa ter pelo menos 8 caracteres.';return;}
+ if(first!==second){message.textContent='As senhas não coincidem. Confira e tente novamente.';return;}
+ button.disabled=true;message.textContent='Salvando sua senha com segurança...';
+ try{
+  const session=await auth.getCurrentSession();
+  if(!session?.user)throw new Error('Sua sessão não está ativa. Entre novamente pelo convite aceito ou pela conta já conectada.');
+  await auth.updateAccountPassword(first);
+  setPasswordForm.reset();
+  message.textContent='Senha do aplicativo definida com sucesso! Use seu e-mail e essa senha para entrar.';
+ }catch(error){message.textContent=error?.message||'Não foi possível salvar a senha agora.';}
+ finally{button.disabled=false;}
+});
 try{
   const module=await import('./supabase/auth.js');
   auth=module;
