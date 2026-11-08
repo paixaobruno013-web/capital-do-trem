@@ -8,7 +8,7 @@ Este guia foi preparado para configurar o banco sem precisar criar as tabelas um
 - Painel: https://supabase.com/dashboard/project/zmjxkfjzrbbxyvgkwirv
 - O arquivo principal de instalação é `supabase/schema.sql`.
 
-**Importante:** o arquivo `schema.sql` já reúne a estrutura principal, catálogo de músicas, curtidas, comentários, bate-papo, políticas de segurança e buckets de arquivos. Para uma instalação nova, execute esse arquivo uma única vez. Não execute as migrations separadas por cima sem necessidade.
+**Importante:** o projeto de produção já está ativo e conectado. Não execute o `schema.sql` completo nele novamente. Esse arquivo é somente para uma instalação nova. Em um banco existente, confira o histórico e aplique apenas migrations ainda não executadas.
 
 ## Etapa 1 — Abrir o Editor SQL
 
@@ -16,7 +16,7 @@ Este guia foi preparado para configurar o banco sem precisar criar as tabelas um
 2. No menu lateral, entre em **SQL Editor**.
 3. Toque em **New query** (Nova consulta).
 
-## Etapa 2 — Executar o arquivo principal
+## Etapa 2 — Executar o arquivo principal (somente instalação nova)
 
 1. Em outra aba, abra este arquivo no GitHub: https://github.com/paixaobruno013-web/capital-do-trem/blob/main/supabase/schema.sql
 2. Copie o conteúdo completo do arquivo.
@@ -24,7 +24,7 @@ Este guia foi preparado para configurar o banco sem precisar criar as tabelas um
 4. Toque em **Run** (Executar).
 5. Aguarde a mensagem de conclusão. Se aparecer erro, pare e envie à equipe uma captura da mensagem; não tente executar comandos aleatórios.
 
-**Se o banco já foi configurado anteriormente:** execute também, no SQL Editor, a migração específica de segurança [2026-11-06-admin-only-song-uploads.sql](https://github.com/paixaobruno013-web/capital-do-trem/blob/main/supabase/migrations/2026-11-06-admin-only-song-uploads.sql). Ela atualiza as permissões para que somente administradores autorizados possam enviar músicas. Em uma instalação nova feita pelo `schema.sql` atualizado, essa proteção já está incluída.
+**Para bancos existentes:** não execute migrations antigas sem conferir se já foram aplicadas. A atualização incremental de segurança mais recente é [2026-11-08-secure-registered-user-access.sql](https://github.com/paixaobruno013-web/capital-do-trem/blob/main/supabase/migrations/2026-11-08-secure-registered-user-access.sql).
 
 ## Etapa 3 — Conferir as tabelas
 
@@ -42,17 +42,11 @@ No menu **Table Editor**, confira se aparecem, entre outras, estas tabelas:
 
 O script também configura os espaços de armazenamento de áudio e imagens.
 
-## Etapa 4 — Liberar o e-mail da equipe como administrador
+## Etapa 4 — Conferir o administrador da equipe
 
-Primeiro, crie a conta normalmente no site usando o e-mail autorizado da equipe e confirme o cadastro pelo e-mail recebido. Depois, volte ao **SQL Editor**, crie uma nova consulta e execute:
+A conta proprietária já está confirmada e autorizada no projeto atual. O painel também verifica o registro administrativo no banco. Não insira outro administrador sem necessidade. Em uma instalação nova, confirme a conta do proprietário antes de conceder acesso administrativo.
 
-```sql
-insert into public.admin_users (user_id)
-select id
-from auth.users
-where lower(email) = lower('capitaldotrem07@gmail.com')
-on conflict (user_id) do nothing;
-```
+
 
 Esse comando só libera o usuário se a conta com esse e-mail já existir em `auth.users`. Não compartilhe senha nem chave secreta.
 
