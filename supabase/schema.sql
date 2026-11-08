@@ -12,6 +12,10 @@ create table if not exists public.profiles (
   bio text not null default '' check (char_length(bio) <= 500),
   city text not null default '' check (char_length(city) <= 100),
   is_public boolean not null default false,
+  avatar_type text not null default 'default' check (avatar_type in ('default', 'photo', 'character')),
+  avatar_url text,
+  avatar_path text,
+  avatar_data jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -21,7 +25,13 @@ alter table public.profiles add column if not exists account_type text not null 
 alter table public.profiles add column if not exists bio text not null default '';
 alter table public.profiles add column if not exists city text not null default '';
 alter table public.profiles add column if not exists is_public boolean not null default false;
+alter table public.profiles add column if not exists avatar_type text not null default 'default';
+alter table public.profiles add column if not exists avatar_url text;
+alter table public.profiles add column if not exists avatar_path text;
+alter table public.profiles add column if not exists avatar_data jsonb;
 alter table public.profiles alter column account_type set default 'user';
+alter table public.profiles drop constraint if exists profiles_avatar_type_check;
+alter table public.profiles add constraint profiles_avatar_type_check check (avatar_type in ('default', 'photo', 'character'));
 update public.profiles set account_type = 'user' where account_type = 'fan';
 alter table public.profiles drop constraint if exists profiles_account_type_check;
 alter table public.profiles add constraint profiles_account_type_check check (account_type in ('user', 'artist'));
@@ -491,8 +501,16 @@ create table if not exists public.song_comments (
   author_id uuid not null references auth.users(id) on delete cascade,
   author_name text not null default 'Usuário Uai',
   content text not null check (char_length(content) between 1 and 1000),
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  author_avatar_type text not null default 'default' check (author_avatar_type in ('default', 'photo', 'character')),
+  author_avatar_url text,
+  author_avatar_data jsonb
 );
+alter table public.chat_messages add column if not exists author_avatar_type text not null default 'default';
+alter table public.chat_messages add column if not exists author_avatar_url text;
+alter table public.chat_messages add column if not exists author_avatar_data jsonb;
+alter table public.chat_messages drop constraint if exists chat_messages_author_avatar_type_check;
+alter table public.chat_messages add constraint chat_messages_author_avatar_type_check check (author_avatar_type in ('default', 'photo', 'character'));
 
 create table if not exists public.chat_messages (
   id uuid primary key default gen_random_uuid(),
@@ -545,18 +563,29 @@ create policy "chat_messages_insert_self" on public.chat_messages
   for insert to authenticated
   with check (author_id = (select auth.uid()));
 
--- O nome é obtido do perfil salvo, não do texto enviado pelo navegador.
+-- Nome e avatar são obtidos do perfil salvo, nunca confiados ao navegador.
 create or replace function public.set_community_author_name()
-returns trigger language plpgsql security definer set search_path = ''
-as $$
-declare profile_name text;
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $func$
+declare
+  profile_name text;
+  profile_avatar_type text;
+  profile_avatar_url text;
+  profile_avatar_data jsonb;
 begin
-  select nullif(trim(p.display_name), '') into profile_name
+  select nullif(trim(p.display_name), ''), p.avatar_type, p.avatar_url, p.avatar_data
+  into profile_name, profile_avatar_type, profile_avatar_url, profile_avatar_data
   from public.profiles p where p.user_id = new.author_id;
   new.author_name := coalesce(profile_name, 'Usuário Uai');
+  new.author_avatar_type := coalesce(profile_avatar_type, 'default');
+  new.author_avatar_url := profile_avatar_url;
+  new.author_avatar_data := profile_avatar_data;
   return new;
 end;
-$$;
+$func$;
 
 drop trigger if exists song_comments_set_author_name on public.song_comments;
 create trigger song_comments_set_author_name before insert on public.song_comments
