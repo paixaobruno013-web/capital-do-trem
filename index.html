@@ -814,7 +814,7 @@ updateConnectionStatus();
    card.append(avatar,copy);
    container.append(card);
   }
- }catch(error){const message=document.createElement('p');message.className='muted';message.textContent='O diretório será ativado depois da conexão segura com o banco.';container.replaceChildren(message);}
+ }catch(error){const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar o diretório agora. Confira sua conexão e tente novamente.';container.replaceChildren(message);}
 })();
 // Vitrine pública: mostra apenas artistas aprovados pela equipe.
 (async()=>{
@@ -870,7 +870,7 @@ updateConnectionStatus();
    if(links.childElementCount)card.append(links);
    container.append(card);
   }
- }catch(error){const message=document.createElement('p');message.className='muted';message.textContent='A vitrine de artistas será ativada depois da conexão segura com o banco.';container.replaceChildren(message);}
+ }catch(error){const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar a vitrine de artistas agora. Tente novamente em instantes.';container.replaceChildren(message);}
 })();
 // Mural público: somente divulgações aprovadas pela equipe.
 (async()=>{
@@ -889,7 +889,7 @@ updateConnectionStatus();
    card.append(heading,body,date);container.append(card);
   }
  }catch(error){
-  const message=document.createElement('p');message.className='muted';message.textContent='O mural compartilhado será ativado quando a conexão segura com o banco for concluída.';container.replaceChildren(message);
+  const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar o mural compartilhado agora. Tente novamente em instantes.';container.replaceChildren(message);
  }
 })();
 // Agenda pública: exibe somente eventos aprovados no banco compartilhado.
@@ -917,7 +917,7 @@ updateConnectionStatus();
    container.append(card);
   }
  }catch(error){
-  const message=document.createElement('p');message.className='muted';message.textContent='A agenda pública compartilhada será ativada quando a conexão segura com o banco for concluída.';container.replaceChildren(message);
+  const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar a agenda pública agora. Tente novamente em instantes.';container.replaceChildren(message);
  }
 })();
 function safeHttpsUrl(value){try{const url=new URL(value);return url.protocol==='https:'?url.href:null;}catch{return null;}}
@@ -974,7 +974,7 @@ function safeHttpsUrl(value){try{const url=new URL(value);return url.protocol===
    form.addEventListener('submit',async event=>{event.preventDefault();const value=input.value.trim();if(!value)return;submit.disabled=true;try{const item=await api.addSongComment(song.id,value);const row=document.createElement('div');row.className='item';const who=document.createElement('strong');who.textContent=item.author_name||'Usuário Uai';const body=document.createElement('p');body.textContent=item.content;row.append(who,body);commentList.append(row);input.value='';status.textContent='Comentário publicado.';}catch(error){status.textContent=error.message||'Entre na sua conta para comentar.';}finally{submit.disabled=false;}});
    container.append(card);
   }
- }catch(error){container.replaceChildren();const message=document.createElement('p');message.className='muted';message.textContent='O catálogo será carregado quando a atualização do Supabase estiver aplicada e houver músicas aprovadas.';container.append(message);}
+ }catch(error){container.replaceChildren();const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar o catálogo agora. Confira sua conexão e tente novamente. Se não houver músicas aprovadas, elas aparecerão aqui quando a equipe publicar os primeiros lançamentos.';container.append(message);}
 })();
 
 </script><script src="./update.js" defer></script>
