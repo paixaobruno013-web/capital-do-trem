@@ -11,6 +11,12 @@ Use sempre o arquivo completo `supabase/schema.sql` deste repositório:
 
 O SQL usa comandos em inglês, como `create table`, `create policy` e `insert into`. Não traduza esses comandos. Comentários podem estar em português; isso é normal e não afeta a execução.
 
+## Atenção: projeto atual já está ativo
+
+O projeto Supabase deste aplicativo já está conectado e em uso. **Não execute o arquivo completo `supabase/schema.sql` novamente no banco atual**, pois ele é destinado a uma instalação nova. Para o projeto existente, aplique apenas migrations incrementais ainda não executadas e nunca repita uma migration sem conferir o histórico.
+
+Use as instruções abaixo somente para criar um ambiente Supabase novo.
+
 ## Antes de colar pelo celular
 
 1. No Chrome, deixe a tradução automática desativada para o GitHub e para o Supabase.
@@ -35,7 +41,7 @@ Se o celular transformar palavras como `create`, `table`, `policy` ou `reference
 - Não compartilhe chaves secretas, especialmente a chave `service_role`.
 - O SQL cria a estrutura e as regras do banco; ele não cria automaticamente uma conta de administrador.
 - A conta de administrador só deve ser configurada depois que a conta correspondente existir em Authentication e o e-mail estiver confirmado.
-- A conexão real do site depende de configurar as credenciais públicas apropriadas do Supabase no projeto; nunca coloque uma chave secreta no código publicado.
+- O site publicado já usa a URL e a chave publicável do projeto conectado. Nunca coloque uma chave secreta no código publicado.
 
 ## Depois da execução
 
@@ -43,6 +49,6 @@ Se o celular transformar palavras como `create`, `table`, `policy` ou `reference
 2. Verifique se as políticas de segurança (RLS) foram criadas.
 3. Teste cadastro e login antes de liberar interações sociais.
 4. Teste upload e reprodução de músicas com uma conta autorizada.
-5. Não considere o site conectado até que esses testes passem.
+5. O projeto está conectado; ainda assim, não considere cada função validada até que os testes de ponta a ponta passem.
 
 Se aparecer qualquer erro no SQL Editor, pare e guarde a mensagem ou uma captura de tela para corrigirmos antes de tentar novamente.
