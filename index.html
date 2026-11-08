@@ -111,6 +111,51 @@ body.light nav#nav button,body.light nav#nav .nav-chat{color:#222}
 }
 @media(prefers-reduced-motion:reduce){.card{transition:none}}
 
+
+/* Refinamento da nova interface — navegação móvel e hierarquia visual */
+@media(max-width:759px){
+  header{padding:18px 12px 14px}
+  header .logo{width:84px;height:84px}
+  header .brand{font-size:clamp(25px,7vw,34px);letter-spacing:1.5px}
+  header .tag{font-size:13px;margin:2px 0 12px}
+  header .header-action-groups{width:100%;gap:7px}
+  header .header-action-row{max-width:100%;gap:6px}
+  header .header-action-row .btn{min-height:40px;border-radius:10px;font-size:12px;padding:7px 5px}
+  header .header-location-row .btn{width:100%;max-width:440px}
+  #intro-sound-status{max-width:320px;margin-left:auto!important;margin-right:auto!important}
+  nav#nav{height:76px;padding:7px 8px calc(7px + env(safe-area-inset-bottom,0px));gap:5px;scroll-snap-type:x proximity;scrollbar-width:none}
+  nav#nav::-webkit-scrollbar{display:none}
+  nav#nav button,nav#nav .nav-chat{flex:0 0 68px;width:68px;min-width:68px;min-height:58px;padding:5px 3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:12px;font-size:10px;line-height:1.15;white-space:normal;text-align:center;scroll-snap-align:center}
+  nav#nav button:before,nav#nav .nav-chat:before{display:block;width:auto;height:20px;font-size:19px;line-height:20px}
+  nav#nav button[data-page="inicio"]:before{content:"⌂"}
+  nav#nav button[data-page="musicas"]:before{content:"♫"}
+  nav#nav button[data-page="eventos"]:before{content:"▦"}
+  nav#nav button[data-page="artistas"]:before{content:"♛"}
+  nav#nav button[data-page="comunidade"]:before{content:"☻"}
+  nav#nav .nav-chat:before{content:"☏"}
+  nav#nav button[data-page="social"]:before{content:"♥"}
+  nav#nav button[data-page="parcerias"]:before{content:"♕"}
+  nav#nav button[data-page="divulgue"]:before{content:"↗"}
+  nav#nav button[data-page="duvidas"]:before{content:"?"}
+  main{padding:13px 11px 30px}
+  .hero{min-height:200px;padding:20px 17px;border-radius:16px}
+  .hero .social{gap:8px}
+  .hero .social .btn{flex:1;text-align:center;padding:10px 8px;font-size:13px}
+  .grid{grid-template-columns:1fr;gap:9px}
+  #inicio .grid .card{min-height:0;padding:15px}
+  .card{padding:15px;border-radius:14px}
+  .page h2{font-size:22px;line-height:1.2}
+}
+@media(min-width:760px){
+  nav#nav button,nav#nav .nav-chat{transition:background .18s ease,border-color .18s ease,transform .18s ease}
+  nav#nav button:hover,nav#nav .nav-chat:hover{background:#171717;border-color:#3a3a3a;transform:translateX(2px)}
+  nav#nav button.active:hover{background:#ed1c24;border-color:#ff3345}
+  header .header-action-row .btn{min-height:40px}
+}
+body.light nav#nav{box-shadow:8px 0 28px rgba(0,0,0,.06)}
+body.light .hero{background:linear-gradient(100deg,rgba(255,255,255,.96),rgba(255,255,255,.82)),radial-gradient(ellipse at 80% 20%,rgba(237,28,36,.12),transparent 55%),linear-gradient(135deg,#fff,#f2eeee 62%,#ffe8e9)}
+body.light nav#nav button.active{color:#fff}
+
 </style></head>
 <body>
 <script>
