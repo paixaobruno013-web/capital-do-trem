@@ -211,12 +211,20 @@ create trigger profiles_protect_account_type
   before insert or update of account_type on public.profiles
   for each row execute function public.protect_profile_account_type();
 
+-- Configurações públicas do site; escrita exclusiva da equipe administrativa.
+create table if not exists public.site_settings (
+  setting_key text primary key,
+  setting_value text not null default '',
+  updated_at timestamptz not null default now()
+);
+
 -- Ativar proteção por linha em todas as tabelas.
 alter table public.profiles enable row level security;
 alter table public.admin_users enable row level security;
 alter table public.events enable row level security;
 alter table public.artists enable row level security;
 alter table public.posts enable row level security;
+alter table public.site_settings enable row level security;
 
 -- Permissões mínimas para a API; RLS continua controlando cada linha.
 revoke all privileges on all tables in schema public from anon, authenticated;
@@ -250,6 +258,21 @@ drop policy if exists "profiles_read_public" on public.profiles;
 create policy "profiles_read_public" on public.profiles
   for select to anon, authenticated
   using (is_public = true);
+
+-- Configurações podem ser lidas pelo app; somente administradores podem alterá-las.
+drop policy if exists "site_settings_public_read" on public.site_settings;
+create policy "site_settings_public_read" on public.site_settings
+  for select to anon, authenticated using (true);
+drop policy if exists "site_settings_admin_insert" on public.site_settings;
+create policy "site_settings_admin_insert" on public.site_settings
+  for insert to authenticated with check ((select private.is_admin()));
+drop policy if exists "site_settings_admin_update" on public.site_settings;
+create policy "site_settings_admin_update" on public.site_settings
+  for update to authenticated
+  using ((select private.is_admin()))
+  with check ((select private.is_admin()));
+drop policy if exists "site_settings_admin_delete" on public.site_settings
+  for delete to authenticated using ((select private.is_admin()));
 
 -- A tabela admin_users não recebe políticas para usuários comuns:
 -- somente operações administrativas pelo painel seguro/SQL podem alterá-la.
