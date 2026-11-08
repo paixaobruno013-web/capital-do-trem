@@ -979,5 +979,20 @@ function safeHttpsUrl(value){try{const url=new URL(value);return url.protocol===
  }catch(error){container.replaceChildren();const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar o catálogo agora. Confira sua conexão e tente novamente. Se não houver músicas aprovadas, elas aparecerão aqui quando a equipe publicar os primeiros lançamentos.';container.append(message);}
 })();
 
-</script><script src="./update.js" defer></script>
+</script>
+<script type="module">
+(async()=>{
+ try{
+  const auth=await import('./supabase/auth.js');
+  auth.initSupabase();
+  const branding=await auth.getPublicBranding();
+  const safeUrl=value=>typeof value==='string'&&value.startsWith('https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/')?value:'';
+  const profile=safeUrl(branding.profileImageUrl),opening=safeUrl(branding.openingImageUrl);
+  if(profile){const logo=document.getElementById('site-logo');if(logo)logo.src=profile;}
+  if(opening){const intro=document.querySelector('.intro-smoke__brand img');if(intro)intro.src=opening;}
+ }catch(error){console.warn('Identidade visual padrão mantida.',error);}
+})();
+</script>
+
+<script src="./update.js" defer></script>
 </body></html>
