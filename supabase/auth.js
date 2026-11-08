@@ -71,6 +71,15 @@ export async function sendPasswordReset(email) {
   return data;
 }
 
+export async function updateAccountPassword(newPassword) {
+  const supabase = initSupabase();
+  const cleanPassword = String(newPassword || '');
+  if (cleanPassword.length < 8) throw new Error('A nova senha precisa ter pelo menos 8 caracteres.');
+  const { data, error } = await supabase.auth.updateUser({ password: cleanPassword });
+  if (error) throw error;
+  return data;
+}
+
 export async function getCurrentSession() {
   const supabase = initSupabase();
   const { data, error } = await supabase.auth.getSession();
