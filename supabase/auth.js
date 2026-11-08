@@ -2,7 +2,17 @@
 // Este módulo só deve ser importado pela interface depois de configurar os dados públicos.
 // Nunca inserir a chave service_role neste arquivo.
 
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+// O aplicativo pode ser aberto dentro de navegadores móveis com bloqueios pontuais de CDN.
+let createClient;
+try {
+  ({ createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'));
+} catch (primaryError) {
+  try {
+    ({ createClient } = await import('https://esm.sh/@supabase/supabase-js@2'));
+  } catch (fallbackError) {
+    throw new Error('Não foi possível carregar a biblioteca segura de autenticação. Verifique a conexão e tente novamente.');
+  }
+}
 
 const SUPABASE_URL = 'https://zmjxkfjzrbbxyvgkwirv.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_FLbDg6UCePQHb7s0wkywng_J9pNKlsP';
@@ -51,6 +61,18 @@ export async function signInAccount({ email, password }) {
   const { data, error } = await supabase.auth.signInWithPassword({
     email: email.trim(),
     password
+  });
+  if (error) throw error;
+  return data;
+}
+
+export async function signInWithGoogle() {
+  const supabase = initSupabase();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: new URL('./conta.html', window.location.href).toString()
+    }
   });
   if (error) throw error;
   return data;
@@ -109,6 +131,77 @@ export async function uploadMyMedia(file, category) {
   const { data } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
   if (!data?.publicUrl) throw new Error('Não foi possível obter o endereço da imagem enviada.');
   return data.publicUrl;
+}
+
+// Avatar da conta: foto otimizada no bucket de mídia ou personagem configurável.
+export async function getMyAvatar() {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para acessar seu avatar.');
+  const { data, error } = await supabase.from('profiles')
+    .select('avatar_type, avatar_url, avatar_path, avatar_data')
+    .eq('user_id', user.id).single();
+  if (error) throw error;
+  return data;
+}
+
+export async function saveMyAvatar({ type, file = null, character = null }) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para salvar seu avatar.');
+  if (!['photo', 'character', 'default'].includes(type)) throw new Error('Tipo de avatar inválido.');
+
+  const { data: current, error: currentError } = await supabase.from('profiles')
+    .select('avatar_path').eq('user_id', user.id).single();
+  if (currentError) throw currentError;
+
+  let avatarUrl = null;
+  let avatarPath = null;
+  let avatarData = null;
+  if (type === 'photo') {
+    if (!(file instanceof File)) throw new Error('Escolha uma foto antes de salvar.');
+    const allowed = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+    if (!allowed[file.type] || file.size < 1 || file.size > 5 * 1024 * 1024) {
+      throw new Error('Use uma foto JPG, PNG ou WebP de até 5 MB.');
+    }
+    avatarPath = user.id + '/avatar/' + crypto.randomUUID() + '.' + allowed[file.type];
+    const { error: uploadError } = await supabase.storage.from('capital-do-trem-media')
+      .upload(avatarPath, file, { contentType: file.type, cacheControl: '3600', upsert: false });
+    if (uploadError) throw uploadError;
+    const { data } = supabase.storage.from('capital-do-trem-media').getPublicUrl(avatarPath);
+    avatarUrl = data?.publicUrl || null;
+    if (!avatarUrl) {
+      await supabase.storage.from('capital-do-trem-media').remove([avatarPath]);
+      throw new Error('Não foi possível gerar o endereço da foto.');
+    }
+  } else if (type === 'character') {
+    if (!character || typeof character !== 'object') throw new Error('Configure seu personagem antes de salvar.');
+    const allowed = {
+      gender: ['male', 'female'],
+      skin: ['#8d5524', '#f1c27d', '#c68642', '#5a3825', '#e0ac69'],
+      hair: ['#171313', '#5b321d', '#d6a84b', '#a52a2a', '#777777'],
+      shirt: ['#ed1c24', '#111111', '#eeeeee', '#2465a8', '#21834a', '#7a42a6']
+    };
+    for (const [key, values] of Object.entries(allowed)) {
+      if (!values.includes(character[key])) throw new Error('Uma das opções do personagem é inválida.');
+    }
+    avatarData = { gender: character.gender, skin: character.skin, hair: character.hair, shirt: character.shirt };
+  }
+
+  const { error: updateError } = await supabase.from('profiles').update({
+    avatar_type: type, avatar_url: avatarUrl, avatar_path: avatarPath, avatar_data: avatarData
+  }).eq('user_id', user.id);
+  if (updateError) {
+    if (avatarPath) await supabase.storage.from('capital-do-trem-media').remove([avatarPath]);
+    throw updateError;
+  }
+  if (current.avatar_path && current.avatar_path !== avatarPath) {
+    const { error: removeError } = await supabase.storage.from('capital-do-trem-media').remove([current.avatar_path]);
+    if (removeError) console.warn('Avatar antigo mantido no armazenamento:', removeError.message);
+  }
+  return { avatar_type: type, avatar_url: avatarUrl, avatar_path: avatarPath, avatar_data: avatarData };
 }
 
 // Perfil público do artista — sempre limitado ao usuário autenticado pelas políticas RLS.
@@ -207,6 +300,17 @@ export async function getMyEvents() {
 
 // Verificação e moderação administrativa. O banco confirma a função do usuário;
 // a interface não concede privilégios por conta própria.
+// Configura a primeira conta administradora após o cadastro e confirmação do e-mail autorizado.
+export async function bootstrapFirstAdmin() {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na conta proprietária para configurar o primeiro administrador.');
+  const { data, error } = await supabase.rpc('bootstrap_first_admin');
+  if (error) throw error;
+  return data === true;
+}
+
 export async function isCurrentUserAdmin() {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -252,7 +356,7 @@ export async function uploadMySong({ file, title, artistName, description = '' }
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para enviar uma música.');
-  if (!(await isCurrentUserAdmin())) throw new Error('O envio de músicas é exclusivo da equipe autorizada do Capital do Trem.');
+  // Usuários autenticados podem enviar faixas para moderação; o RLS só aceita status=pending.
   if (!(file instanceof File)) throw new Error('Selecione um arquivo de áudio.');
   const mime = file.type.toLowerCase();
   const allowed = ['audio/mpeg','audio/mp4','audio/aac','audio/wav','audio/x-wav','audio/ogg'];
@@ -476,7 +580,7 @@ export async function addSongComment(songId, content) {
 export async function getChatMessages(limit = 60) {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('chat_messages')
-    .select('id, author_id, author_name, content, created_at')
+    .select('id, author_id, author_name, author_avatar_type, author_avatar_url, author_avatar_data, content, created_at')
     .order('created_at', { ascending: false }).limit(Math.min(Math.max(Number(limit) || 60, 1), 100));
   if (error) throw error;
   // Busca as mensagens mais recentes e as apresenta em ordem cronológica.
@@ -492,7 +596,7 @@ export async function sendChatMessage(content) {
   if (!cleanContent || cleanContent.length > 1000) throw new Error('A mensagem deve ter entre 1 e 1.000 caracteres.');
   const { data, error } = await supabase.from('chat_messages')
     .insert({ author_id: user.id, content: cleanContent })
-    .select('id, author_id, author_name, content, created_at').single();
+    .select('id, author_id, author_name, author_avatar_type, author_avatar_url, author_avatar_data, content, created_at').single();
   if (error) throw error;
   return data;
 }
@@ -514,7 +618,7 @@ export async function getRecentChatMessagesForAdmin(limit = 100) {
   const supabase = initSupabase();
   if (!(await isCurrentUserAdmin())) throw new Error('Acesso administrativo não autorizado.');
   const { data, error } = await supabase.from('chat_messages')
-    .select('id, author_id, author_name, content, created_at')
+    .select('id, author_id, author_name, author_avatar_type, author_avatar_url, author_avatar_data, content, created_at')
     .order('created_at', { ascending: false })
     .limit(Math.min(Math.max(Number(limit) || 100, 1), 200));
   if (error) throw error;

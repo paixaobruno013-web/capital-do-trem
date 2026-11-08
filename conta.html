@@ -59,7 +59,7 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 <section class="card">
 <h2>Bem-vindo ao Capital do Trem</h2>
 <p class="muted">Um espaço para artistas e Usuários Uai criarem seus perfis, descobrirem músicas e participarem da comunidade.</p>
-<div id="setup-message" class="notice" role="status">O cadastro ainda não está ativado. A conexão segura com o serviço de contas precisa ser configurada antes de receber usuários.</div>
+<div id="setup-message" class="notice" role="status">Preparando conexão segura com o serviço de contas...</div>
 </section>
 <section class="card" id="basic-profile-panel" hidden aria-labelledby="basic-profile-title">
 <h2 id="basic-profile-title">👤 Meu perfil na comunidade</h2>
@@ -94,8 +94,8 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 
 </div>
 <section class="card" id="admin-songs-panel" hidden aria-labelledby="admin-songs-title">
-<h3 id="admin-songs-title">🎵 Envio e histórico de músicas — equipe</h3>
-<p class="muted">Área exclusiva da equipe autorizada. Envie arquivos em MP3, M4A, AAC, WAV ou OGG (até 50 MB). Cada envio fica privado até a aprovação para o catálogo público.</p>
+<h3 id="admin-songs-title">🎵 Enviar música para análise</h3>
+<p class="muted">Qualquer conta conectada pode enviar uma música própria para avaliação. Envie arquivos MP3, M4A, AAC, WAV ou OGG (até 50 MB). A faixa fica privada até a aprovação da equipe.</p>
 <form id="artist-song-form">
 <label for="song-title">Nome da música</label><input id="song-title" maxlength="120" required>
 <label for="song-artist-name">Nome artístico</label><input id="song-artist-name" maxlength="100" required>
@@ -118,6 +118,8 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 <button type="button" class="secondary" id="tab-reset" aria-pressed="false" disabled>Recuperar senha</button>
 </div>
 <form id="account-form">
+<button type="button" id="google-sign-in" class="secondary" disabled>Continuar com Google</button>
+<p class="muted">Ou entre com seu e-mail e senha:</p>
 <div id="name-wrap" hidden>
 <label for="display-name">Nome artístico ou nome de exibição</label>
 <input id="display-name" name="display-name" maxlength="80" autocomplete="name" disabled>
@@ -196,7 +198,8 @@ const passwordToggle=document.getElementById('toggle-password');
 passwordToggle.addEventListener('click',()=>{const visible=passwordInput.type==='password';passwordInput.type=visible?'text':'password';passwordToggle.textContent=visible?'Ocultar':'Mostrar';passwordToggle.setAttribute('aria-pressed',String(visible));});
 const form=document.getElementById('account-form');
 const status=document.getElementById('account-status');
-const controls=[...form.querySelectorAll('input,button,select,textarea'),...document.querySelectorAll('.tabs button')];
+const googleSignInButton=document.getElementById('google-sign-in');
+const controls=[...form.querySelectorAll('input,button,select,textarea'),...document.querySelectorAll('.tabs button'),googleSignInButton];
 const accessPanel=document.getElementById('access-panel');
 const profilePanel=document.getElementById('profile-panel');
 const basicProfilePanel=document.getElementById('basic-profile-panel');
@@ -270,11 +273,10 @@ const songStatus=document.getElementById('song-status');
 const mySongs=document.getElementById('my-songs');
 const songPanel=document.getElementById('admin-songs-panel');
 async function loadAdminSongAccess(){
- try{
-  const allowed=await auth.isCurrentUserAdmin();
-  songPanel.hidden=!allowed;
-  if(allowed)await loadMySongs();
- }catch(error){songPanel.hidden=true;}
+ // Envio e histórico pertencem a qualquer conta autenticada.
+ // Aprovação e publicação continuam exclusivas da equipe administrativa.
+ songPanel.hidden=false;
+ await loadMySongs();
 }
 async function loadMySongs(){
  try{
@@ -311,6 +313,14 @@ async function loadArtistProfile(){
 function showSession(session){
   if(session?.user){
     activeUserEmail=session.user.email||null;
+    // A RPC valida novamente o e-mail no banco e só permite ocupar a primeira vaga administrativa.
+    if(activeUserEmail&&activeUserEmail.toLowerCase()==='capitaldotrem07@gmail.com'&&auth?.bootstrapFirstAdmin){
+      auth.bootstrapFirstAdmin().then(isAdmin=>{
+        if(isAdmin)sessionStatus.textContent='Conta proprietária reconhecida como administradora do Capital do Trem.';
+      }).catch(error=>{
+        console.warn('Configuração inicial de administrador ainda não concluída:',error?.message||error);
+      });
+    }
     if(isAccountLocked()){
       profilePanel.hidden=true;accessPanel.hidden=true;basicProfilePanel.hidden=true;eventPanel.hidden=true;postPanel.hidden=true;
       lockPanel.hidden=false;window.clearTimeout(lockTimer);return;
@@ -339,7 +349,7 @@ async function loadBasicProfile(){
   const profile=await auth.getMyBasicProfile();
   document.getElementById('basic-display-name').value=profile?.display_name||'';
   document.getElementById('basic-account-type').value=profile?.account_type||'user';
-  artistProfileArea.hidden=(profile?.account_type||'user')!=='artist';
+  // A ficha artística é uma solicitação moderada, disponível a qualquer usuário.\n  artistProfileArea.hidden=false;
   document.getElementById('basic-city').value=profile?.city||'';
   document.getElementById('basic-bio').value=profile?.bio||'';
   document.getElementById('basic-public').checked=profile?.is_public===true;
@@ -357,7 +367,7 @@ basicProfileForm.addEventListener('submit',async event=>{
    bio:document.getElementById('basic-bio').value,
    is_public:document.getElementById('basic-public').checked
   });
-  artistProfileArea.hidden=document.getElementById('basic-account-type').value!=='artist';
+  artistProfileArea.hidden=false;
   basicProfileStatus.textContent='Perfil salvo! '+(document.getElementById('basic-public').checked?'Ele poderá aparecer no diretório público.':'Ele ficará visível somente para você.');
  }catch(error){basicProfileStatus.textContent=error?.message||'Não foi possível salvar seu perfil.';}
  finally{button.disabled=false;}
@@ -436,8 +446,17 @@ try{
   auth.watchAuthChanges(({session})=>showSession(session));
   showSession(await auth.getCurrentSession());
 }catch(error){
-  setupMessage.textContent='Cadastro ainda indisponível: falta configurar a URL e a chave pública do projeto Supabase e concluir os testes de segurança. Nenhum dado foi enviado.';
+  controls.forEach(control=>control.disabled=true);
+  setupMessage.textContent='Não foi possível iniciar o cadastro: '+(error?.message||'falha ao carregar o serviço de autenticação')+'. Atualize a página e tente novamente. Nenhum cadastro foi enviado.';
+  console.error('Falha ao iniciar autenticação do Capital do Trem:',error);
 }
+googleSignInButton.addEventListener('click',async()=>{
+ if(!auth){status.textContent='O serviço de contas ainda não está disponível.';return;}
+ googleSignInButton.disabled=true;status.textContent='Abrindo a autenticação segura do Google...';
+ try{await auth.signInWithGoogle();}
+ catch(error){status.textContent=error?.message||'Não foi possível iniciar o acesso com Google.';googleSignInButton.disabled=false;}
+});
+
 let mode='login';
 const tabs={
  login:document.getElementById('tab-login'),

@@ -36,20 +36,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
  .connection-status{margin:0 0 12px;padding:11px 13px;border:1px solid var(--red);border-radius:10px;background:var(--panel2);color:var(--fg)}.connection-status[hidden]{display:none}
  .skip-link{position:absolute;left:12px;top:-60px;z-index:1000;background:var(--red);color:#fff;padding:12px 16px;border-radius:9px;font-weight:800;text-decoration:none}.skip-link:focus{top:12px}
 /* Abertura cinematográfica: fumaça leve atravessando a marca. */
-.intro-smoke{position:fixed;inset:0;z-index:9998;display:grid;place-items:center;overflow:hidden;background:#000;pointer-events:none;animation:intro-screen-out 7s ease-in-out forwards}
-.intro-smoke__brand{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;opacity:0;animation:intro-brand-in 6.7s ease-out forwards}
-.intro-smoke__brand img{width:clamp(92px,24vw,150px);height:auto;max-height:150px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(255,255,255,.18))}
-.intro-smoke__brand strong{color:#fff;font-size:clamp(23px,6vw,38px);font-weight:950;letter-spacing:clamp(2px,1vw,5px);text-shadow:0 2px 18px #777}
-.intro-smoke__brand span{color:#c7c7c7;font-size:12px;letter-spacing:2px}
-.intro-smoke__signature{position:absolute;z-index:9999;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:6cm;max-width:calc(100vw - 24px);min-height:38px;padding:7px 5px;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;font-size:18px;font-weight:1000;letter-spacing:2.2px;line-height:1.2;text-shadow:0 1px 3px #000,0 0 10px #ed1c24,0 0 22px #ed1c24;background:rgba(0,0,0,.94);border:2px solid #ed1c24;border-radius:9px;box-shadow:0 0 10px rgba(237,28,36,.9),0 0 24px rgba(237,28,36,.55);opacity:1;visibility:visible;pointer-events:none}
-.intro-smoke__cloud{position:absolute;z-index:1;left:-65%;top:22%;width:125%;height:58%;opacity:0;filter:blur(22px);background:radial-gradient(ellipse at 18% 52%,rgba(225,225,225,0) 0 12%,rgba(225,225,225,.35) 22%,rgba(190,190,190,.22) 34%,transparent 53%),radial-gradient(ellipse at 38% 35%,rgba(245,245,245,.32) 0 9%,rgba(190,190,190,.2) 25%,transparent 49%),radial-gradient(ellipse at 60% 62%,rgba(220,220,220,.28) 0 12%,rgba(160,160,160,.16) 29%,transparent 52%);animation:intro-smoke-pass 6.45s cubic-bezier(.2,.65,.3,1) forwards}
-.intro-smoke__cloud:before,.intro-smoke__cloud:after{content:"";position:absolute;inset:-18% 8%;border-radius:50%;background:radial-gradient(ellipse,rgba(210,210,210,.2),transparent 68%);filter:blur(28px)}
-.intro-smoke__cloud:after{inset:12% -8% 0 28%;background:radial-gradient(ellipse,rgba(245,245,245,.18),transparent 70%)}
+.intro-smoke{position:fixed;inset:0;z-index:9998;display:block;overflow:hidden;background:#000;opacity:1;visibility:visible;transition:opacity .45s ease,visibility .45s ease}
+.intro-smoke.is-finished{opacity:0;visibility:hidden}
+.intro-smoke__cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center}
+.intro-smoke__signature{position:absolute;z-index:2;left:50%;bottom:calc(66px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:clamp(112px,30vw,170px);height:auto;max-height:74px;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,.95));pointer-events:none}
+.intro-smoke__loading{position:absolute;z-index:3;left:12%;right:12%;bottom:calc(22px + env(safe-area-inset-bottom,0px));display:grid;gap:8px;text-align:center;color:#fff;font:700 13px/1.2 system-ui,sans-serif;text-shadow:0 1px 4px #000}
+.intro-smoke__track{height:7px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.35);box-shadow:0 1px 5px #000}
+.intro-smoke__progress{display:block;width:0;height:100%;border-radius:inherit;background:#ed1c24;transition:width .25s ease}
 .intro-smoke-skip{display:none!important}
-@keyframes intro-smoke-pass{0%{transform:translate3d(-12%,18%,0) scale(.82);opacity:0}15%{opacity:.88}72%{opacity:.7}100%{transform:translate3d(150%,-12%,0) scale(1.2);opacity:0}}
-@keyframes intro-brand-in{0%,18%{opacity:0;transform:translateY(10px) scale(.97)}42%,78%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-5px) scale(1.02)}}
-@keyframes intro-screen-out{0%,78%{opacity:1}100%{opacity:0;visibility:hidden}}
-@media(prefers-reduced-motion:reduce){.intro-smoke{display:none!important}}
+@media(prefers-reduced-motion:reduce){.intro-smoke{transition:none}}
 
 
 /* Identidade LED vermelha: brilho controlado para destacar sem cansar a leitura. */
@@ -111,6 +106,60 @@ body.light nav#nav button,body.light nav#nav .nav-chat{color:#222}
 }
 @media(prefers-reduced-motion:reduce){.card{transition:none}}
 
+/* Comunidade mobile em tela cheia: navegação inferior permanece acessível. */
+@media(max-width:759px){
+ body.community-open{padding-bottom:0;overflow:hidden}
+ body.community-open header{display:none}
+ body.community-open main{margin:0;padding:0}
+ body.community-open #comunidade.page.active{position:fixed;z-index:450;inset:0 0 calc(68px + env(safe-area-inset-bottom,0px));display:block;overflow-y:auto;overscroll-behavior:contain;width:100%;min-height:0;padding:calc(14px + env(safe-area-inset-top,0px)) 0 22px;background:var(--bg)}
+ body.community-open #comunidade>.card{width:100%;margin:0 0 10px;padding:18px 16px!important;border-left:0!important;border-right:0!important;border-radius:0!important}
+ body.community-open #community-profiles{width:100%}
+ body.community-open #community-profiles>.item{border-radius:0;margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px}
+}
+
+
+
+/* Interface Capital do Trem — navegação adaptada sem remover as páginas antigas. */
+.app-brand-line{display:flex;align-items:center;justify-content:center;gap:14px;max-width:1100px;margin:0 auto}
+.profile-shortcut{display:block;flex:0 0 auto;border-radius:50%;line-height:0}
+.app-brand-copy{text-align:left}
+.app-brand-copy .brand{margin:0}
+.app-brand-copy .tag{margin:3px 0 0}
+.app-header .logo{width:68px;height:68px;object-fit:cover;border-radius:50%;border:2px solid var(--red);background:#000;box-shadow:0 0 16px rgba(237,28,36,.25)}
+.app-header .theme{position:static;flex:0 0 auto;margin-left:auto}
+.app-bottom-nav,.app-menu-backdrop{display:none}
+@media(max-width:759px){
+ body{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+ .app-header{padding:12px 14px 10px;text-align:left;border-bottom:1px solid rgba(237,28,36,.45);background:#050505}
+ .app-brand-line{justify-content:flex-start;gap:11px}
+ .app-header .logo{width:54px;height:54px}
+ .app-brand-copy{min-width:0}
+ .app-brand-copy .brand{font-size:clamp(19px,5vw,25px);letter-spacing:1px;white-space:nowrap}
+ .app-brand-copy .tag{font-size:11px}
+ .app-header .theme{font-size:11px;padding:7px 9px}
+ .app-header .header-action-groups,.app-header #intro-sound-status,.app-header .header-location-row{display:none}
+ nav#nav{display:none}
+ main{padding:12px 12px 24px}
+ .hero{min-height:190px;padding:18px;border-radius:14px}
+ .hero h2{font-size:clamp(23px,6vw,31px)}
+ .card{border-radius:14px}
+ .app-bottom-nav{position:fixed;z-index:520;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;padding:7px 5px calc(7px + env(safe-area-inset-bottom,0px));background:rgba(5,5,5,.97);border-top:1px solid #3b1719;backdrop-filter:blur(14px)}
+ .app-bottom-nav button{min-width:0;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 2px;border:0;border-radius:10px;background:transparent;color:#cfcfcf;font-size:10px;font-weight:750}
+ .app-bottom-nav button span{font-size:19px;line-height:1.15}
+ .app-bottom-nav button.active{background:rgba(237,28,36,.17);color:#fff;box-shadow:inset 0 -2px 0 var(--red)}
+ .app-menu-backdrop{position:fixed;z-index:700;inset:0;display:block;background:rgba(0,0,0,.72);backdrop-filter:blur(5px)}
+ .app-menu-backdrop[hidden]{display:none}
+ .app-menu-sheet{position:absolute;right:0;top:0;bottom:0;width:min(88vw,390px);overflow:auto;padding:calc(18px + env(safe-area-inset-top,0px)) 16px calc(24px + env(safe-area-inset-bottom,0px));background:#090909;border-left:2px solid var(--red);box-shadow:-16px 0 45px #0009}
+ .app-menu-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid #3a2021;letter-spacing:1.5px}
+ .app-menu-head button{width:40px;height:40px;border:1px solid #444;border-radius:50%;background:#171717;color:#fff}
+ .app-menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+ .app-menu-grid button,.app-menu-grid a{min-height:48px;display:flex;align-items:center;justify-content:flex-start;padding:11px 10px;border:1px solid #303030;border-radius:11px;background:#141414;color:#fff;text-decoration:none;font-size:12px;font-weight:750}
+ .app-menu-grid button:active,.app-menu-grid a:active{border-color:var(--red);background:#251012}
+ body.menu-open{overflow:hidden}
+ body.community-open .app-bottom-nav{z-index:520}
+}
+@media(min-width:760px){.app-bottom-nav,.app-menu-backdrop{display:none!important}}
+
 </style></head>
 <body>
 <script>
@@ -120,17 +169,41 @@ body.light nav#nav button,body.light nav#nav .nav-chat{color:#222}
  if(!show)document.documentElement.classList.add('intro-smoke-skip');
 })();
 </script>
-<div class="intro-smoke" id="intro-smoke" aria-hidden="true">
- <div class="intro-smoke__cloud"></div>
- <div class="intro-smoke__brand"><img src="marca.svg" alt=""><strong>CAPITAL DO TREM</strong><span>A MÚSICA DA NOSSA QUEBRADA!</span></div>
- <div class="intro-smoke__signature">BRUNO CHOCK</div>
+<div class="intro-smoke" id="intro-smoke" role="status" aria-label="Carregando Capital do Trem">
+ <img class="intro-smoke__cover" src="./assets/capital-do-trem-cover.jpg" alt="Capital do Trem — Aqui a música não para!" fetchpriority="high">
+ <img class="intro-smoke__signature" src="./assets/bruno-chock-logo.webp" alt="Bruno Chock">
+ <div class="intro-smoke__loading"><span id="intro-loading-label">Preparando o Capital do Trem…</span><span class="intro-smoke__track"><span class="intro-smoke__progress" id="intro-loading-progress"></span></span></div>
 </div>
+<script>
+(function(){
+ const screen=document.getElementById('intro-smoke');
+ const bar=document.getElementById('intro-loading-progress');
+ const label=document.getElementById('intro-loading-label');
+ if(!screen||!bar||!label)return;
+ let progress=8,loaded=false;
+ const paint=(value,message)=>{progress=Math.max(progress,Math.min(100,value));bar.style.width=progress+'%';bar.parentElement.setAttribute('aria-valuenow',String(progress));label.textContent=message;};
+ if(document.readyState!=='loading')paint(35,'Carregando recursos…');
+ else document.addEventListener('DOMContentLoaded',()=>paint(35,'Carregando recursos…'),{once:true});
+ window.addEventListener('load',async()=>{
+  paint(78,'Finalizando a abertura…');
+  const images=[...screen.querySelectorAll('img')];
+  await Promise.all(images.map(img=>img.decode?img.decode().catch(()=>{}):Promise.resolve()));
+  loaded=true;paint(100,'Tudo pronto!'); 
+  window.setTimeout(()=>screen.classList.add('is-finished'),320);
+ },{once:true});
+ if(document.readyState==='complete'&&loaded===false){
+  window.setTimeout(()=>{if(!screen.classList.contains('is-finished'))paint(78,'Finalizando a abertura…');},0);
+ }
+})();
+</script>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
-<header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem</h1><p class="tag">A música da nossa quebrada!</p><div class="header-action-groups"><div class="header-action-row"><a class="btn alt" href="./conta.html">👤 Minha conta</a><a class="btn alt" href="./mensagens.html">✉️ Minhas conversas</a><a class="btn alt" href="./avatar.html">🎭 Meu avatar</a><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button></div><div class="header-action-row"><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn alt" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a></div><div class="header-action-row"><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som de entrada: ligado</button></div></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Vinheta de 7 segundos • toque na tela para ouvir</p><div class="header-location-row"><button class="btn alt" id="quick-location" type="button">📍 Logo ali Uai - Localização</button></div></header>
+<header class="app-header"><div class="app-brand-line"><a class="profile-shortcut" href="./conta.html" aria-label="Abrir meu perfil"><img class="logo" id="site-logo" src="./assets/capital-do-trem-avatar.jpg" alt="Logo Capital do Trem"></a><div class="app-brand-copy"><h1 class="brand">Capital do Trem</h1><p class="tag">A música da nossa quebrada!</p></div><button class="theme" id="theme">☀️ Claro</button></div><div class="header-action-groups"><div class="header-action-row"><a class="btn alt" href="./conta.html">👤 Minha conta</a><a class="btn alt" href="./mensagens.html">✉️ Minhas conversas</a><a class="btn alt" href="./avatar.html">🎭 Meu avatar</a><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button></div><div class="header-action-row"><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn alt" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a></div><div class="header-action-row"><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som de entrada: ligado</button></div></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Vinheta de 7 segundos • toque na tela para ouvir</p><div class="header-location-row"><button class="btn alt" id="quick-location" type="button">📍 Logo ali Uai - Localização</button></div></header>
 <main id="main-content" tabindex="-1">
 <p id="connection-status" class="connection-status" role="status" aria-live="polite" hidden></p>
 <section class="hero"><h2>Conectando música, cultura e comunidade.</h2><p class="muted">Um espaço para valorizar artistas, divulgar lançamentos, compartilhar eventos e fortalecer iniciativas da nossa quebrada.</p><div class="social"><button class="btn" data-go="musicas">Explorar músicas</button><button class="btn alt" data-go="divulgue">Divulgar meu trabalho</button></div></section>
 <nav id="nav" aria-label="Navegação principal"><button class="active" data-page="inicio" aria-controls="inicio" aria-current="page">Início</button><button data-page="musicas" aria-controls="musicas">Músicas</button><button data-page="eventos" aria-controls="eventos">Eventos</button><button data-page="artistas" aria-controls="artistas">Artistas</button><button data-page="comunidade" aria-controls="comunidade">Comunidade</button><a class="nav-chat" href="./bate-papo.html" style="white-space:nowrap;border:1px solid var(--red);border-radius:30px;padding:9px 14px;background:var(--panel);color:var(--fg);text-decoration:none">💬 Bate-papo</a><button data-page="social" aria-controls="social">Ação social</button><button data-page="parcerias" aria-controls="parcerias">Parcerias</button><button data-page="divulgue" aria-controls="divulgue">Divulgue</button><button data-page="duvidas" aria-controls="duvidas">Dúvidas</button></nav>
+<div class="app-bottom-nav" id="app-bottom-nav" aria-label="Atalhos principais"><button type="button" data-open-page="inicio" class="active" aria-current="page"><span>⌂</span>Início</button><button type="button" data-open-page="musicas"><span>♫</span>Músicas</button><button type="button" data-open-page="eventos"><span>📍</span>Eventos</button><button type="button" data-open-page="comunidade"><span>♧</span>Comunidade</button><button type="button" id="app-menu-toggle" aria-expanded="false" aria-controls="app-menu"><span>☰</span>Mais</button></div>
+<div class="app-menu-backdrop" id="app-menu" hidden><section class="app-menu-sheet" role="dialog" aria-modal="true" aria-label="Menu do Capital do Trem"><div class="app-menu-head"><strong>CAPITAL DO TREM</strong><button type="button" id="app-menu-close" aria-label="Fechar menu">✕</button></div><div class="app-menu-grid"><button type="button" data-open-page="artistas">🎤 Artistas</button><button type="button" data-open-page="social">❤️ Ação social</button><button type="button" data-open-page="parcerias">🤝 Parcerias</button><button type="button" data-open-page="divulgue">📣 Divulgue</button><button type="button" data-open-page="duvidas">❔ Dúvidas</button><a href="./bate-papo.html">💬 Bate-papo</a><a href="./conta.html">👤 Minha conta / Perfil</a><a href="./mensagens.html">✉️ Minhas conversas</a><a href="./avatar.html">🎭 Meu avatar</a><button type="button" data-open-action="quick-location">📍 Logo ali Uai</button><button type="button" data-open-action="instalar-app">＋ Instalar aplicativo</button><button type="button" data-open-action="compartilhar-site">↗ Compartilhar</button><button type="button" data-open-action="intro-sound-toggle">🔊 Som de entrada</button><a href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a></div><p class="muted">A música da nossa quebrada!</p></section></div>
 <section class="page active" id="inicio"><div class="grid"><article class="card"><h3>🎧 Música independente</h3><p class="muted">Espaço para lançamentos, artistas e sons da cena.</p></article><article class="card"><h3>📅 Cultura e eventos</h3><p class="muted">Divulgação de encontros, bailes e atividades culturais.</p></article><article class="card"><h3>🤝 Comunidade</h3><p class="muted">Ações sociais, parcerias e informação para fortalecer a comunidade.</p></article></div><div class="card"><h3>📣 Mural da comunidade</h3><p class="muted">Publicações aprovadas pela equipe do Capital do Trem.</p><div id="public-posts" class="list" aria-live="polite"><p class="muted">O mural compartilhado será carregado quando o banco estiver conectado.</p></div></div><div class="card"><h3>Últimas divulgações</h3><div id="feed" class="list" aria-live="polite"><p class="muted">As divulgações salvas nesta demonstração aparecerão aqui neste aparelho.</p></div><button class="btn alt" id="clear-demo-posts" type="button" hidden>Apagar minhas divulgações deste aparelho</button> <button class="btn alt" id="backup-demo-posts" type="button" hidden>Baixar cópia das minhas divulgações</button><p id="feed-status" class="muted" aria-live="polite"></p></div><div class="notice">Esta é a primeira demonstração pública. Cadastro, perfis individuais, chat compartilhado e publicação sincronizada ainda precisam de integração com servidor.</div></section>
 <section class="page" id="musicas"><div class="card"><h2>🎵 Central de músicas</h2><p class="muted">Um espaço para ouvir os sons dentro do Capital do Trem, sem precisar abrir o YouTube.</p><p class="muted">Músicas publicadas pela equipe, com reprodução, download, curtidas e comentários.</p><div id="published-song-catalog" class="list" aria-live="polite"><p class="muted">Carregando catálogo compartilhado…</p></div></div><div class="card"><h3>🎧 Player do Capital do Trem</h3><label for="audio">Escolha uma música autorizada que esteja no seu aparelho</label><input id="audio" type="file" accept="audio/*"><audio id="player" controls preload="metadata" style="width:100%;margin:12px 0"></audio><div class="social" style="align-items:center"><button class="btn" id="download-audio" type="button" disabled>⬇ Baixar música</button><span id="audio-status" class="muted" role="status" aria-live="polite">Selecione um áudio para ouvir e baixar nesta demonstração.</span></div><p class="muted">O player oferece controles de reprodução e pode continuar tocando com a tela bloqueada, conforme o suporte do navegador e as configurações de economia de bateria do celular. O download salva o arquivo selecionado neste aparelho.</p><p class="muted">Só compartilhe ou baixe músicas que você tenha autorização para distribuir.</p></div></section>
 <section class="page" id="eventos">
@@ -319,8 +392,18 @@ document.addEventListener('keydown',unlockIntroFromGesture,{capture:true});
 updateIntroControl();
 
 const pages=[...document.querySelectorAll('.page')],tabs=[...document.querySelectorAll('[data-page]')];
-function go(id){const target=pages.find(p=>p.id===id);if(!target)return;pages.forEach(p=>p.classList.toggle('active',p===target));tabs.forEach(t=>{const active=t.dataset.page===id;t.classList.toggle('active',active);if(active){t.setAttribute('aria-current','page');t.scrollIntoView({block:'nearest',inline:'nearest',behavior:window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}else t.removeAttribute('aria-current');});const nav=document.querySelector('nav');if(nav)window.scrollTo({top:nav.offsetTop-8,behavior:window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}
-tabs.forEach(t=>t.addEventListener('click',()=>go(t.dataset.page)));document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
+function go(id){const target=pages.find(p=>p.id===id);if(!target)return;document.body.classList.toggle('community-open',id==='comunidade'&&window.matchMedia('(max-width: 759px)').matches);pages.forEach(p=>p.classList.toggle('active',p===target));tabs.forEach(t=>{const active=t.dataset.page===id;t.classList.toggle('active',active);if(active){t.setAttribute('aria-current','page');t.scrollIntoView({block:'nearest',inline:'nearest',behavior:window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}else t.removeAttribute('aria-current');});const nav=document.querySelector('nav');if(nav&&!document.body.classList.contains('community-open'))window.scrollTo({top:nav.offsetTop-8,behavior:window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}
+tabs.forEach(t=>t.addEventListener('click',()=>go(t.dataset.page)));
+const bottomNav=document.getElementById('app-bottom-nav'),menu=document.getElementById('app-menu'),menuToggle=document.getElementById('app-menu-toggle');
+function closeAppMenu(){if(menu){menu.hidden=true;document.body.classList.remove('menu-open');menuToggle?.setAttribute('aria-expanded','false');}}
+function openAppMenu(){if(menu){menu.hidden=false;document.body.classList.add('menu-open');menuToggle?.setAttribute('aria-expanded','true');}}
+bottomNav?.querySelectorAll('[data-open-page]').forEach(button=>button.addEventListener('click',()=>{const id=button.dataset.openPage;go(id);bottomNav.querySelectorAll('[data-open-page]').forEach(item=>{const active=item.dataset.openPage===id;item.classList.toggle('active',active);if(active)item.setAttribute('aria-current','page');else item.removeAttribute('aria-current');});closeAppMenu();}));
+menuToggle?.addEventListener('click',openAppMenu);
+document.getElementById('app-menu-close')?.addEventListener('click',closeAppMenu);
+menu?.addEventListener('click',event=>{if(event.target===menu)closeAppMenu();});
+menu?.querySelectorAll('[data-open-page]').forEach(button=>button.addEventListener('click',()=>{go(button.dataset.openPage);bottomNav?.querySelectorAll('[data-open-page]').forEach(item=>{const active=item.dataset.openPage===button.dataset.openPage;item.classList.toggle('active',active);if(active)item.setAttribute('aria-current','page');else item.removeAttribute('aria-current');});closeAppMenu();}));
+menu?.querySelectorAll('[data-open-action]').forEach(button=>button.addEventListener('click',()=>{document.getElementById(button.dataset.openAction)?.click();closeAppMenu();}));
+document.addEventListener('keydown',event=>{if(event.key==='Escape')closeAppMenu();});document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
 const themeButton=document.getElementById('theme');
 const THEME_KEY='capitaldotrem_theme_v1';
 function applyTheme(theme){
@@ -452,7 +535,8 @@ document.getElementById('copy-event').addEventListener('click',async()=>{
  const status=document.getElementById('event-copy-status');
  if(!document.getElementById('event-name').reportValidity()||!document.getElementById('event-date').reportValidity()||!document.getElementById('event-time').reportValidity()||!document.getElementById('event-place').reportValidity()){status.textContent='Confira os campos obrigatórios destacados.';return;}
  const dateText=date.split('-').reverse().join('/');
- const mapUrl='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(place);\n const message='Olá, Capital do Trem! Gostaria de solicitar a divulgação deste evento.\n\nEvento: '+name+'\nTipo: '+kind+'\nData: '+dateText+'\nHorário: '+time+'\nLocal: '+place+'\nLocalização no Google Maps: '+mapUrl+(contact?'\nContato público: '+contact:'')+'\n\nVou anexar o cartaz para avaliação.\nObrigado(a)!';
+ const mapUrl='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(place);
+ const message='Olá, Capital do Trem! Gostaria de solicitar a divulgação deste evento.\n\nEvento: '+name+'\nTipo: '+kind+'\nData: '+dateText+'\nHorário: '+time+'\nLocal: '+place+'\nLocalização no Google Maps: '+mapUrl+(contact?'\nContato público: '+contact:'')+'\n\nVou anexar o cartaz para avaliação.\nObrigado(a)!';
  try{
   if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(message);status.textContent='Mensagem copiada! Agora abra o Instagram, envie a mensagem e anexe o cartaz.';}
   else{window.prompt('Copie a mensagem abaixo e cole no Instagram:',message);status.textContent='Copie a mensagem exibida e envie pelo Instagram junto com o cartaz.';}
