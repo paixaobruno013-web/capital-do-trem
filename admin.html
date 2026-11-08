@@ -128,6 +128,8 @@ function node(tag,cls,text){const el=document.createElement(tag);if(cls)el.class
 function showLoggedOut(){currentUser=null;loginPanel.hidden=false;dashboard.hidden=true;}
 async function enterDashboard(user){
  currentUser=user;
+ // A conta proprietária pode inicializar o primeiro administrador com validação no banco.
+ if((user.email||'').toLowerCase()==='capitaldotrem07@gmail.com') await auth.bootstrapFirstAdmin();
  const allowed=await auth.isCurrentUserAdmin();
  if(!allowed){await auth.signOutAccount();showLoggedOut();loginStatus.textContent='Esta conta não está autorizada para administrar o Capital do Trem.';return;}
  loginPanel.hidden=true;dashboard.hidden=false;
