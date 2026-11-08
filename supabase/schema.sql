@@ -217,11 +217,12 @@ grant select, insert, update, delete on public.artists, public.events, public.po
 grant select, insert, delete on public.chat_messages, public.song_comments, public.song_likes to authenticated;
 grant select, insert, update, delete on public.site_settings, public.songs to authenticated;
 
--- Perfis: cada usuário vê e altera apenas o próprio registro.
+-- Perfis: público vê somente perfis públicos; cada usuário também vê o próprio.
 drop policy if exists "profile_read_own" on public.profiles;
-create policy "profile_read_own" on public.profiles
-  for select to authenticated
-  using (user_id = (select auth.uid()));
+drop policy if exists "profiles_read_public" on public.profiles;
+create policy "profiles_read_public" on public.profiles
+  for select to anon, authenticated
+  using (is_public = true or user_id = (select auth.uid()));
 
 drop policy if exists "profile_insert_own" on public.profiles;
 create policy "profile_insert_own" on public.profiles
