@@ -33,6 +33,8 @@ jobs:
           grep -q 'create policy "audio_upload_admin_only"' supabase/schema.sql
           grep -q 'create policy "songs_insert_admin_only"' supabase/migrations/2026-11-06-admin-only-song-uploads.sql
           grep -q 'create policy "audio_upload_admin_only"' supabase/migrations/2026-11-06-admin-only-song-uploads.sql
+          grep -q 'create policy "songs_insert_admin_only"' supabase/migrations/2026-11-08-harden-music-upload-permissions.sql
+          grep -q 'create policy "audio_upload_admin_only"' supabase/migrations/2026-11-08-harden-music-upload-permissions.sql
           if grep -q 'create policy "songs_insert_own_pending"' supabase/schema.sql; then
             echo "ERRO: política antiga permite envio sem checagem de administrador."
             exit 1
