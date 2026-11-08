@@ -102,7 +102,7 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 <label for="song-description">Descrição (opcional)</label><textarea id="song-description" maxlength="1000" rows="3" placeholder="Conte um pouco sobre essa música..." style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
 <label for="song-audio-file">Arquivo de áudio</label><input id="song-audio-file" type="file" accept="audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/x-wav,audio/ogg,.mp3,.m4a,.aac,.wav,.ogg" required>
 <p class="muted" id="song-file-info">Tamanho máximo: 50 MB. Envie somente músicas das quais você tenha autorização de uso.</p>
-<button type="submit" id="submit-song">Enviar música para análise</button>
+<button type="submit" id="submit-song">🎵 Postar música</button>
 <p id="song-status" class="status" role="status" aria-live="polite"></p>
 </form>
 <h3>Histórico dos meus envios</h3><div id="my-songs" class="muted" aria-live="polite">Suas músicas aparecerão aqui.</div>
@@ -149,21 +149,21 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 </form>
 </section>
 <section class="card" id="post-panel" hidden aria-labelledby="post-title">
-<h2 id="post-title">📣 Enviar divulgação para a comunidade</h2>
-<p class="muted">Compartilhe lançamento musical, notícia, parceria ou ação social. A publicação só aparecerá no mural depois da aprovação da equipe.</p>
+<h2 id="post-title">📣 Publicar na comunidade</h2>
+<p class="muted">Preencha e toque em Postar. Sua divulgação ou lançamento entra no mural imediatamente.</p>
 <form id="community-post-form">
 <label for="post-category">Categoria</label>
 <select id="post-category" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option>Lançamento musical</option><option>Evento</option><option>Ação social</option><option>Parceria</option><option>Notícia</option></select>
 <label for="post-content">Sua divulgação</label>
 <textarea id="post-content" maxlength="1300" rows="5" required placeholder="Conte o que deseja divulgar..." style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
 <p class="muted">Máximo de 1.300 caracteres. Não inclua dados pessoais sensíveis.</p>
-<button type="submit" id="submit-post">Enviar para análise</button>
+<button type="submit" id="submit-post">📣 Postar</button>
 <p id="post-status" class="status" role="status" aria-live="polite"></p>
 </form>
 </section>
 <section class="card" id="event-panel" hidden aria-labelledby="event-title">
-<h2 id="event-title">Enviar evento, show ou ação social</h2>
-<p class="muted">Cadastre as informações para análise da equipe. A publicação só aparece na agenda depois da aprovação.</p>
+<h2 id="event-title">Publicar evento, show ou ação social</h2>
+<p class="muted">Preencha os dados e toque em Postar. O evento aparece na agenda assim que for enviado.</p>
 <form id="event-form">
 <label for="event-name">Nome do evento</label><input id="event-name" maxlength="120" required>
 <label for="event-date">Data</label><input id="event-date" type="date" required>
@@ -172,7 +172,7 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 <label for="event-category">Tipo</label><select id="event-category" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="show">Show</option><option value="evento">Evento</option><option value="acao-social">Ação social</option><option value="outro">Outro</option></select>
 <label for="event-description">Descrição</label><textarea id="event-description" maxlength="2000" rows="4" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
 <label for="event-contact">Contato público (opcional)</label><input id="event-contact" maxlength="120"><label for="event-poster-upload">Cartaz do evento (JPG, PNG ou WebP, até 5 MB)</label><input id="event-poster-upload" type="file" accept="image/jpeg,image/png,image/webp"><div id="event-poster-preview" class="image-preview" aria-live="polite"></div><p class="muted">O cartaz será enviado junto com o evento para análise.</p>
-<button type="submit" id="submit-event">Enviar para análise</button>
+<button type="submit" id="submit-event">📅 Postar evento</button>
 <p id="event-status" class="status" role="status" aria-live="polite"></p>
 </form>
 <h3>Meus envios</h3><div id="my-events" class="muted" aria-live="polite">Seus eventos aparecerão aqui.</div>
@@ -309,10 +309,10 @@ songForm.addEventListener('submit',async event=>{
  const button=document.getElementById('submit-song');
  const file=document.getElementById('song-audio-file').files[0];
  if(!file){songStatus.textContent='Selecione o arquivo de áudio.';return;}
- button.disabled=true;songStatus.textContent='Enviando sua música com segurança...';
+ button.disabled=true;songStatus.textContent='Enviando e publicando sua música…';
  try{
   await auth.uploadMySong({file,title:document.getElementById('song-title').value.trim(),artistName:document.getElementById('song-artist-name').value.trim(),description:document.getElementById('song-description').value.trim()});
-  songForm.reset();songStatus.textContent='Música recebida! Ela ficará privada até a análise e aprovação da equipe.';
+  songForm.reset();songStatus.textContent='Música publicada com sucesso! Ela já está no catálogo.';
   await loadMySongs();
  }catch(error){songStatus.textContent=error?.message||'Não foi possível enviar a música. Confira o formato, tamanho e conexão.';}
  finally{button.disabled=false;}
@@ -615,11 +615,11 @@ postForm.addEventListener('submit',async event=>{
  const content=document.getElementById('post-content').value.trim();
  if(!content){postStatus.textContent='Escreva sua divulgação antes de enviar.';return;}
  const button=document.getElementById('submit-post');
- button.disabled=true;postStatus.textContent='Enviando para análise...';
+ button.disabled=true;postStatus.textContent='Publicando…';
  try{
   await auth.submitMyPost(category+' • '+content);
   postForm.reset();
-  postStatus.textContent='Divulgação enviada! Ela ficará pendente até a aprovação da equipe.';
+  postStatus.textContent='Publicado com sucesso! Sua divulgação já está no mural.';
  }catch(error){postStatus.textContent=error?.message||'Não foi possível enviar. Verifique a conexão e tente novamente.';}
  finally{button.disabled=false;}
 });
@@ -631,11 +631,11 @@ eventForm.addEventListener('submit',async event=>{
  eventDateInput.min=today;
  if(!date||date<today){eventStatus.textContent='Escolha uma data de hoje em diante.';eventDateInput.focus();return;}
  const payload={title:document.getElementById('event-name').value.trim(),event_date:date,event_time:document.getElementById('event-time').value||null,address:document.getElementById('event-address').value.trim(),category:document.getElementById('event-category').value,description:document.getElementById('event-description').value.trim(),contact:document.getElementById('event-contact').value.trim()};
- button.disabled=true;eventStatus.textContent='Enviando para análise...';
+ button.disabled=true;eventStatus.textContent='Publicando evento…';
  try{
   const poster=document.getElementById('event-poster-upload').files[0];
   if(poster){eventStatus.textContent='Enviando cartaz seguro...';payload.poster_url=await auth.uploadMyMedia(poster,'event');}
-  await auth.submitMyEvent(payload);eventForm.reset();clearImagePreview('event-poster-preview');eventStatus.textContent='Evento enviado! Ele ficará pendente até a aprovação da equipe.';await loadMyEvents();}
+  await auth.submitMyEvent(payload);eventForm.reset();clearImagePreview('event-poster-preview');eventStatus.textContent='Evento publicado com sucesso! Ele já está na agenda.';await loadMyEvents();}
  catch(error){eventStatus.textContent=error?.message||'Não foi possível enviar. Verifique a conexão e tente novamente.';}
  finally{button.disabled=false;}
 });
