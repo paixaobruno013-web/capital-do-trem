@@ -764,3 +764,45 @@ begin
    alter publication supabase_realtime add table public.private_messages;
  end if;
 end $$;
+
+
+
+-- Índices e chamadas auth.uid() preparadas para desempenho em RLS.
+create index if not exists private_blocks_blocked_idx on public.private_blocks(blocked_id);
+create index if not exists private_conversations_initiated_idx on public.private_conversations(initiated_by);
+create index if not exists private_messages_sender_idx on public.private_messages(sender_id);
+drop policy if exists private_conversations_read_participants on public.private_conversations;
+create policy private_conversations_read_participants on public.private_conversations for select to authenticated using ((select auth.uid()) in(participant_one,participant_two));
+drop policy if exists private_conversations_request_public_user on public.private_conversations;
+create policy private_conversations_request_public_user on public.private_conversations for insert to authenticated with check(
+ initiated_by=(select auth.uid()) and (select auth.uid()) in(participant_one,participant_two)
+ and exists(select 1 from public.profiles p where p.user_id=case when participant_one=(select auth.uid()) then participant_two else participant_one end and p.is_public=true)
+ and not exists(select 1 from public.private_blocks b where
+ (b.blocker_id=case when participant_one=(select auth.uid()) then participant_two else participant_one end and b.blocked_id=(select auth.uid()))
+ or (b.blocker_id=(select auth.uid()) and b.blocked_id=case when participant_one=(select auth.uid()) then participant_two else participant_one end))
+);
+drop policy if exists private_conversations_recipient_decision on public.private_conversations;
+create policy private_conversations_recipient_decision on public.private_conversations for update to authenticated
+ using((select auth.uid())=case when initiated_by=participant_one then participant_two else participant_one end and status='pending')
+ with check((select auth.uid())=case when initiated_by=participant_one then participant_two else participant_one end and status in('accepted','declined'));
+drop policy if exists private_messages_read_accepted_participants on public.private_messages;
+create policy private_messages_read_accepted_participants on public.private_messages for select to authenticated using(
+ exists(select 1 from public.private_conversations c where c.id=conversation_id and c.status='accepted' and (select auth.uid()) in(c.participant_one,c.participant_two))
+ and not exists(select 1 from public.private_blocks b join public.private_conversations c on c.id=conversation_id
+ where (b.blocker_id=(select auth.uid()) and b.blocked_id=case when c.participant_one=(select auth.uid()) then c.participant_two else c.participant_one end)
+ or (b.blocker_id=case when c.participant_one=(select auth.uid()) then c.participant_two else c.participant_one end and b.blocked_id=(select auth.uid())))
+);
+drop policy if exists private_messages_insert_accepted_participants on public.private_messages;
+create policy private_messages_insert_accepted_participants on public.private_messages for insert to authenticated with check(
+ sender_id=(select auth.uid()) and exists(select 1 from public.private_conversations c where c.id=conversation_id and c.status='accepted'
+ and (select auth.uid()) in(c.participant_one,c.participant_two)
+ and not exists(select 1 from public.private_blocks b where
+ (b.blocker_id=(select auth.uid()) and b.blocked_id=case when c.participant_one=(select auth.uid()) then c.participant_two else c.participant_one end)
+ or (b.blocker_id=case when c.participant_one=(select auth.uid()) then c.participant_two else c.participant_one end and b.blocked_id=(select auth.uid()))))
+);
+drop policy if exists private_blocks_read_own on public.private_blocks;
+create policy private_blocks_read_own on public.private_blocks for select to authenticated using(blocker_id=(select auth.uid()));
+drop policy if exists private_blocks_insert_own on public.private_blocks;
+create policy private_blocks_insert_own on public.private_blocks for insert to authenticated with check(blocker_id=(select auth.uid()));
+drop policy if exists private_blocks_delete_own on public.private_blocks;
+create policy private_blocks_delete_own on public.private_blocks for delete to authenticated using(blocker_id=(select auth.uid()));
