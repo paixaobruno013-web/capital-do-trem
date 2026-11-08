@@ -427,7 +427,8 @@ document.getElementById('share-event').addEventListener('click',async()=>{
  const status=document.getElementById('event-copy-status');
  if(!document.getElementById('event-name').reportValidity()||!document.getElementById('event-date').reportValidity()||!document.getElementById('event-time').reportValidity()||!document.getElementById('event-place').reportValidity()){status.textContent='Confira os campos obrigatórios destacados.';return;}
  const date=value('event-date').split('-').reverse().join('/');
- const mapUrl='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(value('event-place'));\n const message='📣 '+value('event-name')+'\n'+value('event-kind')+'\n📅 '+date+' às '+value('event-time')+'\n📍 '+value('event-place')+'\n🗺️ Localização no Google Maps: '+mapUrl+(value('event-contact')?'\nContato: '+value('event-contact'):'')+'\n\nDivulgação preparada no Capital do Trem — A música da nossa quebrada!';
+ const mapUrl='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(value('event-place'));
+ const message='📣 '+value('event-name')+'\n'+value('event-kind')+'\n📅 '+date+' às '+value('event-time')+'\n📍 '+value('event-place')+'\n🗺️ Localização no Google Maps: '+mapUrl+(value('event-contact')?'\nContato: '+value('event-contact'):'')+'\n\nDivulgação preparada no Capital do Trem — A música da nossa quebrada!';
  try{
   const poster=document.getElementById('event-poster').files[0];
   const canSharePoster=poster&&navigator.canShare&&navigator.canShare({files:[poster]});
