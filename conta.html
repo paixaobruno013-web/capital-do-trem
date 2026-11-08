@@ -94,8 +94,8 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 
 </div>
 <section class="card" id="admin-songs-panel" hidden aria-labelledby="admin-songs-title">
-<h3 id="admin-songs-title">🎵 Envio e histórico de músicas — equipe</h3>
-<p class="muted">Área exclusiva da equipe autorizada. Envie arquivos em MP3, M4A, AAC, WAV ou OGG (até 50 MB). Cada envio fica privado até a aprovação para o catálogo público.</p>
+<h3 id="admin-songs-title">🎵 Enviar música para análise</h3>
+<p class="muted">Qualquer conta conectada pode enviar uma música própria para avaliação. Envie arquivos MP3, M4A, AAC, WAV ou OGG (até 50 MB). A faixa fica privada até a aprovação da equipe.</p>
 <form id="artist-song-form">
 <label for="song-title">Nome da música</label><input id="song-title" maxlength="120" required>
 <label for="song-artist-name">Nome artístico</label><input id="song-artist-name" maxlength="100" required>
@@ -270,11 +270,10 @@ const songStatus=document.getElementById('song-status');
 const mySongs=document.getElementById('my-songs');
 const songPanel=document.getElementById('admin-songs-panel');
 async function loadAdminSongAccess(){
- try{
-  const allowed=await auth.isCurrentUserAdmin();
-  songPanel.hidden=!allowed;
-  if(allowed)await loadMySongs();
- }catch(error){songPanel.hidden=true;}
+ // Envio e histórico pertencem a qualquer conta autenticada.
+ // Aprovação e publicação continuam exclusivas da equipe administrativa.
+ songPanel.hidden=false;
+ await loadMySongs();
 }
 async function loadMySongs(){
  try{
@@ -339,7 +338,7 @@ async function loadBasicProfile(){
   const profile=await auth.getMyBasicProfile();
   document.getElementById('basic-display-name').value=profile?.display_name||'';
   document.getElementById('basic-account-type').value=profile?.account_type||'user';
-  artistProfileArea.hidden=(profile?.account_type||'user')!=='artist';
+  // A ficha artística é uma solicitação moderada, disponível a qualquer usuário.\n  artistProfileArea.hidden=false;
   document.getElementById('basic-city').value=profile?.city||'';
   document.getElementById('basic-bio').value=profile?.bio||'';
   document.getElementById('basic-public').checked=profile?.is_public===true;
@@ -357,7 +356,7 @@ basicProfileForm.addEventListener('submit',async event=>{
    bio:document.getElementById('basic-bio').value,
    is_public:document.getElementById('basic-public').checked
   });
-  artistProfileArea.hidden=document.getElementById('basic-account-type').value!=='artist';
+  artistProfileArea.hidden=false;
   basicProfileStatus.textContent='Perfil salvo! '+(document.getElementById('basic-public').checked?'Ele poderá aparecer no diretório público.':'Ele ficará visível somente para você.');
  }catch(error){basicProfileStatus.textContent=error?.message||'Não foi possível salvar seu perfil.';}
  finally{button.disabled=false;}
