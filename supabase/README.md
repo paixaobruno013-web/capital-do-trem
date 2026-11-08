@@ -19,7 +19,7 @@ O projeto Capital do Trem já está conectado a um projeto Supabase ativo. O sit
 - `migrations/`: atualizações incrementais para bancos já existentes.
 - `auth.js`: integração do site com Supabase Auth, banco e Storage.
 
-**Atenção:** não execute novamente o `schema.sql` completo no projeto de produção que já está ativo. Para esse projeto, aplique somente migrations ainda não executadas, depois de revisar o conteúdo. A migration de segurança mais recente é `2026-11-08-secure-registered-user-access.sql`.
+**Atenção:** não execute novamente o `schema.sql` completo no projeto de produção que já está ativo. Para esse projeto, aplique somente migrations ainda não executadas, depois de revisar o conteúdo. As migrations incrementais mais recentes são `2026-11-08-secure-registered-user-access.sql` e `2026-11-08-restrict-private-block-checks-to-participants.sql`.
 
 ## Segurança
 
