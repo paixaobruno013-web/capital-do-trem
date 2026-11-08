@@ -803,7 +803,9 @@ updateConnectionStatus();
   if(!profiles.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Ainda não há perfis públicos. Crie sua conta e escolha aparecer na comunidade!';container.append(empty);return;}
   for(const profile of profiles){
    const card=document.createElement('article');card.className='item community-profile-card';
-   const avatar=document.createElement('div');avatar.className='community-profile-avatar';avatar.setAttribute('aria-hidden','true');avatar.textContent=Array.from((profile.display_name||'U').trim())[0]?.toLocaleUpperCase('pt-BR')||'U';
+   const avatar=document.createElement('div');avatar.className='community-profile-avatar';avatar.setAttribute('aria-hidden','true');
+   if(profile.avatar_type==='photo'&&typeof profile.avatar_url==='string'&&profile.avatar_url.startsWith('https://')){const image=document.createElement('img');image.src=profile.avatar_url;image.alt='';image.loading='lazy';image.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';avatar.append(image);}
+   else avatar.textContent=profile.avatar_type==='character'?'🎭':Array.from((profile.display_name||'U').trim())[0]?.toLocaleUpperCase('pt-BR')||'U';
    const copy=document.createElement('div');copy.className='community-profile-copy';
    const name=document.createElement('strong');name.textContent=profile.display_name||'Participante do Capital do Trem';
    const meta=document.createElement('div');meta.className='community-profile-meta';
