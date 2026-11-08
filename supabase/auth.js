@@ -111,6 +111,77 @@ export async function uploadMyMedia(file, category) {
   return data.publicUrl;
 }
 
+// Avatar da conta: foto otimizada no bucket de mídia ou personagem configurável.
+export async function getMyAvatar() {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para acessar seu avatar.');
+  const { data, error } = await supabase.from('profiles')
+    .select('avatar_type, avatar_url, avatar_path, avatar_data')
+    .eq('user_id', user.id).single();
+  if (error) throw error;
+  return data;
+}
+
+export async function saveMyAvatar({ type, file = null, character = null }) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para salvar seu avatar.');
+  if (!['photo', 'character', 'default'].includes(type)) throw new Error('Tipo de avatar inválido.');
+
+  const { data: current, error: currentError } = await supabase.from('profiles')
+    .select('avatar_path').eq('user_id', user.id).single();
+  if (currentError) throw currentError;
+
+  let avatarUrl = null;
+  let avatarPath = null;
+  let avatarData = null;
+  if (type === 'photo') {
+    if (!(file instanceof File)) throw new Error('Escolha uma foto antes de salvar.');
+    const allowed = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+    if (!allowed[file.type] || file.size < 1 || file.size > 5 * 1024 * 1024) {
+      throw new Error('Use uma foto JPG, PNG ou WebP de até 5 MB.');
+    }
+    avatarPath = user.id + '/avatar/' + crypto.randomUUID() + '.' + allowed[file.type];
+    const { error: uploadError } = await supabase.storage.from('capital-do-trem-media')
+      .upload(avatarPath, file, { contentType: file.type, cacheControl: '3600', upsert: false });
+    if (uploadError) throw uploadError;
+    const { data } = supabase.storage.from('capital-do-trem-media').getPublicUrl(avatarPath);
+    avatarUrl = data?.publicUrl || null;
+    if (!avatarUrl) {
+      await supabase.storage.from('capital-do-trem-media').remove([avatarPath]);
+      throw new Error('Não foi possível gerar o endereço da foto.');
+    }
+  } else if (type === 'character') {
+    if (!character || typeof character !== 'object') throw new Error('Configure seu personagem antes de salvar.');
+    const allowed = {
+      gender: ['male', 'female'],
+      skin: ['#8d5524', '#f1c27d', '#c68642', '#5a3825', '#e0ac69'],
+      hair: ['#171313', '#5b321d', '#d6a84b', '#a52a2a', '#777777'],
+      shirt: ['#ed1c24', '#111111', '#eeeeee', '#2465a8', '#21834a', '#7a42a6']
+    };
+    for (const [key, values] of Object.entries(allowed)) {
+      if (!values.includes(character[key])) throw new Error('Uma das opções do personagem é inválida.');
+    }
+    avatarData = { gender: character.gender, skin: character.skin, hair: character.hair, shirt: character.shirt };
+  }
+
+  const { error: updateError } = await supabase.from('profiles').update({
+    avatar_type: type, avatar_url: avatarUrl, avatar_path: avatarPath, avatar_data: avatarData
+  }).eq('user_id', user.id);
+  if (updateError) {
+    if (avatarPath) await supabase.storage.from('capital-do-trem-media').remove([avatarPath]);
+    throw updateError;
+  }
+  if (current.avatar_path && current.avatar_path !== avatarPath) {
+    const { error: removeError } = await supabase.storage.from('capital-do-trem-media').remove([current.avatar_path]);
+    if (removeError) console.warn('Avatar antigo mantido no armazenamento:', removeError.message);
+  }
+  return { avatar_type: type, avatar_url: avatarUrl, avatar_path: avatarPath, avatar_data: avatarData };
+}
+
 // Perfil público do artista — sempre limitado ao usuário autenticado pelas políticas RLS.
 export async function getMyArtistProfile() {
   const supabase = initSupabase();
@@ -476,7 +547,7 @@ export async function addSongComment(songId, content) {
 export async function getChatMessages(limit = 60) {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('chat_messages')
-    .select('id, author_id, author_name, content, created_at')
+    .select('id, author_id, author_name, author_avatar_type, author_avatar_url, author_avatar_data, content, created_at')
     .order('created_at', { ascending: false }).limit(Math.min(Math.max(Number(limit) || 60, 1), 100));
   if (error) throw error;
   // Busca as mensagens mais recentes e as apresenta em ordem cronológica.
