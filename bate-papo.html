@@ -10,10 +10,33 @@ body.light{color-scheme:light;--bg:#f5f5f5;--panel:#fff;--fg:#111;--muted:#555;-
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 
 :focus-visible{outline:3px solid var(--red);outline-offset:3px}
+
+/* FALA UAI — identidade visual e leitura confortável no celular */
+.chat-brand{display:inline-flex;align-items:center;gap:9px;padding:8px 14px;border:1px solid #ed1c2466;border-radius:999px;background:linear-gradient(110deg,#ed1c241f,#ed1c2408);color:var(--fg);font-size:13px;font-weight:950;letter-spacing:2px}
+.chat-brand small{font-size:10px;font-weight:650;letter-spacing:.3px;color:var(--muted);padding-left:8px;border-left:1px solid var(--line)}
+.chat-live-dot{width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red)}
+.chat-panel{border-radius:20px;background:linear-gradient(145deg,var(--panel),color-mix(in srgb,var(--panel) 84%,var(--red)));box-shadow:0 12px 36px #0003}
+.room-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.room-heading h2{margin:3px 0;font-size:21px}
+.eyebrow{font-size:10px;letter-spacing:1.5px;font-weight:900;color:var(--red)}
+.room-tag{border:1px solid #ed1c2466;color:var(--red);font-size:10px;font-weight:900;letter-spacing:1px;padding:6px 9px;border-radius:8px;white-space:nowrap}
+#messages{height:min(58vh,580px);min-height:240px;padding:12px;background:color-mix(in srgb,var(--bg) 88%,var(--red));border:1px solid var(--line);border-radius:15px;scrollbar-width:thin;scrollbar-color:var(--red) transparent}
+.message{max-width:92%;border-radius:14px 14px 14px 4px;padding:11px 13px;background:var(--panel);box-shadow:0 3px 12px #0002}
+.message strong{letter-spacing:.2px}
+.message time{font-variant-numeric:tabular-nums}
+.composer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:9px;margin-top:12px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
+.composer input{margin:0;border:0;background:transparent;min-height:44px;outline:none}
+.composer input:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
+.composer small{grid-column:1/-1;padding-left:5px}
+.composer button{grid-column:2;grid-row:1;min-width:92px}
+#status{padding:2px 5px}
+body.light .chat-panel{background:linear-gradient(145deg,#fff,#fff4f4)}
+@media(max-width:480px){.chat-brand{gap:6px;padding:7px 10px}.chat-brand small{font-size:9px}.room-heading h2{font-size:19px}#messages{height:55vh;min-height:220px}.composer{grid-template-columns:minmax(0,1fr) 84px}.composer button{min-width:0;padding:10px}.composer small{font-size:11px}}
+
 </style></head><body>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
-<header><img src="./marca.svg" alt="Capital do Trem"><h1>Bate-papo da quebrada</h1><p class="muted">Artistas e Usuários Uai, juntos na mesma conversa.</p><div class="actions"><a class="btn alt" href="./index.html">Início</a><a class="btn alt" href="./conta.html">Minha conta</a><a class="btn alt" href="./avatar.html">Meu avatar</a><a class="btn" href="./mensagens.html">✉️ Minhas conversas</a><button class="alt" id="theme" type="button">☀️ Claro</button></div></header>
-<main id="main-content"><section class="panel"><h2>💬 Sala geral</h2><p class="muted">Respeito em primeiro lugar. Não compartilhe dados pessoais, ameaças ou conteúdo ofensivo. A equipe poderá moderar o espaço.</p><div id="gate" class="status" role="status" aria-live="polite">Verificando sua conta…</div><div id="chat-area" hidden><p id="chat-connection" class="status" role="status" aria-live="polite">Conectando à sala em tempo real…</p><div id="messages" aria-live="polite" aria-relevant="additions" aria-label="Mensagens do bate-papo"></div><form id="composer" class="composer"><label class="sr-only" for="message">Sua mensagem para o bate-papo</label><input id="message" maxlength="1000" autocomplete="off" placeholder="Escreva sua mensagem…" aria-describedby="message-counter" required><small id="message-counter" class="muted" aria-live="polite">0/1000 caracteres</small><button id="send" type="submit">Enviar</button></form><p id="status" class="status" role="status" aria-live="polite"></p></div></section></main>
+<header><img src="./marca.svg" alt="Capital do Trem"><div class="chat-brand"><span class="chat-live-dot" aria-hidden="true"></span><span>FALA UAI</span><small>O ponto de encontro da comunidade</small></div><h1>Bate-papo da quebrada</h1><p class="muted">Artistas e Usuários Uai, juntos na mesma conversa.</p><div class="actions"><a class="btn alt" href="./index.html">Início</a><a class="btn alt" href="./conta.html">Minha conta</a><a class="btn alt" href="./avatar.html">Meu avatar</a><a class="btn" href="./mensagens.html">✉️ Minhas conversas</a><button class="alt" id="theme" type="button">☀️ Claro</button></div></header>
+<main id="main-content"><section class="panel chat-panel"><div class="room-heading"><div><span class="eyebrow">CAPITAL DO TREM • COMUNIDADE</span><h2>💬 Sala geral</h2></div><span class="room-tag">FALA UAI</span></div><p class="muted">Respeito em primeiro lugar. Não compartilhe dados pessoais, ameaças ou conteúdo ofensivo. A equipe poderá moderar o espaço.</p><div id="gate" class="status" role="status" aria-live="polite">Verificando sua conta…</div><div id="chat-area" hidden><p id="chat-connection" class="status" role="status" aria-live="polite">Conectando à sala em tempo real…</p><div id="messages" aria-live="polite" aria-relevant="additions" aria-label="Mensagens do bate-papo"></div><form id="composer" class="composer"><label class="sr-only" for="message">Sua mensagem para o bate-papo</label><input id="message" maxlength="1000" autocomplete="off" placeholder="Escreva sua mensagem…" aria-describedby="message-counter" required><small id="message-counter" class="muted" aria-live="polite">0/1000 caracteres</small><button id="send" type="submit">Enviar</button></form><p id="status" class="status" role="status" aria-live="polite"></p></div></section></main>
 <script type="module">
 import {getCurrentSession,getChatMessages,sendChatMessage,subscribeChatMessages} from './supabase/auth.js';
 const gate=document.getElementById('gate'),area=document.getElementById('chat-area'),connection=document.getElementById('chat-connection'),list=document.getElementById('messages'),form=document.getElementById('composer'),input=document.getElementById('message'),send=document.getElementById('send'),status=document.getElementById('status');
