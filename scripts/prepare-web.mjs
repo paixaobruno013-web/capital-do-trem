@@ -16,6 +16,7 @@ const files = [
   'marca.svg',
   'manifest.webmanifest',
   'sw.js',
+  'update.js',
   'supabase/auth.js'
 ];
 
