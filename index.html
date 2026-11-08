@@ -216,6 +216,66 @@ body.light nav#nav{background:rgba(255,255,255,.96);border-color:rgba(0,0,0,.1)}
  nav#nav button,nav#nav .nav-chat,nav#nav .nav-profile{border-radius:13px}
 }
 
+
+/* Polimento geral da experiência — fundo artístico definitivo será inserido quando enviado. */
+:root{--red:#ed1c24;--red-hot:#ff3b48;--glass:rgba(15,15,18,.86);--hairline:rgba(255,255,255,.085)}
+html{scroll-behavior:smooth;scroll-padding-top:18px}
+body{min-height:100vh;background-image:radial-gradient(ellipse at 88% 0%,rgba(237,28,36,.16),transparent 32%),radial-gradient(ellipse at 4% 42%,rgba(237,28,36,.075),transparent 34%),linear-gradient(180deg,#09090b,#070708 70%);background-attachment:fixed}
+header{isolation:isolate;overflow:hidden}
+header:before{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(115deg,transparent 15%,rgba(237,28,36,.055) 52%,transparent 84%);pointer-events:none}
+header .logo{filter:drop-shadow(0 0 16px rgba(237,28,36,.2))}
+.header-action-row{flex-wrap:wrap}
+.header-action-row .btn{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.hero{gap:7px}
+.hero p{max-width:680px}
+.hero .social{margin-top:8px}
+.hero .social .btn{min-height:46px}
+.page.active{animation:ct-page-in .24s ease both}
+@keyframes ct-page-in{from{opacity:.55;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.card,.item,.home-shortcuts button,.home-shortcuts a{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.card h2,.card h3{line-height:1.25}
+.card p{line-height:1.6}
+.btn{transition:transform .18s ease,filter .18s ease,box-shadow .18s ease}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn.alt:hover{border-color:rgba(237,28,36,.42);background:rgba(237,28,36,.08)}
+nav#nav button{transition:background .18s ease,border-color .18s ease,color .18s ease,transform .18s ease}
+nav#nav button:focus-visible,.home-shortcuts button:focus-visible,.home-shortcuts a:focus-visible{outline:3px solid #fff;outline-offset:3px}
+input,textarea,select{min-height:46px}
+textarea{line-height:1.55}
+input[type=file]{padding:10px}
+input[type=checkbox],input[type=radio]{width:auto;min-height:0;accent-color:var(--red)}
+.connection-status{backdrop-filter:blur(12px)}
+footer{border-top:1px solid var(--hairline);margin-top:26px}
+footer a{text-underline-offset:3px}
+::selection{background:rgba(237,28,36,.35);color:#fff}
+::-webkit-scrollbar{width:9px;height:8px}
+::-webkit-scrollbar-thumb{background:rgba(237,28,36,.45);border:2px solid transparent;background-clip:padding-box;border-radius:99px}
+::-webkit-scrollbar-track{background:transparent}
+body.light{background-image:radial-gradient(ellipse at 88% 0%,rgba(237,28,36,.1),transparent 32%),linear-gradient(180deg,#f8f8fa,#efeff2 70%)}
+body.light header:before{background:linear-gradient(115deg,transparent 15%,rgba(237,28,36,.035) 52%,transparent 84%)}
+body.light .btn.alt:hover{background:rgba(237,28,36,.06)}
+body.light ::selection{color:#111}
+@media(max-width:759px){
+ html{scroll-padding-bottom:94px}
+ body{background-attachment:scroll}
+ header .header-action-row{overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;padding:2px 1px 5px;scrollbar-width:none}
+ header .header-action-row::-webkit-scrollbar{display:none}
+ header .header-action-row .btn{flex:0 0 auto}
+ header .header-action-row:first-child .btn{min-width:max-content}
+ .hero{gap:9px}
+ .hero .social{display:grid;grid-template-columns:1fr 1fr}
+ .hero .social .btn{min-height:48px;display:flex;align-items:center;justify-content:center}
+ .page.active{animation-duration:.18s}
+ .card,.item{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+ nav#nav button.active{transform:translateY(-2px)}
+ footer{padding-bottom:28px}
+}
+@media(prefers-reduced-motion:reduce){
+ html{scroll-behavior:auto}
+ .page.active{animation:none}
+ .btn,.card,nav#nav button{transition:none}
+}
+
 </style></head>
 <body>
 <script>
