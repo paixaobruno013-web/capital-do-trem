@@ -563,7 +563,7 @@ export async function sendChatMessage(content) {
   if (!cleanContent || cleanContent.length > 1000) throw new Error('A mensagem deve ter entre 1 e 1.000 caracteres.');
   const { data, error } = await supabase.from('chat_messages')
     .insert({ author_id: user.id, content: cleanContent })
-    .select('id, author_id, author_name, content, created_at').single();
+    .select('id, author_id, author_name, author_avatar_type, author_avatar_url, author_avatar_data, content, created_at').single();
   if (error) throw error;
   return data;
 }
@@ -585,7 +585,7 @@ export async function getRecentChatMessagesForAdmin(limit = 100) {
   const supabase = initSupabase();
   if (!(await isCurrentUserAdmin())) throw new Error('Acesso administrativo não autorizado.');
   const { data, error } = await supabase.from('chat_messages')
-    .select('id, author_id, author_name, content, created_at')
+    .select('id, author_id, author_name, author_avatar_type, author_avatar_url, author_avatar_data, content, created_at')
     .order('created_at', { ascending: false })
     .limit(Math.min(Math.max(Number(limit) || 100, 1), 200));
   if (error) throw error;
