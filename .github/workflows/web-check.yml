@@ -75,6 +75,9 @@ jobs:
           test -s supabase/migrations/2026-11-08-artist-account-type.sql
           test -s supabase/migrations/2026-11-08-optimize-profile-and-settings-policies.sql
           test -s supabase/migrations/2026-11-08-sync-profile-avatars-to-chat-messages.sql
+          test -s supabase/migrations/2026-11-08-require-confirmed-owner-email-for-admin-bootstrap.sql
+          grep -q "lower(coalesce(u.email, '')) = 'capitaldotrem07@gmail.com'" supabase/schema.sql
+          grep -q 'u.email_confirmed_at is not null' supabase/schema.sql
           grep -q 'create table if not exists public.site_settings' supabase/schema.sql
           grep -q 'create policy "site_settings_admin_update"' supabase/schema.sql
           grep -q 'export async function saveMyAvatar' supabase/auth.js
