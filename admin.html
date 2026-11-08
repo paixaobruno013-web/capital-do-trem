@@ -107,7 +107,7 @@ body.light .command-section{background:linear-gradient(150deg,#fff,#f7f7f7);bord
 <a class="command-link" href="#queue"><span class="glyph">⚙</span>Moderação</a>
 </nav>
 <section class="command-section"><h2>Publicações e aprovações</h2><p class="muted">Acompanhe artistas, músicas, eventos e divulgações enviados para análise.</p><p id="queue-status" class="status" role="status" aria-live="polite"></p><div id="queue"></div></section>
-<section class="command-section"><h2>CHAMA 🔥 • Moderação do bate-papo</h2><p class="muted">Revise mensagens recentes e remova conteúdos ofensivos, spam ou informações impróprias.</p><div id="chat-moderation"></div></section>
+<section class="command-section"><div class="actions" style="justify-content:space-between;align-items:center"><h2>CHAMA 🔥 • Moderação do bate-papo</h2><button id="refresh-chat" class="secondary" type="button">Atualizar mensagens</button></div><p class="muted">Revise mensagens recentes e remova conteúdos ofensivos, spam ou informações impróprias.</p><div id="chat-moderation"></div></section>
 </section>
 <section class="card"><h2>Segurança</h2><p class="muted">O painel verifica a permissão de administrador no banco de dados. As ações também são protegidas pelas políticas RLS do Supabase. Não use nem publique a chave service_role no navegador.</p></section>
 <footer class="muted">Capital do Trem • painel em preparação</footer>
@@ -197,7 +197,9 @@ loginForm.addEventListener('submit',async event=>{
  catch(error){loginStatus.textContent=error?.message||'Não foi possível entrar.';}
  finally{button.disabled=false;}
 });
-document.getElementById('refresh-queue').addEventListener('click',loadQueue);
+document.getElementById('refresh-queue').textContent='Atualizar tudo';
+document.getElementById('refresh-queue').addEventListener('click',async()=>{await Promise.all([loadQueue(),loadChatModeration()]);});
+document.getElementById('refresh-chat').addEventListener('click',loadChatModeration);
 document.getElementById('logout').addEventListener('click',async()=>{await auth.signOutAccount();showLoggedOut();loginStatus.textContent='Você saiu do painel.';});
 try{
  auth=await import('./supabase/auth.js');auth.initSupabase();
