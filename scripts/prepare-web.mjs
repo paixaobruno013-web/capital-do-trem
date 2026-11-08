@@ -5,10 +5,13 @@ const root = process.cwd();
 const webDir = join(root, 'www');
 const files = [
   'index.html',
+  'offline.html',
   'conta.html',
   'admin.html',
   'privacidade.html',
   'bate-papo.html',
+  'avatar.html',
+  'mensagens.html',
   'diagnostico.html',
   'marca.svg',
   'manifest.webmanifest',
