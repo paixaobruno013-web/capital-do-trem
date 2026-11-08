@@ -37,9 +37,9 @@
       ]
     },
     {
-      "name": "Bate-papo",
-      "short_name": "Bate-papo",
-      "description": "Abra o bate-papo da comunidade.",
+      "name": "Koe Fala Tu",
+      "short_name": "Koe Fala Tu",
+      "description": "Abra o Koe Fala Tu, bate-papo da comunidade.",
       "url": "./bate-papo.html",
       "icons": [
         {
