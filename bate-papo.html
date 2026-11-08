@@ -22,7 +22,7 @@ body.light{color-scheme:light;--bg:#f5f5f5;--panel:#fff;--fg:#111;--muted:#555;-
 .room-tag{border:1px solid #ed1c2466;color:var(--red);font-size:10px;font-weight:900;letter-spacing:1px;padding:6px 9px;border-radius:8px;white-space:nowrap}
 #messages{height:min(58vh,580px);min-height:240px;padding:12px;background:color-mix(in srgb,var(--bg) 88%,var(--red));border:1px solid var(--line);border-radius:15px;scrollbar-width:thin;scrollbar-color:var(--red) transparent}
 .message{max-width:92%;border-radius:14px 14px 14px 4px;padding:11px 13px;background:var(--panel);box-shadow:0 3px 12px #0002}
-.message strong{letter-spacing:.2px}
+.message-head{display:flex;align-items:center;gap:9px;margin-bottom:6px}.message-avatar{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;overflow:hidden;border:1px solid #ed1c2477;border-radius:50%;background:var(--bg);color:var(--red);font-size:17px}.message-avatar img{width:100%;height:100%;object-fit:cover}.message strong{letter-spacing:.2px;margin:0}.message time{margin:2px 0 0}
 .message time{font-variant-numeric:tabular-nums}
 .composer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:9px;margin-top:12px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
 .composer input{margin:0;border:0;background:transparent;min-height:44px;outline:none}
@@ -50,11 +50,18 @@ function addMessage(m){
  const wasNearBottom=list.scrollHeight-list.scrollTop-list.clientHeight<90;
  seen.add(m.id);
  const box=document.createElement('article');box.className='message';box.dataset.createdAt=m.created_at||'';box.dataset.messageId=m.id;
+ const head=document.createElement('div');head.className='message-head';
+ const avatar=document.createElement('span');avatar.className='message-avatar';avatar.setAttribute('aria-hidden','true');
+ if(m.author_avatar_type==='photo'&&typeof m.author_avatar_url==='string'&&m.author_avatar_url.startsWith('https://')){
+  const image=document.createElement('img');image.src=m.author_avatar_url;image.alt='';image.loading='lazy';avatar.append(image);
+ }else avatar.textContent=m.author_avatar_type==='character'?'🎭':'👤';
+ const identity=document.createElement('div');
  const name=document.createElement('strong');name.textContent=m.author_name||'Usuário Uai';
- const body=document.createElement('div');body.textContent=m.content||'';
  const time=document.createElement('time');const d=new Date(m.created_at);
  time.textContent=Number.isNaN(d.getTime())?'':d.toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
- box.append(name,body,time);
+ identity.append(name,time);head.append(avatar,identity);
+ const body=document.createElement('div');body.textContent=m.content||'';
+ box.append(head,body);
  const stamp=Number.isNaN(d.getTime())?0:d.getTime();
  const next=[...list.children].find(node=>{const value=new Date(node.dataset.createdAt).getTime();return (Number.isNaN(value)?0:value)>stamp;});
  list.insertBefore(box,next||null);
