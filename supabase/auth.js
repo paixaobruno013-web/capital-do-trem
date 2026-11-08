@@ -56,6 +56,19 @@ export async function signInAccount({ email, password }) {
   return data;
 }
 
+export async function signInWithGoogleAccount({ redirectTo = window.location.href } = {}) {
+  const supabase = initSupabase();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo,
+      queryParams: { prompt: 'select_account' }
+    }
+  });
+  if (error) throw error;
+  return data;
+}
+
 export async function signOutAccount() {
   const supabase = initSupabase();
   const { error } = await supabase.auth.signOut();
