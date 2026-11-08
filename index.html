@@ -36,20 +36,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
  .connection-status{margin:0 0 12px;padding:11px 13px;border:1px solid var(--red);border-radius:10px;background:var(--panel2);color:var(--fg)}.connection-status[hidden]{display:none}
  .skip-link{position:absolute;left:12px;top:-60px;z-index:1000;background:var(--red);color:#fff;padding:12px 16px;border-radius:9px;font-weight:800;text-decoration:none}.skip-link:focus{top:12px}
 /* Abertura cinematográfica: fumaça leve atravessando a marca. */
-.intro-smoke{position:fixed;inset:0;z-index:9998;display:grid;place-items:center;overflow:hidden;background:#000;pointer-events:none;animation:intro-screen-out 7s ease-in-out forwards}
-.intro-smoke__brand{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;opacity:0;animation:intro-brand-in 6.7s ease-out forwards}
-.intro-smoke__brand img{width:clamp(92px,24vw,150px);height:auto;max-height:150px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(255,255,255,.18))}
-.intro-smoke__brand strong{color:#fff;font-size:clamp(23px,6vw,38px);font-weight:950;letter-spacing:clamp(2px,1vw,5px);text-shadow:0 2px 18px #777}
-.intro-smoke__brand span{color:#c7c7c7;font-size:12px;letter-spacing:2px}
-.intro-smoke__signature{position:absolute;z-index:9999;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:4.5cm;max-width:calc(100vw - 24px);min-height:30px;padding:5px 4px;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;font-size:13px;font-weight:950;letter-spacing:1.5px;line-height:1.15;text-shadow:0 1px 3px #000,0 0 8px #ed1c24,0 0 16px #ed1c24;background:rgba(0,0,0,.94);border:1.5px solid #ed1c24;border-radius:8px;box-shadow:0 0 8px rgba(237,28,36,.8),0 0 18px rgba(237,28,36,.42);opacity:1;visibility:visible;pointer-events:none}
-.intro-smoke__cloud{position:absolute;z-index:1;left:-65%;top:22%;width:125%;height:58%;opacity:0;filter:blur(22px);background:radial-gradient(ellipse at 18% 52%,rgba(225,225,225,0) 0 12%,rgba(225,225,225,.35) 22%,rgba(190,190,190,.22) 34%,transparent 53%),radial-gradient(ellipse at 38% 35%,rgba(245,245,245,.32) 0 9%,rgba(190,190,190,.2) 25%,transparent 49%),radial-gradient(ellipse at 60% 62%,rgba(220,220,220,.28) 0 12%,rgba(160,160,160,.16) 29%,transparent 52%);animation:intro-smoke-pass 6.45s cubic-bezier(.2,.65,.3,1) forwards}
-.intro-smoke__cloud:before,.intro-smoke__cloud:after{content:"";position:absolute;inset:-18% 8%;border-radius:50%;background:radial-gradient(ellipse,rgba(210,210,210,.2),transparent 68%);filter:blur(28px)}
-.intro-smoke__cloud:after{inset:12% -8% 0 28%;background:radial-gradient(ellipse,rgba(245,245,245,.18),transparent 70%)}
+.intro-smoke{position:fixed;inset:0;z-index:9998;display:block;overflow:hidden;background:#000;opacity:1;visibility:visible;transition:opacity .45s ease,visibility .45s ease}
+.intro-smoke.is-finished{opacity:0;visibility:hidden}
+.intro-smoke__cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center}
+.intro-smoke__signature{position:absolute;z-index:2;left:50%;bottom:calc(66px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:clamp(112px,30vw,170px);height:auto;max-height:74px;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,.95));pointer-events:none}
+.intro-smoke__loading{position:absolute;z-index:3;left:12%;right:12%;bottom:calc(22px + env(safe-area-inset-bottom,0px));display:grid;gap:8px;text-align:center;color:#fff;font:700 13px/1.2 system-ui,sans-serif;text-shadow:0 1px 4px #000}
+.intro-smoke__track{height:7px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.35);box-shadow:0 1px 5px #000}
+.intro-smoke__progress{display:block;width:0;height:100%;border-radius:inherit;background:#ed1c24;transition:width .25s ease}
 .intro-smoke-skip{display:none!important}
-@keyframes intro-smoke-pass{0%{transform:translate3d(-12%,18%,0) scale(.82);opacity:0}15%{opacity:.88}72%{opacity:.7}100%{transform:translate3d(150%,-12%,0) scale(1.2);opacity:0}}
-@keyframes intro-brand-in{0%,18%{opacity:0;transform:translateY(10px) scale(.97)}42%,78%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-5px) scale(1.02)}}
-@keyframes intro-screen-out{0%,78%{opacity:1}100%{opacity:0;visibility:hidden}}
-@media(prefers-reduced-motion:reduce){.intro-smoke{display:none!important}}
+@media(prefers-reduced-motion:reduce){.intro-smoke{transition:none}}
 
 
 /* Identidade LED vermelha: brilho controlado para destacar sem cansar a leitura. */
@@ -132,11 +127,33 @@ body.light nav#nav button,body.light nav#nav .nav-chat{color:#222}
  if(!show)document.documentElement.classList.add('intro-smoke-skip');
 })();
 </script>
-<div class="intro-smoke" id="intro-smoke" aria-hidden="true">
- <div class="intro-smoke__cloud"></div>
- <div class="intro-smoke__brand"><img src="marca.svg" alt=""><strong>CAPITAL DO TREM</strong><span>A MÚSICA DA NOSSA QUEBRADA!</span></div>
- <div class="intro-smoke__signature">BRUNO CHOCK</div>
+<div class="intro-smoke" id="intro-smoke" role="status" aria-label="Carregando Capital do Trem">
+ <img class="intro-smoke__cover" src="./assets/capital-do-trem-cover.jpg" alt="Capital do Trem — Aqui a música não para!" fetchpriority="high">
+ <img class="intro-smoke__signature" src="./assets/bruno-chock-logo.webp" alt="Bruno Chock">
+ <div class="intro-smoke__loading"><span id="intro-loading-label">Preparando o Capital do Trem…</span><span class="intro-smoke__track"><span class="intro-smoke__progress" id="intro-loading-progress"></span></span></div>
 </div>
+<script>
+(function(){
+ const screen=document.getElementById('intro-smoke');
+ const bar=document.getElementById('intro-loading-progress');
+ const label=document.getElementById('intro-loading-label');
+ if(!screen||!bar||!label)return;
+ let progress=8,loaded=false;
+ const paint=(value,message)=>{progress=Math.max(progress,Math.min(100,value));bar.style.width=progress+'%';bar.parentElement.setAttribute('aria-valuenow',String(progress));label.textContent=message;};
+ if(document.readyState!=='loading')paint(35,'Carregando recursos…');
+ else document.addEventListener('DOMContentLoaded',()=>paint(35,'Carregando recursos…'),{once:true});
+ window.addEventListener('load',async()=>{
+  paint(78,'Finalizando a abertura…');
+  const images=[...screen.querySelectorAll('img')];
+  await Promise.all(images.map(img=>img.decode?img.decode().catch(()=>{}):Promise.resolve()));
+  loaded=true;paint(100,'Tudo pronto!'); 
+  window.setTimeout(()=>screen.classList.add('is-finished'),320);
+ },{once:true});
+ if(document.readyState==='complete'&&loaded===false){
+  window.setTimeout(()=>{if(!screen.classList.contains('is-finished'))paint(78,'Finalizando a abertura…');},0);
+ }
+})();
+</script>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
 <header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem</h1><p class="tag">A música da nossa quebrada!</p><div class="header-action-groups"><div class="header-action-row"><a class="btn alt" href="./conta.html">👤 Minha conta</a><a class="btn alt" href="./mensagens.html">✉️ Minhas conversas</a><a class="btn alt" href="./avatar.html">🎭 Meu avatar</a><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button></div><div class="header-action-row"><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn alt" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a></div><div class="header-action-row"><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som de entrada: ligado</button></div></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Vinheta de 7 segundos • toque na tela para ouvir</p><div class="header-location-row"><button class="btn alt" id="quick-location" type="button">📍 Logo ali Uai - Localização</button></div></header>
 <main id="main-content" tabindex="-1">
