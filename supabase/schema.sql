@@ -837,3 +837,49 @@ drop policy if exists private_conversations_touch_accepted on public.private_con
 create policy private_conversations_touch_accepted on public.private_conversations for update to authenticated
  using(status='accepted' and (select auth.uid()) in(participant_one,participant_two))
  with check(status='accepted' and (select auth.uid()) in(participant_one,participant_two));
+
+
+
+-- Restringe transições de convite e combina as regras de UPDATE em uma política.
+create or replace function private.protect_private_conversation_update()
+returns trigger language plpgsql security invoker set search_path=''
+as $$
+declare recipient uuid;
+begin
+ if new.participant_one is distinct from old.participant_one
+    or new.participant_two is distinct from old.participant_two
+    or new.initiated_by is distinct from old.initiated_by then
+   raise exception 'Os participantes do convite não podem ser alterados.';
+ end if;
+ recipient:=case when old.initiated_by=old.participant_one then old.participant_two else old.participant_one end;
+ if old.status='pending' then
+   if (select auth.uid()) is distinct from recipient or new.status not in('accepted','declined') then
+     raise exception 'Somente quem recebeu o convite pode aceitar ou recusar.';
+   end if;
+ elsif old.status='accepted' then
+   if (select auth.uid()) not in(old.participant_one,old.participant_two) or new.status<>'accepted' then
+     raise exception 'Atualização não permitida para esta conversa.';
+   end if;
+ else
+   raise exception 'Este convite já foi encerrado.';
+ end if;
+ return new;
+end;
+$$;
+revoke all on function private.protect_private_conversation_update() from public;
+revoke execute on function private.protect_private_conversation_update() from anon;
+grant execute on function private.protect_private_conversation_update() to authenticated;
+drop trigger if exists private_conversation_update_guard on public.private_conversations;
+create trigger private_conversation_update_guard before update on public.private_conversations for each row execute function private.protect_private_conversation_update();
+drop policy if exists private_conversations_recipient_decision on public.private_conversations;
+drop policy if exists private_conversations_touch_accepted on public.private_conversations;
+drop policy if exists private_conversations_update_participants on public.private_conversations;
+create policy private_conversations_update_participants on public.private_conversations for update to authenticated
+using(
+ (status='pending' and (select auth.uid())=case when initiated_by=participant_one then participant_two else participant_one end)
+ or (status='accepted' and (select auth.uid()) in(participant_one,participant_two))
+)
+with check(
+ (status in('accepted','declined') and (select auth.uid())=case when initiated_by=participant_one then participant_two else participant_one end)
+ or (status='accepted' and (select auth.uid()) in(participant_one,participant_two))
+);
