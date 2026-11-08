@@ -85,6 +85,8 @@ jobs:
           grep -q 'create table if not exists public.private_conversations' supabase/schema.sql
           grep -q 'create table if not exists public.private_messages' supabase/schema.sql
           grep -q 'private_messages_insert_accepted_participants' supabase/schema.sql
+          grep -q 'private.private_users_blocked' supabase/schema.sql
+          grep -q 'private_conversations_touch_accepted' supabase/schema.sql
           test -s supabase/migrations/2026-11-08-private-conversations.sql
           grep -q 'export async function sendPrivateMessage' supabase/auth.js
           grep -q 'subscribePrivateMessages' mensagens.html
