@@ -31,6 +31,29 @@ body.light h1,body.light h2{text-shadow:0 0 8px rgba(237,28,36,.1)}
 .skip-link{position:fixed;top:10px;left:10px;z-index:20000;transform:translateY(-160%);padding:12px 16px;border-radius:9px;background:var(--red);color:#fff;font-weight:800;text-decoration:none;box-shadow:0 4px 18px #0008}.skip-link:focus{transform:translateY(0);outline:3px solid var(--fg);outline-offset:3px}
 
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+ 
+/* Central de comando moderna: atalhos compactos, hierarquia clara e adaptação móvel. */
+main{max-width:1240px;padding:18px}
+header{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+#dashboard{border:0;background:transparent;padding:0}
+.command-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:18px;border:1px solid var(--line);border-radius:18px;background:radial-gradient(ellipse at 90% 0%,rgba(237,28,36,.17),transparent 48%),linear-gradient(145deg,var(--panel2),var(--panel));}
+.command-top h2{margin:0;font-size:clamp(20px,3vw,28px)}
+.command-top p{margin:4px 0 0}
+.command-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:9px;margin:14px 0 20px}
+.command-link{min-width:0;min-height:68px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:8px 5px;border:1px solid rgba(237,28,36,.58);border-radius:12px;background:linear-gradient(145deg,var(--panel2),var(--panel));color:var(--fg);text-decoration:none;text-align:center;font-size:12px;font-weight:850;line-height:1.2;box-shadow:0 0 10px rgba(237,28,36,.12);transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.command-link .glyph{font-size:20px;line-height:1;color:var(--red);text-shadow:0 0 10px rgba(237,28,36,.45)}
+.command-link:hover{transform:translateY(-2px);border-color:var(--red);box-shadow:0 0 14px rgba(237,28,36,.3)}
+.command-section{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin:14px 0}
+.command-section h2{font-size:19px;margin:0 0 5px}
+.command-section .muted{margin-top:0}
+#queue h2{font-size:18px;border-bottom:1px solid var(--line);padding:14px 0 8px}
+#queue .item,#chat-moderation .item{background:var(--panel2)}
+#queue .item{border-left:3px solid var(--red)}
+#chat-moderation .item{border-left:3px solid #555}
+#dashboard .actions button{min-height:38px;padding:8px 12px;font-size:13px}
+@media(min-width:850px){main{padding:24px 30px}.command-grid{grid-template-columns:repeat(9,minmax(0,1fr))}.command-section{padding:20px}}
+@media(max-width:480px){main{padding:12px}.command-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.command-link{min-height:62px;font-size:11px;padding:6px 3px}.command-link .glyph{font-size:18px}.command-section{padding:13px}}
+
 </style>
 </head>
 <body>
@@ -46,10 +69,20 @@ body.light h1,body.light h2{text-shadow:0 0 8px rgba(237,28,36,.1)}
 </form></section>
 <section class="card" id="dashboard" hidden>
 <div class="actions"><button id="refresh-queue" type="button">Atualizar fila</button><button id="logout" class="secondary" type="button">Sair</button></div>
-<p id="admin-welcome" class="muted"></p><p id="queue-status" class="status" role="status" aria-live="polite"></p>
-<div id="queue"></div>
-<hr style="border:0;border-top:1px solid var(--line);margin:24px 0">
-<h2>Moderação do bate-papo</h2><p class="muted">Revise as mensagens recentes e remova conteúdos ofensivos, spam ou informações impróprias.</p><div id="chat-moderation"></div>
+<section class="command-top"><div><h2>Central de controle</h2><p class="muted">Tudo do Capital do Trem em um só lugar.</p><p id="admin-welcome" class="muted"></p></div><p class="notice">Acesso restrito ao administrador</p></section>
+<nav class="command-grid" aria-label="Atalhos da central">
+<a class="command-link" href="./"><span class="glyph">⌂</span>Ver aplicativo</a>
+<a class="command-link" href="./conta.html"><span class="glyph">♙</span>Minha conta</a>
+<a class="command-link" href="./#musicas"><span class="glyph">♫</span>Músicas</a>
+<a class="command-link" href="./#eventos"><span class="glyph">▦</span>Eventos</a>
+<a class="command-link" href="./#comunidade"><span class="glyph">☻</span>Comunidade</a>
+<a class="command-link" href="./bate-papo.html"><span class="glyph">☏</span>FALA UAI</a>
+<a class="command-link" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener noreferrer"><span class="glyph">▶</span>YouTube</a>
+<a class="command-link" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener noreferrer"><span class="glyph">◎</span>Instagram</a>
+<a class="command-link" href="#queue"><span class="glyph">⚙</span>Moderação</a>
+</nav>
+<section class="command-section"><h2>Publicações e aprovações</h2><p class="muted">Acompanhe artistas, músicas, eventos e divulgações enviados para análise.</p><p id="queue-status" class="status" role="status" aria-live="polite"></p><div id="queue"></div></section>
+<section class="command-section"><h2>FALA UAI • Moderação do bate-papo</h2><p class="muted">Revise mensagens recentes e remova conteúdos ofensivos, spam ou informações impróprias.</p><div id="chat-moderation"></div></section>
 </section>
 <section class="card"><h2>Segurança</h2><p class="muted">O painel verifica a permissão de administrador no banco de dados. As ações também são protegidas pelas políticas RLS do Supabase. Não use nem publique a chave service_role no navegador.</p></section>
 <footer class="muted">Capital do Trem • painel em preparação</footer>
@@ -83,7 +116,7 @@ async function loadQueue(){
   const groups=await auth.getModerationQueue();
   let count=0;
   for(const [kind,label] of [['artists','Artistas'],['events','Eventos e ações'],['posts','Divulgações'],['songs','Músicas']]){
-   const heading=node('h2','',label);queue.append(heading);
+   const heading=node('h2','',label);heading.id='section-'+kind;queue.append(heading);
    if(!groups[kind].length){queue.append(node('p','muted','Nenhum item aguardando análise.'));continue;}
    for(const item of groups[kind]){
     count++;
