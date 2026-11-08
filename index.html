@@ -846,7 +846,8 @@ function updateConnectionStatus(isReconnect=false){
   connectionStatus.hidden=true;
  }
 }
-window.addEventListener('offline',()=>{updateConnectionStatus();try{if(navigator.vibrate)navigator.vibrate(3000);}catch{}});
+// O alerta sonoro/visual e a vibração de 3 segundos são centralizados em update.js.
+window.addEventListener('offline',()=>updateConnectionStatus());
 window.addEventListener('online',()=>updateConnectionStatus(true));
 updateConnectionStatus();
 
