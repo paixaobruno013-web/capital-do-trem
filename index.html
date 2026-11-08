@@ -779,7 +779,7 @@ let reconnectNoticeTimer;
 function updateConnectionStatus(isReconnect=false){
  if(!navigator.onLine){
   clearTimeout(reconnectNoticeTimer);
-  connectionStatus.textContent='Você está sem conexão com a internet. As partes já carregadas podem continuar disponíveis, mas mapas, links e serviços externos podem não funcionar.';
+  connectionStatus.textContent='⚠️ ALERTA — VOCÊ TÁ OFFLINE. As partes já carregadas podem continuar disponíveis, mas mapas, links e serviços externos podem não funcionar.';
   connectionStatus.hidden=false;
  }else if(isReconnect){
   connectionStatus.textContent='Conexão restabelecida. Você já pode tentar novamente os recursos que precisam de internet.';
@@ -790,7 +790,7 @@ function updateConnectionStatus(isReconnect=false){
   connectionStatus.hidden=true;
  }
 }
-window.addEventListener('offline',()=>updateConnectionStatus());
+window.addEventListener('offline',()=>{updateConnectionStatus();try{if(navigator.vibrate)navigator.vibrate(3000);}catch{}});
 window.addEventListener('online',()=>updateConnectionStatus(true));
 updateConnectionStatus();
 
