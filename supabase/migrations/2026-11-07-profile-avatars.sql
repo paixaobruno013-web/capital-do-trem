@@ -13,7 +13,7 @@ alter table public.chat_messages
   add column if not exists author_avatar_url text,
   add column if not exists author_avatar_data jsonb;
 
-create or replace function public.set_community_author_name()
+create or replace function public.set_chat_author_identity()
 returns trigger language plpgsql security definer set search_path = ''
 as $$
 declare
@@ -39,9 +39,10 @@ end;
 $$;
 
 drop trigger if exists chat_messages_set_author_name on public.chat_messages;
-create trigger chat_messages_set_author_name
+drop trigger if exists chat_messages_set_avatar on public.chat_messages;
+create trigger chat_messages_set_avatar
   before insert on public.chat_messages
-  for each row execute procedure public.set_community_author_name();
+  for each row execute procedure public.set_chat_author_identity();
 
 -- Atualiza também mensagens antigas com a identidade atual do perfil.
 update public.chat_messages m
