@@ -744,6 +744,6 @@ export async function blockPrivateUser(otherUserId) {
   if(userError)throw userError;
   if(!user)throw new Error('Entre na sua conta.');
   if(!otherUserId||otherUserId===user.id)throw new Error('Usuário inválido.');
-  const {error}=await supabase.from('private_blocks').upsert({blocker_id:user.id,blocked_id:otherUserId},{onConflict:'blocker_id,blocked_id'});
-  if(error)throw error;
+  const {error}=await supabase.from('private_blocks').insert({blocker_id:user.id,blocked_id:otherUserId});
+  if(error&&error.code!=='23505')throw error;
 }
