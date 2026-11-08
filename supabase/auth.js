@@ -226,6 +226,18 @@ export async function isCurrentUserAdmin() {
   return data === true;
 }
 
+// Ativa o primeiro administrador somente para o e-mail autorizado no banco.
+// A função SQL valida novamente a identidade e só inicializa se ainda não houver administrador.
+export async function bootstrapFirstAdmin() {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user || (user.email || '').toLowerCase() !== 'capitaldotrem07@gmail.com') return false;
+  const { data, error } = await supabase.rpc('bootstrap_first_admin');
+  if (error) throw error;
+  return data === true;
+}
+
 export async function getModerationQueue() {
   const supabase = initSupabase();
   if (!(await isCurrentUserAdmin())) throw new Error('Acesso administrativo não autorizado.');
