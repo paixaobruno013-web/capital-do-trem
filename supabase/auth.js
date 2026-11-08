@@ -296,7 +296,7 @@ export async function submitMyEvent(eventData) {
     contact: String(eventData.contact || '').trim(),
     poster_url: eventData.poster_url || null,
     created_by: user.id,
-    status: 'pending'
+    status: 'published'
   };
   const { data, error } = await supabase.from('events').insert(payload)
     .select('id, title, event_date, address, status').single();
@@ -394,7 +394,7 @@ export async function uploadMySong({ file, title, artistName, description = '' }
   if (uploadError) throw uploadError;
   const { data, error } = await supabase.from('songs').insert({
     user_id:user.id,title:cleanTitle,artist_name:cleanArtist,description:cleanDescription,
-    storage_path:path,mime_type:mime,file_size:file.size,status:'pending'
+    storage_path:path,mime_type:mime,file_size:file.size,status:'published'
   }).select('id,title,artist_name,status,created_at').single();
   if (error) {
     await supabase.storage.from('capital-do-trem-audio').remove([path]);
@@ -468,7 +468,7 @@ export async function submitMyPost(content) {
     throw new Error('A divulgação deve ter entre 1 e 1.500 caracteres.');
   }
   const { data, error } = await supabase.from('posts')
-    .insert({ author_id: user.id, content: cleanContent, status: 'pending' })
+    .insert({ author_id: user.id, content: cleanContent, status: 'published' })
     .select('id, content, status, created_at').single();
   if (error) throw error;
   return data;
