@@ -108,26 +108,18 @@ body.light .command-section{background:linear-gradient(150deg,#fff,#f7f7f7);bord
 </nav>
 
 <section class="command-section" id="branding-section">
- <h2>Identidade visual do aplicativo</h2>
- <p class="muted">Troque as imagens oficiais do Capital do Trem pela galeria do celular. As alterações aparecem para todos os usuários. JPG, PNG ou WebP até 5 MB.</p>
- <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px">
-  <article class="item">
-   <h3>Foto de perfil oficial</h3><p class="muted">Logo que aparece no cabeçalho do aplicativo.</p>
-   <img id="branding-profile-preview" src="./marca.svg" alt="Prévia da foto oficial" style="display:block;width:112px;height:112px;object-fit:cover;border-radius:50%;background:#000;margin:10px auto">
-   <label for="branding-profile-file">Escolher foto</label><input id="branding-profile-file" type="file" accept="image/jpeg,image/png,image/webp">
-   <button id="branding-profile-save" type="button">Salvar foto oficial</button>
-   <p id="branding-profile-status" class="status" role="status" aria-live="polite"></p>
-  </article>
-  <article class="item">
-   <h3>Imagem da abertura</h3><p class="muted">Imagem exibida na abertura cinematográfica do app.</p>
-   <img id="branding-opening-preview" src="./marca.svg" alt="Prévia da imagem de abertura" style="display:block;width:100%;max-width:220px;height:130px;object-fit:contain;border-radius:10px;background:#000;margin:10px auto">
-   <label for="branding-opening-file">Escolher imagem</label><input id="branding-opening-file" type="file" accept="image/jpeg,image/png,image/webp">
-   <button id="branding-opening-save" type="button">Salvar imagem da abertura</button>
-   <p id="branding-opening-status" class="status" role="status" aria-live="polite"></p>
-  </article>
+ <h2>Identidade visual oficial • logo circular</h2>
+ <p class="muted">Escolha a arte original uma única vez. O sistema salvará o mesmo arquivo para a foto de perfil e para a abertura. JPG, PNG ou WebP até 5 MB.</p>
+ <div class="item">
+  <img id="branding-profile-preview" src="./marca.svg" alt="Prévia circular da logo oficial" style="display:block;width:116px;height:116px;object-fit:cover;object-position:center;border:2px solid #ed1c24;border-radius:50%;background:#000;margin:12px auto;box-shadow:0 0 16px #ed1c2455">
+  <p class="muted" style="text-align:center">Prévia da mesma logo que aparecerá no perfil e na abertura</p>
+  <label for="branding-pair-file">Selecionar arte original</label><input id="branding-pair-file" type="file" accept="image/jpeg,image/png,image/webp">
+  <button id="branding-pair-save" type="button">Atualizar perfil e abertura</button>
+  <p id="branding-pair-status" class="status" role="status" aria-live="polite"></p>
  </div>
- <p class="muted">A imagem atual continua ativa até você salvar outra. A assinatura Bruno Chock permanece somente na abertura.</p>
+ <p class="muted">A abertura terá a logo em um círculo maior, centralizado sobre fundo preto. A assinatura Bruno Chock continua somente na abertura.</p>
 </section>
+
 <section class="command-section"><h2>Publicações e aprovações</h2><p class="muted">Acompanhe artistas, músicas, eventos e divulgações enviados para análise.</p><p id="queue-status" class="status" role="status" aria-live="polite"></p><div id="queue"></div></section>
 <section class="command-section"><div class="actions" style="justify-content:space-between;align-items:center"><h2>Koe Fala Tu • Moderação do chat</h2><button id="refresh-chat" class="secondary" type="button">Atualizar mensagens</button></div><p class="muted">Revise mensagens recentes e remova conteúdos ofensivos, spam ou informações impróprias.</p><div id="chat-moderation"></div></section>
 </section>
@@ -164,29 +156,26 @@ async function enterDashboard(user){
 async function loadBranding(){
  try{
   const branding=await auth.getPublicBranding();
-  if(branding.profileImageUrl)document.getElementById('branding-profile-preview').src=branding.profileImageUrl;
-  if(branding.openingImageUrl)document.getElementById('branding-opening-preview').src=branding.openingImageUrl;
- }catch(error){document.getElementById('branding-profile-status').textContent='Não foi possível carregar as imagens atuais.';}
+  const url=branding.profileImageUrl||branding.openingImageUrl;
+  if(url)document.getElementById('branding-profile-preview').src=url;
+ }catch(error){document.getElementById('branding-pair-status').textContent='Não foi possível carregar a imagem atual.';}
 }
-function setupBrandingEditor(kind){
- const fileInput=document.getElementById('branding-'+kind+'-file');
- const preview=document.getElementById('branding-'+kind+'-preview');
- const saveButton=document.getElementById('branding-'+kind+'-save');
- const status=document.getElementById('branding-'+kind+'-status');
- fileInput.addEventListener('change',()=>{
-  const file=fileInput.files?.[0];if(!file)return;
-  if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){status.textContent='Escolha JPG, PNG ou WebP de até 5 MB.';fileInput.value='';return;}
-  preview.src=URL.createObjectURL(file);status.textContent='Prévia selecionada. Toque em salvar para publicar.';
- });
- saveButton.addEventListener('click',async()=>{
-  const file=fileInput.files?.[0];if(!file){status.textContent='Primeiro escolha uma imagem na galeria.';return;}
-  saveButton.disabled=true;status.textContent='Enviando e salvando a imagem…';
-  try{const url=await auth.saveAdminBrandingImage(kind,file);preview.src=url;fileInput.value='';status.textContent='Imagem oficial atualizada para todos os usuários!';}
-  catch(error){status.textContent=error?.message||'Não foi possível salvar. Confira sua conexão e tente novamente.';}
-  finally{saveButton.disabled=false;}
- });
-}
-setupBrandingEditor('profile');setupBrandingEditor('opening');
+const brandingFile=document.getElementById('branding-pair-file');
+const brandingPreview=document.getElementById('branding-profile-preview');
+const brandingSave=document.getElementById('branding-pair-save');
+const brandingStatus=document.getElementById('branding-pair-status');
+brandingFile.addEventListener('change',()=>{
+ const file=brandingFile.files?.[0];if(!file)return;
+ if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){brandingStatus.textContent='Escolha JPG, PNG ou WebP de até 5 MB.';brandingFile.value='';return;}
+ brandingPreview.src=URL.createObjectURL(file);brandingStatus.textContent='Prévia circular pronta. Toque em atualizar para publicar nas duas telas.';
+});
+brandingSave.addEventListener('click',async()=>{
+ const file=brandingFile.files?.[0];if(!file){brandingStatus.textContent='Primeiro escolha a arte original na galeria.';return;}
+ brandingSave.disabled=true;brandingStatus.textContent='Enviando uma cópia e atualizando perfil + abertura…';
+ try{const url=await auth.saveAdminBrandingPair(file);brandingPreview.src=url;brandingFile.value='';brandingStatus.textContent='Logo atualizada nas duas posições para todos os usuários!';}
+ catch(error){brandingStatus.textContent=error?.message||'Não foi possível salvar. Confira sua conexão e tente novamente.';}
+ finally{brandingSave.disabled=false;}
+});
 async function loadQueue(){
  queue.replaceChildren();queueStatus.textContent='Carregando publicações pendentes...';
  try{
