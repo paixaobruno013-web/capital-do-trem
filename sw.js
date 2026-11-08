@@ -1,4 +1,4 @@
-const CACHE='capital-do-trem-v162';
+const CACHE='capital-do-trem-v163';
 const CORE_FILES=['./','./index.html','./offline.html','./marca.svg','./manifest.webmanifest','./update.js'];
 const OPTIONAL_FILES=['./admin.html','./privacidade.html','./conta.html','./supabase/auth.js','./diagnostico.html','./bate-papo.html','./avatar.html','./mensagens.html'];
 
@@ -43,7 +43,7 @@ self.addEventListener('fetch',event=>{
           caches.open(CACHE).then(cache=>cache.put(event.request,copy));
         }
         return response;
-      }).catch(()=>caches.match(event.request,{ignoreSearch:true}).then(async cached=>cached||(await caches.match('./offline.html'))||new Response('<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sem conexão — Capital do Trem</title><body style="background:#000;color:#fff;font:16px system-ui;padding:24px"><h1>Você está sem conexão</h1><p>Conecte-se novamente e tente abrir o Capital do Trem.</p><a href="./">Voltar ao início</a></body></html>',{status:503,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}})))
+      }).catch(()=>caches.match(event.request,{ignoreSearch:true}).then(async cached=>cached||(await caches.match('./offline.html'))||new Response('<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sem conexão — Capital do Trem</title><body style="background:#000;color:#fff;font:16px system-ui;padding:24px"><h1>ALERTA — VOCÊ TÁ OFFLINE</h1><p>Conecte-se novamente e tente abrir o Capital do Trem.</p><a href="./">Voltar ao início</a></body></html>',{status:503,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}})))
     );
     return;
   }
