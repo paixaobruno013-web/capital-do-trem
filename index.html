@@ -343,6 +343,13 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
 .home-youtube-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .home-youtube-video>a{display:inline-block;margin-top:9px;color:var(--fg);font-size:13px;font-weight:800;text-decoration:underline;text-decoration-color:var(--red);text-underline-offset:3px}
 @media(max-width:520px){.home-youtube-grid{grid-template-columns:1fr}.home-youtube{padding:13px}}
+
+/* Desempenho em celulares: não iniciar quatro players do YouTube ao abrir a página. */
+.home-youtube-load{position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;background:#000;color:#fff;cursor:pointer;overflow:hidden;border-radius:9px}
+.home-youtube-load img{width:100%;height:100%;display:block;object-fit:cover;opacity:.9}
+.home-youtube-load span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:9px 14px;border-radius:999px;background:rgba(237,28,36,.94);color:#fff;font-weight:800;white-space:nowrap;box-shadow:0 3px 14px rgba(0,0,0,.45)}
+.home-youtube-frame:has(.home-youtube-load){isolation:isolate}
+@media(max-width:759px){.card,.item,.home-shortcuts button,.home-shortcuts a,header,nav#nav{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}}
 </style></head>
 <body>
 <script>
@@ -367,10 +374,10 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
 <h2 id="home-youtube-title">▶ Vídeos da Capital do Trem</h2>
 <p class="muted">Os 4 vídeos enviados por você, do mais recente ao mais antigo.</p>
 <div class="home-youtube-grid">
-<article class="home-youtube-video"><span class="home-youtube-order">1º • Mais recente</span><div class="home-youtube-frame"><iframe src="https://www.youtube-nocookie.com/embed/LmI04iuudmQ" title="Vídeo mais recente da Capital do Trem" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><a href="https://youtu.be/LmI04iuudmQ" target="_blank" rel="noopener noreferrer">Assistir no YouTube</a></article>
-<article class="home-youtube-video"><span class="home-youtube-order">2º</span><div class="home-youtube-frame"><iframe src="https://www.youtube-nocookie.com/embed/DDHrNCagaD0" title="Segundo vídeo da Capital do Trem" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><a href="https://youtu.be/DDHrNCagaD0" target="_blank" rel="noopener noreferrer">Assistir no YouTube</a></article>
-<article class="home-youtube-video"><span class="home-youtube-order">3º</span><div class="home-youtube-frame"><iframe src="https://www.youtube-nocookie.com/embed/eQHIsU_mamM" title="Terceiro vídeo da Capital do Trem" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><a href="https://youtu.be/eQHIsU_mamM" target="_blank" rel="noopener noreferrer">Assistir no YouTube</a></article>
-<article class="home-youtube-video"><span class="home-youtube-order">4º • Mais antigo</span><div class="home-youtube-frame"><iframe src="https://www.youtube-nocookie.com/embed/W4wnKF5AHQA" title="Vídeo mais antigo da seleção" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><a href="https://youtu.be/W4wnKF5AHQA" target="_blank" rel="noopener noreferrer">Assistir no YouTube</a></article>
+<article class="home-youtube-video"><span class="home-youtube-order">1º • Mais recente</span><div class="home-youtube-frame"><button class="home-youtube-load" type="button" data-youtube-id="LmI04iuudmQ" aria-label="Carregar e reproduzir: Vídeo mais recente da Capital do Trem"><img src="https://i.ytimg.com/vi/LmI04iuudmQ/hqdefault.jpg" alt="" loading="lazy" decoding="async"><span>▶ Reproduzir vídeo</span></button></div><a href="https://youtu.be/LmI04iuudmQ" target="_blank" rel="noopener noreferrer">Assistir no YouTube</a></article>
+<article class="home-youtube-video"><span class="home-youtube-order">2º</span><div class="home-youtube-frame"><button class="home-youtube-load" type="button" data-youtube-id="DDHrNCagaD0" aria-label="Carregar e reproduzir: Segundo vídeo da Capital do Trem"><img src="https://i.ytimg.com/vi/DDHrNCagaD0/hqdefault.jpg" alt="" loading="lazy" decoding="async"><span>▶ Reproduzir vídeo</span></button></div><a href="https://youtu.be/DDHrNCagaD0" target="_blank" rel="noopener noreferrer">Assistir no YouTube</a></article>
+<article class="home-youtube-video"><span class="home-youtube-order">3º</span><div class="home-youtube-frame"><button class="home-youtube-load" type="button" data-youtube-id="eQHIsU_mamM" aria-label="Carregar e reproduzir: Terceiro vídeo da Capital do Trem"><img src="https://i.ytimg.com/vi/eQHIsU_mamM/hqdefault.jpg" alt="" loading="lazy" decoding="async"><span>▶ Reproduzir vídeo</span></button></div><a href="https://youtu.be/eQHIsU_mamM" target="_blank" rel="noopener noreferrer">Assistir no YouTube</a></article>
+<article class="home-youtube-video"><span class="home-youtube-order">4º • Mais antigo</span><div class="home-youtube-frame"><button class="home-youtube-load" type="button" data-youtube-id="W4wnKF5AHQA" aria-label="Carregar e reproduzir: Vídeo mais antigo da seleção"><img src="https://i.ytimg.com/vi/W4wnKF5AHQA/hqdefault.jpg" alt="" loading="lazy" decoding="async"><span>▶ Reproduzir vídeo</span></button></div><a href="https://youtu.be/W4wnKF5AHQA" target="_blank" rel="noopener noreferrer">Assistir no YouTube</a></article>
 </div></section>
 <div class="home-shortcuts" aria-label="Atalhos principais"><button type="button" data-go="musicas"><span aria-hidden="true">♫</span>Músicas</button><button type="button" data-go="musicas"><span aria-hidden="true">✦</span>Lançamentos</button><button type="button" data-go="artistas"><span aria-hidden="true">♛</span>Artistas</button><a href="./bate-papo.html"><span aria-hidden="true">☏</span>Koe Fala Tu</a><button type="button" data-go="comunidade"><span aria-hidden="true">♟</span>Comunidade</button><button type="button" data-go="eventos"><span aria-hidden="true">▦</span>Eventos</button><a href="./conta.html"><span aria-hidden="true">👤</span>Minha conta</a><a href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">▶</span>YouTube</a><a href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">◎</span>Instagram</a></div><div class="grid"><article class="card"><h3>🎧 Música independente</h3><p class="muted">Espaço para lançamentos, artistas e sons da cena.</p></article><article class="card"><h3>📅 Cultura e eventos</h3><p class="muted">Divulgação de encontros, bailes e atividades culturais.</p></article><article class="card"><h3>🤝 Comunidade</h3><p class="muted">Ações sociais, parcerias e informação para fortalecer a comunidade.</p></article></div><div class="card"><h3>📣 Mural da comunidade</h3><p class="muted">Publicações aprovadas pela equipe do Capital do Trem.</p><div id="public-posts" class="list" aria-live="polite"><p class="muted">O mural compartilhado será carregado quando o banco estiver conectado.</p></div></div><div class="notice">O mural mostra somente divulgações aprovadas pela equipe. Para enviar uma publicação, entre na sua conta e use a área de divulgação. <a href="./conta.html">Acessar minha conta</a>.</div></section>
 <section class="page" id="musicas"><div class="card"><h2>🎵 Central de músicas</h2><p class="muted">Um espaço para ouvir os sons dentro do Capital do Trem, sem precisar abrir o YouTube.</p><p class="muted">Músicas publicadas pela equipe, com reprodução, download, curtidas e comentários.</p><div id="published-song-catalog" class="list" aria-live="polite"><p class="muted">Carregando catálogo compartilhado…</p></div></div><div class="card"><h3>🎧 Player do Capital do Trem</h3><label for="audio">Escolha uma música autorizada que esteja no seu aparelho</label><input id="audio" type="file" accept="audio/*"><audio id="player" controls preload="metadata" style="width:100%;margin:12px 0"></audio><div class="social" style="align-items:center"><button class="btn" id="download-audio" type="button" disabled>⬇ Baixar música</button><span id="audio-status" class="muted" role="status" aria-live="polite">Selecione um áudio para ouvir e baixar nesta demonstração.</span></div><p class="muted">O player oferece controles de reprodução e pode continuar tocando com a tela bloqueada, conforme o suporte do navegador e as configurações de economia de bateria do celular. O download salva o arquivo selecionado neste aparelho.</p><p class="muted">Só compartilhe ou baixe músicas que você tenha autorização para distribuir.</p></div></section>
@@ -1052,4 +1059,22 @@ function safeHttpsUrl(value){try{const url=new URL(value);return url.protocol===
 </script>
 
 <script src="./update.js" defer></script>
+
+<script>
+// Players do YouTube são carregados somente quando a pessoa toca em Reproduzir.
+document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=>{
+ button.addEventListener('click',()=>{
+  const id=button.dataset.youtubeId;
+  if(!/^[a-zA-Z0-9_-]{11}$/.test(id))return;
+  const frame=document.createElement('iframe');
+  frame.src='https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1';
+  frame.title=button.getAttribute('aria-label')||'Vídeo da Capital do Trem';
+  frame.loading='eager';frame.referrerPolicy='strict-origin-when-cross-origin';
+  frame.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+  frame.allowFullscreen=true;
+  frame.style.cssText='position:absolute;inset:0;width:100%;height:100%;border:0';
+  button.replaceWith(frame);
+ },{once:true});
+});
+</script>
 </body></html>
