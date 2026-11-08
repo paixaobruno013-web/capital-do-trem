@@ -3,16 +3,16 @@ import { dirname, join, resolve } from 'node:path';
 
 const root = process.cwd();
 const serviceWorker = await readFile(join(root, 'sw.js'), 'utf8');
-const matches = [...serviceWorker.matchAll(/const\\s+(?:CORE_FILES|OPTIONAL_FILES)\\s*=\\s*\\[([\\s\\S]*?)\\]\\s*;/g)];
+const matches = [...serviceWorker.matchAll(/const\s+(?:CORE_FILES|OPTIONAL_FILES)\s*=\s*\[([\s\S]*?)\]\s*;/g)];
 if (matches.length === 0) throw new Error('Não foi possível localizar as listas CORE_FILES/OPTIONAL_FILES do service worker.');
 
-const entries = matches.flatMap((match) => [...match[1].matchAll(/(['"])(.*?)\\1/g)].map((item) => item[2]));
+const entries = matches.flatMap((match) => [...match[1].matchAll(/(['"])(.*?)\1/g)].map((item) => item[2]));
 if (entries.length === 0) throw new Error('As listas de arquivos pré-armazenados estão vazias.');
 
 for (const entry of entries) {
-  if (/^(https?:)?\\/\\//i.test(entry)) continue;
+  if (/^(https?:)?\/\//i.test(entry)) continue;
   const pathname = decodeURIComponent(entry.split(/[?#]/, 1)[0]);
-  const relative = pathname === './' || pathname === '.' ? 'index.html' : pathname.replace(/^\\.\\//, '');
+  const relative = pathname === './' || pathname === '.' ? 'index.html' : pathname.replace(/^\.\//, '');
   const target = resolve(root, 'www', relative);
   if (!target.startsWith(resolve(root, 'www') + '/') && target !== resolve(root, 'www')) {
     throw new Error('Caminho fora da pasta www no pré-cache: ' + entry);
