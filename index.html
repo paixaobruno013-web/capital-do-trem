@@ -174,6 +174,48 @@ nav#nav .nav-profile:before{content:"♙";display:inline-block;width:22px;font-s
  nav#nav .nav-chat:before,nav#nav .nav-profile:before{display:block;width:auto;height:20px;font-size:19px;line-height:20px}
  nav#nav .nav-profile:before{content:"♙"}
 }
+
+/* Capital do Trem — camada visual moderna, mantendo o fundo definitivo substituível. */
+:root{--red:#ed1c24;--red2:#ff3945;--surface-glass:rgba(18,18,20,.88);--line:rgba(255,255,255,.09)}
+body{background:radial-gradient(ellipse at 92% 4%,rgba(237,28,36,.14),transparent 34%),radial-gradient(ellipse at 8% 35%,rgba(237,28,36,.07),transparent 38%),#080809;background-attachment:fixed}
+header{background:linear-gradient(180deg,rgba(12,12,14,.98),rgba(8,8,9,.82));border-bottom:1px solid rgba(237,28,36,.2);backdrop-filter:blur(18px)}
+.brand{letter-spacing:clamp(1px,.35vw,3px);text-shadow:0 0 22px rgba(237,28,36,.28)}
+.tag{letter-spacing:.025em}
+.hero{min-height:230px;border:1px solid rgba(255,58,69,.32);border-radius:22px;background:linear-gradient(112deg,rgba(7,7,8,.97),rgba(18,12,13,.88) 58%,rgba(55,8,13,.78)),radial-gradient(circle at 88% 18%,rgba(237,28,36,.24),transparent 36%);box-shadow:0 22px 55px rgba(0,0,0,.36),inset 0 1px rgba(255,255,255,.04)}
+.hero:after{right:-65px;top:-105px;width:300px;height:300px;border:1px solid rgba(255,255,255,.11);border-radius:42px;box-shadow:0 0 0 24px rgba(237,28,36,.035),0 0 0 48px rgba(237,28,36,.025);transform:rotate(35deg)}
+.hero h2{letter-spacing:-.035em;text-shadow:0 4px 24px rgba(237,28,36,.22)}
+.card,.item{border:1px solid rgba(255,255,255,.085);border-radius:18px;background:linear-gradient(145deg,rgba(25,25,28,.96),rgba(11,11,13,.98));box-shadow:0 12px 32px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.035)}
+.card{padding:19px}
+.card h3{letter-spacing:-.015em}
+.card:hover{transform:translateY(-2px);border-color:rgba(237,28,36,.48);box-shadow:0 16px 34px rgba(0,0,0,.3),0 0 22px rgba(237,28,36,.07)}
+.btn,nav button.active{background:linear-gradient(135deg,#ff3541,#c90d19);border:1px solid rgba(255,255,255,.13);border-radius:12px;box-shadow:0 7px 20px rgba(237,28,36,.2)}
+.btn.alt{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.12);box-shadow:none}
+.home-shortcuts button,.home-shortcuts a{background:linear-gradient(145deg,#202023,#0d0d0f);border:1px solid rgba(237,28,36,.34);border-radius:17px;box-shadow:0 10px 25px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.055)}
+.home-shortcuts button:active,.home-shortcuts a:active,.btn:active{transform:scale(.98)}
+nav#nav{background:rgba(7,7,9,.94);border-color:rgba(255,255,255,.09);backdrop-filter:blur(20px)}
+nav#nav button.active{box-shadow:0 7px 20px rgba(237,28,36,.24)}
+input,textarea,select{border-radius:12px;background:rgba(0,0,0,.25);border-color:rgba(255,255,255,.12)}
+.notice{border:1px solid rgba(237,28,36,.2);border-left:3px solid var(--red);background:rgba(237,28,36,.065)}
+body.light{background:radial-gradient(ellipse at 92% 4%,rgba(237,28,36,.09),transparent 34%),#f1f1f3}
+body.light header{background:rgba(255,255,255,.94);border-color:rgba(237,28,36,.16)}
+body.light .card,body.light .item{background:linear-gradient(145deg,#fff,#f7f7f8);border-color:rgba(0,0,0,.08);box-shadow:0 10px 26px rgba(0,0,0,.065)}
+body.light .hero{background:linear-gradient(112deg,rgba(255,255,255,.97),rgba(250,242,243,.94) 58%,rgba(255,231,233,.88));box-shadow:0 18px 40px rgba(0,0,0,.08)}
+body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear-gradient(145deg,#fff,#f4f4f5);color:#151515}
+body.light nav#nav{background:rgba(255,255,255,.96);border-color:rgba(0,0,0,.1)}
+@media(max-width:759px){
+ body{background-attachment:scroll}
+ header{border-radius:0 0 20px 20px}
+ .hero{min-height:218px;border-radius:20px;padding:22px 19px}
+ .home-shortcuts button,.home-shortcuts a{min-height:76px}
+ nav#nav{border-radius:18px 18px 0 0;box-shadow:0 -10px 28px rgba(0,0,0,.28)}
+ .card{padding:16px}
+}
+@media(min-width:760px){
+ main{padding-top:28px}
+ nav#nav{box-shadow:12px 0 36px rgba(0,0,0,.22)}
+ nav#nav button,nav#nav .nav-chat,nav#nav .nav-profile{border-radius:13px}
+}
+
 </style></head>
 <body>
 <script>
