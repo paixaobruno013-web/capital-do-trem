@@ -197,3 +197,33 @@ with check(
  (status in('accepted','declined') and (select auth.uid())=case when initiated_by=participant_one then participant_two else participant_one end)
  or (status='accepted' and (select auth.uid()) in(participant_one,participant_two))
 );
+
+
+
+-- Também impede alterações dos identificadores e da data original do convite.
+create or replace function private.protect_private_conversation_update()
+returns trigger language plpgsql security invoker set search_path=''
+as $$
+declare recipient uuid;
+begin
+ if new.id is distinct from old.id or new.created_at is distinct from old.created_at
+    or new.participant_one is distinct from old.participant_one
+    or new.participant_two is distinct from old.participant_two
+    or new.initiated_by is distinct from old.initiated_by then
+   raise exception 'Os dados originais do convite não podem ser alterados.';
+ end if;
+ recipient:=case when old.initiated_by=old.participant_one then old.participant_two else old.participant_one end;
+ if old.status='pending' then
+   if (select auth.uid()) is distinct from recipient or new.status not in('accepted','declined') then
+     raise exception 'Somente quem recebeu o convite pode aceitar ou recusar.';
+   end if;
+ elsif old.status='accepted' then
+   if (select auth.uid()) not in(old.participant_one,old.participant_two) or new.status<>'accepted' then
+     raise exception 'Atualização não permitida para esta conversa.';
+   end if;
+ else
+   raise exception 'Este convite já foi encerrado.';
+ end if;
+ return new;
+end;
+$$;
