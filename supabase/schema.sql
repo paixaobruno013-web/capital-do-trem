@@ -501,6 +501,14 @@ create table if not exists public.song_comments (
   author_id uuid not null references auth.users(id) on delete cascade,
   author_name text not null default 'Usuário Uai',
   content text not null check (char_length(content) between 1 and 1000),
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.chat_messages (
+  id uuid primary key default gen_random_uuid(),
+  author_id uuid not null references auth.users(id) on delete cascade,
+  author_name text not null default 'Usuário Uai',
+  content text not null check (char_length(content) between 1 and 1000),
   created_at timestamptz not null default now(),
   author_avatar_type text not null default 'default' check (author_avatar_type in ('default', 'photo', 'character')),
   author_avatar_url text,
@@ -511,14 +519,6 @@ alter table public.chat_messages add column if not exists author_avatar_url text
 alter table public.chat_messages add column if not exists author_avatar_data jsonb;
 alter table public.chat_messages drop constraint if exists chat_messages_author_avatar_type_check;
 alter table public.chat_messages add constraint chat_messages_author_avatar_type_check check (author_avatar_type in ('default', 'photo', 'character'));
-
-create table if not exists public.chat_messages (
-  id uuid primary key default gen_random_uuid(),
-  author_id uuid not null references auth.users(id) on delete cascade,
-  author_name text not null default 'Usuário Uai',
-  content text not null check (char_length(content) between 1 and 1000),
-  created_at timestamptz not null default now()
-);
 
 create index if not exists song_comments_song_created_idx on public.song_comments(song_id, created_at);
 create index if not exists chat_messages_created_idx on public.chat_messages(created_at desc);
