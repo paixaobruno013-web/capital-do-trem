@@ -82,6 +82,11 @@ jobs:
           grep -q 'create policy "site_settings_admin_update"' supabase/schema.sql
           grep -q 'export async function saveMyAvatar' supabase/auth.js
           grep -q 'author_avatar_url' supabase/auth.js
+          grep -q 'create table if not exists public.private_conversations' supabase/schema.sql
+          grep -q 'create table if not exists public.private_messages' supabase/schema.sql
+          grep -q 'private_messages_insert_accepted_participants' supabase/schema.sql
+          grep -q 'export async function sendPrivateMessage' supabase/auth.js
+          grep -q 'subscribePrivateMessages' mensagens.html
           grep -q 'author_avatar_type' bate-papo.html
           echo "Políticas de perfil, configurações e avatar sincronizado verificadas."
       - name: Conferir arquivos essenciais
