@@ -59,7 +59,7 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 <section class="card">
 <h2>Bem-vindo ao Capital do Trem</h2>
 <p class="muted">Um espaço para artistas e Usuários Uai criarem seus perfis, descobrirem músicas e participarem da comunidade.</p>
-<div id="setup-message" class="notice" role="status">O cadastro ainda não está ativado. A conexão segura com o serviço de contas precisa ser configurada antes de receber usuários.</div>
+<div id="setup-message" class="notice" role="status">Preparando conexão segura com o serviço de contas...</div>
 </section>
 <section class="card" id="basic-profile-panel" hidden aria-labelledby="basic-profile-title">
 <h2 id="basic-profile-title">👤 Meu perfil na comunidade</h2>
@@ -443,7 +443,9 @@ try{
   auth.watchAuthChanges(({session})=>showSession(session));
   showSession(await auth.getCurrentSession());
 }catch(error){
-  setupMessage.textContent='Cadastro ainda indisponível: falta configurar a URL e a chave pública do projeto Supabase e concluir os testes de segurança. Nenhum dado foi enviado.';
+  controls.forEach(control=>control.disabled=true);
+  setupMessage.textContent='Não foi possível iniciar o cadastro: '+(error?.message||'falha ao carregar o serviço de autenticação')+'. Atualize a página e tente novamente. Nenhum cadastro foi enviado.';
+  console.error('Falha ao iniciar autenticação do Capital do Trem:',error);
 }
 let mode='login';
 const tabs={
