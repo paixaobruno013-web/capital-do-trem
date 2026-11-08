@@ -62,6 +62,55 @@ button:focus-visible,a:focus-visible{box-shadow:0 0 0 3px rgba(237,28,36,.22),0 
 .connection-status{box-shadow:0 0 12px rgba(237,28,36,.12)}
 body.light .brand,body.light .hero h2,body.light .card h3{text-shadow:0 0 10px rgba(237,28,36,.12)}
 
+
+/* Capital do Trem — layout inspirado diretamente nas telas de referência */
+@media(min-width:760px){
+ body{background:radial-gradient(ellipse at 70% 0%,rgba(237,28,36,.08),transparent 42%),var(--bg)}
+ header{margin-left:226px;min-height:108px;display:flex;align-items:center;justify-content:flex-start;gap:16px;text-align:left;padding:14px 24px}
+ header .logo{width:72px;height:72px;margin:0;flex:0 0 72px}
+ header .brand{font-size:30px}
+ header .tag{margin:3px 0 0}
+ header .header-action-groups{margin:0 0 0 auto;max-width:520px;gap:5px}
+ header .header-action-row{max-width:none;justify-content:flex-end}
+ header .header-location-row{justify-content:flex-end;margin-top:3px}
+ nav#nav{position:fixed;z-index:100;left:0;top:0;bottom:0;width:226px;height:100dvh;overflow-y:auto;display:flex;flex-direction:column;align-items:stretch;gap:7px;padding:24px 14px;background:#050505;border-right:1px solid #292929}
+ nav#nav:before{content:"CAPITAL DO TREM";display:block;color:#fff;font-weight:950;font-size:22px;line-height:1.1;text-align:center;padding:25px 8px 28px;border-bottom:1px solid #292929;margin-bottom:12px;text-shadow:0 0 12px rgba(237,28,36,.4)}
+ nav#nav button,nav#nav .nav-chat{display:flex;align-items:center;gap:10px;min-height:46px;text-align:left;border-radius:11px;padding:10px 13px;background:transparent;border:1px solid transparent;color:#eee;text-decoration:none}
+ nav#nav button:before{display:inline-block;width:22px;font-size:17px}
+ nav#nav button[data-page="inicio"]:before{content:"⌂"}
+ nav#nav button[data-page="musicas"]:before{content:"♫"}
+ nav#nav button[data-page="eventos"]:before{content:"▦"}
+ nav#nav button[data-page="artistas"]:before{content:"♛"}
+ nav#nav button[data-page="comunidade"]:before{content:"☻"}
+ nav#nav .nav-chat:before{content:"☏";width:22px;font-size:17px}
+ nav#nav button[data-page="social"]:before{content:"✦"}
+ nav#nav button[data-page="parcerias"]:before{content:"♕"}
+ nav#nav button[data-page="divulgue"]:before{content:"↗"}
+ nav#nav button[data-page="duvidas"]:before{content:"?"}
+ nav#nav button.active{background:#ed1c24;color:#fff;border-color:#ed1c24}
+ main{max-width:1120px;margin:0 auto 0 226px;padding:22px 26px 70px}
+}
+.hero{position:relative;isolation:isolate;overflow:hidden;min-height:190px;display:flex;flex-direction:column;justify-content:center;background:linear-gradient(100deg,rgba(0,0,0,.94),rgba(0,0,0,.72)),radial-gradient(ellipse at 80% 20%,rgba(237,28,36,.3),transparent 55%),linear-gradient(135deg,#262020,#090909 62%,#26090b);border:1px solid rgba(237,28,36,.38);box-shadow:0 10px 30px rgba(0,0,0,.28)}
+.hero:after{content:"";position:absolute;z-index:-1;right:-45px;top:-75px;width:260px;height:260px;border:18px solid rgba(237,28,36,.16);transform:rotate(45deg);border-radius:32px}
+.hero h2{max-width:680px;font-size:clamp(26px,5vw,42px);font-weight:950}
+.card{box-shadow:0 8px 24px rgba(0,0,0,.18);transition:transform .18s ease,border-color .18s ease}
+.card:hover{border-color:rgba(237,28,36,.45)}
+#inicio .grid .card{min-height:132px;background:linear-gradient(145deg,var(--panel2),var(--panel))}
+#published-song-catalog .card,#public-events .card,#community-profiles .card{border-color:rgba(237,28,36,.28)}
+body.light nav#nav{background:#fff;border-color:#ddd}
+body.light nav#nav:before{color:#111;border-color:#ddd}
+body.light nav#nav button,body.light nav#nav .nav-chat{color:#222}
+@media(max-width:759px){
+ body{padding-bottom:72px}
+ header{padding:20px 14px 16px}
+ nav#nav{position:fixed;z-index:500;left:0;right:0;bottom:0;top:auto;height:68px;display:flex;gap:7px;align-items:center;justify-content:flex-start;padding:7px 10px calc(7px + env(safe-area-inset-bottom,0px));margin:0;background:rgba(5,5,5,.97);border-top:1px solid #333;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;backdrop-filter:blur(14px)}
+ nav#nav button,nav#nav .nav-chat{flex:0 0 auto;min-height:48px;padding:8px 12px;border-radius:12px;font-size:12px}
+ nav#nav button.active{background:#ed1c24}
+ main{padding:14px 12px 28px}
+ .hero{min-height:210px;padding:20px}
+}
+@media(prefers-reduced-motion:reduce){.card{transition:none}}
+
 </style></head>
 <body>
 <script>
