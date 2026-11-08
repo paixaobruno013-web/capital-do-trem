@@ -763,6 +763,30 @@ export async function getPublicBranding() {
   };
 }
 
+// Publica um único arquivo e grava o mesmo endereço nas duas posições oficiais.
+export async function saveAdminBrandingPair(file) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode alterar a identidade visual.');
+  if (!(file instanceof File)) throw new Error('Escolha a arte oficial na galeria do celular.');
+  const allowed = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+  if (!allowed[file.type]) throw new Error('Use uma imagem JPG, PNG ou WebP.');
+  if (file.size < 1 || file.size > 5 * 1024 * 1024) throw new Error('A imagem deve ter até 5 MB.');
+  const path = user.id + '/branding/official-logo-' + crypto.randomUUID() + '.' + allowed[file.type];
+  const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: false });
+  if (uploadError) throw uploadError;
+  const { data: publicData } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
+  if (!publicData?.publicUrl) throw new Error('Não foi possível gerar o endereço público da imagem.');
+  const now = new Date().toISOString();
+  const { error: saveError } = await supabase.from('site_settings').upsert([
+    { setting_key: 'official_profile_image_url', setting_value: publicData.publicUrl, updated_at: now },
+    { setting_key: 'app_opening_image_url', setting_value: publicData.publicUrl, updated_at: now }
+  ], { onConflict: 'setting_key' });
+  if (saveError) throw saveError;
+  return publicData.publicUrl;
+}
+
 export async function saveAdminBrandingImage(kind, file) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
