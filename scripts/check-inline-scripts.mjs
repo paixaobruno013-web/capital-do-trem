@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 
-const files = ['index.html', 'conta.html', 'admin.html', 'bate-papo.html', 'diagnostico.html'];
+const files = ['index.html', 'conta.html', 'admin.html', 'bate-papo.html', 'diagnostico.html', 'avatar.html', 'mensagens.html', 'privacidade.html', 'offline.html'];
 let checked = 0;
 let failed = false;
 
