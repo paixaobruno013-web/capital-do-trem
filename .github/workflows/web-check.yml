@@ -34,6 +34,9 @@ jobs:
           grep -q 'create policy "songs_insert_admin_only"' supabase/migrations/2026-11-08-harden-music-upload-permissions.sql
           grep -q 'create policy "audio_upload_admin_only"' supabase/migrations/2026-11-08-harden-music-upload-permissions.sql
           grep -q 'create or replace function private.is_admin()' supabase/schema.sql
+          grep -q 'revoke all privileges on all tables in schema public from anon, authenticated' supabase/schema.sql
+          grep -q 'grant select on public.artists, public.events, public.posts, public.profiles, public.site_settings, public.songs to anon' supabase/schema.sql
+          grep -q 'revoke all privileges on all tables in schema public from anon, authenticated' supabase/migrations/2026-11-08-minimize-public-api-table-privileges.sql
           grep -q 'create or replace function private.bootstrap_first_admin()' supabase/schema.sql
           grep -Fq 'as $func$' supabase/schema.sql
           grep -q 'revoke execute on function public.is_admin() from anon' supabase/schema.sql
