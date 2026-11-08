@@ -651,3 +651,99 @@ export async function deleteChatMessage(messageId) {
   const { error } = await supabase.from('chat_messages').delete().eq('id', messageId);
   if (error) throw error;
 }
+
+
+// Conversas privadas: pedidos de contato, aceite, mensagens e bloqueios.
+export async function getPrivateConversationData() {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para acessar suas conversas.');
+  const [{ data: conversations, error: conversationError }, { data: people, error: peopleError }, { data: blocks, error: blockError }] = await Promise.all([
+    supabase.from('private_conversations').select('id,participant_one,participant_two,initiated_by,status,created_at,updated_at').or('participant_one.eq.' + user.id + ',participant_two.eq.' + user.id).order('updated_at',{ascending:false}).limit(100),
+    supabase.from('profiles').select('user_id,display_name,account_type,city,avatar_type,avatar_url,avatar_data').eq('is_public',true).neq('user_id',user.id).order('display_name',{ascending:true}).limit(100),
+    supabase.from('private_blocks').select('blocked_id').eq('blocker_id',user.id)
+  ]);
+  if (conversationError) throw conversationError;
+  if (peopleError) throw peopleError;
+  if (blockError) throw blockError;
+  return { userId:user.id, conversations:conversations||[], people:people||[], blocked:(blocks||[]).map(row=>row.blocked_id) };
+}
+
+export async function requestPrivateConversation(otherUserId) {
+  const supabase=initSupabase();
+  const {data:{user},error:userError}=await supabase.auth.getUser();
+  if(userError)throw userError;
+  if(!user)throw new Error('Entre na sua conta para enviar um convite.');
+  if(!otherUserId||otherUserId===user.id)throw new Error('Escolha outra pessoa.');
+  const [one,two]=[user.id,otherUserId].sort();
+  const {data:existing,error:lookupError}=await supabase.from('private_conversations')
+    .select('id,status,initiated_by').eq('participant_one',one).eq('participant_two',two).maybeSingle();
+  if(lookupError)throw lookupError;
+  if(existing){
+    if(existing.status==='accepted')return existing;
+    if(existing.status==='pending')throw new Error(existing.initiated_by===user.id?'Seu convite já foi enviado.':'Essa pessoa já enviou um convite. Aceite na lista de convites recebidos.');
+    throw new Error('Esse convite já foi recusado. Peça à pessoa para iniciar uma nova conversa.');
+  }
+  const {data,error}=await supabase.from('private_conversations')
+    .insert({participant_one:one,participant_two:two,initiated_by:user.id,status:'pending'})
+    .select('id,status,initiated_by').single();
+  if(error)throw error;
+  return data;
+}
+
+export async function decidePrivateConversation(conversationId,decision) {
+  const supabase=initSupabase();
+  const {data:{user},error:userError}=await supabase.auth.getUser();
+  if(userError)throw userError;
+  if(!user)throw new Error('Entre na sua conta.');
+  if(!['accepted','declined'].includes(decision))throw new Error('Decisão inválida.');
+  const {data,error}=await supabase.from('private_conversations').update({status:decision,updated_at:new Date().toISOString()})
+    .eq('id',conversationId).eq('status','pending')
+    .select('id,status').single();
+  if(error)throw error;
+  return data;
+}
+
+export async function getPrivateMessages(conversationId) {
+  const supabase=initSupabase();
+  const {data,error}=await supabase.from('private_messages')
+    .select('id,conversation_id,sender_id,content,created_at')
+    .eq('conversation_id',conversationId).order('created_at',{ascending:true}).limit(100);
+  if(error)throw error;
+  return data||[];
+}
+
+export async function sendPrivateMessage(conversationId,content) {
+  const supabase=initSupabase();
+  const {data:{user},error:userError}=await supabase.auth.getUser();
+  if(userError)throw userError;
+  if(!user)throw new Error('Entre na sua conta para enviar mensagens.');
+  const clean=String(content||'').trim();
+  if(!clean||clean.length>2000)throw new Error('A mensagem deve ter entre 1 e 2.000 caracteres.');
+  const {data,error}=await supabase.from('private_messages')
+    .insert({conversation_id:conversationId,sender_id:user.id,content:clean})
+    .select('id,conversation_id,sender_id,content,created_at').single();
+  if(error)throw error;
+  await supabase.from('private_conversations').update({updated_at:new Date().toISOString()}).eq('id',conversationId);
+  return data;
+}
+
+export async function subscribePrivateMessages(conversationId,onMessage,onStatus) {
+  const supabase=initSupabase();
+  const channel=supabase.channel('private-chat-'+conversationId)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'private_messages',filter:'conversation_id=eq.'+conversationId},payload=>{
+      if(typeof onMessage==='function')onMessage(payload.new);
+    }).subscribe(status=>{if(typeof onStatus==='function')onStatus(status);});
+  return ()=>{supabase.removeChannel(channel);};
+}
+
+export async function blockPrivateUser(otherUserId) {
+  const supabase=initSupabase();
+  const {data:{user},error:userError}=await supabase.auth.getUser();
+  if(userError)throw userError;
+  if(!user)throw new Error('Entre na sua conta.');
+  if(!otherUserId||otherUserId===user.id)throw new Error('Usuário inválido.');
+  const {error}=await supabase.from('private_blocks').upsert({blocker_id:user.id,blocked_id:otherUserId},{onConflict:'blocker_id,blocked_id'});
+  if(error)throw error;
+}
