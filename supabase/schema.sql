@@ -109,7 +109,7 @@ returns boolean
 language plpgsql
 security definer
 set search_path = ''
-as $
+as $func$
 declare
   current_user_id uuid := (select auth.uid());
   current_email text := lower(coalesce((select auth.jwt() ->> 'email'), ''));
@@ -124,7 +124,7 @@ begin
   on conflict (user_id) do nothing;
   return exists (select 1 from public.admin_users where user_id = current_user_id);
 end;
-$;
+$func$;
 revoke all on function private.bootstrap_first_admin() from public;
 grant execute on function private.bootstrap_first_admin() to authenticated;
 
@@ -133,7 +133,7 @@ returns boolean
 language sql
 security invoker
 set search_path = ''
-as $ select private.bootstrap_first_admin(); $;
+as $func$ select private.bootstrap_first_admin(); $func$;
 revoke all on function public.bootstrap_first_admin() from public;
 grant execute on function public.bootstrap_first_admin() to authenticated;
 
@@ -183,7 +183,7 @@ returns trigger
 language plpgsql
 security invoker
 set search_path = ''
-as $
+as $func$
 begin
   if new.account_type is null or new.account_type not in ('user', 'artist') then
     if tg_op = 'UPDATE' then
@@ -194,7 +194,7 @@ begin
   end if;
   return new;
 end;
-$;
+$func$;
 
 drop trigger if exists profiles_protect_account_type on public.profiles;
 create trigger profiles_protect_account_type
