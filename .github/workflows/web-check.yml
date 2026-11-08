@@ -61,10 +61,13 @@ jobs:
           echo "Proteção administrativa, políticas de upload e funções privadas verificadas."
       - name: Conferir isolamento dos perfis
         run: |
-          grep -q 'create policy "profile_read_own"' supabase/schema.sql
+          grep -q 'create policy "profiles_read_public"' supabase/schema.sql
+          grep -q 'is_public = true or user_id = (select auth.uid())' supabase/schema.sql
           grep -q 'create policy "profile_insert_own"' supabase/schema.sql
           grep -q 'create policy "profile_update_own"' supabase/schema.sql
-          grep -q 'create policy "profiles_read_public"' supabase/schema.sql
+          grep -q 'avatar_type text not null default' supabase/schema.sql
+          grep -q 'author_avatar_type text not null default' supabase/schema.sql
+          grep -q 'create or replace function public.set_community_author_name()' supabase/schema.sql
           grep -q 'create policy "artists_update_own_or_admin"' supabase/schema.sql
           grep -q 'create or replace function public.protect_profile_account_type' supabase/schema.sql
           grep -q "new.raw_user_meta_data ->> 'account_type' = 'artist'" supabase/schema.sql
