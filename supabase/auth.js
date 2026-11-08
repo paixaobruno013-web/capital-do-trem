@@ -278,6 +278,17 @@ export async function getMyEvents() {
 
 // Verificação e moderação administrativa. O banco confirma a função do usuário;
 // a interface não concede privilégios por conta própria.
+// Configura a primeira conta administradora após o cadastro e confirmação do e-mail autorizado.
+export async function bootstrapFirstAdmin() {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na conta proprietária para configurar o primeiro administrador.');
+  const { data, error } = await supabase.rpc('bootstrap_first_admin');
+  if (error) throw error;
+  return data === true;
+}
+
 export async function isCurrentUserAdmin() {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
