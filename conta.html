@@ -289,7 +289,7 @@ async function loadMySongs(){
    const date=document.createElement('small');date.className='muted';date.textContent=new Date(song.created_at).toLocaleString('pt-BR');
    card.append(title,artist,state,date);mySongs.append(card);
   }
- }catch(error){mySongs.textContent='Não foi possível consultar suas músicas. O banco precisa estar configurado e a atualização do catálogo aplicada.';}
+ }catch(error){mySongs.textContent='Não foi possível consultar suas músicas agora. Confira sua conexão e tente novamente.';}
 }
 songForm.addEventListener('submit',async event=>{
  event.preventDefault();
@@ -306,7 +306,7 @@ songForm.addEventListener('submit',async event=>{
 });
 async function loadArtistProfile(){
  try{const profile=await auth.getMyArtistProfile();fillArtistForm(profile);}
- catch(error){artistStatus.textContent='Não foi possível carregar a ficha. Confirme se o banco foi configurado e se a tabela artists existe.';}
+ catch(error){artistStatus.textContent='Não foi possível carregar sua ficha artística agora. Atualize a página e tente novamente.';}
 }
 function showSession(session){
   if(session?.user){
@@ -349,7 +349,7 @@ async function loadBasicProfile(){
   document.getElementById('basic-city').value=profile?.city||'';
   document.getElementById('basic-bio').value=profile?.bio||'';
   document.getElementById('basic-public').checked=profile?.is_public===true;
- }catch(error){artistProfileArea.hidden=true;basicProfileStatus.textContent='Não foi possível carregar seu perfil básico. Confira se a atualização do banco foi aplicada.';}
+ }catch(error){artistProfileArea.hidden=true;basicProfileStatus.textContent='Não foi possível carregar seu perfil agora. Atualize a página e tente novamente.';}
 }
 basicProfileForm.addEventListener('submit',async event=>{
  event.preventDefault();
@@ -560,7 +560,7 @@ async function loadMyEvents(){
    const state=document.createElement('p');state.textContent='Situação: '+(item.status==='published'?'Publicado':item.status==='rejected'?'Precisa de ajustes':'Aguardando análise');
    card.append(title,detail,state);myEvents.append(card);
   }
- }catch(error){myEvents.textContent='Não foi possível consultar seus envios. Confirme se o banco foi configurado.';}
+ }catch(error){myEvents.textContent='Não foi possível consultar seus eventos enviados agora. Atualize a página e tente novamente.';}
 }
 postForm.addEventListener('submit',async event=>{
  event.preventDefault();
