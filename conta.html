@@ -433,10 +433,21 @@ try{
   module.initSupabase();
   controls.forEach(control=>control.disabled=false);
   setupMessage.textContent='Serviço de contas configurado. Faça um teste antes de divulgar o cadastro ao público.';
-  auth.watchAuthChanges(({session})=>showSession(session));
+  auth.watchAuthChanges(({event,session})=>{
+    if(event==='PASSWORD_RECOVERY'){
+      setMode('recovery');
+      document.getElementById('email').value=session?.user?.email||'';
+      document.getElementById('email').readOnly=true;
+      profilePanel.hidden=true;accessPanel.hidden=false;
+      status.textContent='Crie uma nova senha para concluir a recuperação da sua conta.';
+      return;
+    }
+    showSession(session);
+  });
   showSession(await auth.getCurrentSession());
 }catch(error){
-  setupMessage.textContent='Cadastro ainda indisponível: falta configurar a URL e a chave pública do projeto Supabase e concluir os testes de segurança. Nenhum dado foi enviado.';
+  controls.forEach(control=>control.disabled=false);
+  setupMessage.textContent='Não foi possível conectar agora. Você ainda pode abrir as opções de acesso; tente novamente ao enviar o formulário.';
 }
 let mode='login';
 const tabs={
@@ -449,19 +460,25 @@ function setMode(next){
  Object.entries(tabs).forEach(([key,button])=>button.setAttribute('aria-pressed',String(key===mode)));
  document.getElementById('name-wrap').hidden=mode!=='register';
  document.getElementById('password-wrap').hidden=mode==='reset';
+ document.getElementById('email').readOnly=mode==='recovery';
+ document.querySelector('label[for="password"]').textContent=mode==='recovery'?'Nova senha':'Senha';
  document.getElementById('display-name').required=mode==='register';
  document.getElementById('register-type').required=mode==='register';
  document.getElementById('register-type').hidden=mode!=='register';
  document.getElementById('password').required=mode!=='reset';
+ document.getElementById('password').autocomplete=mode==='register'||mode==='recovery'?'new-password':'current-password';
  passwordInput.type='password';passwordToggle.textContent='Mostrar';passwordToggle.setAttribute('aria-pressed','false');document.getElementById('password').autocomplete=mode==='register'?'new-password':'current-password';
- document.getElementById('submit-account').textContent=mode==='register'?'Criar minha conta':mode==='reset'?'Enviar link de recuperação':'Entrar';
+ document.getElementById('submit-account').textContent=mode==='register'?'Criar minha conta':mode==='reset'?'Enviar link de recuperação':mode==='recovery'?'Salvar nova senha':'Entrar';
  status.textContent='';
 }
 setMode('login');
 Object.entries(tabs).forEach(([key,button])=>button.addEventListener('click',()=>setMode(key)));
 form.addEventListener('submit',async event=>{
  event.preventDefault();
- if(!auth){status.textContent='O acesso ainda não está configurado. Tente novamente mais tarde.';return;}
+ if(!auth){
+  try{const module=await import('./supabase/auth.js');module.initSupabase();auth=module;}
+  catch(error){status.textContent='Não foi possível conectar ao serviço agora. Verifique sua internet e tente novamente.';return;}
+ }
  const email=document.getElementById('email').value.trim();
  const password=document.getElementById('password').value;
  const displayName=document.getElementById('display-name').value.trim();
@@ -474,7 +491,15 @@ form.addEventListener('submit',async event=>{
    status.textContent=result.user?.identities?.length===0?'Este e-mail já possui cadastro.':'Cadastro enviado. Confira seu e-mail para confirmar a conta.';
   }else if(mode==='reset'){
    await auth.sendPasswordReset(email);
-   status.textContent='Se o endereço estiver cadastrado, você receberá um link para redefinir a senha.';
+   status.textContent='Se o endereço estiver cadastrado, você receberá um link para redefinir a senha. Confira também o spam e o lixo eletrônico.';
+  }else if(mode==='recovery'){
+   if(password.length<8)throw new Error('A nova senha precisa ter pelo menos 8 caracteres.');
+   await auth.updateAccountPassword(password);
+   status.textContent='Senha atualizada com sucesso! Agora entre usando sua nova senha.';
+   document.getElementById('email').readOnly=false;
+   form.reset();
+   setMode('login');
+   await auth.signOutAccount();
   }else{
    await auth.signInAccount({email,password});
    status.textContent='Acesso realizado. Sua área de conta está aberta.';
