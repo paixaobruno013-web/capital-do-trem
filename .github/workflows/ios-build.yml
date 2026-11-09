@@ -1,0 +1,88 @@
+name: Preparar iOS — Capital do Trem
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'conta.html'
+      - 'admin.html'
+      - 'privacidade.html'
+      - 'bate-papo.html'
+      - 'avatar.html'
+      - 'mensagens.html'
+      - 'diagnostico.html'
+      - 'marca.svg'
+      - 'sw.js'
+      - 'update.js'
+      - 'supabase/**'
+      - 'scripts/**'
+      - 'assets/**'
+      - 'package.json'
+      - 'capacitor.config.ts'
+      - '.github/workflows/ios-build.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-ios-simulator:
+    name: Gerar aplicativo para simulador iOS
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Preparar arquivos web
+        run: npm run build:web
+
+      - name: Criar projeto iOS Capacitor
+        run: npx cap add ios
+
+      - name: Sincronizar projeto iOS
+        run: npx cap sync ios
+
+      - name: Conferir versão do Xcode e simuladores
+        run: |
+          xcodebuild -version
+          xcrun simctl list devices available
+
+      - name: Compilar para simulador sem assinatura
+        run: |
+          xcodebuild \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath ios/build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Empacotar aplicativo do simulador
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent \
+            ios/build/Build/Products/Debug-iphonesimulator/App.app \
+            Capital-do-Trem-iOS-Simulator.zip
+
+      - name: Publicar artefato para testes técnicos
+        uses: actions/upload-artifact@v4
+        with:
+          name: capital-do-trem-ios-simulator
+          path: Capital-do-Trem-iOS-Simulator.zip
+          if-no-files-found: error
+          retention-days: 14
