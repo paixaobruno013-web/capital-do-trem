@@ -3,7 +3,7 @@
  if(!/^https?:$/.test(location.protocol))return;
  // Escurece suavemente a interface inteira enquanto o aparelho estiver sem internet.
  const offlineStyle=document.createElement('style');
- offlineStyle.textContent='html.app-offline::after{content:"";position:fixed;inset:0;background:rgba(0,0,0,.28);backdrop-filter:saturate(.68);-webkit-backdrop-filter:saturate(.68);pointer-events:none;z-index:9000}html{transition:filter .25s ease}@media(prefers-reduced-motion:reduce){html{transition:none!important}}';
+ offlineStyle.textContent='html.app-offline::after{content:"";position:fixed;inset:0;background:rgba(0,0,0,.22);pointer-events:none;z-index:9000}html{transition:filter .25s ease}@media(prefers-reduced-motion:reduce){html{transition:none!important}}';
  (document.head||document.documentElement).append(offlineStyle);
  const markOffline=()=>document.documentElement.classList.add('app-offline');
  const markOnline=()=>document.documentElement.classList.remove('app-offline');
@@ -155,4 +155,21 @@
  const addBanner=()=>{if(!banner.isConnected)document.body.append(banner);};
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addBanner,{once:true});
  else addBanner();
+})();
+// Performance mobile: imagens fora da primeira tela usam carregamento adiado e decodificação assíncrona.
+(()=>{
+ const tuneImages=root=>{
+  root.querySelectorAll?.('img:not(#site-logo):not(.intro-smoke__brand img)').forEach(img=>{
+   if(!img.hasAttribute('loading'))img.loading='lazy';
+   if(!img.hasAttribute('decoding'))img.decoding='async';
+   if(!img.hasAttribute('fetchpriority'))img.fetchPriority='low';
+  });
+ };
+ tuneImages(document);
+ if('MutationObserver' in window){
+  const observer=new MutationObserver(records=>records.forEach(record=>record.addedNodes.forEach(node=>{
+   if(node.nodeType===1){if(node.matches?.('img'))tuneImages({querySelectorAll:()=>[node]});tuneImages(node);}
+  })));
+  observer.observe(document.documentElement,{childList:true,subtree:true});
+ }
 })();
