@@ -1231,7 +1231,7 @@ updateConnectionStatus();
    const name=document.createElement('strong');name.textContent=profile.display_name||'Participante do Capital do Trem';
    const handle=document.createElement('p');handle.className='muted';handle.style.margin='2px 0 6px';handle.textContent='@'+(profile.username||'usuario');
    const meta=document.createElement('div');meta.className='community-profile-meta';
-   const role=document.createElement('span');role.className='community-profile-role';role.textContent=profile.account_type==='artist'?'Artista':'Usuário Uai';meta.append(role);if(profile.account_type==='artist'){const verified=document.createElement('span');verified.className='verified-badge';verified.textContent='✓';verified.setAttribute('role','img');verified.setAttribute('aria-label','Artista verificado');meta.append(verified);}
+   const role=document.createElement('span');role.className='community-profile-role';role.textContent=profile.account_type==='artist'?'Artista / DJ':'Usuário Uai';meta.append(role);if(profile.account_type==='artist'){const verified=document.createElement('span');verified.className='verified-badge';verified.textContent='✓';verified.setAttribute('role','img');verified.setAttribute('aria-label','Artista verificado');meta.append(verified);}
    copy.append(name,handle,meta);
    if(profile.city){const city=document.createElement('p');city.className='muted community-profile-city';city.textContent=profile.city;copy.append(city);}
    if(profile.bio){const bio=document.createElement('p');bio.className='community-profile-bio';bio.textContent=profile.bio;copy.append(bio);}
