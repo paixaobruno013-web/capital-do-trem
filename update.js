@@ -3,7 +3,7 @@
  const supportsServiceWorkerUpdates=/^https?:$/.test(location.protocol);
  // Escurece suavemente a interface inteira enquanto o aparelho estiver sem internet.
  const offlineStyle=document.createElement('style');
- offlineStyle.textContent='html.app-offline::after{content:"";position:fixed;inset:0;background:rgba(0,0,0,.22);pointer-events:none;z-index:9000}html{transition:filter .25s ease}@media(prefers-reduced-motion:reduce){html{transition:none!important}}';
+ offlineStyle.textContent='html.app-offline::after{content:"";position:fixed;inset:0;background:rgba(0,0,0,.22);pointer-events:none;z-index:9000}html{transition:filter .25s ease}#train-offline-alert .offline-train{transform-box:fill-box;transform-origin:center;animation:capital-train-exit 1.35s cubic-bezier(.2,.75,.25,1) infinite alternate}#train-offline-alert .offline-triangle{transform-origin:50% 50%;animation:capital-triangle-pulse 1.1s ease-in-out infinite alternate}@keyframes capital-train-exit{0%{transform:translate(0,0) scale(.82)}65%{transform:translate(9px,13px) scale(1)}100%{transform:translate(23px,29px) scale(1.08)}}@keyframes capital-triangle-pulse{from{filter:drop-shadow(0 0 1px #ed1c24)}to{filter:drop-shadow(0 0 9px #ed1c24)}}@media(prefers-reduced-motion:reduce){html{transition:none!important}#train-offline-alert .offline-train,#train-offline-alert .offline-triangle{animation:none!important}}';
  (document.head||document.documentElement).append(offlineStyle);
  const markOffline=()=>document.documentElement.classList.add('app-offline');
  const markOnline=()=>document.documentElement.classList.remove('app-offline');
@@ -20,7 +20,7 @@
  const trainMark=document.createElement('div');
  trainMark.setAttribute('aria-hidden','true');
  trainMark.style.cssText='width:112px;height:112px;flex:0 0 112px;display:grid;place-items:center;margin-bottom:1px';
- trainMark.innerHTML='<svg viewBox="0 0 100 100" width="112" height="112" xmlns="http://www.w3.org/2000/svg"><path d="M50 18 94 91H6L50 18Z" fill="#16090a" stroke="#ed1c24" stroke-width="4" stroke-linejoin="round"/><g stroke="#fff" stroke-linejoin="round"><path d="M31 57V25q0-8 8-8h22q8 0 8 8v32l-7 9H38z" fill="#e9e9e9" stroke-width="2.4"/><path d="M36 27q0-4 5-4h18q5 0 5 4v15H36z" fill="#171717" stroke-width="2"/><path d="M41 27h18v11H41z" fill="#9ec9d8" stroke="none"/><path d="M24 58h13v12H24zm39 0h13v12H63z" fill="#ed1c24" stroke-width="2"/><path d="M30 53h40v7H30zM38 66h24l6 8H32z" fill="#ed1c24" stroke-width="2"/><path d="M43 44h14v10H43z" fill="#303030" stroke-width="2"/><path d="M47 46h6v6h-6z" fill="#f4d36b" stroke="none"/><path d="M35 79h30" fill="none" stroke="#fff" stroke-width="3"/><path d="M40 12h20l-4-7H44z" fill="#ed1c24" stroke-width="2"/></g><circle cx="30" cy="63" r="3" fill="#fff"/><circle cx="70" cy="63" r="3" fill="#fff"/></svg>';
+ trainMark.innerHTML='<svg viewBox="0 0 100 100" width="112" height="112" style="overflow:visible" xmlns="http://www.w3.org/2000/svg"><path class="offline-triangle" d="M50 18 94 91H6L50 18Z" fill="#16090a" stroke="#ed1c24" stroke-width="4" stroke-linejoin="round"/><g class="offline-train" stroke="#fff" stroke-linejoin="round"><path d="M31 57V25q0-8 8-8h22q8 0 8 8v32l-7 9H38z" fill="#e9e9e9" stroke-width="2.4"/><path d="M36 27q0-4 5-4h18q5 0 5 4v15H36z" fill="#171717" stroke-width="2"/><path d="M41 27h18v11H41z" fill="#9ec9d8" stroke="none"/><path d="M24 58h13v12H24zm39 0h13v12H63z" fill="#ed1c24" stroke-width="2"/><path d="M30 53h40v7H30zM38 66h24l6 8H32z" fill="#ed1c24" stroke-width="2"/><path d="M43 44h14v10H43z" fill="#303030" stroke-width="2"/><path d="M47 46h6v6h-6z" fill="#f4d36b" stroke="none"/><path d="M35 79h30" fill="none" stroke="#fff" stroke-width="3"/><path d="M40 12h20l-4-7H44z" fill="#ed1c24" stroke-width="2"/></g><circle cx="30" cy="63" r="3" fill="#fff"/><circle cx="70" cy="63" r="3" fill="#fff"/></svg>';
  const alertText=document.createElement('div');
  alertText.style.cssText='width:100%;min-width:0;text-align:center';
  const alertTitle=document.createElement('strong');
@@ -34,8 +34,7 @@
  hornButton.type='button';
  hornButton.style.cssText='min-height:44px;padding:9px 16px;border:1px solid #ed1c24;border-radius:10px;background:#ed1c24;color:#fff;font-weight:800;cursor:pointer';
  const preferenceKey='capitaldotrem_train_horn_v1';
- // Carrega o plugin nativo enquanto houver internet para permitir alerta tátil em Android/iPhone.
- const nativeHapticsPromise = import('https://cdn.jsdelivr.net/npm/@capacitor/haptics@8.0.2/+esm').catch(()=>null);
+ // Não depende de baixar bibliotecas pela internet: o alerta também precisa funcionar offline.
  let hornEnabled=true,audioContext=null,audioUnlocked=false,playedThisOutage=false,offlineFeedbackSent=false,reconnectTimer=null;
  try{hornEnabled=localStorage.getItem(preferenceKey)!=='off';}catch{}
  function updateHornButton(){hornButton.textContent=hornEnabled?'🔊 Corneta ligada':'🔇 Corneta desligada';hornButton.setAttribute('aria-pressed',String(hornEnabled));}
@@ -80,12 +79,13 @@
   alertBox.style.borderColor='#ed1c24';alertBox.style.display='flex';
   if(!offlineFeedbackSent){
    offlineFeedbackSent=true;
-   nativeHapticsPromise.then(async module=>{
+   (async()=>{
     try{
-     if(module?.Haptics&&window.Capacitor?.isNativePlatform?.())await module.Haptics.vibrate({duration:3000});
-     else if('vibrate' in navigator)navigator.vibrate(3000);
-    }catch(error){try{if('vibrate' in navigator)navigator.vibrate(3000);}catch{}}
-   });
+     const nativeHaptics=window.Capacitor?.Plugins?.Haptics;
+     if(nativeHaptics?.vibrate&&window.Capacitor?.isNativePlatform?.())await nativeHaptics.vibrate({duration:3000});
+     else if(typeof navigator.vibrate==='function')navigator.vibrate(3000);
+    }catch(error){try{if(typeof navigator.vibrate==='function')navigator.vibrate(3000);}catch{}}
+   })();
   }
   if(!playedThisOutage&&audioUnlocked){playedThisOutage=true;playTrainHorn();}
  }
