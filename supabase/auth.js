@@ -617,16 +617,39 @@ export async function getChatMessages(limit = 60) {
   return (data || []).reverse();
 }
 
-export async function sendChatMessage(content) {
+export async function uploadChatAttachment(file) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para enviar mídia.');
+  if (!(file instanceof File)) throw new Error('Selecione uma imagem ou áudio.');
+  const imageTypes = ['image/jpeg','image/png','image/webp'];
+  const audioTypes = ['audio/mpeg','audio/mp4','audio/aac','audio/ogg','audio/wav','audio/x-wav','audio/webm'];
+  const isImage = imageTypes.includes(file.type);
+  const isAudio = audioTypes.includes(file.type);
+  if (!isImage && !isAudio) throw new Error('Formato não permitido. Envie JPG, PNG, WebP ou áudio MP3, M4A, AAC, OGG, WAV ou WebM.');
+  const max = isImage ? 8*1024*1024 : 20*1024*1024;
+  if (file.size < 1 || file.size > max) throw new Error(isImage ? 'A imagem deve ter até 8 MB.' : 'O áudio deve ter até 20 MB.');
+  const ext = (file.name.split('.').pop() || (isImage ? 'jpg':'mp3')).toLowerCase().replace(/[^a-z0-9]/g,'') || (isImage?'jpg':'mp3');
+  const path = user.id + '/chat/' + crypto.randomUUID() + '.' + ext;
+  const { error } = await supabase.storage.from('capital-do-trem-media').upload(path,file,{contentType:file.type,cacheControl:'3600',upsert:false});
+  if (error) throw error;
+  const { data } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
+  if (!data?.publicUrl) throw new Error('Não foi possível gerar o link da mídia.');
+  return { url:data.publicUrl, type:isImage?'image':'audio', name:file.name, mime:file.type, size:file.size };
+}
+
+export async function sendChatMessage(content, attachment = null) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para participar do bate-papo.');
   const cleanContent = String(content || '').trim();
-  if (!cleanContent || cleanContent.length > 1000) throw new Error('A mensagem deve ter entre 1 e 1.000 caracteres.');
-  const { data, error } = await supabase.from('chat_messages')
-    .insert({ author_id: user.id, content: cleanContent })
-    .select('id, author_id, author_name, content, created_at, author_avatar_type, author_avatar_url, author_avatar_data').single();
+  if ((!cleanContent && !attachment) || cleanContent.length > 1000) throw new Error('Escreva uma mensagem ou anexe uma mídia. O texto pode ter até 1.000 caracteres.');
+  const payload = { author_id:user.id, content:cleanContent || (attachment?.type === 'image' ? '📷 Imagem' : '🎵 Áudio') };
+  if (attachment) Object.assign(payload,{attachment_url:attachment.url,attachment_type:attachment.type,attachment_name:attachment.name,attachment_mime:attachment.mime,attachment_size:attachment.size});
+  const { data, error } = await supabase.from('chat_messages').insert(payload)
+    .select('id, author_id, author_name, content, created_at, author_avatar_type, author_avatar_url, author_avatar_data, attachment_url, attachment_type, attachment_name, attachment_mime, attachment_size').single();
   if (error) throw error;
   return data;
 }
