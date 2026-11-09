@@ -442,9 +442,12 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
 
 /* Locomotiva animada acompanha o progresso real da abertura */
 .opening-live-track .opening-live-train{display:block;width:auto;height:auto;border:0;border-radius:0;background:none;box-shadow:none;padding:0}
-.opening-live-track{position:relative}
-.opening-live-track .opening-live-progress{position:absolute;left:0;top:0}
-.opening-live-train{position:absolute;z-index:2;left:0;top:50%;transform:translate(-48%,-57%);font-size:clamp(22px,6vw,29px);line-height:1;filter:drop-shadow(0 1px 3px #000);transition:left .22s linear;white-space:nowrap}
+.opening-live-track{position:relative;overflow:visible!important}
+.opening-live-track .opening-live-progress{position:absolute;left:0;top:0;z-index:1;max-width:100%}
+.opening-live-train{position:absolute!important;z-index:3!important;left:0;top:50%;transform:translate(-48%,-62%);font-size:clamp(25px,7vw,33px);line-height:1;filter:drop-shadow(0 1px 3px #000) drop-shadow(0 0 5px rgba(255,20,28,.65));transition:left .22s linear;white-space:nowrap;animation:opening-train-bounce .42s ease-in-out infinite alternate}
+@keyframes opening-train-bounce{from{margin-top:-1px}to{margin-top:1px}}
+.opening-live-train::after{content:"";position:absolute;right:-3px;top:-9px;width:7px;height:7px;border-radius:50%;background:rgba(235,235,235,.65);filter:blur(2px);animation:opening-train-smoke .8s ease-out infinite}
+@keyframes opening-train-smoke{from{opacity:.8;transform:translate(0,0) scale(.5)}to{opacity:0;transform:translate(9px,-10px) scale(1.8)}}
 
 
 /* Correção de camadas da abertura: arte integral retangular, sem recorte circular herdado do avatar. */
