@@ -527,6 +527,49 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
  from{left:-140px}
  to{left:calc(100% + 140px)}
 }
+
+/* Ajuste final da composição: vagões no trilho e locomotiva à frente, à direita. */
+.opening-live-track #opening-live-train{
+ display:flex!important;flex-flow:row nowrap!important;align-items:flex-end!important;
+ justify-content:flex-start!important;gap:3px!important;width:max-content!important;
+ height:38px!important;max-width:none!important;
+}
+.opening-live-track #opening-live-train .opening-wagon{
+ display:flex!important;flex:0 0 auto!important;position:relative!important;
+ align-self:flex-end!important;order:0!important;
+}
+.opening-live-track #opening-live-train .opening-wagon-load{
+ display:flex!important;align-items:flex-end!important;justify-content:center!important;
+ flex:0 0 auto!important;min-height:21px!important;
+}
+.opening-live-track #opening-live-train .opening-wagon-deck{flex:0 0 9px!important}
+.opening-live-track #opening-live-train .opening-locomotive{
+ display:inline-block!important;position:relative!important;flex:0 0 auto!important;
+ align-self:flex-end!important;order:4!important;margin-left:2px!important;
+ font-size:29px!important;line-height:1!important;transform:scaleX(-1)!important;
+}
+.opening-live-track #opening-live-train .opening-dancer{
+ position:relative!important;display:inline-block!important;line-height:1!important;
+ font-size:14px!important;transform-origin:50% 85%;
+ animation:opening-dance-bounce .42s ease-in-out infinite alternate;
+}
+.opening-live-track #opening-live-train .opening-dancer.male{animation-delay:-.21s}
+.opening-live-track #opening-live-train .opening-dancer .arm{
+ position:absolute;top:5px;width:2px;height:8px;border-radius:3px;
+ background:#fff;box-shadow:0 0 3px #ed1c24;transform-origin:50% 0;
+}
+.opening-live-track #opening-live-train .opening-dancer .arm-left{
+ left:2px;animation:opening-arm-wave .34s ease-in-out infinite alternate;
+}
+.opening-live-track #opening-live-train .opening-dancer .arm-right{
+ right:2px;animation:opening-arm-wave .34s ease-in-out -.17s infinite alternate-reverse;
+}
+@keyframes opening-arm-wave{from{transform:rotate(-48deg)}to{transform:rotate(52deg)}}
+@keyframes opening-dance-bounce{from{transform:rotate(-5deg) translateY(0)}to{transform:rotate(5deg) translateY(-2px)}}
+@media(prefers-reduced-motion:reduce){
+ .opening-live-track #opening-live-train .opening-dancer,
+ .opening-live-track #opening-live-train .opening-dancer .arm{animation:none!important}
+}
 @media(max-width:759px){
  .opening-live-track{height:10px!important}
  .opening-live-track #opening-live-train{font-size:25px!important}
@@ -591,7 +634,7 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
  <div class="intro-smoke__cloud"></div>
  <div class="intro-smoke__brand"><img src="marca.svg" alt=""><strong>CAPITAL DO TREM</strong><span>A MÚSICA DA NOSSA QUEBRADA!</span></div>
  <div class="opening-clean-zone" aria-hidden="true"></div>
- <div class="opening-live-loader" id="opening-live-loader" role="status" aria-live="polite"><div class="opening-live-spinner" aria-hidden="true"></div><strong>Carregando...</strong><div class="opening-live-track"><span id="opening-live-progress"></span><span class="opening-live-train" id="opening-live-train" aria-hidden="true"><span class="opening-wagon opening-wagon-speakers" aria-label="Vagão transportando alto-falantes"><span class="opening-wagon-load">🔊</span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-dancers" aria-label="Vagão transportando pessoas dançando"><span class="opening-wagon-load">💃🕺</span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-singers" aria-label="Vagão transportando duas pessoas cantando"><span class="opening-wagon-load">🎤👨‍🎤👩‍🎤</span><span class="opening-wagon-deck"></span></span><span class="opening-locomotive" aria-label="Locomotiva que puxa os três vagões">🚂</span></span></div></div>
+ <div class="opening-live-loader" id="opening-live-loader" role="status" aria-live="polite"><div class="opening-live-spinner" aria-hidden="true"></div><strong>Carregando...</strong><div class="opening-live-track"><span id="opening-live-progress"></span><span class="opening-live-train" id="opening-live-train" aria-hidden="true"><span class="opening-wagon opening-wagon-speakers" aria-label="Vagão transportando alto-falantes"><span class="opening-wagon-load">🔊</span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-dancers" aria-label="Vagão transportando pessoas dançando"><span class="opening-wagon-load"><span class="opening-dancer female" aria-label="dançarina">💃<i class="arm arm-left"></i><i class="arm arm-right"></i></span><span class="opening-dancer male" aria-label="dançarino">🕺<i class="arm arm-left"></i><i class="arm arm-right"></i></span></span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-singers" aria-label="Vagão transportando duas pessoas cantando"><span class="opening-wagon-load">🎤👨‍🎤👩‍🎤</span><span class="opening-wagon-deck"></span></span><span class="opening-locomotive" aria-label="Locomotiva que puxa os três vagões">🚂</span></span></div></div>
 </div>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
 <header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem</h1><p class="tag">A música da nossa quebrada!</p><div class="header-action-groups"><div class="header-action-row"><a class="btn alt" href="./conta.html">👤 Minha conta</a><a class="btn alt" href="./mensagens.html">✉️ Minhas conversas</a><a class="btn alt" href="./avatar.html">🎭 Meu avatar</a><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button></div><div class="header-action-row"><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn instagram-button" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a></div><div class="header-action-row"><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som de entrada: ligado</button></div></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Vinheta de 7 segundos • toque na tela para ouvir</p><div class="header-location-row"><button class="btn alt" id="quick-location" type="button">📍 Logo ali Uai - Localização</button></div></header>
