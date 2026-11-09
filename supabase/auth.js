@@ -8,6 +8,8 @@ const SUPABASE_URL = 'https://zmjxkfjzrbbxyvgkwirv.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_FLbDg6UCePQHb7s0wkywng_J9pNKlsP';
 
 let client = null;
+let presenceLifecycleStarted = false;
+let presenceCleanup = null;
 
 export function initSupabase() {
   if (client) return client;
@@ -28,6 +30,25 @@ export function initSupabase() {
       detectSessionInUrl: true
     }
   });
+
+  // Mantém a presença ativa em todas as telas autenticadas (início, conta e conversas).
+  if (!presenceLifecycleStarted) {
+    presenceLifecycleStarted = true;
+    client.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        if (presenceCleanup) presenceCleanup();
+        presenceCleanup = null;
+        return;
+      }
+      if (session?.user) {
+        window.setTimeout(async () => {
+          if (presenceCleanup) return;
+          try { presenceCleanup = await startUserPresence(); }
+          catch (error) { console.warn('Não foi possível iniciar a presença online.', error); }
+        }, 0);
+      }
+    });
+  }
 
   return client;
 }
