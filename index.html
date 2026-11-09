@@ -483,7 +483,7 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
  border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
  transform:translate(-50%,-58%)!important;font-size:27px!important;line-height:1!important;
  white-space:nowrap!important;filter:drop-shadow(0 1px 3px #000)!important;
- animation:opening-train-travel 3s linear infinite alternate!important;
+ animation:opening-train-travel 5s linear infinite alternate!important;
 }
 @keyframes opening-train-travel{
  from{left:3%}
@@ -1227,12 +1227,18 @@ function safeHttpsUrl(value){try{const url=new URL(value);return url.protocol===
   screen.classList.add('custom-opening-screen');
   const bar=document.getElementById('opening-live-progress');
   const train=document.getElementById('opening-live-train');
-  let progress=3,ready=document.readyState==='complete',imageReady=false,finished=false;
+  const openingStartedAt=performance.now();let progress=3,ready=document.readyState==='complete',imageReady=false,finished=false,finishQueued=false;
   const paint=()=>{if(bar)bar.style.width=progress+'%';};
   const finish=()=>{
-   if(finished||!ready||!imageReady)return;
-   finished=true;progress=100;paint();
-   setTimeout(()=>{screen.classList.add('is-finished');setTimeout(()=>screen.remove(),600);},500);
+   if(finished||finishQueued||!ready||!imageReady)return;
+   const remaining=Math.max(0,7000-(performance.now()-openingStartedAt));
+   finishQueued=true;
+   setTimeout(()=>{
+    if(finished)return;
+    finished=true;progress=100;paint();
+    screen.classList.add('is-finished');
+    setTimeout(()=>screen.remove(),600);
+   },remaining);
   };
   const loader=setInterval(()=>{
    if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}
