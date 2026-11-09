@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - 'index.html'
+      - 'offline.html'
       - 'conta.html'
       - 'admin.html'
       - 'privacidade.html'
