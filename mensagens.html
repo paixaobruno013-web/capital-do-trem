@@ -44,15 +44,15 @@ audio{width:100%;}
 import {getCurrentSession,getPrivateConversationData,requestPrivateConversation,decidePrivateConversation,getPrivateMessages,sendPrivateMessage,subscribePrivateMessages,blockPrivateUser} from './supabase/auth.js';
 const $=id=>document.getElementById(id);let state=null,active=null,unsubscribe=null;
 const esc=s=>String(s||'');const fmt=v=>new Date(v).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
-function personName(id){return state?.people.find(p=>p.user_id===id)?.display_name||'Usuário Uai';}
+function personName(id){const p=state?.people.find(p=>p.user_id===id);return p?`${p.display_name||'Usuário Uai'} (@${p.username||'sem_usuario'})`:'Usuário Uai';}
 function partner(c){return c.participant_one===state.userId?c.participant_two:c.participant_one;}
 function node(tag,cls,text){const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;}
 function clearSubscription(){if(unsubscribe){unsubscribe();unsubscribe=null;}}
 function drawPeople(){
  const term=$('search').value.trim().toLocaleLowerCase('pt-BR'),box=$('people');box.replaceChildren();
- const people=state.people.filter(p=>!state.blocked.includes(p.user_id)&&((p.display_name||'').toLocaleLowerCase('pt-BR').includes(term)||(p.city||'').toLocaleLowerCase('pt-BR').includes(term)));
+ const people=state.people.filter(p=>!state.blocked.includes(p.user_id)&&((p.display_name||'').toLocaleLowerCase('pt-BR').includes(term)||(p.username||'').toLocaleLowerCase('pt-BR').includes(term)||(p.city||'').toLocaleLowerCase('pt-BR').includes(term)));
  if(!people.length){box.append(node('p','empty','Nenhuma pessoa pública encontrada.'));return;}
- for(const p of people){const row=node('div','person'),copy=node('div','person-copy'),name=node('strong',null,p.display_name||'Usuário Uai'),meta=node('span','small',(p.account_type==='artist'?'Artista':'Usuário Uai')+(p.city?' • '+p.city:'')),btn=node('button',null,'Convidar');copy.append(name,meta);btn.addEventListener('click',async()=>{btn.disabled=true;$('status').textContent='Enviando convite…';try{await requestPrivateConversation(p.user_id);$('status').textContent='Convite enviado! A conversa será liberada quando a pessoa aceitar.';await refresh();}catch(e){$('status').textContent=e.message||'Não foi possível enviar o convite.';btn.disabled=false;}});row.append(copy,btn);box.append(row);}
+ for(const p of people){const row=node('div','person'),copy=node('div','person-copy'),name=node('strong',null,p.display_name||'Usuário Uai'),meta=node('span','small','@'+(p.username||'sem_usuario')+' • '+(p.account_type==='artist'?'Artista / DJ':'Usuário Uai')+(p.city?' • '+p.city:'')),btn=node('button',null,'Convidar');copy.append(name,meta);btn.addEventListener('click',async()=>{btn.disabled=true;$('status').textContent='Enviando convite…';try{await requestPrivateConversation(p.user_id);$('status').textContent='Convite enviado! A conversa será liberada quando a pessoa aceitar.';await refresh();}catch(e){$('status').textContent=e.message||'Não foi possível enviar o convite.';btn.disabled=false;}});row.append(copy,btn);box.append(row);}
 }
 function drawConversations(){
  const box=$('conversations');box.replaceChildren();
