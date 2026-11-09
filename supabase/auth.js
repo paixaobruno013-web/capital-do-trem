@@ -32,13 +32,15 @@ export function initSupabase() {
   return client;
 }
 
-export async function registerAccount({ email, password, displayName, accountType = 'user' }) {
+export async function registerAccount({ email, password, displayName, username, accountType = 'user' }) {
+  const cleanUsername = String(username || '').trim().toLowerCase();
+  if (!/^[a-z0-9][a-z0-9_]{2,31}$/.test(cleanUsername)) throw new Error('O nome de usuário deve ter de 3 a 32 caracteres: letras minúsculas, números e _.');
   const supabase = initSupabase();
   const { data, error } = await supabase.auth.signUp({
     email: email.trim(),
     password,
     options: {
-      data: { name: String(displayName || '').trim().slice(0, 80), account_type: accountType === 'artist' ? 'artist' : 'user' },
+      data: { name: String(displayName || '').trim().slice(0, 80), username: cleanUsername, account_type: accountType === 'artist' ? 'artist' : 'user' },
       emailRedirectTo: window.location.href
     }
   });
@@ -503,7 +505,7 @@ export async function getMyBasicProfile() {
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para acessar seu perfil.');
   const { data, error } = await supabase.from('profiles')
-    .select('user_id, display_name, account_type, bio, city, is_public')
+    .select('user_id, display_name, username, account_type, bio, city, is_public')
     .eq('user_id', user.id).maybeSingle();
   if (error) throw error;
   if (data) return data;
@@ -513,6 +515,7 @@ export async function getMyBasicProfile() {
   const accountType = metadata.account_type === 'artist' ? 'artist' : 'user';
   const created = await saveMyBasicProfile({
     display_name: metadata.name || (user.email || '').split('@')[0] || 'Participante',
+    username: metadata.username || ('uai_' + user.id.replace(/-/g, '').slice(0, 12)),
     account_type: accountType,
     is_public: false
   });
@@ -524,8 +527,11 @@ export async function saveMyBasicProfile(profile) {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para salvar seu perfil.');
+  const username = String(profile.username || '').trim().toLowerCase();
+  if (!/^[a-z0-9][a-z0-9_]{2,31}$/.test(username)) throw new Error('O nome de usuário deve ter de 3 a 32 caracteres: letras minúsculas, números e _.');
   const payload = {
     user_id: user.id,
+    username,
     display_name: String(profile.display_name || '').trim().slice(0, 80),
     account_type: profile.account_type === 'artist' ? 'artist' : 'user',
     bio: String(profile.bio || '').trim().slice(0, 500),
@@ -534,7 +540,7 @@ export async function saveMyBasicProfile(profile) {
   };
   const { data, error } = await supabase.from('profiles')
     .upsert(payload, { onConflict: 'user_id' })
-    .select('user_id, display_name, account_type, bio, city, is_public').single();
+    .select('user_id, display_name, username, account_type, bio, city, is_public').single();
   if (error) throw error;
   return data;
 }
@@ -542,7 +548,7 @@ export async function saveMyBasicProfile(profile) {
 export async function getPublicProfiles() {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('profiles')
-    .select('user_id, display_name, account_type, bio, city, avatar_type, avatar_url, avatar_data')
+    .select('user_id, display_name, username, account_type, bio, city, avatar_type, avatar_url, avatar_data')
     .eq('is_public', true)
     .order('display_name', { ascending: true })
     .limit(100);
@@ -704,7 +710,7 @@ export async function getPrivateConversationData() {
   if (!user) throw new Error('Entre na sua conta para acessar suas conversas.');
   const [{ data: conversations, error: conversationError }, { data: people, error: peopleError }, { data: blocks, error: blockError }] = await Promise.all([
     supabase.from('private_conversations').select('id,participant_one,participant_two,initiated_by,status,created_at,updated_at').or('participant_one.eq.' + user.id + ',participant_two.eq.' + user.id).order('updated_at',{ascending:false}).limit(100),
-    supabase.from('profiles').select('user_id,display_name,account_type,city,avatar_type,avatar_url,avatar_data').eq('is_public',true).neq('user_id',user.id).order('display_name',{ascending:true}).limit(100),
+    supabase.from('profiles').select('user_id,display_name,username,account_type,city,avatar_type,avatar_url,avatar_data').eq('is_public',true).neq('user_id',user.id).order('display_name',{ascending:true}).limit(100),
     supabase.from('private_blocks').select('blocked_id').eq('blocker_id',user.id)
   ]);
   if (conversationError) throw conversationError;
