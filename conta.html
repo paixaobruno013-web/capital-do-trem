@@ -130,7 +130,7 @@ audio{width:100%;}
 </div>
 <section class="card" id="admin-songs-panel" hidden aria-labelledby="admin-songs-title">
 <h3 id="admin-songs-title">🎵 Divulgue sua música</h3>
-<p class="muted">O envio de arquivos musicais é exclusivo do administrador e da equipe autorizada. Envie MP3, M4A, AAC, WAV ou OGG (até 50 MB). As músicas publicadas pela equipe aparecem no catálogo público.</p>
+<p class="muted">Todos os perfis Artista / DJ podem enviar músicas diretamente para o catálogo. Usuários Uai podem ouvir, curtir, comentar e baixar. Envie MP3, M4A, AAC, WAV ou OGG (até 50 MB).</p>
 <form id="artist-song-form">
 <label for="song-title">Nome da música</label><input id="song-title" maxlength="120" required>
 <label for="song-artist-name">Nome artístico</label><input id="song-artist-name" maxlength="100" required>
@@ -325,9 +325,9 @@ const songStatus=document.getElementById('song-status');
 const mySongs=document.getElementById('my-songs');
 const songPanel=document.getElementById('admin-songs-panel');
 async function loadAdminSongAccess(){
- // O formulário de envio de músicas só aparece para administradores e equipe autorizada.
+ // O formulário de envio aparece para todos os perfis Artista / DJ e administradores.
  try{
-  const allowed=await auth.isCurrentUserAdmin();
+  const allowed=await auth.isCurrentUserArtistOrAdmin();
   songPanel.hidden=!allowed;
   if(allowed)await loadMySongs();
  }catch(error){songPanel.hidden=true;}
