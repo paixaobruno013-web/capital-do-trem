@@ -175,9 +175,9 @@ body.light .card{background-color:rgba(255,255,255,.9)}
 <form id="event-form">
 <label for="event-name">Nome do evento</label><input id="event-name" maxlength="120" required>
 <label for="event-date">Data</label><input id="event-date" type="date" required>
+<label for="event-address">Endereço do evento</label><input id="event-address" maxlength="240" required placeholder="Rua, número, bairro e cidade"><a id="event-map-preview" class="event-map-preview" href="#" target="_blank" rel="noopener noreferrer" hidden>📍 Abrir localização no Google Maps</a><p class="muted">Ao informar o endereço, a localização é ativada automaticamente no mapa.</p>
 <details style="margin:8px 0 14px"><summary style="cursor:pointer;color:var(--red);font-weight:800;padding:8px 0">+ Informações opcionais (horário, tipo, descrição e contato)</summary>
 <label for="event-time">Horário (opcional)</label><input id="event-time" type="time">
-<label for="event-address">Endereço do evento</label><input id="event-address" maxlength="240" required placeholder="Rua, número, bairro e cidade"><a id="event-map-preview" class="event-map-preview" href="#" target="_blank" rel="noopener noreferrer" hidden>📍 Abrir localização no Google Maps</a><p class="muted">Ao informar o endereço, a localização é ativada automaticamente no mapa.</p>
 <label for="event-category">Tipo</label><select id="event-category" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="show">Festa / Show</option><option value="evento">Evento</option><option value="acao-social">Ação social</option><option value="outro">Outro</option></select>
 <label for="event-description">Descrição (opcional)</label><textarea id="event-description" maxlength="2000" rows="3" placeholder="Se quiser, conte mais detalhes..." style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
 <label for="event-contact">Contato público (opcional)</label><input id="event-contact" maxlength="120"></details>
