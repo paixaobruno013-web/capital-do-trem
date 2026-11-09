@@ -55,6 +55,11 @@ jobs:
       - name: Criar projeto iOS Capacitor
         run: npx cap add ios
 
+      - name: Configurar Python para gerar os ícones
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Preparar o ícone oficial do Capital do Trem
         env:
           PROFILE_ICON_URL: https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/31937786-c321-445f-ae1c-de018eca95c8/avatar/b338f7a8-8964-4063-9086-64a9bd603f4f.jpg
