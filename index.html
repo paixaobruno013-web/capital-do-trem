@@ -1210,10 +1210,10 @@ function safeHttpsUrl(value){try{const url=new URL(value);return url.protocol===
    setTimeout(()=>{screen.classList.add('is-finished');setTimeout(()=>screen.remove(),600);},500);
   };
   const loader=setInterval(()=>{
-   if(!finished){progress=Math.min(92,progress+(progress<55?2:progress<82?0.8:0.25));paint();}
+   if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}
    finish();
    if(finished)clearInterval(loader);
-  },180);
+  },220);
   if(intro.complete&&intro.naturalWidth>0)imageReady=true;
   else {intro.addEventListener('load',()=>{imageReady=true;finish();},{once:true});intro.addEventListener('error',()=>{imageReady=true;finish();},{once:true});}
   if(ready)finish();else window.addEventListener('load',()=>{ready=true;finish();},{once:true});
