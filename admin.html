@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="manifest" href="manifest.webmanifest">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#000000"><meta name="description" content="Painel de administração do Capital do Trem.">
 <title>Administração — Capital do Trem</title>
 <style>
@@ -77,6 +77,16 @@ body.light .command-section{background:linear-gradient(150deg,#fff,#f7f7f7);bord
 @media(min-width:850px){.command-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.command-link{min-height:78px;flex-direction:row;justify-content:flex-start;padding:10px 12px;text-align:left;font-size:12px}.command-link .glyph{flex:0 0 32px}}
 @media(max-width:480px){.command-top{padding:17px;min-height:118px}.command-top:after{right:-35px}.command-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.command-link{min-height:68px}.command-section{padding:13px}}
 
+
+/* Ajustes comuns para telas nativas Android e iOS */
+html{min-height:100%;scroll-padding-top:16px;-webkit-text-size-adjust:100%;}
+body{min-height:100vh;min-height:100dvh;padding-bottom:env(safe-area-inset-bottom);overscroll-behavior-y:contain;}
+button,a,input,textarea,select{-webkit-tap-highlight-color:transparent;}
+input,textarea,select{font-size:16px;}
+img,video,audio{max-width:100%;}
+audio{width:100%;}
+:focus-visible{outline:2px solid var(--red);outline-offset:3px;}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}}
 </style>
 </head>
 <body>
