@@ -129,7 +129,8 @@
  // A verificação usa um endpoint externo ao cache PWA para detectar a queda real.
  let probeRunning=false,lastProbeOnline=null,lastProbeAt=0,consecutiveProbeFailures=0;
  async function verifyRealConnection(){
-  if(probeRunning)return;
+  // Evita sondagens de rede em segundo plano; a retomada verifica a conexão pelos eventos de foco/visibilidade.
+  if(probeRunning||document.hidden)return;
   probeRunning=true;
   const controller=new AbortController();
   const timeout=window.setTimeout(()=>controller.abort(),4200);
@@ -171,7 +172,8 @@
  navigator.connection?.addEventListener?.('change',verifyRealConnection);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)verifyRealConnection();});
  window.setTimeout(verifyRealConnection,500);
- window.setInterval(verifyRealConnection,5000);
+ // Mantém a detecção de quedas silenciosas sem consultar a rede a cada 5 segundos.
+ window.setInterval(verifyRealConnection,15000);
  if(!supportsServiceWorkerUpdates||!('serviceWorker' in navigator))return;
  let registration=null,reloading=false;
  const banner=document.createElement('aside');
