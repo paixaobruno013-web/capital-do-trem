@@ -1216,16 +1216,6 @@ window.addEventListener('offline',()=>updateConnectionStatus());
 window.addEventListener('online',()=>updateConnectionStatus(true));
 updateConnectionStatus();
 
-// Registro de instalação e presença em tempo real aproximada (heartbeat).
-(async()=>{
- try{
-  const api=await import('./supabase/auth.js');api.initSupabase();
-  const count=await api.registerAppInstallation();
-  const countNode=document.getElementById('app-install-count');if(countNode)countNode.textContent=count.toLocaleString('pt-BR');
-  await api.startUserPresence();
- }catch(error){console.warn('Contagem/presença indisponível.',error);}
-})();
-
 // Diretório de perfis: lista apenas participantes que optaram por visibilidade pública.
 (async()=>{
  const container=document.getElementById('community-profiles');
