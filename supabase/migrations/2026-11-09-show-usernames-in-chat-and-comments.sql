@@ -42,7 +42,7 @@ declare
   profile_username text;
   profile_avatar_type text;
   profile_avatar_url text;
-  profile_avatar_data text;
+  profile_avatar_data jsonb;
 begin
   select
     nullif(trim(p.display_name), ''),
