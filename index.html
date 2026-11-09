@@ -482,7 +482,12 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
  width:auto!important;height:auto!important;display:block!important;padding:0!important;margin:0!important;
  border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
  transform:translate(-50%,-58%)!important;font-size:27px!important;line-height:1!important;
- transition:left .18s linear!important;white-space:nowrap!important;filter:drop-shadow(0 1px 3px #000)!important;
+ white-space:nowrap!important;filter:drop-shadow(0 1px 3px #000)!important;
+ animation:opening-train-travel 3s linear infinite alternate!important;
+}
+@keyframes opening-train-travel{
+ from{left:3%}
+ to{left:97%}
 }
 @media(max-width:759px){
  .opening-live-track{height:10px!important}
@@ -1203,7 +1208,7 @@ function safeHttpsUrl(value){try{const url=new URL(value);return url.protocol===
   const bar=document.getElementById('opening-live-progress');
   const train=document.getElementById('opening-live-train');
   let progress=3,ready=document.readyState==='complete',imageReady=false,finished=false;
-  const paint=()=>{if(bar)bar.style.width=progress+'%';if(train)train.style.left=progress+'%';};
+  const paint=()=>{if(bar)bar.style.width=progress+'%';};
   const finish=()=>{
    if(finished||!ready||!imageReady)return;
    finished=true;progress=100;paint();
