@@ -28,6 +28,7 @@ nav{display:flex;gap:8px;overflow:auto;padding:16px 0 8px}nav button{white-space
 input,textarea,select{display:block;width:100%;padding:12px;margin:7px 0 12px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--fg)}textarea{min-height:90px}
 .list{display:grid;gap:9px}.item{padding:12px;background:var(--panel2);border-radius:10px}.social{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
 .header-action-groups{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:14px}.header-action-row{display:flex;justify-content:center;gap:8px;width:100%;max-width:440px}.header-location-row{display:flex;justify-content:center;width:100%;margin-top:9px}.header-location-row .btn{min-height:42px;padding:8px 16px;font-size:13px}.header-action-row .btn{display:flex;flex:1;min-width:0;min-height:44px;align-items:center;justify-content:center;text-align:center;padding:7px 7px;font-size:13px;line-height:1.2;white-space:nowrap}@media(max-width:360px){.header-action-row .btn{font-size:11px;padding:7px 4px;white-space:normal;line-height:1.15}}
+.community-online-dot{display:inline-block;width:10px;height:10px;flex:0 0 10px;border-radius:50%;background:#777;box-shadow:0 0 0 2px rgba(120,120,120,.16);vertical-align:middle}.community-online-dot.is-online{background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,.85),0 0 15px rgba(34,197,94,.4)}.community-online-label{font-size:12px;color:var(--muted)}
 .community-profile-card{display:flex;align-items:flex-start;gap:13px;padding:14px!important;border:1px solid var(--line)!important;border-radius:13px!important}.community-profile-avatar{width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;border-radius:50%;background:var(--red);color:#fff;font-size:20px;font-weight:800;box-shadow:0 0 12px rgba(237,28,36,.2)}.community-profile-copy{min-width:0;flex:1}.community-profile-copy strong{display:block;font-size:1.02rem;overflow-wrap:anywhere}.community-profile-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:5px 0}.community-profile-role{display:inline-block;padding:3px 9px;border-radius:999px;background:rgba(237,28,36,.12);color:var(--red);font-size:.78rem;font-weight:700}.community-profile-city,.community-profile-bio{margin:5px 0;overflow-wrap:anywhere}.community-profile-bio{line-height:1.45}.public-artist-card{padding:16px!important;border:1px solid rgba(237,28,36,.35)!important;border-radius:14px!important;background:linear-gradient(145deg,var(--panel2),var(--panel))!important;box-shadow:0 8px 24px rgba(0,0,0,.18)}.public-artist-head{display:flex;align-items:center;gap:14px;min-width:0}.public-artist-avatar{width:88px;height:88px;flex:0 0 88px;object-fit:cover;border-radius:50%;border:2px solid var(--red);background:var(--bg);box-shadow:0 0 12px rgba(237,28,36,.25)}.public-artist-copy{min-width:0}.public-artist-copy h3{margin:0 0 5px;overflow-wrap:anywhere}.public-artist-copy p{margin:0}.public-artist-bio{margin:14px 0 0;line-height:1.55;overflow-wrap:anywhere}.artist-social-links{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;margin-top:14px}.artist-social-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:9px 14px;border:1px solid rgba(237,28,36,.72);border-radius:11px;background:#090909;color:#fff;text-decoration:none;font-weight:800;box-shadow:0 0 8px rgba(255,0,32,.42),0 0 18px rgba(237,28,36,.22)}.artist-social-link svg{width:22px;height:22px;flex:0 0 22px}.artist-social-link:hover{box-shadow:0 0 12px rgba(255,20,42,.75),0 0 26px rgba(237,28,36,.4)}body.light .artist-social-link{background:#fff;color:#111}
 footer{text-align:center;color:var(--muted);font-size:12px;padding:24px}
 button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--red);outline-offset:3px}
@@ -760,6 +761,7 @@ html.auth-check-pending body{visibility:hidden}
 </section>
 <section class="page" id="comunidade">
 <div class="card"><h2>👥 Nossa comunidade</h2><p class="muted">Um espaço para usuários Uai, artistas e todos que fazem parte do Capital do Trem. Cada pessoa escolhe se quer deixar seu perfil visível.</p><a class="btn" href="./conta.html">Criar minha conta / Meu perfil</a></div>
+<div class="card"><h3>🚂 Capital do Trem instalado</h3><p style="display:flex;align-items:center;gap:9px;margin:4px 0"><strong id="app-install-count" style="font-size:28px;color:var(--red)">—</strong><span class="muted">instalações registradas</span></p><p class="muted" style="font-size:12px">Contagem de instalações que já abriram o aplicativo neste aparelho.</p></div>
 <div class="card"><h3>Perfis públicos</h3><div id="community-profiles" class="list" aria-live="polite"><p class="muted">Os perfis públicos aparecerão aqui quando o banco estiver conectado.</p></div></div>
 </section>
 <section class="page" id="social"><div class="card"><h2>❤️ Ação social</h2><p>Um espaço para divulgar campanhas solidárias, arrecadações e iniciativas comunitárias.</p><p class="muted">As campanhas oficiais serão publicadas após implantação de moderação e canal administrativo. Para sugerir uma ação, envie uma apresentação com objetivo, responsável, data e local.</p><a class="btn instagram-button" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Apresentar uma ação social</a></div></section>
@@ -1215,13 +1217,26 @@ window.addEventListener('offline',()=>updateConnectionStatus());
 window.addEventListener('online',()=>updateConnectionStatus(true));
 updateConnectionStatus();
 
+// Registro de instalação e presença em tempo real aproximada (heartbeat).
+(async()=>{
+ try{
+  const api=await import('./supabase/auth.js');api.initSupabase();
+  const count=await api.registerAppInstallation();
+  const countNode=document.getElementById('app-install-count');if(countNode)countNode.textContent=count.toLocaleString('pt-BR');
+  await api.startUserPresence();
+ }catch(error){console.warn('Contagem/presença indisponível.',error);}
+})();
+
 // Diretório de perfis: lista apenas participantes que optaram por visibilidade pública.
 (async()=>{
  const container=document.getElementById('community-profiles');
  try{
   const module=await import('./supabase/auth.js');module.initSupabase();
-  const profiles=await module.getPublicProfiles();container.replaceChildren();
+  const profiles=await module.getPublicProfiles();
+  let onlineIds=await module.getOnlineUserIds();
+  container.replaceChildren();
   if(!profiles.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Ainda não há perfis públicos. Crie sua conta e escolha aparecer na comunidade!';container.append(empty);return;}
+  const onlineNodes=new Map();
   for(const profile of profiles){
    const card=document.createElement('article');card.className='item community-profile-card';
    const avatar=document.createElement('div');avatar.className='community-profile-avatar';avatar.setAttribute('aria-hidden','true');
@@ -1232,12 +1247,26 @@ updateConnectionStatus();
    const handle=document.createElement('p');handle.className='muted';handle.style.margin='2px 0 6px';handle.textContent='@'+(profile.username||'usuario');
    const meta=document.createElement('div');meta.className='community-profile-meta';
    const role=document.createElement('span');role.className='community-profile-role';role.textContent=profile.account_type==='artist'?'Artista / DJ':'Usuário Uai';meta.append(role);if(profile.account_type==='artist'){const verified=document.createElement('span');verified.className='verified-badge';verified.textContent='✓';verified.setAttribute('role','img');verified.setAttribute('aria-label','Artista verificado');meta.append(verified);}
+   const status=document.createElement('span');status.className='community-online-dot'+(onlineIds.has(profile.user_id)?' is-online':'');status.setAttribute('role','img');status.setAttribute('aria-label',onlineIds.has(profile.user_id)?'Online':'Offline');status.title=onlineIds.has(profile.user_id)?'Online':'Offline';
+   const statusText=document.createElement('span');statusText.className='community-online-label';statusText.textContent=onlineIds.has(profile.user_id)?'Online':'Offline';
+   meta.append(status,statusText);onlineNodes.set(profile.user_id,{dot:status,label:statusText});
    copy.append(name,handle,meta);
    if(profile.city){const city=document.createElement('p');city.className='muted community-profile-city';city.textContent=profile.city;copy.append(city);}
    if(profile.bio){const bio=document.createElement('p');bio.className='community-profile-bio';bio.textContent=profile.bio;copy.append(bio);}
-   card.append(avatar,copy);
-   container.append(card);
+   card.append(avatar,copy);container.append(card);
   }
+  window.setInterval(async()=>{
+   if(!navigator.onLine||document.hidden)return;
+   try{
+    onlineIds=await module.getOnlineUserIds();
+    for(const [userId,nodes] of onlineNodes){
+     const online=onlineIds.has(userId);
+     nodes.dot.classList.toggle('is-online',online);
+     nodes.dot.setAttribute('aria-label',online?'Online':'Offline');
+     nodes.dot.title=online?'Online':'Offline';nodes.label.textContent=online?'Online':'Offline';
+    }
+   }catch(error){/* Mantém o último status válido quando a rede oscilar. */}
+  },45000);
  }catch(error){const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar o diretório agora. Confira sua conexão e tente novamente.';container.replaceChildren(message);}
 })();
 // Vitrine pública: mostra apenas artistas aprovados pela equipe.
