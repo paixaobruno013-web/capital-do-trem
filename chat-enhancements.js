@@ -40,7 +40,7 @@ tools.querySelector('#cdt-emojis').addEventListener('click',()=>{emojiPanel.clas
 tools.querySelector('#cdt-photo').addEventListener('click',()=>imageInput.click());
 tools.querySelector('#cdt-audio').addEventListener('click',()=>audioInput.click());
 let attachmentFile=null,recorder=null,chunks=[];
-function choose(file){attachmentFile=file||null;preview.hidden=!file;preview.textContent=file?'Anexo: '+file.name+' • '+(file.size/1048576).toFixed(1)+' MB':'';}
+function choose(file){attachmentFile=file||null;preview.hidden=!file;preview.textContent=file?'Anexo: '+file.name+' • '+(file.size/1048576).toFixed(1)+' MB':'';input.required=!file;}
 imageInput.addEventListener('change',()=>choose(imageInput.files?.[0]));
 audioInput.addEventListener('change',()=>choose(audioInput.files?.[0]));
 tools.querySelector('#cdt-record').addEventListener('click',async event=>{
@@ -52,19 +52,6 @@ tools.querySelector('#cdt-record').addEventListener('click',async event=>{
  recorder.start();button.textContent='⏹️ Parar gravação';
  }catch(error){status.textContent='Libere o acesso ao microfone nas permissões do celular.';}
 });
-function renderAttachment(message){
- if(!message?.attachment_url||!message.attachment_url.startsWith('https://'))return;
- if(list.querySelector('[data-attachment-for="'+message.id+'"]'))return;
- const bubble=list.querySelector('[data-message-id="'+message.id+'"]');
- if(!bubble)return;
- const media=document.createElement('div');media.className='message-attachment';media.dataset.attachmentFor=message.id;
- if(message.attachment_type==='image'){const img=document.createElement('img');img.src=message.attachment_url;img.alt='Imagem enviada no chat';img.loading='lazy';media.append(img);}
- else if(message.attachment_type==='audio'){const audio=document.createElement('audio');audio.controls=true;audio.preload='metadata';audio.src=message.attachment_url;media.append(audio);}
- bubble.append(media);
-}
-const observer=new MutationObserver(()=>{for(const node of list.children){const id=node.dataset.messageId;if(id&&!node.dataset.attachmentObserver){node.dataset.attachmentObserver='1';}}});
-observer.observe(list,{childList:true});
-const originalAdd=window.addMessage;
 form.addEventListener('submit',async event=>{
  if(!attachmentFile)return;
  event.preventDefault();event.stopImmediatePropagation();
@@ -74,9 +61,8 @@ form.addEventListener('submit',async event=>{
   status.textContent='Enviando anexo…';
   const uploaded=await uploadChatAttachment(attachmentFile);
   const sent=await sendChatMessage(input.value.trim(),uploaded);
-  const item=document.createElement('article');item.className='message';item.dataset.messageId=sent.id;item.dataset.createdAt=sent.created_at;
-  const body=document.createElement('div');body.textContent=sent.content||'';item.append(body);list.append(item);renderAttachment(sent);list.scrollTop=list.scrollHeight;
-  input.value='';attachmentFile=null;preview.hidden=true;preview.textContent='';imageInput.value='';audioInput.value='';status.textContent='Mensagem enviada.';
+  window.dispatchEvent(new CustomEvent('capital-chat-message',{detail:sent}));
+  input.value='';attachmentFile=null;input.required=true;preview.hidden=true;preview.textContent='';imageInput.value='';audioInput.value='';status.textContent='Mensagem enviada.';
  }catch(error){status.textContent=error.message||'Não foi possível enviar o anexo.';}
  finally{if(send)send.disabled=false;}
 },true);
@@ -89,4 +75,4 @@ const existingObserver=new MutationObserver(()=>{
  }
 });
 existingObserver.observe(list,{childList:true,subtree:true});
-window.addEventListener('pagehide',()=>{observer.disconnect();existingObserver.disconnect();});
+window.addEventListener('pagehide',()=>{if(recorder?.state==='recording')recorder.stop();});
