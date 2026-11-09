@@ -532,6 +532,34 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
 .bubble.mine{margin-left:auto;border-radius:14px 14px 4px 14px;background:rgba(18,92,58,.34);border-color:rgba(42,170,105,.3)}
 .bubble time{display:block;margin-top:5px;text-align:right;font-size:10px;opacity:.7}
 @media(prefers-reduced-motion:reduce){#published-song-catalog audio{scroll-behavior:auto}}
+
+/* Navegação: usa somente os SVG reais do HTML, sem pseudoícones duplicados. */
+#nav button::before,#nav .nav-chat::before,#nav .nav-profile::before{content:none!important;display:none!important}
+#nav button svg,#nav a.nav-chat svg,#nav a.nav-profile svg{
+ display:block!important;width:28px!important;height:28px!important;min-width:28px!important;
+ flex:0 0 28px!important;fill:currentColor!important;color:inherit!important;
+}
+#nav button,#nav a.nav-chat,#nav a.nav-profile{color:#fff}
+@media(max-width:759px){
+ #nav button svg,#nav a.nav-chat svg,#nav a.nav-profile svg{
+  width:30px!important;height:30px!important;min-width:30px!important;flex:0 0 30px!important;
+ }
+ #nav button,#nav a.nav-chat,#nav a.nav-profile{font-size:10px!important}
+}
+/* Imagens internas: dimensões estáveis e apresentação consistente no celular. */
+#community-profiles img,#public-artists img,#public-events img{
+ display:block;max-width:100%;height:auto;
+}
+#community-profiles .community-profile-avatar img{
+ width:100%;height:100%;object-fit:cover;display:block;
+}
+#public-events .internal-image-fallback,#public-artists .internal-image-fallback{
+ display:grid;place-items:center;min-height:110px;padding:18px;
+ border:1px dashed rgba(237,28,36,.55);border-radius:12px;
+ background:linear-gradient(145deg,rgba(237,28,36,.12),rgba(0,0,0,.18));
+ color:var(--muted);text-align:center;
+}
+
 </style></head>
 <body>
 <script>
@@ -1051,7 +1079,7 @@ updateConnectionStatus();
   for(const profile of profiles){
    const card=document.createElement('article');card.className='item community-profile-card';
    const avatar=document.createElement('div');avatar.className='community-profile-avatar';avatar.setAttribute('aria-hidden','true');
-   if(profile.avatar_type==='photo'&&typeof profile.avatar_url==='string'&&profile.avatar_url.startsWith('https://')){const image=document.createElement('img');image.src=profile.avatar_url;image.alt='';image.loading='lazy';image.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';avatar.append(image);}
+   if(profile.avatar_type==='photo'&&typeof profile.avatar_url==='string'&&profile.avatar_url.startsWith('https://')){const image=document.createElement('img');image.src=profile.avatar_url;image.alt='Foto de '+(profile.display_name||'participante');image.loading='eager';image.decoding='async';image.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%;display:block';image.addEventListener('error',()=>{image.remove();avatar.textContent=Array.from((profile.display_name||'U').trim())[0]?.toLocaleUpperCase('pt-BR')||'U';},{once:true});avatar.append(image);}
    else avatar.textContent=profile.avatar_type==='character'?'🎭':Array.from((profile.display_name||'U').trim())[0]?.toLocaleUpperCase('pt-BR')||'U';
    const copy=document.createElement('div');copy.className='community-profile-copy';
    const name=document.createElement('strong');name.textContent=profile.display_name||'Participante do Capital do Trem';
@@ -1082,7 +1110,7 @@ updateConnectionStatus();
     try{
      const photoUrl=new URL(artist.photo_url);
      if(photoUrl.protocol==='https:'){
-      const photo=document.createElement('img');photo.className='public-artist-avatar';photo.src=photoUrl.href;photo.alt='Foto de '+(artist.artist_name||'artista');photo.loading='lazy';photo.decoding='async';photo.referrerPolicy='no-referrer';photo.addEventListener('error',()=>photo.remove(),{once:true});head.append(photo);
+      const photo=document.createElement('img');photo.className='public-artist-avatar';photo.src=photoUrl.href;photo.alt='Foto de '+(artist.artist_name||'artista');photo.loading='eager';photo.decoding='async';photo.referrerPolicy='no-referrer';photo.addEventListener('error',()=>{const fallback=document.createElement('div');fallback.className='public-artist-avatar internal-image-fallback';fallback.textContent='🎤 Foto indisponível';photo.replaceWith(fallback);},{once:true});head.append(photo);
      }
     }catch{}
    }
@@ -1162,7 +1190,7 @@ updateConnectionStatus();
    if(item.description){const description=document.createElement('p');description.textContent=item.description;card.append(description);}
    if(item.contact){const contact=document.createElement('p');contact.textContent='Contato: '+item.contact;card.append(contact);}
    const map=document.createElement('a');map.className='btn alt';map.target='_blank';map.rel='noopener';map.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(item.address);map.textContent='Ver localização no mapa';card.append(map);
-   const posterUrl=safeHttpsUrl(item.poster_url);if(posterUrl){const image=document.createElement('img');image.src=posterUrl;image.alt='Cartaz de '+item.title;image.loading='lazy';image.decoding='async';image.style.cssText='display:block;width:100%;max-height:420px;object-fit:cover;border-radius:12px;margin:10px 0';card.append(image);}
+   const posterUrl=safeHttpsUrl(item.poster_url);if(posterUrl){const image=document.createElement('img');image.src=posterUrl;image.alt='Cartaz de '+item.title;image.loading='eager';image.decoding='async';image.referrerPolicy='no-referrer';image.style.cssText='display:block;width:100%;max-height:420px;object-fit:contain;background:#090909;border-radius:12px;margin:10px 0';image.addEventListener('error',()=>{const fallback=document.createElement('div');fallback.className='internal-image-fallback';fallback.textContent='🖼️ Cartaz temporariamente indisponível';image.replaceWith(fallback);},{once:true});card.append(image);}
    const actions=document.createElement('div');actions.className='social';actions.style.marginTop='10px';
    const share=document.createElement('button');share.type='button';share.className='btn alt';share.textContent='↗ Compartilhar evento';share.addEventListener('click',async()=>{const url=map.href;const shareData={title:item.title,text:item.title+' • '+date.textContent+' • '+item.address,url};try{if(navigator.share)await navigator.share(shareData);else{await navigator.clipboard.writeText(shareData.text+' • '+url);share.textContent='✓ Copiado';}}catch(error){if(error.name!=='AbortError')share.textContent='Não foi possível compartilhar';}});actions.append(share);card.append(actions);
    container.append(card);
