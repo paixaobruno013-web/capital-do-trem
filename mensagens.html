@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#050505"><meta name="description" content="Conversas privadas seguras do Capital do Trem.">
 <link rel="manifest" href="./manifest.webmanifest"><title>Minhas conversas — Capital do Trem</title>
 <style>
@@ -16,6 +16,16 @@ body.light{background-image:linear-gradient(180deg,rgba(248,248,250,.86),rgba(23
 body.light .card,body.light .panel,body.light .conversation,body.light .message-list{background-color:rgba(255,255,255,.9)}
 @media(max-width:759px){body{background-attachment:scroll}}
 
+
+/* Ajustes comuns para telas nativas Android e iOS */
+html{min-height:100%;scroll-padding-top:16px;-webkit-text-size-adjust:100%;}
+body{min-height:100vh;min-height:100dvh;padding-bottom:env(safe-area-inset-bottom);overscroll-behavior-y:contain;}
+button,a,input,textarea,select{-webkit-tap-highlight-color:transparent;}
+input,textarea,select{font-size:16px;}
+img,video,audio{max-width:100%;}
+audio{width:100%;}
+:focus-visible{outline:2px solid var(--red);outline-offset:3px;}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}}
 </style></head>
 <body><a class="skip" href="#main">Pular para o conteúdo</a>
 <header><img src="./marca.svg" alt="Capital do Trem"><h1>Minhas conversas</h1><p class="muted">Conversas individuais com convite e aceite antes de começar.</p><div class="actions"><a class="btn" href="./index.html">Início</a><a class="btn" href="./bate-papo.html">Koe Fala Tu • Geral</a><a class="btn" href="./conta.html">Minha conta</a><button id="theme" type="button">☀️ Claro</button></div></header>
