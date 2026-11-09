@@ -576,7 +576,7 @@ form.addEventListener('submit',async event=>{
    if(result.user?.identities?.length===0){
     status.textContent='Este e-mail já possui cadastro. Entre na sua conta ou use Recuperar senha.';
    }else if(result.session?.user){
-    status.textContent='Conta criada e acesso iniciado. Complete seu perfil para participar do Capital do Trem.';
+    status.textContent='Conta criada e acesso iniciado. Bem-vindo ao Capital do Trem!';window.location.replace('./');return;
    }else{
     status.textContent='Cadastro recebido. Abra o e-mail de confirmação enviado pelo serviço de contas antes de entrar. Confira também spam e lixo eletrônico.';
    }
@@ -594,7 +594,7 @@ form.addEventListener('submit',async event=>{
    status.textContent='Senha atualizada com sucesso! Agora entre usando sua nova senha.';
   }else{
    await auth.signInAccount({email,password});
-   status.textContent='Acesso realizado. Sua área de conta está aberta.';
+   status.textContent='Acesso realizado. Abrindo o Capital do Trem...';window.location.replace('./');return;
   }
  }catch(error){
   status.textContent=error?.message||'Não foi possível concluir. Confira os dados e tente novamente.';
