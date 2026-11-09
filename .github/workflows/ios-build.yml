@@ -60,11 +60,12 @@ jobs:
         run: |
           xcodebuild -version
           xcrun simctl list devices available
+          test -d ios/App/App.xcodeproj
 
       - name: Compilar para simulador sem assinatura
         run: |
           xcodebuild \
-            -workspace ios/App/App.xcworkspace \
+            -project ios/App/App.xcodeproj \
             -scheme App \
             -configuration Debug \
             -sdk iphonesimulator \
