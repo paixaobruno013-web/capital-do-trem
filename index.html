@@ -621,6 +621,65 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
 /* Instagram: identidade visual em degradê rosa e roxo */
 .instagram-button{background:linear-gradient(110deg,#feda75 0%,#fa7e1e 18%,#d62976 48%,#962fbf 76%,#4f5bd5 100%)!important;color:#fff!important;border:1px solid rgba(255,255,255,.22)!important;box-shadow:0 3px 14px rgba(214,41,118,.28)!important;text-shadow:0 1px 2px rgba(0,0,0,.18)}
 .instagram-button:hover,.instagram-button:focus-visible{filter:brightness(1.08);box-shadow:0 4px 18px rgba(150,47,191,.42)!important}
+
+
+/* Ajustes solicitados: capa superior mais legível e dançarinos apoiados no vagão. */
+@media (max-width:759px), (min-width:760px){
+ body:not(.light) header{
+  position:relative!important;
+  isolation:isolate!important;
+  overflow:hidden!important;
+  background:#050505!important;
+  background-image:none!important;
+  border-bottom:1px solid rgba(237,28,36,.55)!important;
+ }
+ body:not(.light) header::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  background-image:linear-gradient(90deg,rgba(0,0,0,.20),rgba(0,0,0,.10)),url('./assets/favela-header.webp');
+  background-size:cover;
+  background-position:center 48%;
+  background-repeat:no-repeat;
+  filter:brightness(1.22) contrast(1.10) saturate(1.16);
+ }
+ body:not(.light) header>*{position:relative;z-index:1}
+}
+.opening-live-track #opening-live-train .opening-wagon-dancers{
+ height:38px!important;
+ justify-content:flex-end!important;
+}
+.opening-live-track #opening-live-train .opening-wagon-dancers .opening-wagon-load{
+ display:flex!important;
+ align-items:flex-end!important;
+ justify-content:center!important;
+ height:25px!important;
+ min-height:25px!important;
+ padding:0 1px 0!important;
+ line-height:1!important;
+}
+.opening-live-track #opening-live-train .opening-wagon-dancers .opening-dancer{
+ display:inline-flex!important;
+ align-items:flex-end!important;
+ align-self:flex-end!important;
+ height:22px!important;
+ line-height:1!important;
+ vertical-align:bottom!important;
+ transform-origin:50% 100%!important;
+ animation:opening-dance-rock .42s ease-in-out infinite alternate!important;
+}
+.opening-live-track #opening-live-train .opening-wagon-dancers .opening-dancer.male{
+ animation-delay:-.21s!important;
+}
+@keyframes opening-dance-rock{
+ from{transform:rotate(-7deg)}
+ to{transform:rotate(7deg)}
+}
+@media(prefers-reduced-motion:reduce){
+ .opening-live-track #opening-live-train .opening-wagon-dancers .opening-dancer{animation:none!important}
+}
+
 </style></head>
 <body>
 <script>
