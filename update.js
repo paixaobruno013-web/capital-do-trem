@@ -125,10 +125,9 @@
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addTrainAlert,{once:true});
  else addTrainAlert();
  window.addEventListener('offline',showOffline);
- window.addEventListener('online',showOnline);
  // navigator.onLine pode continuar true quando o Wi-Fi está conectado, mas sem internet.
  // A verificação usa um endpoint externo ao cache PWA para detectar a queda real.
- let probeRunning=false,lastProbeOnline=null,lastProbeAt=0;
+ let probeRunning=false,lastProbeOnline=null,lastProbeAt=0,consecutiveProbeFailures=0;
  async function verifyRealConnection(){
   if(probeRunning)return;
   probeRunning=true;
@@ -142,11 +141,17 @@
    });
    if(!response.ok)throw new Error('A internet não respondeu ao teste de conexão');
    const wasOffline=document.documentElement.classList.contains('app-offline')||lastProbeOnline===false;
-   lastProbeOnline=true;lastProbeAt=Date.now();
+   consecutiveProbeFailures=0;lastProbeOnline=true;lastProbeAt=Date.now();
    if(wasOffline)showOnline();else markOnline();
   }catch(error){
-   lastProbeOnline=false;lastProbeAt=Date.now();
-   showOffline();
+   lastProbeAt=Date.now();
+   consecutiveProbeFailures++;
+   // Uma falha isolada ou resposta lenta não deve disparar falso alerta.
+   // Sem rede no aparelho: alerta imediato. Com Wi-Fi/dados ativos: confirma em duas falhas seguidas.
+   if(!navigator.onLine||consecutiveProbeFailures>=2||document.documentElement.classList.contains('app-offline')){
+    lastProbeOnline=false;
+    showOffline();
+   }
   }finally{
    window.clearTimeout(timeout);
    probeRunning=false;
