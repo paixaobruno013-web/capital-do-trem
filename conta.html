@@ -45,6 +45,15 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 .account-lock-card input{font-size:18px}
 
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* Papel de parede interno também na área da conta, em celular e computador. */
+body{background-image:linear-gradient(180deg,rgba(0,0,0,.82),rgba(0,0,0,.9)),url('./assets/favela-header.webp');background-size:cover;background-position:center top;background-repeat:no-repeat;background-attachment:fixed}
+body.light{background-image:linear-gradient(180deg,rgba(248,248,250,.86),rgba(239,239,242,.92)),url('./assets/favela-header.webp')}
+.card{background-color:rgba(16,16,16,.88)}
+body.light .card{background-color:rgba(255,255,255,.9)}
+.event-map-preview{display:inline-flex;align-items:center;gap:7px;margin:0 0 12px;padding:8px 12px;border:1px solid var(--red);border-radius:9px;color:var(--fg);text-decoration:none;font-weight:700}
+.event-map-preview[hidden]{display:none!important}
+
 </style>
 </head>
 <body>
@@ -99,7 +108,6 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 <form id="artist-song-form">
 <label for="song-title">Nome da música</label><input id="song-title" maxlength="120" required>
 <label for="song-artist-name">Nome artístico</label><input id="song-artist-name" maxlength="100" required>
-<label for="song-description">Descrição (opcional)</label><textarea id="song-description" maxlength="1000" rows="3" placeholder="Conte um pouco sobre essa música..." style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
 <label for="song-audio-file">Arquivo de áudio</label><input id="song-audio-file" type="file" accept="audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/x-wav,audio/ogg,.mp3,.m4a,.aac,.wav,.ogg" required>
 <p class="muted" id="song-file-info">Tamanho máximo: 50 MB. Envie somente músicas das quais você tenha autorização de uso.</p>
 <button type="submit" id="submit-song">🎵 Postar música</button>
@@ -167,11 +175,13 @@ body.light h1{text-shadow:0 0 10px rgba(237,28,36,.12)}
 <form id="event-form">
 <label for="event-name">Nome do evento</label><input id="event-name" maxlength="120" required>
 <label for="event-date">Data</label><input id="event-date" type="date" required>
-<label for="event-time">Horário</label><input id="event-time" type="time">
-<label for="event-address">Endereço público</label><input id="event-address" maxlength="240" required>
-<label for="event-category">Tipo</label><select id="event-category" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="show">Show</option><option value="evento">Evento</option><option value="acao-social">Ação social</option><option value="outro">Outro</option></select>
-<label for="event-description">Descrição</label><textarea id="event-description" maxlength="2000" rows="4" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
-<label for="event-contact">Contato público (opcional)</label><input id="event-contact" maxlength="120"><label for="event-poster-upload">Cartaz do evento (JPG, PNG ou WebP, até 5 MB)</label><input id="event-poster-upload" type="file" accept="image/jpeg,image/png,image/webp"><div id="event-poster-preview" class="image-preview" aria-live="polite"></div><p class="muted">O cartaz será enviado junto com o evento na hora da publicação.</p>
+<details style="margin:8px 0 14px"><summary style="cursor:pointer;color:var(--red);font-weight:800;padding:8px 0">+ Informações opcionais (horário, tipo, descrição e contato)</summary>
+<label for="event-time">Horário (opcional)</label><input id="event-time" type="time">
+<label for="event-address">Endereço do evento</label><input id="event-address" maxlength="240" required placeholder="Rua, número, bairro e cidade"><a id="event-map-preview" class="event-map-preview" href="#" target="_blank" rel="noopener noreferrer" hidden>📍 Abrir localização no Google Maps</a><p class="muted">Ao informar o endereço, a localização é ativada automaticamente no mapa.</p>
+<label for="event-category">Tipo</label><select id="event-category" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="show">Festa / Show</option><option value="evento">Evento</option><option value="acao-social">Ação social</option><option value="outro">Outro</option></select>
+<label for="event-description">Descrição (opcional)</label><textarea id="event-description" maxlength="2000" rows="3" placeholder="Se quiser, conte mais detalhes..." style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
+<label for="event-contact">Contato público (opcional)</label><input id="event-contact" maxlength="120"></details>
+<label for="event-poster-upload">Cartaz do evento (JPG, PNG ou WebP, até 5 MB)</label><input id="event-poster-upload" type="file" accept="image/jpeg,image/png,image/webp"><div id="event-poster-preview" class="image-preview" aria-live="polite"></div><p class="muted">O cartaz será enviado junto com o evento na hora da publicação.</p>
 <button type="submit" id="submit-event">📅 Postar evento</button>
 <p id="event-status" class="status" role="status" aria-live="polite"></p>
 </form>
@@ -227,6 +237,11 @@ const postForm=document.getElementById('community-post-form');
 const postStatus=document.getElementById('post-status');
 const eventForm=document.getElementById('event-form');
 const eventDateInput=document.getElementById('event-date');
+const eventAddressInput=document.getElementById('event-address');
+const eventMapPreview=document.getElementById('event-map-preview');
+function updateEventMapPreview(){const address=eventAddressInput.value.trim();if(!address){eventMapPreview.hidden=true;eventMapPreview.href='#';return;}eventMapPreview.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(address);eventMapPreview.hidden=false;}
+eventAddressInput.addEventListener('input',updateEventMapPreview);
+eventAddressInput.addEventListener('change',updateEventMapPreview);
 const eventStatus=document.getElementById('event-status');
 function localDateValue(date=new Date()){const year=date.getFullYear();const month=String(date.getMonth()+1).padStart(2,'0');const day=String(date.getDate()).padStart(2,'0');return `${year}-${month}-${day}`;}
 function refreshAccountEventDateMinimum(){
@@ -311,7 +326,7 @@ songForm.addEventListener('submit',async event=>{
  if(!file){songStatus.textContent='Selecione o arquivo de áudio.';return;}
  button.disabled=true;songStatus.textContent='Enviando e publicando sua música…';
  try{
-  await auth.uploadMySong({file,title:document.getElementById('song-title').value.trim(),artistName:document.getElementById('song-artist-name').value.trim(),description:document.getElementById('song-description').value.trim()});
+  await auth.uploadMySong({file,title:document.getElementById('song-title').value.trim(),artistName:document.getElementById('song-artist-name').value.trim()});
   songForm.reset();songStatus.textContent='Música publicada com sucesso! Ela já está no catálogo.';
   await loadMySongs();
  }catch(error){songStatus.textContent=error?.message||'Não foi possível enviar a música. Confira o formato, tamanho e conexão.';}
@@ -635,7 +650,7 @@ eventForm.addEventListener('submit',async event=>{
  try{
   const poster=document.getElementById('event-poster-upload').files[0];
   if(poster){eventStatus.textContent='Enviando cartaz seguro...';payload.poster_url=await auth.uploadMyMedia(poster,'event');}
-  await auth.submitMyEvent(payload);eventForm.reset();clearImagePreview('event-poster-preview');eventStatus.textContent='Evento publicado com sucesso! Ele já está na agenda.';await loadMyEvents();}
+  await auth.submitMyEvent(payload);eventForm.reset();updateEventMapPreview();clearImagePreview('event-poster-preview');eventStatus.textContent='Evento publicado com sucesso! A localização já está vinculada ao endereço no Google Maps.';await loadMyEvents();}
  catch(error){eventStatus.textContent=error?.message||'Não foi possível enviar. Verifique a conexão e tente novamente.';}
  finally{button.disabled=false;}
 });
