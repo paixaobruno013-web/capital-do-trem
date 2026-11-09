@@ -34,6 +34,8 @@
  hornButton.type='button';
  hornButton.style.cssText='min-height:44px;padding:9px 16px;border:1px solid #ed1c24;border-radius:10px;background:#ed1c24;color:#fff;font-weight:800;cursor:pointer';
  const preferenceKey='capitaldotrem_train_horn_v1';
+ // Carrega o plugin nativo enquanto houver internet para permitir alerta tátil em Android/iPhone.
+ const nativeHapticsPromise = import('https://cdn.jsdelivr.net/npm/@capacitor/haptics@8.0.2/+esm').catch(()=>null);
  let hornEnabled=true,audioContext=null,audioUnlocked=false,playedThisOutage=false,offlineFeedbackSent=false,reconnectTimer=null;
  try{hornEnabled=localStorage.getItem(preferenceKey)!=='off';}catch{}
  function updateHornButton(){hornButton.textContent=hornEnabled?'🔊 Corneta ligada':'🔇 Corneta desligada';hornButton.setAttribute('aria-pressed',String(hornEnabled));}
@@ -76,7 +78,15 @@
   alertTitle.textContent='ALERTA';
   alertDetail.textContent='VOCE TÁ OFFLINE';
   alertBox.style.borderColor='#ed1c24';alertBox.style.display='flex';
-  if(!offlineFeedbackSent){offlineFeedbackSent=true;try{if('vibrate' in navigator)navigator.vibrate(3000);}catch(error){/* Vibração depende do suporte do aparelho e navegador. */}}
+  if(!offlineFeedbackSent){
+   offlineFeedbackSent=true;
+   nativeHapticsPromise.then(async module=>{
+    try{
+     if(module?.Haptics&&window.Capacitor?.isNativePlatform?.())await module.Haptics.vibrate({duration:3000});
+     else if('vibrate' in navigator)navigator.vibrate(3000);
+    }catch(error){try{if('vibrate' in navigator)navigator.vibrate(3000);}catch{}}
+   });
+  }
   if(!playedThisOutage&&audioUnlocked){playedThisOutage=true;playTrainHorn();}
  }
  function showOnline(){
