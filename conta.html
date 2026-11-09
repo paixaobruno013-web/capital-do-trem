@@ -103,8 +103,8 @@ body.light .card{background-color:rgba(255,255,255,.9)}
 
 </div>
 <section class="card" id="admin-songs-panel" hidden aria-labelledby="admin-songs-title">
-<h3 id="admin-songs-title">🎵 Envio e histórico de músicas — equipe</h3>
-<p class="muted">Área exclusiva da equipe autorizada. Envie arquivos em MP3, M4A, AAC, WAV ou OGG (até 50 MB). Depois de tocar em Postar, a música entra diretamente no catálogo público. O envio é exclusivo da equipe autorizada.</p>
+<h3 id="admin-songs-title">🎵 Divulgue sua música</h3>
+<p class="muted">Qualquer usuário com conta registrada pode divulgar sua música. Envie MP3, M4A, AAC, WAV ou OGG (até 50 MB). Depois de tocar em Postar, ela entra diretamente no catálogo público. Envie somente músicas que você criou ou tem autorização para compartilhar.</p>
 <form id="artist-song-form">
 <label for="song-title">Nome da música</label><input id="song-title" maxlength="120" required>
 <label for="song-artist-name">Nome artístico</label><input id="song-artist-name" maxlength="100" required>
@@ -298,11 +298,9 @@ const songStatus=document.getElementById('song-status');
 const mySongs=document.getElementById('my-songs');
 const songPanel=document.getElementById('admin-songs-panel');
 async function loadAdminSongAccess(){
- try{
-  const allowed=await auth.isCurrentUserAdmin();
-  songPanel.hidden=!allowed;
-  if(allowed)await loadMySongs();
- }catch(error){songPanel.hidden=true;}
+ // A área fica disponível para qualquer conta autenticada; o RLS valida a autoria no banco.
+ songPanel.hidden=false;
+ await loadMySongs();
 }
 async function loadMySongs(){
  try{
