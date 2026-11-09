@@ -124,6 +124,35 @@
  else addTrainAlert();
  window.addEventListener('offline',showOffline);
  window.addEventListener('online',showOnline);
+ // navigator.onLine pode continuar true quando o Wi-Fi está conectado, mas sem internet.
+ // A verificação usa um endpoint externo ao cache PWA para detectar a queda real.
+ let probeRunning=false,lastProbeOnline=null;
+ async function verifyRealConnection(){
+  if(probeRunning)return;
+  probeRunning=true;
+  const controller=new AbortController();
+  const timeout=window.setTimeout(()=>controller.abort(),6500);
+  try{
+   if(!navigator.onLine)throw new Error('Dispositivo sem rede');
+   await fetch('https://zmjxkfjzrbbxyvgkwirv.supabase.co/auth/v1/health',{
+    method:'GET',mode:'no-cors',cache:'no-store',credentials:'omit',signal:controller.signal
+   });
+   const wasOffline=document.documentElement.classList.contains('app-offline')||lastProbeOnline===false;
+   lastProbeOnline=true;
+   if(wasOffline)showOnline();else markOnline();
+  }catch(error){
+   lastProbeOnline=false;
+   showOffline();
+  }finally{
+   window.clearTimeout(timeout);
+   probeRunning=false;
+  }
+ }
+ window.addEventListener('online',()=>window.setTimeout(verifyRealConnection,800));
+ window.addEventListener('pageshow',verifyRealConnection);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)verifyRealConnection();});
+ window.setTimeout(verifyRealConnection,1200);
+ window.setInterval(verifyRealConnection,12000);
  if(!supportsServiceWorkerUpdates||!('serviceWorker' in navigator))return;
  let registration=null,reloading=false;
  const banner=document.createElement('aside');
