@@ -1339,6 +1339,37 @@ updateConnectionStatus();
  }
 })();
 function safeHttpsUrl(value){try{const url=new URL(value);return url.protocol==='https:'?url.href:null;}catch{return null;}}
+// Armazenamento local de músicas: permite ouvir sem internet após o download explícito.
+const OFFLINE_MUSIC_DB='capital-do-trem-offline-music';
+function openOfflineMusicDB(){
+ return new Promise((resolve,reject)=>{
+  if(!('indexedDB' in window)){reject(new Error('Armazenamento offline não suportado'));return;}
+  const request=indexedDB.open(OFFLINE_MUSIC_DB,1);
+  request.onupgradeneeded=()=>{const db=request.result;if(!db.objectStoreNames.contains('tracks'))db.createObjectStore('tracks',{keyPath:'id'});};
+  request.onsuccess=()=>resolve(request.result);
+  request.onerror=()=>reject(request.error||new Error('Não foi possível abrir o armazenamento offline'));
+ });
+}
+async function getOfflineMusic(id){
+ if(!id)return null;
+ const db=await openOfflineMusicDB();
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction('tracks','readonly'),request=tx.objectStore('tracks').get(String(id));
+  request.onsuccess=()=>{db.close();resolve(request.result||null);};
+  request.onerror=()=>{db.close();reject(request.error);};
+ });
+}
+async function saveOfflineMusic(id,blob,title){
+ if(!id||!blob?.size)throw new Error('Arquivo de áudio vazio ou sem identificador');
+ const db=await openOfflineMusicDB();
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction('tracks','readwrite');
+  tx.objectStore('tracks').put({id:String(id),blob,title:String(title||'Música'),savedAt:Date.now()});
+  tx.oncomplete=()=>{db.close();resolve(true);};
+  tx.onerror=()=>{const error=tx.error;db.close();reject(error||new Error('Falha ao salvar a música'));};
+  tx.onabort=()=>{const error=tx.error;db.close();reject(error||new Error('Armazenamento offline interrompido'));};
+ });
+}
 // Catálogo musical compartilhado com reprodução, download, curtidas e comentários.
 (async()=>{
  const container=document.getElementById('published-song-catalog');
@@ -1358,6 +1389,8 @@ function safeHttpsUrl(value){try{const url=new URL(value);return url.protocol===
    const audioUrl=safeHttpsUrl(song.audio_url);const downloadUrl=safeHttpsUrl(song.download_url)||audioUrl;
    if(audioUrl){
     const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=audioUrl;audio.addEventListener('play',()=>{container.querySelectorAll('audio').forEach(other=>{if(other!==audio&&!other.paused)other.pause();});});audio.style.cssText='width:100%;margin:8px 0';audio.setAttribute('aria-label','Ouvir '+song.title);
+    let offlineTrack=null;
+    try{offlineTrack=await getOfflineMusic(song.id);if(offlineTrack?.blob){audio.src=URL.createObjectURL(offlineTrack.blob);audio.dataset.offlineReady='true';}}catch(error){/* A reprodução online continua disponível se o armazenamento local falhar. */}
     if('mediaSession' in navigator){
      const updateMediaPlayback=()=>{try{if(navigator.mediaSession.playbackState)navigator.mediaSession.playbackState=audio.paused?'paused':'playing';}catch{}};
      audio.addEventListener('play',()=>{
@@ -1368,6 +1401,28 @@ function safeHttpsUrl(value){try{const url=new URL(value);return url.protocol===
     card.append(audio);
    }else{const unavailable=document.createElement('p');unavailable.className='muted';unavailable.textContent='Áudio temporariamente indisponível.';card.append(unavailable);}
    if(downloadUrl){const download=document.createElement('a');download.className='btn alt';download.href=downloadUrl;download.rel='noopener';download.textContent='⬇ Baixar música';download.setAttribute('aria-label','Baixar '+song.title);download.style.display='inline-block';download.style.margin='4px 0';card.append(download);}
+   if(audioUrl&&song.id){
+    const offlineButton=document.createElement('button');offlineButton.type='button';offlineButton.className='btn alt';offlineButton.style.margin='4px';offlineButton.textContent=offlineTrack?.blob?'✓ Salva para ouvir offline':'⇩ Guardar para ouvir offline';
+    offlineButton.setAttribute('aria-label','Guardar '+song.title+' no aparelho para ouvir sem internet');
+    const offlineStatus=document.createElement('span');offlineStatus.className='muted';offlineStatus.setAttribute('role','status');offlineStatus.setAttribute('aria-live','polite');
+    offlineButton.addEventListener('click',async()=>{
+     if(offlineButton.disabled)return;
+     if(!navigator.onLine&&!offlineTrack?.blob){offlineStatus.textContent='Conecte-se à internet para guardar esta música primeiro.';return;}
+     offlineButton.disabled=true;offlineStatus.textContent='Baixando música para armazenamento offline…';
+     try{
+      const response=await fetch(audioUrl,{mode:'cors',cache:'no-store'});
+      if(!response.ok)throw new Error('Não foi possível baixar o áudio');
+      const blob=await response.blob();
+      if(!blob.size)throw new Error('O arquivo recebido está vazio');
+      await saveOfflineMusic(song.id,blob,song.title);
+      offlineTrack={blob,title:song.title};
+      audio.src=URL.createObjectURL(blob);audio.dataset.offlineReady='true';audio.load();
+      offlineButton.textContent='✓ Salva para ouvir offline';offlineStatus.textContent='Música guardada neste aparelho. Agora pode tocar sem internet.';
+     }catch(error){offlineStatus.textContent='Não foi possível guardar offline. Verifique a conexão e tente novamente.';}
+     finally{offlineButton.disabled=false;}
+    });
+    card.append(offlineButton,offlineStatus);
+   }
    const shareRow=document.createElement('div');shareRow.className='social';shareRow.style.marginTop='6px';
    const shareButton=document.createElement('button');shareButton.type='button';shareButton.className='btn alt';shareButton.textContent='↗ Compartilhar música';shareButton.setAttribute('aria-label','Compartilhar a música '+song.title);
    const shareStatus=document.createElement('span');shareStatus.className='muted';shareStatus.setAttribute('role','status');shareStatus.setAttribute('aria-live','polite');
