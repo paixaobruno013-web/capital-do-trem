@@ -399,7 +399,8 @@ export async function uploadMySong({ file, title, artistName, description = '' }
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para enviar uma música.');
-  // Qualquer conta registrada pode publicar sua própria música; o banco valida user_id e pasta.
+  // Envio de músicas e arquivos de áudio é exclusivo da administração e equipe autorizada.
+  if (!(await isCurrentUserAdmin())) throw new Error('Envio de músicas restrito à equipe autorizada.');
   if (!(file instanceof File)) throw new Error('Selecione um arquivo de áudio.');
   // Alguns seletores de arquivo do Android informam aliases ou MIME genérico.
   // Aceita MIME conhecido ou extensão de áudio permitida e grava sempre o MIME canônico.
