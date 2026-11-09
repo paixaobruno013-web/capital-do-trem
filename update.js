@@ -77,7 +77,9 @@
   const fallbackStatus=document.getElementById('connection-status');if(fallbackStatus)fallbackStatus.hidden=true;
   clearTimeout(reconnectTimer);document.documentElement.classList.add('app-offline');
   alertTitle.textContent='ALERTA';
+  alertTitle.style.color='#fff';
   alertDetail.textContent='VOCE TÁ OFFLINE';
+  alertDetail.style.color='#fff';
   alertBox.style.background='linear-gradient(180deg,#26090b,#111)';
    alertBox.style.boxShadow='0 8px 30px #000b,0 0 18px #ed1c2455';
    alertBox.style.borderColor='#ed1c24';alertBox.style.display='flex';
