@@ -1,6 +1,6 @@
 // Atualizações do Capital do Trem: avisa quando uma nova versão estiver pronta.
 (()=>{
- if(!/^https?:$/.test(location.protocol))return;
+ const supportsServiceWorkerUpdates=/^https?:$/.test(location.protocol);
  // Escurece suavemente a interface inteira enquanto o aparelho estiver sem internet.
  const offlineStyle=document.createElement('style');
  offlineStyle.textContent='html.app-offline::after{content:"";position:fixed;inset:0;background:rgba(0,0,0,.22);pointer-events:none;z-index:9000}html{transition:filter .25s ease}@media(prefers-reduced-motion:reduce){html{transition:none!important}}';
@@ -103,7 +103,7 @@
  else addTrainAlert();
  window.addEventListener('offline',showOffline);
  window.addEventListener('online',showOnline);
- if(!('serviceWorker' in navigator))return;
+ if(!supportsServiceWorkerUpdates||!('serviceWorker' in navigator))return;
  let registration=null,reloading=false;
  const banner=document.createElement('aside');
  banner.id='app-update-banner';
