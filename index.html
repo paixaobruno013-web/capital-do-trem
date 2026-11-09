@@ -1368,6 +1368,21 @@ function safeHttpsUrl(value){try{const url=new URL(value);return url.protocol===
     card.append(audio);
    }else{const unavailable=document.createElement('p');unavailable.className='muted';unavailable.textContent='Áudio temporariamente indisponível.';card.append(unavailable);}
    if(downloadUrl){const download=document.createElement('a');download.className='btn alt';download.href=downloadUrl;download.rel='noopener';download.textContent='⬇ Baixar música';download.setAttribute('aria-label','Baixar '+song.title);download.style.display='inline-block';download.style.margin='4px 0';card.append(download);}
+   const shareRow=document.createElement('div');shareRow.className='social';shareRow.style.marginTop='6px';
+   const shareButton=document.createElement('button');shareButton.type='button';shareButton.className='btn alt';shareButton.textContent='↗ Compartilhar música';shareButton.setAttribute('aria-label','Compartilhar a música '+song.title);
+   const shareStatus=document.createElement('span');shareStatus.className='muted';shareStatus.setAttribute('role','status');shareStatus.setAttribute('aria-live','polite');
+   shareButton.addEventListener('click',async()=>{
+    const shareUrl=new URL('./index.html#musicas',window.location.href).href;
+    const shareData={title:song.title+' • Capital do Trem',text:'Ouça '+song.title+(song.artist_name?' — '+song.artist_name:'')+' no Capital do Trem!',url:shareUrl};
+    shareButton.disabled=true;
+    try{
+     if(typeof navigator.share==='function'){await navigator.share(shareData);shareStatus.textContent='Compartilhamento aberto.';}
+     else if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(shareData.text+' '+shareData.url);shareStatus.textContent='Link copiado para compartilhar.';}
+     else{shareStatus.textContent='Compartilhamento não disponível neste aparelho.';}
+    }catch(error){if(error?.name!=='AbortError')shareStatus.textContent='Não foi possível compartilhar agora.';}
+    finally{shareButton.disabled=false;}
+   });
+   shareRow.append(shareButton,shareStatus);card.append(shareRow);
    if(!session){
     const access=document.createElement('div');access.className='notice';access.style.marginTop='12px';
     const message=document.createElement('p');message.textContent='Entre na sua conta para curtir, comentar e acompanhar a conversa desta música.';
