@@ -19,6 +19,7 @@ on:
       - 'update.js'
       - 'supabase/**'
       - 'scripts/**'
+      - 'assets/**'
       - 'package.json'
       - 'capacitor.config.ts'
       - '.github/workflows/android-debug.yml'
