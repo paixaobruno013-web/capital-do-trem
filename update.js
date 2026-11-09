@@ -119,11 +119,35 @@
  button.addEventListener('blur',()=>{button.style.outline='none';});
  button.addEventListener('click',()=>{
   if(!registration?.waiting)return;
-  button.disabled=true;button.textContent='Atualizando…';
-  registration.waiting.postMessage({type:'SKIP_WAITING'});
+  if(hasUnsavedWork()){message.textContent='Salve o que está preenchendo antes de atualizar.';return;}
+  applyWaitingUpdate();
  });
  banner.append(message,button);
  function showUpdate(){banner.style.display='flex';}
+ function hasUnsavedWork(){
+  const active=document.activeElement;
+  if(active&&/^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName))return true;
+  return [...document.querySelectorAll('input,textarea,select')].some(field=>{
+   if(field.type==='file')return !!field.files?.length;
+   if(field.type==='checkbox'||field.type==='radio')return field.checked!==field.defaultChecked;
+   return field.value!==field.defaultValue&&field.value.trim()!=='';
+  });
+ }
+ let autoUpdateTimer=null;
+ function applyWaitingUpdate(){
+  if(!registration?.waiting||!navigator.serviceWorker.controller)return false;
+  if(hasUnsavedWork()){showUpdate();return false;}
+  if(reloading)return true;
+  button.disabled=true;button.textContent='Atualizando automaticamente…';
+  registration.waiting.postMessage({type:'SKIP_WAITING'});
+  return true;
+ }
+ function scheduleAutoUpdate(){
+  clearTimeout(autoUpdateTimer);
+  autoUpdateTimer=window.setTimeout(()=>{
+   if(!applyWaitingUpdate())showUpdate();
+  },12000);
+ }
  navigator.serviceWorker.addEventListener('controllerchange',()=>{
   if(reloading)return;
   reloading=true;
@@ -131,12 +155,12 @@
  });
  navigator.serviceWorker.register('./sw.js').then(reg=>{
   registration=reg;
-  if(reg.waiting&&navigator.serviceWorker.controller)showUpdate();
+  if(reg.waiting&&navigator.serviceWorker.controller)scheduleAutoUpdate();
   reg.addEventListener('updatefound',()=>{
    const worker=reg.installing;
    if(!worker)return;
    worker.addEventListener('statechange',()=>{
-    if(worker.state==='installed'&&navigator.serviceWorker.controller)showUpdate();
+    if(worker.state==='installed'&&navigator.serviceWorker.controller)scheduleAutoUpdate();
    });
   });
   let checkingUpdate=false;
@@ -151,7 +175,9 @@
   window.addEventListener('online',check);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)check();});
   // Confere atualizações periodicamente enquanto o app permanece aberto.
-  window.setInterval(check,6*60*60*1000);
+  window.setInterval(check,30*60*1000);
+  window.addEventListener('focus',()=>{if(reg.waiting)scheduleAutoUpdate();});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&reg.waiting)scheduleAutoUpdate();});
   check();
  }).catch(()=>{});
  const addBanner=()=>{if(!banner.isConnected)document.body.append(banner);};
@@ -174,5 +200,54 @@
    if(node.nodeType===1){if(node.matches?.('img'))tuneImages({querySelectorAll:()=>[node]});tuneImages(node);}
   })));
   observer.observe(document.documentElement,{childList:true,subtree:true});
+ }
+})();
+
+
+// Monitoramento local de saúde: detecta travamentos longos e erros sem coletar dados pessoais.
+(()=>{
+ const incidents=[];
+ let recoveryShown=false;
+ function safeToRecover(){
+  const active=document.activeElement;
+  if(active&&/^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName))return false;
+  return ![...document.querySelectorAll('input,textarea,select')].some(field=>{
+   if(field.type==='file')return !!field.files?.length;
+   if(field.type==='checkbox'||field.type==='radio')return field.checked!==field.defaultChecked;
+   return field.value!==field.defaultValue&&field.value.trim()!=='';
+  });
+ }
+ function reportIncident(kind){
+  const now=Date.now();
+  incidents.push({kind,time:now});
+  while(incidents.length&&now-incidents[0].time>90000)incidents.shift();
+  if(incidents.length<3||recoveryShown)return;
+  recoveryShown=true;
+  const notice=document.createElement('aside');
+  notice.setAttribute('role','status');
+  notice.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(90px + env(safe-area-inset-bottom,0px));z-index:10003;max-width:520px;margin:auto;padding:13px 15px;border:1px solid #ed1c24;border-radius:12px;background:#111;color:#fff;font:600 14px/1.45 system-ui,sans-serif;box-shadow:0 8px 28px #0009';
+  notice.textContent='O Capital do Trem identificou uma instabilidade e está tentando recuperar o funcionamento. Se você estiver preenchendo algo, salve antes de recarregar.';
+  document.body.append(notice);
+  let last=0;
+  try{last=Number(localStorage.getItem('capital-do-trem-last-recovery')||0);}catch{}
+  if(navigator.onLine&&safeToRecover()&&now-last>30*60*1000){
+   try{localStorage.setItem('capital-do-trem-last-recovery',String(now));}catch{}
+   window.setTimeout(()=>{if(safeToRecover())location.reload();},1800);
+  }
+ }
+ window.addEventListener('error',event=>{
+  if(event.target&&event.target!==window){
+   const tag=event.target.tagName;
+   if(tag==='SCRIPT'||tag==='LINK')reportIncident('asset-load');
+  }else reportIncident('javascript');
+ },true);
+ window.addEventListener('unhandledrejection',()=>reportIncident('promise'));
+ if('PerformanceObserver'in window){
+  try{
+   const observer=new PerformanceObserver(list=>{
+    for(const entry of list.getEntries())if(entry.duration>=2000)reportIncident('long-task');
+   });
+   observer.observe({entryTypes:['longtask']});
+  }catch(error){}
  }
 })();
