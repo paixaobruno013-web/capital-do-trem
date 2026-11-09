@@ -85,6 +85,7 @@ audio{width:100%;}
 <p class="muted">Escolha se deseja aparecer no diretório público como Artista ou Usuário Uai.</p>
 <form id="basic-profile-form">
 <label for="basic-display-name">Nome que será exibido</label><input id="basic-display-name" maxlength="80" required>
+<label for="basic-username">Nome de usuário (@)</label><input id="basic-username" maxlength="32" minlength="3" pattern="[a-zA-Z0-9][a-zA-Z0-9_]{2,31}" autocomplete="username" required placeholder="ex.: brunochock"><p class="muted">Seu @ será único e aparecerá nas conversas, comentários e publicações.</p>
 <label for="basic-account-type">Como deseja participar?</label>
 <select id="basic-account-type" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="user">Usuário Uai</option><option value="artist">Sou artista</option></select>
 <label for="basic-city">Cidade (opcional)</label><input id="basic-city" maxlength="100">
@@ -149,6 +150,7 @@ audio{width:100%;}
 <div id="name-wrap" hidden>
 <label for="display-name">Nome artístico ou nome de exibição</label>
 <input id="display-name" name="display-name" maxlength="80" autocomplete="name" disabled>
+<label for="register-username">Escolha seu nome de usuário (@)</label><input id="register-username" name="register-username" maxlength="32" minlength="3" pattern="[a-zA-Z0-9][a-zA-Z0-9_]{2,31}" autocomplete="username" placeholder="ex.: brunochock" disabled><p class="muted">Use letras, números ou _. Esse @ será sua identificação no Capital do Trem.</p>
 <label for="register-type">Tipo de conta</label>
 <select id="register-type" name="register-type" disabled style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="user">Usuário Uai</option><option value="artist">Artista</option></select>
 </div>
@@ -380,6 +382,7 @@ async function loadBasicProfile(){
  try{
   const profile=await auth.getMyBasicProfile();
   document.getElementById('basic-display-name').value=profile?.display_name||'';
+  document.getElementById('basic-username').value=profile?.username||'';
   document.getElementById('basic-account-type').value=profile?.account_type||'user';
   artistProfileArea.hidden=(profile?.account_type||'user')!=='artist';
   document.getElementById('basic-city').value=profile?.city||'';
@@ -394,6 +397,7 @@ basicProfileForm.addEventListener('submit',async event=>{
  try{
   await auth.saveMyBasicProfile({
    display_name:document.getElementById('basic-display-name').value,
+   username:document.getElementById('basic-username').value,
    account_type:document.getElementById('basic-account-type').value,
    city:document.getElementById('basic-city').value,
    bio:document.getElementById('basic-bio').value,
@@ -534,6 +538,8 @@ function setMode(next){
  document.getElementById('email').readOnly=mode==='recovery';
  document.querySelector('label[for="password"]').textContent=mode==='recovery'?'Nova senha':'Senha';
  document.getElementById('display-name').required=mode==='register';
+ document.getElementById('register-username').required=mode==='register';
+ document.getElementById('register-username').hidden=mode!=='register';
  document.getElementById('register-type').required=mode==='register';
  document.getElementById('register-type').hidden=mode!=='register';
  document.getElementById('password').required=mode!=='reset';
@@ -567,12 +573,13 @@ form.addEventListener('submit',async event=>{
  const email=document.getElementById('email').value.trim();
  const password=document.getElementById('password').value;
  const displayName=document.getElementById('display-name').value.trim();
+ const username=document.getElementById('register-username').value.trim().toLowerCase();
  const accountType=document.getElementById('register-type').value;
  const submit=document.getElementById('submit-account');
  submit.disabled=true;status.textContent='Aguarde...';
  try{
   if(mode==='register'){
-   const result=await auth.registerAccount({email,password,displayName,accountType});
+   const result=await auth.registerAccount({email,password,displayName,username,accountType});
    if(result.user?.identities?.length===0){
     status.textContent='Este e-mail já possui cadastro. Entre na sua conta ou use Recuperar senha.';
    }else if(result.session?.user){
