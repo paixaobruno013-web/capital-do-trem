@@ -82,12 +82,12 @@ audio{width:100%;}
 </section>
 <section class="card" id="basic-profile-panel" hidden aria-labelledby="basic-profile-title">
 <h2 id="basic-profile-title">👤 Meu perfil na comunidade</h2>
-<p class="muted">Escolha se deseja aparecer no diretório público como Artista ou Usuário Uai.</p>
+<p class="muted">Escolha como deseja aparecer: Usuário Uai ou Artista / DJ. Todo perfil Artista / DJ recebe o selo azul de artista.</p>
 <form id="basic-profile-form">
 <label for="basic-display-name">Nome que será exibido</label><input id="basic-display-name" maxlength="80" required>
 <label for="basic-username">Nome de usuário (@)</label><input id="basic-username" maxlength="32" minlength="3" pattern="[a-zA-Z0-9][a-zA-Z0-9_]{2,31}" autocomplete="username" required placeholder="ex.: brunochock"><p class="muted">Seu @ será único e aparecerá nas conversas, comentários e publicações.</p>
 <label for="basic-account-type">Como deseja participar?</label>
-<select id="basic-account-type" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="user">Usuário Uai</option><option value="artist">Sou artista</option></select>
+<select id="basic-account-type" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="user">Usuário Uai</option><option value="artist">Artista / DJ</option></select>
 <label for="basic-city">Cidade (opcional)</label><input id="basic-city" maxlength="100">
 <label for="basic-bio">Sobre você (opcional)</label><textarea id="basic-bio" maxlength="500" rows="3" placeholder="Conte um pouco sobre você..." style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
 <label style="display:flex;gap:10px;align-items:center"><input id="basic-public" type="checkbox" style="width:auto"> Quero que meu perfil apareça no diretório público</label>
@@ -152,7 +152,7 @@ audio{width:100%;}
 <input id="display-name" name="display-name" maxlength="80" autocomplete="name" disabled>
 <label for="register-username">Escolha seu nome de usuário (@)</label><input id="register-username" name="register-username" maxlength="32" minlength="3" pattern="[a-zA-Z0-9][a-zA-Z0-9_]{2,31}" autocomplete="username" placeholder="ex.: brunochock" disabled><p class="muted">Use letras, números ou _. Esse @ será sua identificação no Capital do Trem.</p>
 <label for="register-type">Tipo de conta</label>
-<select id="register-type" name="register-type" disabled style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="user">Usuário Uai</option><option value="artist">Artista</option></select>
+<select id="register-type" name="register-type" disabled style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="user">Usuário Uai</option><option value="artist">Artista / DJ</option></select><p class="muted">É DJ? Escolha Artista / DJ. DJs recebem o mesmo selo azul de artista.</p>
 </div>
 <label for="email">E-mail</label>
 <input id="email" name="email" type="email" maxlength="254" autocomplete="email" required disabled>
