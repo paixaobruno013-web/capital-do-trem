@@ -29,4 +29,8 @@ for (const file of files) {
   await cp(join(root, file), destination);
 }
 
-console.log(`Arquivos web preparados em ${webDir} (${files.length} arquivos).`);
+const assetsSource = join(root, 'assets');
+const assetsDestination = join(webDir, 'assets');
+await cp(assetsSource, assetsDestination, { recursive: true });
+
+console.log(`Arquivos web preparados em ${webDir} (${files.length} arquivos + pasta assets).`);
