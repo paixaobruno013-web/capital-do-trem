@@ -446,6 +446,37 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
 .opening-live-track .opening-live-progress{position:absolute;left:0;top:0}
 .opening-live-train{position:absolute;z-index:2;left:0;top:50%;transform:translate(-48%,-57%);font-size:clamp(22px,6vw,29px);line-height:1;filter:drop-shadow(0 1px 3px #000);transition:left .22s linear;white-space:nowrap}
 
+
+/* Correção de camadas da abertura: arte integral retangular, sem recorte circular herdado do avatar. */
+.intro-smoke.custom-opening-screen{display:block!important;inset:0!important;overflow:hidden!important;animation:none!important;background:#000!important}
+.intro-smoke.custom-opening-screen .intro-smoke__brand.custom-opening-image{
+ position:absolute!important;inset:0!important;width:100vw!important;height:100dvh!important;
+ max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;
+ display:block!important;opacity:1!important;animation:none!important;background:#000!important;
+}
+.intro-smoke.custom-opening-screen .intro-smoke__brand.custom-opening-image img{
+ position:absolute!important;inset:0!important;display:block!important;
+ width:100vw!important;height:100dvh!important;max-width:none!important;max-height:none!important;
+ aspect-ratio:auto!important;object-fit:contain!important;object-position:center!important;
+ border:0!important;border-radius:0!important;clip-path:none!important;-webkit-clip-path:none!important;
+ box-shadow:none!important;padding:0!important;margin:0!important;background:#000!important;filter:none!important;
+}
+.intro-smoke.custom-opening-screen .opening-clean-zone{z-index:4}
+.intro-smoke.custom-opening-screen .opening-live-loader{z-index:6}
+.opening-live-track{overflow:visible!important}
+.opening-live-track #opening-live-progress{position:relative;z-index:1;display:block;height:100%;width:0}
+.opening-live-track #opening-live-train{
+ position:absolute!important;z-index:3!important;top:50%!important;left:3%;
+ width:auto!important;height:auto!important;display:block!important;padding:0!important;margin:0!important;
+ border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
+ transform:translate(-50%,-58%)!important;font-size:27px!important;line-height:1!important;
+ transition:left .18s linear!important;white-space:nowrap!important;filter:drop-shadow(0 1px 3px #000)!important;
+}
+@media(max-width:759px){
+ .opening-live-track{height:10px!important}
+ .opening-live-track #opening-live-train{font-size:25px!important}
+}
+
 </style></head>
 <body>
 <script>
