@@ -126,33 +126,44 @@
  window.addEventListener('online',showOnline);
  // navigator.onLine pode continuar true quando o Wi-Fi está conectado, mas sem internet.
  // A verificação usa um endpoint externo ao cache PWA para detectar a queda real.
- let probeRunning=false,lastProbeOnline=null;
+ let probeRunning=false,lastProbeOnline=null,lastProbeAt=0;
  async function verifyRealConnection(){
   if(probeRunning)return;
   probeRunning=true;
   const controller=new AbortController();
-  const timeout=window.setTimeout(()=>controller.abort(),6500);
+  const timeout=window.setTimeout(()=>controller.abort(),4200);
   try{
    if(!navigator.onLine)throw new Error('Dispositivo sem rede');
-   await fetch('https://zmjxkfjzrbbxyvgkwirv.supabase.co/auth/v1/health',{
-    method:'GET',mode:'no-cors',cache:'no-store',credentials:'omit',signal:controller.signal
+   const response=await fetch('https://zmjxkfjzrbbxyvgkwirv.supabase.co/auth/v1/health?cdt_probe='+Date.now(),{
+    method:'GET',mode:'cors',cache:'no-store',credentials:'omit',redirect:'follow',signal:controller.signal
    });
+   if(!response.ok)throw new Error('A internet não respondeu ao teste de conexão');
    const wasOffline=document.documentElement.classList.contains('app-offline')||lastProbeOnline===false;
-   lastProbeOnline=true;
+   lastProbeOnline=true;lastProbeAt=Date.now();
    if(wasOffline)showOnline();else markOnline();
   }catch(error){
-   lastProbeOnline=false;
+   lastProbeOnline=false;lastProbeAt=Date.now();
    showOffline();
   }finally{
    window.clearTimeout(timeout);
    probeRunning=false;
   }
  }
- window.addEventListener('online',()=>window.setTimeout(verifyRealConnection,800));
+ // Interface de diagnóstico usada pela página Verificar sistema.
+ window.CapitalDoTremConnection={
+  simulateOffline:showOffline,
+  simulateOnline:showOnline,
+  check:verifyRealConnection,
+  getState:()=>({deviceOnline:navigator.onLine,verifiedOnline:lastProbeOnline,lastCheckAt:lastProbeAt})
+ };
+ window.addEventListener('online',()=>window.setTimeout(verifyRealConnection,300));
+ window.addEventListener('offline',showOffline);
  window.addEventListener('pageshow',verifyRealConnection);
+ window.addEventListener('focus',verifyRealConnection);
+ navigator.connection?.addEventListener?.('change',verifyRealConnection);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)verifyRealConnection();});
- window.setTimeout(verifyRealConnection,1200);
- window.setInterval(verifyRealConnection,12000);
+ window.setTimeout(verifyRealConnection,500);
+ window.setInterval(verifyRealConnection,5000);
  if(!supportsServiceWorkerUpdates||!('serviceWorker' in navigator))return;
  let registration=null,reloading=false;
  const banner=document.createElement('aside');
