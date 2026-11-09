@@ -92,12 +92,14 @@
  function showOnline(){
   const fallbackStatus=document.getElementById('connection-status');if(fallbackStatus)fallbackStatus.hidden=true;
   document.documentElement.classList.remove('app-offline');
+  // Reinicia o ciclo mesmo se a conexão voltar antes de o alerta entrar no DOM.
+  playedThisOutage=false;offlineFeedbackSent=false;
+  try{if(typeof navigator.vibrate==='function')navigator.vibrate(0);}catch(error){}
   if(!alertBox.isConnected)return;
   alertTitle.textContent='🚂 CONEXÃO RESTABELECIDA!';
   alertDetail.textContent='A internet voltou. O Capital do Trem está conectado novamente.';
   alertBox.style.borderColor='#269b65';alertBox.style.display='flex';
-  playedThisOutage=false;offlineFeedbackSent=false;
-  try{if('vibrate' in navigator)navigator.vibrate(0);}catch(error){}
+  clearTimeout(reconnectTimer);
   reconnectTimer=window.setTimeout(()=>{alertBox.style.display='none';},5500);
  }
  hornButton.addEventListener('click',async()=>{
