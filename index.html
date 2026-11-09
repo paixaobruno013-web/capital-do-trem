@@ -1392,11 +1392,20 @@ async function saveOfflineMusic(id,blob,title){
     let offlineTrack=null;
     try{offlineTrack=await getOfflineMusic(song.id);if(offlineTrack?.blob){audio.src=URL.createObjectURL(offlineTrack.blob);audio.dataset.offlineReady='true';}}catch(error){/* A reprodução online continua disponível se o armazenamento local falhar. */}
     if('mediaSession' in navigator){
-     const updateMediaPlayback=()=>{try{if(navigator.mediaSession.playbackState)navigator.mediaSession.playbackState=audio.paused?'paused':'playing';}catch{}};
+     const updateMediaPlayback=()=>{try{navigator.mediaSession.playbackState=audio.paused?'paused':'playing';}catch{}};
      audio.addEventListener('play',()=>{
-      try{if('MediaMetadata' in window)navigator.mediaSession.metadata=new MediaMetadata({title:song.title,artist:song.artist_name||'Capital do Trem',album:'Capital do Trem',artwork:[{src:'./marca.svg',sizes:'any',type:'image/svg+xml'}]});navigator.mediaSession.playbackState='playing';}catch{}
+      try{
+       if('MediaMetadata' in window)navigator.mediaSession.metadata=new MediaMetadata({title:song.title,artist:song.artist_name||'Capital do Trem',album:'Capital do Trem',artwork:[{src:'./marca.svg',sizes:'any',type:'image/svg+xml'}]});
+       navigator.mediaSession.playbackState='playing';
+       navigator.mediaSession.setActionHandler('play',()=>audio.play().catch(()=>{}));
+       navigator.mediaSession.setActionHandler('pause',()=>audio.pause());
+       navigator.mediaSession.setActionHandler('seekbackward',details=>{audio.currentTime=Math.max(0,audio.currentTime-(details.seekOffset||10));});
+       navigator.mediaSession.setActionHandler('seekforward',details=>{audio.currentTime=Math.min(audio.duration||Infinity,audio.currentTime+(details.seekOffset||10));});
+       navigator.mediaSession.setActionHandler('seekto',details=>{if(Number.isFinite(details.seekTime))audio.currentTime=details.seekTime;});
+      }catch{}
      });
-     audio.addEventListener('pause',updateMediaPlayback);audio.addEventListener('ended',()=>{try{navigator.mediaSession.playbackState='none';}catch{}});
+     audio.addEventListener('pause',updateMediaPlayback);
+     audio.addEventListener('ended',()=>{try{navigator.mediaSession.playbackState='none';}catch{}});
     }
     card.append(audio);
    }else{const unavailable=document.createElement('p');unavailable.className='muted';unavailable.textContent='Áudio temporariamente indisponível.';card.append(unavailable);}
