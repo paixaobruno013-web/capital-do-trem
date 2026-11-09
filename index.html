@@ -699,6 +699,13 @@ img,video,audio{max-width:100%;}
 audio{width:100%;}
 :focus-visible{outline:2px solid var(--red);outline-offset:3px;}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}}
+
+/* Selo de verificação oficial da marca e dos perfis de artista. */
+.verified-badge{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;margin-left:6px;vertical-align:middle;border-radius:50%;background:#1688f8;color:#fff;font-size:13px;font-weight:1000;line-height:1;box-shadow:0 0 8px rgba(22,136,248,.42)}
+.brand .verified-badge{width:22px;height:22px;font-size:15px}
+.community-profile-meta .verified-badge{width:17px;height:17px;margin-left:2px;font-size:11px}
+.public-artist-copy h3 .verified-badge{width:18px;height:18px;font-size:12px}
+html.auth-check-pending body{visibility:hidden}
 </style></head>
 <body>
 <script>
@@ -715,7 +722,7 @@ audio{width:100%;}
  <div class="opening-live-loader" id="opening-live-loader" role="status" aria-live="polite"><div class="opening-live-spinner" aria-hidden="true"></div><strong>Carregando...</strong><div class="opening-live-track"><span id="opening-live-progress"></span><span class="opening-live-train" id="opening-live-train" aria-hidden="true"><span class="opening-wagon opening-wagon-speakers" aria-label="Vagão transportando alto-falantes"><span class="opening-wagon-load">🔊</span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-dancers" aria-label="Vagão transportando pessoas dançando"><span class="opening-wagon-load"><span class="opening-dancer female" aria-label="dançarina">💃<i class="arm arm-left"></i><i class="arm arm-right"></i></span><span class="opening-dancer male" aria-label="dançarino">🕺<i class="arm arm-left"></i><i class="arm arm-right"></i></span></span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-singers" aria-label="Vagão transportando duas pessoas cantando"><span class="opening-wagon-load">🎤👨‍🎤👩‍🎤</span><span class="opening-wagon-deck"></span></span><span class="opening-locomotive" aria-label="Locomotiva que puxa os três vagões">🚂</span></span></div></div>
 </div>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
-<header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem</h1><p class="tag">A música da nossa quebrada!</p><div class="header-action-groups"><div class="header-action-row"><a class="btn alt" href="./conta.html">👤 Minha conta</a><a class="btn alt" href="./mensagens.html">✉️ Minhas conversas</a><a class="btn alt" href="./avatar.html">🎭 Meu avatar</a><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button></div><div class="header-action-row"><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn instagram-button" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a></div><div class="header-action-row"><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som de entrada: ligado</button></div></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Vinheta de 7 segundos • toque na tela para ouvir</p><div class="header-location-row"><button class="btn alt" id="quick-location" type="button">📍 Logo ali Uai - Localização</button></div></header>
+<header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem <span class="verified-badge" role="img" aria-label="Perfil oficial verificado">✓</span></h1><p class="tag">A música da nossa quebrada!</p><div class="header-action-groups"><div class="header-action-row"><a class="btn alt" href="./conta.html">👤 Minha conta</a><a class="btn alt" href="./mensagens.html">✉️ Minhas conversas</a><a class="btn alt" href="./avatar.html">🎭 Meu avatar</a><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button></div><div class="header-action-row"><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn instagram-button" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a></div><div class="header-action-row"><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som de entrada: ligado</button></div></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Vinheta de 7 segundos • toque na tela para ouvir</p><div class="header-location-row"><button class="btn alt" id="quick-location" type="button">📍 Logo ali Uai - Localização</button></div></header>
 <main id="main-content" tabindex="-1">
 <p id="connection-status" class="connection-status" role="status" aria-live="polite" hidden></p>
 <section class="hero reference-banner"><h2>AQUI A MÚSICA<br><strong>NÃO PARA!</strong></h2><p>Conectando a quebrada!</p><div class="social"><button class="btn" data-go="musicas">▶ Ouvir músicas</button><button class="btn alt" data-go="comunidade">Comunidade</button></div></section>
@@ -1223,7 +1230,7 @@ updateConnectionStatus();
    const copy=document.createElement('div');copy.className='community-profile-copy';
    const name=document.createElement('strong');name.textContent=profile.display_name||'Participante do Capital do Trem';
    const meta=document.createElement('div');meta.className='community-profile-meta';
-   const role=document.createElement('span');role.className='community-profile-role';role.textContent=profile.account_type==='artist'?'Artista':'Usuário Uai';meta.append(role);
+   const role=document.createElement('span');role.className='community-profile-role';role.textContent=profile.account_type==='artist'?'Artista':'Usuário Uai';meta.append(role);if(profile.account_type==='artist'){const verified=document.createElement('span');verified.className='verified-badge';verified.textContent='✓';verified.setAttribute('role','img');verified.setAttribute('aria-label','Artista verificado');meta.append(verified);}
    copy.append(name,meta);
    if(profile.city){const city=document.createElement('p');city.className='muted community-profile-city';city.textContent=profile.city;copy.append(city);}
    if(profile.bio){const bio=document.createElement('p');bio.className='community-profile-bio';bio.textContent=profile.bio;copy.append(bio);}
@@ -1242,7 +1249,7 @@ updateConnectionStatus();
   for(const artist of artists){
    const card=document.createElement('article');card.className='item public-artist-card';
    const head=document.createElement('div');head.className='public-artist-head';
-   const name=document.createElement('h3');name.textContent=artist.artist_name||'Artista do Capital';
+   const name=document.createElement('h3');name.textContent=artist.artist_name||'Artista do Capital';const verified=document.createElement('span');verified.className='verified-badge';verified.textContent='✓';verified.setAttribute('role','img');verified.setAttribute('aria-label','Artista verificado');name.append(verified);
    const style=document.createElement('p');style.className='muted';style.textContent=[artist.style,artist.city].filter(Boolean).join(' • ')||'Artista da comunidade';
    const copy=document.createElement('div');copy.className='public-artist-copy';copy.append(name,style);
    if(artist.photo_url){
