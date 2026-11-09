@@ -10,6 +10,7 @@ const files = [
   'admin.html',
   'privacidade.html',
   'bate-papo.html',
+  'chat-enhancements.js',
   'avatar.html',
   'mensagens.html',
   'diagnostico.html',
