@@ -883,3 +883,69 @@ export async function saveAdminBrandingImage(kind, file) {
   if (saveError) throw saveError;
   return publicData.publicUrl;
 }
+
+
+// Registro de instalações (uma identificação aleatória por instalação local do app).
+export async function registerAppInstallation() {
+  const supabase = initSupabase();
+  let installationId = '';
+  try {
+    installationId = localStorage.getItem('capital-do-trem-installation-id') || '';
+    if (!/^[0-9a-f-]{36}$/i.test(installationId)) {
+      installationId = crypto.randomUUID();
+      localStorage.setItem('capital-do-trem-installation-id', installationId);
+    }
+  } catch {
+    installationId = crypto.randomUUID();
+  }
+  const { error } = await supabase.from('app_installations')
+    .upsert({ installation_id: installationId }, { onConflict: 'installation_id', ignoreDuplicates: true });
+  if (error) throw error;
+  const { count, error: countError } = await supabase.from('app_installations')
+    .select('installation_id', { count: 'exact', head: true });
+  if (countError) throw countError;
+  return Number(count || 0);
+}
+
+export async function getOnlineUserIds() {
+  const supabase = initSupabase();
+  const cutoff = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+  const { data, error } = await supabase.from('user_presence')
+    .select('user_id').gte('last_seen_at', cutoff);
+  if (error) throw error;
+  return new Set((data || []).map(row => row.user_id));
+}
+
+export async function startUserPresence() {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) return () => {};
+  let stopped = false;
+  let busy = false;
+  const heartbeat = async () => {
+    if (stopped || busy || !navigator.onLine || document.visibilityState === 'hidden') return;
+    busy = true;
+    try {
+      const { error } = await supabase.from('user_presence').upsert(
+        { user_id: user.id, last_seen_at: new Date().toISOString() },
+        { onConflict: 'user_id' }
+      );
+      if (error) console.warn('Presença online não atualizada.', error);
+    } finally { busy = false; }
+  };
+  await heartbeat();
+  const timer = window.setInterval(heartbeat, 45000);
+  const onFocus = () => heartbeat();
+  const onOnline = () => heartbeat();
+  window.addEventListener('focus', onFocus);
+  window.addEventListener('online', onOnline);
+  document.addEventListener('visibilitychange', onFocus);
+  return () => {
+    stopped = true;
+    window.clearInterval(timer);
+    window.removeEventListener('focus', onFocus);
+    window.removeEventListener('online', onOnline);
+    document.removeEventListener('visibilitychange', onFocus);
+  };
+}
