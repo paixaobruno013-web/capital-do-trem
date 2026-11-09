@@ -1,11 +1,22 @@
 # Chamadas de voz e vídeo — Capital do Trem
 
 **Status:** arquitetura definida; integração de mídia ainda não ativada.  
-**Escopo aprovado pelo produto:** chamadas individuais e em grupo, com limite rígido de 4 participantes por sala (incluindo quem iniciou).
+**Escopo aprovado pelo produto:** chamadas individuais e em grupo, com limite rígido de 4 participantes por sala (incluindo quem iniciou).  
+**Modelo aprovado:** chamadas gratuitas para todos os usuários; iniciar com LiveKit Cloud no plano gratuito (Build), sem contratar plano pago nem habilitar cobrança automática.
 
 ## Objetivo
 
 Entregar uma experiência familiar para quem usa WhatsApp, com identidade visual Capital do Trem, priorizando Android, conexões móveis brasileiras e aparelhos de entrada/intermediários. O limite de quatro participantes é uma decisão intencional de produto, mesmo que outros serviços suportem grupos maiores.
+
+## Política de custo e gratuidade
+
+- As chamadas de voz e vídeo serão gratuitas para artistas e usuários Uai; não haverá cobrança por minuto ao usuário na primeira versão.
+- Provedor escolhido para iniciar: **LiveKit Cloud — plano Build gratuito**.
+- Permanecer dentro das cotas gratuitas publicadas (referência consultada: 5.000 WebRTC participant-minutes/mês, 50 GB de transferência de dados e até 100 conexões simultâneas; os limites podem mudar e devem ser conferidos no painel antes da publicação).
+- Não contratar Ship, Scale ou qualquer plano pago; não habilitar upgrade automático, faturamento ou adicionar cartão sem autorização explícita do responsável pelo projeto.
+- Implementar medição/alertas de consumo e testar limites. Se a cota gratuita estiver perto de acabar, bloquear novas chamadas de forma controlada ou pausar o recurso e avisar o administrador; nunca gerar despesa silenciosamente.
+- Se a operação ultrapassar a cota, avaliar otimização, self-hosting ou nova autorização do responsável antes de qualquer custo. Self-hosting também tem custos próprios de servidor, tráfego e manutenção.
+- A gratuidade para usuários é uma decisão do produto; ela não significa que infraestrutura de terceiros seja ilimitada ou gratuita para sempre.
 
 ## Recursos previstos
 
@@ -39,7 +50,7 @@ Entregar uma experiência familiar para quem usa WhatsApp, com identidade visual
 
 ## Arquitetura recomendada
 
-- **Mídia em tempo real:** LiveKit com SFU (LiveKit Cloud para implantação gerenciada ou servidor próprio após análise operacional).
+- **Mídia em tempo real:** LiveKit Cloud no plano Build gratuito; self-hosting só será considerado se a cota não atender e após avaliação de custo/operacional.
 - **Cliente:** SDK JavaScript oficial `livekit-client`, atualmente documentado na série 2.x. Integrar à página `bate-papo.html` e ao app Capacitor; testar especificamente WebView Android e permissões de câmera/microfone.
 - **Identidade:** sessão autenticada do Supabase; identidade do participante derivada no backend, nunca aceita livremente do navegador.
 - **Autorização:** Supabase Edge Function para criar/consultar chamadas e emitir tokens LiveKit de curta duração. Chave API e segredo LiveKit ficam somente nos secrets do backend.
@@ -58,13 +69,14 @@ Entregar uma experiência familiar para quem usa WhatsApp, com identidade visual
 
 ## Etapas de implementação
 
-1. Confirmar provedor e orçamento: LiveKit Cloud gerenciado ou self-hosted. Nenhum serviço pago deve ser contratado sem autorização explícita.
+1. Provedor escolhido: LiveKit Cloud no plano Build gratuito, limitado às cotas gratuitas; sem cartão, upgrade ou contratação paga.
 2. Criar Edge Functions para iniciar chamada, emitir token, convidar, aprovar, entrar e encerrar; validar identidade e limite de quatro no servidor.
 3. Criar migrations com RLS para chamadas, participantes e convites.
 4. Integrar SDK no chat e construir telas de chamada recebida/ativa, áudio e vídeo.
 5. Integrar notificações push e comportamento de segundo plano no Android.
-6. Testar em dois, três e quatro aparelhos reais, Wi-Fi e 4G/5G, alternância de rede, permissões negadas, chamadas simultâneas, tela bloqueada, app em segundo plano e encerramento abrupto.
-7. Liberar gradualmente; monitorar falhas e qualidade antes de ampliar.
+6. Implementar medição/alertas de consumo e comportamento seguro ao atingir a cota gratuita.
+7. Testar em dois, três e quatro aparelhos reais, Wi-Fi e 4G/5G, alternância de rede, permissões negadas, chamadas simultâneas, tela bloqueada, app em segundo plano e encerramento abrupto.
+8. Liberar gradualmente; monitorar falhas e qualidade antes de ampliar.
 
 ## Critérios de aceite
 
@@ -75,11 +87,12 @@ Entregar uma experiência familiar para quem usa WhatsApp, com identidade visual
 - Áudio continua priorizado quando a banda cai; vídeo adapta qualidade.
 - Chamada recebida funciona em Android em primeiro plano e, depois da integração push, em segundo plano.
 - Não há chaves secretas no bundle, repositório ou APK.
-- Nenhum anúncio de E2EE antes da validação criptográfica completa.
+- Não há upgrade ou cobrança automática; o uso é monitorado e novas chamadas podem ser pausadas antes de ultrapassar cotas gratuitas.
+- Não há anúncio de E2EE antes da validação criptográfica completa.
 
 ## Dependências e bloqueios atuais
 
 - O projeto tem chat Supabase em `bate-papo.html`, mensagens privadas em `mensagens.html` e Capacitor 8; não foi encontrada integração de chamadas ou dependência LiveKit no `package.json`.
 - O projeto ainda não possui servidor de mídia nem Edge Functions de chamadas.
-- A escolha LiveKit Cloud vs. self-hosted precisa ser confirmada porque o serviço gerenciado pode gerar cobrança conforme uso. Até essa decisão, não adicionar SDK pago/infra, não criar chaves e não publicar botões que pareçam funcionar.
 - A integração não está concluída nem testada em aparelho real.
+- As credenciais LiveKit devem ser criadas e guardadas apenas nos secrets do backend; nunca pedir ao usuário para publicar chaves no chat ou no frontend.
