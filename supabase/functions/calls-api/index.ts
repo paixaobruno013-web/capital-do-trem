@@ -215,17 +215,20 @@ Deno.serve(async (req: Request) => {
         .eq("call_id", body.call_id)
         .eq("invited_user_id", user.id)
         .maybeSingle();
-      if (!invite || invite.revoked_at || invite.used_at || new Date(invite.expires_at).getTime() < Date.now()) {
-        const { data: host } = await admin.from("call_participants")
-          .select("id")
-          .eq("call_id", body.call_id)
-          .eq("user_id", user.id)
-          .eq("role", "host")
-          .maybeSingle();
-        if (!host) return json({ error: "Convite expirado ou não encontrado." }, 403);
+      const { data: participant } = await admin.from("call_participants")
+        .select("id, role, state")
+        .eq("call_id", body.call_id)
+        .eq("user_id", user.id)
+        .maybeSingle();
+      const isHost = participant?.role === "host";
+      const isReconnectingJoinedParticipant = participant?.state === "joined" && !!invite?.used_at && !invite?.revoked_at;
+      const isFreshValidInvite = !!invite && !invite.revoked_at && !invite.used_at &&
+        new Date(invite.expires_at).getTime() >= Date.now();
+      if (!isHost && !isReconnectingJoinedParticipant && !isFreshValidInvite) {
+        return json({ error: "Convite expirado ou não encontrado." }, 403);
       }
       const tokenPayload = await issueToken(body.call_id);
-      if (invite && !invite.revoked_at && !invite.used_at && new Date(invite.expires_at).getTime() >= Date.now()) {
+      if (isFreshValidInvite) {
         await admin.from("call_invites").update({
           used_at: new Date().toISOString(),
           approved_at: new Date().toISOString(),
