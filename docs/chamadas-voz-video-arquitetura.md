@@ -1,6 +1,6 @@
 # Chamadas de voz e vídeo — Capital do Trem
 
-**Status:** arquitetura definida; integração de mídia ainda não ativada.  
+**Status:** tabelas e proteção de limite criadas no Supabase; Edge Function preparada no repositório, ainda não implantada; integração de mídia e interface ainda não ativadas.  
 **Escopo aprovado pelo produto:** chamadas individuais e em grupo, com limite rígido de 4 participantes por sala (incluindo quem iniciou).  
 **Modelo aprovado:** chamadas gratuitas para todos os usuários; iniciar com LiveKit Cloud no plano gratuito (Build), sem contratar plano pago nem habilitar cobrança automática.
 
@@ -60,12 +60,13 @@ Entregar uma experiência familiar para quem usa WhatsApp, com identidade visual
 - **Segurança:** tokens curtos, autorização por conversa/participante, rate limiting e expiração de convites. Não colocar segredo de servidor, service-role ou chave privada no frontend.
 - **Criptografia:** transporte WebRTC protegido. Não anunciar criptografia ponta a ponta no produto até implementar e testar E2EE com distribuição segura de chaves para todos os participantes; SFU e TLS por si só não equivalem a E2EE.
 
-## Modelo de dados a implementar após escolha do provedor
+## Modelo de dados criado no Supabase
 
 - `calls`: id, room_name aleatório, conversation_id opcional, initiator_id, call_type (audio/video), status, max_participants=4, created_at, started_at, ended_at.
 - `call_participants`: call_id, user_id, state, invited_at, joined_at, left_at, role (host/participant), outcome.
 - `call_invites`: call_id, invited_user_id ou token_hash, expires_at, approved_at, revoked_at, created_by.
-- RLS: somente participantes autorizados podem ler os metadados da chamada; escrita de estados sensíveis feita pelo backend. Nunca armazenar tokens de mídia permanentes.
+- As três tabelas foram criadas no projeto Supabase em 2026-11-09, com RLS ativo e privilégios diretos revogados para `anon` e `authenticated`; o backend privilegiado fará as operações. Nunca armazenar tokens de mídia permanentes.
+- Um trigger no banco bloqueia inserções que ultrapassem quatro participantes ativos/convocados por chamada e impede novos participantes em chamadas encerradas.
 
 ## Etapas de implementação
 
