@@ -137,7 +137,8 @@
   try{
    if(!navigator.onLine)throw new Error('Dispositivo sem rede');
    const response=await fetch('https://zmjxkfjzrbbxyvgkwirv.supabase.co/auth/v1/health?cdt_probe='+Date.now(),{
-    method:'GET',mode:'cors',cache:'no-store',credentials:'omit',redirect:'follow',signal:controller.signal
+    method:'GET',mode:'cors',cache:'no-store',credentials:'omit',redirect:'follow',
+    headers:{apikey:'sb_publishable_FLbDg6UCePQHb7s0wkywng_J9pNKlsP'},signal:controller.signal
    });
    if(!response.ok)throw new Error('A internet não respondeu ao teste de conexão');
    const wasOffline=document.documentElement.classList.contains('app-offline')||lastProbeOnline===false;
