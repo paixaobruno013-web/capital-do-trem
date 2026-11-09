@@ -399,6 +399,26 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
 }
 @media(min-width:760px){nav#nav button span,nav#nav a span{display:inline-block;margin-right:8px}}
 
+
+/* Abertura: arte oficial sem assinatura pessoal e carregamento real. */
+.intro-smoke.custom-opening-screen{animation:none!important;opacity:1;transition:opacity .55s ease}
+.intro-smoke.custom-opening-screen .intro-smoke__cloud,
+.intro-smoke.custom-opening-screen .intro-smoke__signature{display:none!important}
+.intro-smoke.custom-opening-screen .intro-smoke__brand.custom-opening-image{opacity:1!important;animation:none!important}
+.intro-smoke.custom-opening-screen .intro-smoke__brand.custom-opening-image img{object-fit:contain!important;object-position:center!important}
+.opening-clean-zone{display:none}
+.opening-live-loader{display:none}
+.intro-smoke.custom-opening-screen .opening-clean-zone{display:block;position:absolute;z-index:4;left:7%;right:7%;bottom:2.8%;height:12.5%;background:linear-gradient(180deg,rgba(0,0,0,.05),#000 22%,#000);pointer-events:none}
+.intro-smoke.custom-opening-screen .opening-live-loader{display:flex;position:absolute;z-index:5;left:12.5%;right:12.5%;bottom:15.1%;height:9%;align-items:center;justify-content:flex-end;flex-direction:column;gap:7px;color:#fff;text-align:center;text-shadow:0 2px 5px #000;font-size:clamp(12px,3.2vw,17px);pointer-events:none}
+.opening-live-spinner{width:27px;height:27px;border:3px solid rgba(255,255,255,.28);border-top-color:#fff;border-right-color:#fff;border-radius:50%;animation:opening-spin .8s linear infinite}
+.opening-live-track{width:100%;height:9px;border:1.5px solid #ddd;border-radius:99px;background:#111;overflow:hidden;box-shadow:0 1px 5px #000}
+.opening-live-track span{display:block;width:0;height:100%;border-radius:99px;background:#ff101b;box-shadow:0 0 8px #f00;transition:width .22s linear}
+.intro-smoke.custom-opening-screen.is-finished{opacity:0;pointer-events:none}
+@keyframes opening-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.opening-live-spinner{animation:none}}
+.reference-shortcuts svg,nav#nav svg{width:25px;height:25px;display:block;fill:currentColor;flex:none}
+.reference-shortcuts button, .reference-shortcuts a{font-weight:800}
+
 </style></head>
 <body>
 <script>
@@ -411,14 +431,15 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
 <div class="intro-smoke" id="intro-smoke" aria-hidden="true">
  <div class="intro-smoke__cloud"></div>
  <div class="intro-smoke__brand"><img src="marca.svg" alt=""><strong>CAPITAL DO TREM</strong><span>A MÚSICA DA NOSSA QUEBRADA!</span></div>
- <div class="intro-smoke__signature">BRUNO CHOCK</div>
+ <div class="opening-clean-zone" aria-hidden="true"></div>
+ <div class="opening-live-loader" id="opening-live-loader" role="status" aria-live="polite"><div class="opening-live-spinner" aria-hidden="true"></div><strong>Carregando...</strong><div class="opening-live-track"><span id="opening-live-progress"></span></div></div>
 </div>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
 <header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem</h1><p class="tag">A música da nossa quebrada!</p><div class="header-action-groups"><div class="header-action-row"><a class="btn alt" href="./conta.html">👤 Minha conta</a><a class="btn alt" href="./mensagens.html">✉️ Minhas conversas</a><a class="btn alt" href="./avatar.html">🎭 Meu avatar</a><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button></div><div class="header-action-row"><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn alt" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a></div><div class="header-action-row"><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som de entrada: ligado</button></div></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Vinheta de 7 segundos • toque na tela para ouvir</p><div class="header-location-row"><button class="btn alt" id="quick-location" type="button">📍 Logo ali Uai - Localização</button></div></header>
 <main id="main-content" tabindex="-1">
 <p id="connection-status" class="connection-status" role="status" aria-live="polite" hidden></p>
 <section class="hero reference-banner"><h2>AQUI A MÚSICA<br><strong>NÃO PARA!</strong></h2><p>Conectando a quebrada!</p><div class="social"><button class="btn" data-go="musicas">▶ Ouvir músicas</button><button class="btn alt" data-go="comunidade">Comunidade</button></div></section>
-<nav id="nav" aria-label="Navegação principal"><button class="active" data-page="inicio" aria-controls="inicio" aria-current="page"><span aria-hidden="true">⌂</span>Início</button><a class="nav-chat" href="./bate-papo.html" aria-label="Abrir chat"><span aria-hidden="true">●</span>Chat</a><button data-page="musicas" aria-controls="musicas"><span aria-hidden="true">♫</span>Músicas</button><button data-page="artistas" aria-controls="artistas"><span aria-hidden="true">🏆</span>Ranking</button><a class="nav-profile" href="./conta.html" aria-label="Abrir meu perfil"><span aria-hidden="true">♙</span>Perfil</a></nav>
+<nav id="nav" aria-label="Navegação principal"><button class="active" data-page="inicio" aria-controls="inicio" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11h2v10h6v-6h4v6h6V11h2L12 3z"/></svg>Início</button><a class="nav-chat" href="./bate-papo.html" aria-label="Abrir chat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.7 2 11.3c0 2.2 1 4.2 2.7 5.7L4 21l4.4-2.1c1.1.4 2.3.6 3.6.6 5.5 0 10-3.7 10-8.2S17.5 3 12 3zm-4 9a1.3 1.3 0 1 1 0-2.6A1.3 1.3 0 0 1 8 12zm4 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6zm4 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6z"/></svg>Chat</a><button data-page="musicas" aria-controls="musicas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-3-3c1.7 0 3 1.3 3 3zm12-2a3 3 0 1 1-3-3c1.7 0 3 1.3 3 3z"/></svg>Músicas</button><button data-page="artistas" aria-controls="artistas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v3h4v3a5 5 0 0 1-5 5 5 5 0 0 1-3 2.8V20h5v2H6v-2h5v-3.2A5 5 0 0 1 8 14a5 5 0 0 1-5-5V6h4V3zm10 5v4a3 3 0 0 0 2-3V8h-2zM5 8v1a3 3 0 0 0 2 3V8H5z"/></svg>Ranking</button><a class="nav-profile" href="./conta.html" aria-label="Abrir meu perfil"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0 2c-4.4 0-8 2.2-8 5v2h16v-2c0-2.8-3.6-5-8-5z"/></svg>Perfil</a></nav>
 <section class="page active" id="inicio"><section class="card home-youtube" aria-labelledby="home-youtube-title">
 <h2 id="home-youtube-title">▶ Vídeos da Capital do Trem</h2>
 <p class="muted">Os 4 vídeos enviados por você, do mais recente ao mais antigo.</p>
@@ -428,7 +449,7 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
 <article class="home-youtube-video"><span class="home-youtube-order">3º</span><div class="home-youtube-frame"><button class="home-youtube-load" type="button" data-youtube-id="eQHIsU_mamM" aria-label="Carregar e reproduzir: Terceiro vídeo da Capital do Trem"><img src="https://i.ytimg.com/vi/eQHIsU_mamM/hqdefault.jpg" alt="" loading="lazy" decoding="async"><span>▶ Reproduzir vídeo</span></button></div><a href="https://youtu.be/eQHIsU_mamM" target="_blank" rel="noopener noreferrer">Assistir no YouTube</a></article>
 <article class="home-youtube-video"><span class="home-youtube-order">4º • Mais antigo</span><div class="home-youtube-frame"><button class="home-youtube-load" type="button" data-youtube-id="W4wnKF5AHQA" aria-label="Carregar e reproduzir: Vídeo mais antigo da seleção"><img src="https://i.ytimg.com/vi/W4wnKF5AHQA/hqdefault.jpg" alt="" loading="lazy" decoding="async"><span>▶ Reproduzir vídeo</span></button></div><a href="https://youtu.be/W4wnKF5AHQA" target="_blank" rel="noopener noreferrer">Assistir no YouTube</a></article>
 </div></section>
-<div class="home-shortcuts reference-shortcuts" aria-label="Atalhos principais"><button type="button" data-go="musicas"><span aria-hidden="true">♫</span>Músicas</button><button type="button" data-go="comunidade"><span aria-hidden="true">♟</span>Comunidade</button><button type="button" data-go="eventos"><span aria-hidden="true">▦</span>Eventos</button><button type="button" data-go="artistas"><span aria-hidden="true">🏆</span>Ranking</button><a href="./conta.html"><span aria-hidden="true">⚙</span>Configurações</a></div><div class="grid"><article class="card"><h3>🎧 Música independente</h3><p class="muted">Espaço para lançamentos, artistas e sons da cena.</p></article><article class="card"><h3>📅 Cultura e eventos</h3><p class="muted">Divulgação de encontros, bailes e atividades culturais.</p></article><article class="card"><h3>🤝 Comunidade</h3><p class="muted">Ações sociais, parcerias e informação para fortalecer a comunidade.</p></article></div><div class="card reference-trending"><h3>🔥 Em Alta na Comunidade</h3><div id="public-posts" class="list" aria-live="polite"><p class="muted">Carregando publicações da comunidade…</p></div></div><div class="card reference-extra-links"><h3>Mais do Capital do Trem</h3><p><a href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">YouTube</a> · <a href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Instagram</a> · <a href="./conta.html">Minha conta</a> · <a href="./mensagens.html">Minhas conversas</a></p></div><div class="card"><h3>📣 Mural da comunidade</h3><p class="muted">Publicações aprovadas pela equipe do Capital do Trem.</p><p class="muted">As publicações da comunidade aparecem na área “Em Alta na Comunidade” acima.</p></div><div class="notice">O mural mostra somente divulgações aprovadas pela equipe. Para enviar uma publicação, entre na sua conta e use a área de divulgação. <a href="./conta.html">Acessar minha conta</a>.</div></section>
+<div class="home-shortcuts reference-shortcuts" aria-label="Atalhos principais"><button type="button" data-go="musicas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-3-3c1.7 0 3 1.3 3 3zm12-2a3 3 0 1 1-3-3c1.7 0 3 1.3 3 3z"/></svg>Músicas</button><button type="button" data-go="comunidade"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zm8 0a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM8 13c-3.5 0-6 1.8-6 4v3h11v-3c0-2.2-2.5-4-5-4zm8 0c-.6 0-1.2.1-1.8.2 1.7 1 2.8 2.3 2.8 3.8v3h5v-3c0-2.2-2.5-4-6-4z"/></svg>Comunidade</button><button type="button" data-go="eventos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h2v3h6V2h2v3h3v17H4V5h3V2zm-1 8v10h12V10H6zm2 2h3v3H8v-3z"/></svg>Eventos</button><button type="button" data-go="artistas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v3h4v3a5 5 0 0 1-5 5 5 5 0 0 1-3 2.8V20h5v2H6v-2h5v-3.2A5 5 0 0 1 8 14a5 5 0 0 1-5-5V6h4V3zm10 5v4a3 3 0 0 0 2-3V8h-2zM5 8v1a3 3 0 0 0 2 3V8H5z"/></svg>Ranking</button><a href="./conta.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 13a7.8 7.8 0 0 0 0-2l2-1.5-2-3.5-2.4 1a7.8 7.8 0 0 0-1.7-1L15 3H9l-.4 3a7.8 7.8 0 0 0-1.7 1l-2.4-1-2 3.5 2 1.5a7.8 7.8 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a7.8 7.8 0 0 0 1.7 1L9 21h6l.4-3a7.8 7.8 0 0 0 1.7-1l2.4 1 2-3.5-2.1-1.5zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>Configurações</a></div><div class="grid"><article class="card"><h3>🎧 Música independente</h3><p class="muted">Espaço para lançamentos, artistas e sons da cena.</p></article><article class="card"><h3>📅 Cultura e eventos</h3><p class="muted">Divulgação de encontros, bailes e atividades culturais.</p></article><article class="card"><h3>🤝 Comunidade</h3><p class="muted">Ações sociais, parcerias e informação para fortalecer a comunidade.</p></article></div><div class="card reference-trending"><h3>🔥 Em Alta na Comunidade</h3><div id="public-posts" class="list" aria-live="polite"><p class="muted">Carregando publicações da comunidade…</p></div></div><div class="card reference-extra-links"><h3>Mais do Capital do Trem</h3><p><a href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">YouTube</a> · <a href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Instagram</a> · <a href="./conta.html">Minha conta</a> · <a href="./mensagens.html">Minhas conversas</a></p></div><div class="card"><h3>📣 Mural da comunidade</h3><p class="muted">Publicações aprovadas pela equipe do Capital do Trem.</p><p class="muted">As publicações da comunidade aparecem na área “Em Alta na Comunidade” acima.</p></div><div class="notice">O mural mostra somente divulgações aprovadas pela equipe. Para enviar uma publicação, entre na sua conta e use a área de divulgação. <a href="./conta.html">Acessar minha conta</a>.</div></section>
 <section class="page" id="musicas"><div class="card"><h2>🎵 Central de músicas</h2><p class="muted">Um espaço para ouvir os sons dentro do Capital do Trem, sem precisar abrir o YouTube.</p><p class="muted">Músicas publicadas pela equipe, com reprodução, download, curtidas e comentários.</p><div id="published-song-catalog" class="list" aria-live="polite"><p class="muted">Carregando catálogo compartilhado…</p></div></div><div class="card"><h3>🎧 Player do Capital do Trem</h3><label for="audio">Escolha uma música autorizada que esteja no seu aparelho</label><input id="audio" type="file" accept="audio/*"><audio id="player" controls preload="metadata" style="width:100%;margin:12px 0"></audio><div class="social" style="align-items:center"><button class="btn" id="download-audio" type="button" disabled>⬇ Baixar música</button><span id="audio-status" class="muted" role="status" aria-live="polite">Selecione um áudio para ouvir e baixar nesta demonstração.</span></div><p class="muted">O player oferece controles de reprodução e pode continuar tocando com a tela bloqueada, conforme o suporte do navegador e as configurações de economia de bateria do celular. O download salva o arquivo selecionado neste aparelho.</p><p class="muted">Só compartilhe ou baixe músicas que você tenha autorização para distribuir.</p></div></section>
 <section class="page" id="eventos">
 <div class="card"><h2>📍 Logo ali</h2><p class="muted">Encontre shows, bailes, encontros e ações sociais próximos de onde você está.</p><button class="btn" id="find-nearby">Usar localização do meu celular</button><p id="location-status" class="muted" aria-live="polite">Sua localização só será acessada se você tocar no botão e autorizar o GPS. As coordenadas serão usadas para abrir o Google Maps e não serão salvas pelo Capital do Trem.</p><a id="nearby-map" class="btn alt" href="#" target="_blank" rel="noopener" hidden>Abrir mapa com opções próximas</a></div>
@@ -1102,7 +1123,31 @@ function safeHttpsUrl(value){try{const url=new URL(value);return url.protocol===
   const safeUrl=value=>typeof value==='string'&&value.startsWith('https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/')?value:'';
   const profile=safeUrl(branding.profileImageUrl),opening=safeUrl(branding.openingImageUrl);
   if(profile){const logo=document.getElementById('site-logo');if(logo)logo.src=profile;}
-  if(opening){const intro=document.querySelector('.intro-smoke__brand img');if(intro){intro.src=opening;intro.closest('.intro-smoke__brand')?.classList.add('custom-opening-image');document.getElementById('intro-smoke')?.classList.add('custom-opening-screen');}}
+  if(opening){
+ const intro=document.querySelector('.intro-smoke__brand img');
+ const screen=document.getElementById('intro-smoke');
+ if(intro&&screen){
+  intro.src=opening;
+  intro.closest('.intro-smoke__brand')?.classList.add('custom-opening-image');
+  screen.classList.add('custom-opening-screen');
+  const bar=document.getElementById('opening-live-progress');
+  let progress=3,ready=document.readyState==='complete',imageReady=false,finished=false;
+  const paint=()=>{if(bar)bar.style.width=progress+'%';};
+  const finish=()=>{
+   if(finished||!ready||!imageReady)return;
+   finished=true;progress=100;paint();
+   setTimeout(()=>{screen.classList.add('is-finished');setTimeout(()=>screen.remove(),600);},500);
+  };
+  const loader=setInterval(()=>{
+   if(!finished){progress=Math.min(92,progress+(progress<55?2:progress<82?0.8:0.25));paint();}
+   finish();
+   if(finished)clearInterval(loader);
+  },180);
+  if(intro.complete&&intro.naturalWidth>0)imageReady=true;
+  else {intro.addEventListener('load',()=>{imageReady=true;finish();},{once:true});intro.addEventListener('error',()=>{imageReady=true;finish();},{once:true});}
+  if(ready)finish();else window.addEventListener('load',()=>{ready=true;finish();},{once:true});
+ }
+}
  }catch(error){console.warn('Identidade visual padrão mantida.',error);}
 })();
 </script>
