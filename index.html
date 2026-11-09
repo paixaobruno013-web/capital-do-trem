@@ -439,6 +439,12 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
  body:not(.light) .reference-banner .social{display:none!important}
 }
 
+
+/* Locomotiva animada acompanha o progresso real da abertura */
+.opening-live-track{position:relative}
+.opening-live-track .opening-live-progress{position:absolute;left:0;top:0}
+.opening-live-train{position:absolute;z-index:2;left:0;top:50%;transform:translate(-48%,-57%);font-size:clamp(22px,6vw,29px);line-height:1;filter:drop-shadow(0 1px 3px #000);transition:left .22s linear;white-space:nowrap}
+
 </style></head>
 <body>
 <script>
@@ -452,7 +458,7 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
  <div class="intro-smoke__cloud"></div>
  <div class="intro-smoke__brand"><img src="marca.svg" alt=""><strong>CAPITAL DO TREM</strong><span>A MÚSICA DA NOSSA QUEBRADA!</span></div>
  <div class="opening-clean-zone" aria-hidden="true"></div>
- <div class="opening-live-loader" id="opening-live-loader" role="status" aria-live="polite"><div class="opening-live-spinner" aria-hidden="true"></div><strong>Carregando...</strong><div class="opening-live-track"><span id="opening-live-progress"></span></div></div>
+ <div class="opening-live-loader" id="opening-live-loader" role="status" aria-live="polite"><div class="opening-live-spinner" aria-hidden="true"></div><strong>Carregando...</strong><div class="opening-live-track"><span id="opening-live-progress"></span><span class="opening-live-train" id="opening-live-train" aria-hidden="true">🚂</span></div></div>
 </div>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
 <header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem</h1><p class="tag">A música da nossa quebrada!</p><div class="header-action-groups"><div class="header-action-row"><a class="btn alt" href="./conta.html">👤 Minha conta</a><a class="btn alt" href="./mensagens.html">✉️ Minhas conversas</a><a class="btn alt" href="./avatar.html">🎭 Meu avatar</a><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button></div><div class="header-action-row"><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn alt" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a></div><div class="header-action-row"><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som de entrada: ligado</button></div></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Vinheta de 7 segundos • toque na tela para ouvir</p><div class="header-location-row"><button class="btn alt" id="quick-location" type="button">📍 Logo ali Uai - Localização</button></div></header>
@@ -1151,8 +1157,9 @@ function safeHttpsUrl(value){try{const url=new URL(value);return url.protocol===
   intro.closest('.intro-smoke__brand')?.classList.add('custom-opening-image');
   screen.classList.add('custom-opening-screen');
   const bar=document.getElementById('opening-live-progress');
+  const train=document.getElementById('opening-live-train');
   let progress=3,ready=document.readyState==='complete',imageReady=false,finished=false;
-  const paint=()=>{if(bar)bar.style.width=progress+'%';};
+  const paint=()=>{if(bar)bar.style.width=progress+'%';if(train)train.style.left=progress+'%';};
   const finish=()=>{
    if(finished||!ready||!imageReady)return;
    finished=true;progress=100;paint();
