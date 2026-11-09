@@ -370,7 +370,7 @@ export async function moderateItem(table, id, status) {
 }
 
 
- // Envio de música para análise. O arquivo permanece privado até aprovação.
+ // Publicação direta de música: o áudio entra no catálogo assim que o envio termina.
 export async function uploadMySong({ file, title, artistName, description = '' }) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -451,7 +451,7 @@ export async function getPublishedSongs() {
   return songs;
 }
 
-// Agenda pública: o RLS permite leitura somente de eventos aprovados para visitantes.
+// Agenda pública: visitantes podem consultar eventos publicados diretamente.
 export async function getPublishedEvents() {
   const supabase = initSupabase();
   const { data, error } = await supabase
@@ -467,7 +467,7 @@ export async function getPublishedEvents() {
   return data || [];
 }
 
-// Envia uma divulgação autenticada para análise; novas publicações começam pendentes.
+// Publica uma divulgação imediatamente no mural da comunidade.
 export async function submitMyPost(content) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -484,7 +484,7 @@ export async function submitMyPost(content) {
   return data;
 }
 
-// Mural público: visitantes só recebem divulgações aprovadas.
+// Mural público: visitantes recebem divulgações publicadas diretamente.
 export async function getPublishedPosts() {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('posts')
