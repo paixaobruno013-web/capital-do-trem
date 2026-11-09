@@ -431,6 +431,7 @@ basicProfileForm.addEventListener('submit',async event=>{
    is_public:document.getElementById('basic-public').checked
   });
   artistProfileArea.hidden=document.getElementById('basic-account-type').value!=='artist';
+  await loadAdminSongAccess();
   basicProfileStatus.textContent='Perfil salvo! '+(document.getElementById('basic-public').checked?'Ele poderá aparecer no diretório público.':'Ele ficará visível somente para você.');
  }catch(error){basicProfileStatus.textContent=error?.message||'Não foi possível salvar seu perfil.';}
  finally{button.disabled=false;}
