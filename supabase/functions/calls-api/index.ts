@@ -157,6 +157,20 @@ Deno.serve(async (req: Request) => {
         if (!relation) return json({ error: "Só é possível convidar pessoas com conversa privada aceita com você." }, 403);
       }
 
+      const { data: existingCall } = await admin.from("calls")
+        .select("id")
+        .eq("initiator_id", user.id)
+        .in("status", ["ringing", "active"])
+        .limit(1)
+        .maybeSingle();
+      if (existingCall) return json({ error: "Você já tem uma chamada em andamento." }, 409);
+
+      const { count: recentCallCount } = await admin.from("calls")
+        .select("id", { count: "exact", head: true })
+        .eq("initiator_id", user.id)
+        .gte("created_at", new Date(Date.now() - 60_000).toISOString());
+      if ((recentCallCount ?? 0) >= 3) return json({ error: "Aguarde um minuto antes de iniciar outra chamada." }, 429);
+
       const { data: call, error: createError } = await admin.from("calls")
         .insert({
           conversation_id: conversationId,
@@ -209,10 +223,15 @@ Deno.serve(async (req: Request) => {
           .eq("role", "host")
           .maybeSingle();
         if (!host) return json({ error: "Convite expirado ou não encontrado." }, 403);
-      } else {
-        await admin.from("call_invites").update({ used_at: new Date().toISOString(), approved_at: new Date().toISOString() }).eq("id", invite.id);
       }
-      return json(await issueToken(body.call_id));
+      const tokenPayload = await issueToken(body.call_id);
+      if (invite && !invite.revoked_at && !invite.used_at && new Date(invite.expires_at).getTime() >= Date.now()) {
+        await admin.from("call_invites").update({
+          used_at: new Date().toISOString(),
+          approved_at: new Date().toISOString(),
+        }).eq("id", invite.id);
+      }
+      return json(tokenPayload);
     }
 
     if (action === "decline") {
