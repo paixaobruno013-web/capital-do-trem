@@ -120,6 +120,18 @@ body.light .command-section{background:linear-gradient(150deg,#fff,#f7f7f7);bord
  <p class="muted">A abertura terá a logo em um círculo maior, centralizado sobre fundo preto. A assinatura Bruno Chock continua somente na abertura.</p>
 </section>
 
+
+<section class="command-section" id="opening-image-section">
+ <h2>Abertura oficial • arte completa</h2>
+ <p class="muted">Envie a imagem inteira da abertura. Esta opção altera somente a abertura e preserva a foto oficial do perfil. JPG, PNG ou WebP até 5 MB.</p>
+ <div class="item">
+  <img id="opening-image-preview" src="./marca.svg" alt="Prévia da abertura completa" style="display:block;width:100%;max-width:260px;max-height:420px;object-fit:contain;background:#000;margin:12px auto;border-radius:10px">
+  <label for="opening-image-file">Selecionar imagem completa da abertura</label><input id="opening-image-file" type="file" accept="image/jpeg,image/png,image/webp">
+  <button id="opening-image-save" type="button">Atualizar somente a abertura</button>
+  <p id="opening-image-status" class="status" role="status" aria-live="polite"></p>
+ </div>
+</section>
+
 <section class="command-section"><h2>Publicações e aprovações</h2><p class="muted">Acompanhe artistas, músicas, eventos e divulgações enviados para análise.</p><p id="queue-status" class="status" role="status" aria-live="polite"></p><div id="queue"></div></section>
 <section class="command-section"><div class="actions" style="justify-content:space-between;align-items:center"><h2>Koe Fala Tu • Moderação do chat</h2><button id="refresh-chat" class="secondary" type="button">Atualizar mensagens</button></div><p class="muted">Revise mensagens recentes e remova conteúdos ofensivos, spam ou informações impróprias.</p><div id="chat-moderation"></div></section>
 </section>
@@ -158,6 +170,7 @@ async function loadBranding(){
   const branding=await auth.getPublicBranding();
   const url=branding.profileImageUrl||branding.openingImageUrl;
   if(url)document.getElementById('branding-profile-preview').src=url;
+  if(branding.openingImageUrl)document.getElementById('opening-image-preview').src=branding.openingImageUrl;
  }catch(error){document.getElementById('branding-pair-status').textContent='Não foi possível carregar a imagem atual.';}
 }
 const brandingFile=document.getElementById('branding-pair-file');
@@ -168,6 +181,23 @@ brandingFile.addEventListener('change',()=>{
  const file=brandingFile.files?.[0];if(!file)return;
  if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){brandingStatus.textContent='Escolha JPG, PNG ou WebP de até 5 MB.';brandingFile.value='';return;}
  brandingPreview.src=URL.createObjectURL(file);brandingStatus.textContent='Prévia circular pronta. Toque em atualizar para publicar nas duas telas.';
+});
+
+const openingFile=document.getElementById('opening-image-file');
+const openingPreview=document.getElementById('opening-image-preview');
+const openingSave=document.getElementById('opening-image-save');
+const openingStatus=document.getElementById('opening-image-status');
+openingFile.addEventListener('change',()=>{
+ const file=openingFile.files?.[0];if(!file)return;
+ if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){openingStatus.textContent='Escolha JPG, PNG ou WebP de até 5 MB.';openingFile.value='';return;}
+ openingPreview.src=URL.createObjectURL(file);openingStatus.textContent='Prévia da arte completa pronta. Toque em atualizar somente a abertura.';
+});
+openingSave.addEventListener('click',async()=>{
+ const file=openingFile.files?.[0];if(!file){openingStatus.textContent='Primeiro selecione a imagem completa na galeria.';return;}
+ openingSave.disabled=true;openingStatus.textContent='Enviando a arte e atualizando somente a abertura…';
+ try{const url=await auth.saveAdminOpeningImage(file);openingPreview.src=url;openingFile.value='';openingStatus.textContent='Abertura atualizada! A foto do perfil foi preservada.';}
+ catch(error){openingStatus.textContent=error?.message||'Não foi possível salvar. Confira sua conexão e tente novamente.';}
+ finally{openingSave.disabled=false;}
 });
 brandingSave.addEventListener('click',async()=>{
  const file=brandingFile.files?.[0];if(!file){brandingStatus.textContent='Primeiro escolha a arte original na galeria.';return;}
