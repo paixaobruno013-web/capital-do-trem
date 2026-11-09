@@ -71,6 +71,7 @@
  document.addEventListener('pointerdown',unlockHorn,{once:true,passive:true});
  document.addEventListener('keydown',unlockHorn,{once:true});
  function showOffline(){
+  const fallbackStatus=document.getElementById('connection-status');if(fallbackStatus)fallbackStatus.hidden=true;
   clearTimeout(reconnectTimer);document.documentElement.classList.add('app-offline');
   alertTitle.textContent='ALERTA';
   alertDetail.textContent='VOCE TÁ OFFLINE';
@@ -79,6 +80,7 @@
   if(!playedThisOutage&&audioUnlocked){playedThisOutage=true;playTrainHorn();}
  }
  function showOnline(){
+  const fallbackStatus=document.getElementById('connection-status');if(fallbackStatus)fallbackStatus.hidden=true;
   document.documentElement.classList.remove('app-offline');
   if(!alertBox.isConnected)return;
   alertTitle.textContent='🚂 CONEXÃO RESTABELECIDA!';
