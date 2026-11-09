@@ -376,7 +376,7 @@ export async function uploadMySong({ file, title, artistName, description = '' }
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para enviar uma música.');
-  if (!(await isCurrentUserAdmin())) throw new Error('O envio de músicas é exclusivo da equipe autorizada do Capital do Trem.');
+  // Qualquer conta registrada pode publicar sua própria música; o banco valida user_id e pasta.
   if (!(file instanceof File)) throw new Error('Selecione um arquivo de áudio.');
   const mime = file.type.toLowerCase();
   const allowed = ['audio/mpeg','audio/mp4','audio/aac','audio/wav','audio/x-wav','audio/ogg'];
