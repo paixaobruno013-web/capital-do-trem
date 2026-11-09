@@ -449,11 +449,13 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
 .intro-smoke.custom-opening-screen #opening-live-progress{display:none!important}
 .intro-smoke.custom-opening-screen .opening-live-train{top:50%;transform:translate(-50%,-62%)}
 
-/* Composição completa: locomotiva voltada para a direita e três vagões. */
+/* Composição: três vagões atrás da locomotiva, que puxa o trem para a direita. */
 .opening-live-track #opening-live-train{
  display:flex!important;flex-direction:row!important;align-items:center!important;
- gap:1px!important;width:max-content!important;max-width:none!important;
+ gap:2px!important;width:max-content!important;max-width:none!important;
 }
+.opening-live-track #opening-live-train .opening-wagon-singers{font-size:13px!important}
+.opening-live-track #opening-live-train .opening-wagon-dancers{font-size:14px!important}
 .opening-live-track #opening-live-train .opening-locomotive{
  display:inline-block;transform:scaleX(-1);font-size:27px;line-height:1;
 }
@@ -510,8 +512,8 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
  animation:opening-train-travel 9.5s linear 1 forwards!important;
 }
 @keyframes opening-train-travel{
- from{left:3%}
- to{left:97%}
+ from{left:-140px}
+ to{left:calc(100% + 140px)}
 }
 @media(max-width:759px){
  .opening-live-track{height:10px!important}
@@ -577,7 +579,7 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
  <div class="intro-smoke__cloud"></div>
  <div class="intro-smoke__brand"><img src="marca.svg" alt=""><strong>CAPITAL DO TREM</strong><span>A MÚSICA DA NOSSA QUEBRADA!</span></div>
  <div class="opening-clean-zone" aria-hidden="true"></div>
- <div class="opening-live-loader" id="opening-live-loader" role="status" aria-live="polite"><div class="opening-live-spinner" aria-hidden="true"></div><strong>Carregando...</strong><div class="opening-live-track"><span id="opening-live-progress"></span><span class="opening-live-train" id="opening-live-train" aria-hidden="true"><span class="opening-wagon opening-wagon-speakers">🔊</span><span class="opening-wagon opening-wagon-dancers">💃🕺</span><span class="opening-wagon opening-wagon-speakers">🔊</span><span class="opening-locomotive">🚂</span></span></div></div>
+ <div class="opening-live-loader" id="opening-live-loader" role="status" aria-live="polite"><div class="opening-live-spinner" aria-hidden="true"></div><strong>Carregando...</strong><div class="opening-live-track"><span id="opening-live-progress"></span><span class="opening-live-train" id="opening-live-train" aria-hidden="true"><span class="opening-wagon opening-wagon-speakers" aria-label="Vagão com alto-falantes">🔊</span><span class="opening-wagon opening-wagon-dancers" aria-label="Vagão com pessoas dançando">💃🕺</span><span class="opening-wagon opening-wagon-singers" aria-label="Vagão com duas pessoas cantando">🎤👨‍🎤👩‍🎤</span><span class="opening-locomotive" aria-label="Locomotiva">🚂</span></span></div></div>
 </div>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
 <header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem</h1><p class="tag">A música da nossa quebrada!</p><div class="header-action-groups"><div class="header-action-row"><a class="btn alt" href="./conta.html">👤 Minha conta</a><a class="btn alt" href="./mensagens.html">✉️ Minhas conversas</a><a class="btn alt" href="./avatar.html">🎭 Meu avatar</a><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button></div><div class="header-action-row"><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn instagram-button" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a></div><div class="header-action-row"><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som de entrada: ligado</button></div></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Vinheta de 7 segundos • toque na tela para ouvir</p><div class="header-location-row"><button class="btn alt" id="quick-location" type="button">📍 Logo ali Uai - Localização</button></div></header>
