@@ -1111,7 +1111,7 @@ updateConnectionStatus();
    const heading=document.createElement('h3');heading.textContent='Divulgação da comunidade';
    const body=document.createElement('p');body.textContent=item.content;
    const date=document.createElement('small');date.className='muted';date.textContent=new Date(item.created_at).toLocaleDateString('pt-BR');
-   card.append(heading,body,date);container.append(card);
+   card.append(heading,body,date);const share=document.createElement('button');share.type='button';share.className='btn alt';share.textContent='↗ Compartilhar';share.style.marginTop='9px';share.addEventListener('click',async()=>{const data={title:'Capital do Trem • Comunidade',text:item.content,url:location.href};try{if(navigator.share)await navigator.share(data);else{await navigator.clipboard.writeText(data.text+' '+data.url);share.textContent='✓ Copiado';}}catch(error){if(error.name!=='AbortError')share.textContent='Não foi possível compartilhar';}});card.append(share);container.append(card);
   }
  }catch(error){
   const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar o mural compartilhado agora. Tente novamente em instantes.';container.replaceChildren(message);
