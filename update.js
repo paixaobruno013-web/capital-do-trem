@@ -3,7 +3,7 @@
  const supportsServiceWorkerUpdates=/^https?:$/.test(location.protocol);
  // Escurece suavemente a interface inteira enquanto o aparelho estiver sem internet.
  const offlineStyle=document.createElement('style');
- offlineStyle.textContent='html.app-offline::after{content:"";position:fixed;inset:0;background:rgba(0,0,0,.22);pointer-events:none;z-index:9000}html{transition:filter .25s ease}#train-offline-alert .offline-train{transform-box:fill-box;transform-origin:center;animation:capital-train-exit 1.35s cubic-bezier(.2,.75,.25,1) infinite alternate}#train-offline-alert .offline-triangle{transform-origin:50% 50%;animation:capital-triangle-pulse 1.1s ease-in-out infinite alternate}@keyframes capital-train-exit{0%{transform:translate(0,0) scale(.82)}65%{transform:translate(9px,13px) scale(1)}100%{transform:translate(23px,29px) scale(1.08)}}@keyframes capital-triangle-pulse{from{filter:drop-shadow(0 0 1px #ed1c24)}to{filter:drop-shadow(0 0 9px #ed1c24)}}@media(prefers-reduced-motion:reduce){html{transition:none!important}#train-offline-alert .offline-train,#train-offline-alert .offline-triangle{animation:none!important}}';
+ offlineStyle.textContent='html.app-offline::after{content:"";position:fixed;inset:0;background:rgba(0,0,0,.22);pointer-events:none;z-index:9000}html{transition:filter .25s ease}#train-offline-alert .offline-train{transform-box:fill-box;transform-origin:center;animation:capital-train-exit 1.35s cubic-bezier(.2,.75,.25,1) infinite alternate}#train-offline-alert .offline-triangle{transform-origin:50% 50%;animation:capital-triangle-pulse 1.1s ease-in-out infinite alternate}@keyframes capital-train-exit{0%{transform:translate(0,0) scale(.78)}55%{transform:translate(0,17px) scale(1.08)}100%{transform:translate(0,34px) scale(1.28)}}@keyframes capital-triangle-pulse{from{filter:drop-shadow(0 0 1px #ed1c24)}to{filter:drop-shadow(0 0 9px #ed1c24)}}@media(prefers-reduced-motion:reduce){html{transition:none!important}#train-offline-alert .offline-train,#train-offline-alert .offline-triangle{animation:none!important}}';
  (document.head||document.documentElement).append(offlineStyle);
  const markOffline=()=>document.documentElement.classList.add('app-offline');
  const markOnline=()=>document.documentElement.classList.remove('app-offline');
@@ -25,9 +25,11 @@
  alertText.style.cssText='width:100%;min-width:0;text-align:center';
  const alertTitle=document.createElement('strong');
  alertTitle.textContent='ALERTA';
+   alertTitle.style.color='#fff';
  alertTitle.style.cssText='display:block;color:#fff;font-size:28px;line-height:1.05;font-weight:950;letter-spacing:.08em;text-transform:uppercase';
  const alertDetail=document.createElement('span');
  alertDetail.textContent='VOCE TÁ OFFLINE';
+   alertDetail.style.color='#fff';
  alertDetail.style.cssText='display:block;margin-top:7px;font-size:16px;line-height:1.2;font-weight:850;color:#fff;letter-spacing:.035em';
  alertText.append(alertTitle,alertDetail);
  const hornButton=document.createElement('button');
@@ -76,7 +78,9 @@
   clearTimeout(reconnectTimer);document.documentElement.classList.add('app-offline');
   alertTitle.textContent='ALERTA';
   alertDetail.textContent='VOCE TÁ OFFLINE';
-  alertBox.style.borderColor='#ed1c24';alertBox.style.display='flex';
+  alertBox.style.background='linear-gradient(180deg,#26090b,#111)';
+   alertBox.style.boxShadow='0 8px 30px #000b,0 0 18px #ed1c2455';
+   alertBox.style.borderColor='#ed1c24';alertBox.style.display='flex';
   if(!offlineFeedbackSent){
    offlineFeedbackSent=true;
    (async()=>{
@@ -96,9 +100,14 @@
   playedThisOutage=false;offlineFeedbackSent=false;
   try{if(typeof navigator.vibrate==='function')navigator.vibrate(0);}catch(error){}
   if(!alertBox.isConnected)return;
-  alertTitle.textContent='🚂 CONEXÃO RESTABELECIDA!';
-  alertDetail.textContent='A internet voltou. O Capital do Trem está conectado novamente.';
-  alertBox.style.borderColor='#269b65';alertBox.style.display='flex';
+  alertTitle.textContent='ONLINE';
+   alertTitle.style.color='#48e08b';
+  alertDetail.textContent='🚂 CONEXÃO RESTABELECIDA! A INTERNET VOLTOU.';
+   alertDetail.style.color='#b9ffd5';
+  alertBox.style.background='linear-gradient(180deg,#09291a,#07130d)';
+   alertBox.style.borderColor='#269b65';
+   alertBox.style.boxShadow='0 8px 30px #000b,0 0 20px #269b6577';
+   alertBox.style.display='flex';
   clearTimeout(reconnectTimer);
   reconnectTimer=window.setTimeout(()=>{alertBox.style.display='none';},5500);
  }
