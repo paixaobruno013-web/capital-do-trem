@@ -41,6 +41,12 @@ body.light .card,body.light .panel,body.light .conversation,body.light .message-
 <section class="card">
 <p>Toque no botão para verificar conexão, perfis, artistas, eventos, divulgações, músicas, bate-papo, curtidas, comentários e espaços de mídia. A verificação é somente leitura.</p>
 <div class="actions"><button id="check" type="button">Verificar agora</button><a class="btn" href="./">Voltar ao aplicativo</a></div>
+<div class="card" style="margin-top:14px">
+ <strong>🚨 Teste do alerta de conexão</strong>
+ <p class="muted">Use estes botões para conferir a sirene, a vibração e os avisos na tela sem desligar a internet. Depois, teste também ativando o modo avião do celular.</p>
+ <div class="actions"><button id="test-offline" type="button">Testar alerta offline</button><button id="test-online" type="button">Testar retorno online</button></div>
+ <p id="connection-test-status" class="muted" role="status" aria-live="polite">Aguardando teste do alerta.</p>
+</div>
 <p id="overall" class="muted" role="status" aria-live="polite">Aguardando verificação.</p>
 <div id="results"></div>
 </section>
@@ -54,6 +60,23 @@ const URL='https://zmjxkfjzrbbxyvgkwirv.supabase.co';
 const KEY='sb_publishable_FLbDg6UCePQHb7s0wkywng_J9pNKlsP';
 const client=createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const button=document.getElementById('check'),overall=document.getElementById('overall'),results=document.getElementById('results');
+const testOffline=document.getElementById('test-offline'),testOnline=document.getElementById('test-online'),connectionTestStatus=document.getElementById('connection-test-status');
+testOffline.addEventListener('click',()=>{
+ const monitor=window.CapitalDoTremConnection;
+ if(!monitor){connectionTestStatus.textContent='Monitor ainda carregando. Atualize a página e tente novamente.';return;}
+ monitor.simulateOffline();
+ connectionTestStatus.textContent='Alerta offline acionado para teste. Confira o aviso, a corneta e a vibração.';
+});
+testOnline.addEventListener('click',()=>{
+ const monitor=window.CapitalDoTremConnection;
+ if(!monitor){connectionTestStatus.textContent='Monitor ainda carregando. Atualize a página e tente novamente.';return;}
+ monitor.simulateOnline();
+ connectionTestStatus.textContent='Aviso de conexão restabelecida acionado para teste.';
+});
+window.setInterval(()=>{
+ const state=window.CapitalDoTremConnection?.getState?.();
+ if(state)connectionTestStatus.textContent='Rede do aparelho: '+(state.deviceOnline?'conectada':'desconectada')+' • Teste real: '+(state.verifiedOnline===null?'aguardando':state.verifiedOnline?'internet confirmada':'sem resposta')+'.';
+},3000);
 const publicChecks=[
  ['profiles','user_id'],
  ['artists','id'],
