@@ -269,10 +269,18 @@ Deno.serve(async (req: Request) => {
           .eq("call_id", call.id)
           .in("state", ["invited", "ringing", "joined"]);
       } else {
-        const { error } = await admin.from("call_participants")
-          .update({ state: "left", left_at: new Date().toISOString(), outcome: "left" })
+        const { data: membership, error: membershipError } = await admin.from("call_participants")
+          .select("id, state")
           .eq("call_id", call.id)
           .eq("user_id", user.id)
+          .maybeSingle();
+        if (membershipError) return json({ error: "Não foi possível validar sua participação." }, 500);
+        if (!membership || membership.state !== "joined") {
+          return json({ error: "Você não está participando desta chamada." }, 403);
+        }
+        const { error } = await admin.from("call_participants")
+          .update({ state: "left", left_at: new Date().toISOString(), outcome: "left" })
+          .eq("id", membership.id)
           .eq("state", "joined");
         if (error) return json({ error: "Não foi possível sair da chamada." }, 500);
       }
