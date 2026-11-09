@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#000000">
 <meta name="description" content="Área de acesso do Capital do Trem.">
 <link rel="manifest" href="manifest.webmanifest">
@@ -54,6 +54,16 @@ body.light .card{background-color:rgba(255,255,255,.9)}
 .event-map-preview{display:inline-flex;align-items:center;gap:7px;margin:0 0 12px;padding:8px 12px;border:1px solid var(--red);border-radius:9px;color:var(--fg);text-decoration:none;font-weight:700}
 .event-map-preview[hidden]{display:none!important}
 
+
+/* Ajustes comuns para telas nativas Android e iOS */
+html{min-height:100%;scroll-padding-top:16px;-webkit-text-size-adjust:100%;}
+body{min-height:100vh;min-height:100dvh;padding-bottom:env(safe-area-inset-bottom);overscroll-behavior-y:contain;}
+button,a,input,textarea,select{-webkit-tap-highlight-color:transparent;}
+input,textarea,select{font-size:16px;}
+img,video,audio{max-width:100%;}
+audio{width:100%;}
+:focus-visible{outline:2px solid var(--red);outline-offset:3px;}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}}
 </style>
 </head>
 <body>
