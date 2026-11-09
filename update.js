@@ -159,7 +159,8 @@
 // Performance mobile: imagens fora da primeira tela usam carregamento adiado e decodificação assíncrona.
 (()=>{
  const tuneImages=root=>{
-  root.querySelectorAll?.('img:not(#site-logo):not(.intro-smoke__brand img)').forEach(img=>{
+  root.querySelectorAll?.('img').forEach(img=>{
+   if(img.id==='site-logo'||img.closest?.('.intro-smoke__brand'))return;
    if(!img.hasAttribute('loading'))img.loading='lazy';
    if(!img.hasAttribute('decoding'))img.decoding='async';
    if(!img.hasAttribute('fetchpriority'))img.fetchPriority='low';
