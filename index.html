@@ -460,21 +460,33 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
  display:inline-block;transform:scaleX(-1);font-size:27px;line-height:1;
 }
 .opening-live-track #opening-live-train .opening-wagon{
- position:relative;display:inline-flex;align-items:center;justify-content:center;
- min-width:31px;height:21px;margin-top:1px;padding:0 2px;
- border:2px solid #ff2634;border-radius:5px;
- background:linear-gradient(180deg,#333,#090909);
- box-shadow:0 0 5px rgba(255,20,28,.7);
+ position:relative;display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-end;
+ min-width:38px;height:34px;margin:0 1px 0;padding:0 2px 3px;
+ border:0;border-radius:0;background:transparent;box-shadow:none;
  font-size:15px;line-height:1;white-space:nowrap;
 }
-.opening-live-track #opening-live-train .opening-wagon::before,
-.opening-live-track #opening-live-train .opening-wagon::after{
- content:"";position:absolute;bottom:-6px;width:5px;height:5px;
+.opening-live-track #opening-live-train .opening-wagon-load{
+ position:relative;z-index:2;display:flex;align-items:center;justify-content:center;
+ min-height:19px;padding:0 1px;font-size:15px;line-height:1;
+ filter:drop-shadow(0 1px 1px #000);
+}
+.opening-live-track #opening-live-train .opening-wagon-deck{
+ position:relative;display:block;width:100%;height:9px;margin-top:1px;
+ border:2px solid #ff2634;border-top:3px solid #ff2634;border-radius:2px;
+ background:linear-gradient(180deg,#444,#111);
+ box-shadow:0 0 5px rgba(255,20,28,.7);
+}
+.opening-live-track #opening-live-train .opening-wagon-deck::before,
+.opening-live-track #opening-live-train .opening-wagon-deck::after{
+ content:"";position:absolute;bottom:-7px;width:6px;height:6px;
  border:1px solid #ddd;border-radius:50%;background:#171717;
 }
-.opening-live-track #opening-live-train .opening-wagon::before{left:4px}
-.opening-live-track #opening-live-train .opening-wagon::after{right:4px}
-
+.opening-live-track #opening-live-train .opening-wagon-deck::before{left:3px}
+.opening-live-track #opening-live-train .opening-wagon-deck::after{right:3px}
+.opening-live-track #opening-live-train .opening-wagon:not(:last-of-type)::after{
+ content:"";position:absolute;right:-4px;bottom:6px;width:5px;height:3px;
+ background:#aaa;border-radius:2px;z-index:1;
+}
 /* Locomotiva animada acompanha o progresso real da abertura */
 .opening-live-track .opening-live-train{display:block;width:auto;height:auto;border:0;border-radius:0;background:none;box-shadow:none;padding:0}
 .opening-live-track{position:relative;overflow:visible!important}
@@ -579,7 +591,7 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
  <div class="intro-smoke__cloud"></div>
  <div class="intro-smoke__brand"><img src="marca.svg" alt=""><strong>CAPITAL DO TREM</strong><span>A MÚSICA DA NOSSA QUEBRADA!</span></div>
  <div class="opening-clean-zone" aria-hidden="true"></div>
- <div class="opening-live-loader" id="opening-live-loader" role="status" aria-live="polite"><div class="opening-live-spinner" aria-hidden="true"></div><strong>Carregando...</strong><div class="opening-live-track"><span id="opening-live-progress"></span><span class="opening-live-train" id="opening-live-train" aria-hidden="true"><span class="opening-wagon opening-wagon-speakers" aria-label="Vagão com alto-falantes">🔊</span><span class="opening-wagon opening-wagon-dancers" aria-label="Vagão com pessoas dançando">💃🕺</span><span class="opening-wagon opening-wagon-singers" aria-label="Vagão com duas pessoas cantando">🎤👨‍🎤👩‍🎤</span><span class="opening-locomotive" aria-label="Locomotiva">🚂</span></span></div></div>
+ <div class="opening-live-loader" id="opening-live-loader" role="status" aria-live="polite"><div class="opening-live-spinner" aria-hidden="true"></div><strong>Carregando...</strong><div class="opening-live-track"><span id="opening-live-progress"></span><span class="opening-live-train" id="opening-live-train" aria-hidden="true"><span class="opening-wagon opening-wagon-speakers" aria-label="Vagão transportando alto-falantes"><span class="opening-wagon-load">🔊</span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-dancers" aria-label="Vagão transportando pessoas dançando"><span class="opening-wagon-load">💃🕺</span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-singers" aria-label="Vagão transportando duas pessoas cantando"><span class="opening-wagon-load">🎤👨‍🎤👩‍🎤</span><span class="opening-wagon-deck"></span></span><span class="opening-locomotive" aria-label="Locomotiva que puxa os três vagões">🚂</span></span></div></div>
 </div>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
 <header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem</h1><p class="tag">A música da nossa quebrada!</p><div class="header-action-groups"><div class="header-action-row"><a class="btn alt" href="./conta.html">👤 Minha conta</a><a class="btn alt" href="./mensagens.html">✉️ Minhas conversas</a><a class="btn alt" href="./avatar.html">🎭 Meu avatar</a><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button></div><div class="header-action-row"><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn instagram-button" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a></div><div class="header-action-row"><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som de entrada: ligado</button></div></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Vinheta de 7 segundos • toque na tela para ouvir</p><div class="header-location-row"><button class="btn alt" id="quick-location" type="button">📍 Logo ali Uai - Localização</button></div></header>
