@@ -388,7 +388,7 @@ export async function uploadMySong({ file, title, artistName, description = '' }
     'audio/wav':'wav','audio/x-wav':'wav','audio/wave':'wav','audio/vnd.wave':'wav',
     'audio/ogg':'ogg','application/ogg':'ogg'
   };
-  const extensionFromName = String(file.name || '').toLowerCase().match(/\\.([a-z0-9]+)$/)?.[1] || '';
+  const extensionFromName = String(file.name || '').toLowerCase().match(/\.([a-z0-9]+)$/)?.[1] || '';
   const extension = mimeExtensions[mime] || (['mp3','m4a','aac','wav','ogg'].includes(extensionFromName) ? extensionFromName : '');
   if (!extension) throw new Error('Formato não aceito. Use MP3, M4A, AAC, WAV ou OGG.');
   if (file.size < 1 || file.size > 50 * 1024 * 1024) throw new Error('A música deve ter até 50 MB.');
