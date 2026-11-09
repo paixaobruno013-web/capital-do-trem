@@ -680,6 +680,14 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
  .opening-live-track #opening-live-train .opening-wagon-dancers .opening-dancer{animation:none!important}
 }
 
+
+/* Fundos internos: arte do app em telas grandes, pequenas e nos dois temas. */
+body{background-image:linear-gradient(180deg,rgba(0,0,0,.78),rgba(0,0,0,.88)),url('./assets/favela-header.webp')!important;background-size:cover!important;background-position:center top!important;background-repeat:no-repeat!important;background-attachment:fixed!important}
+body.light{background-image:linear-gradient(180deg,rgba(248,248,250,.84),rgba(239,239,242,.91)),url('./assets/favela-header.webp')!important}
+.card,.item,.reference-trending,.reference-extra-links{background-color:rgba(10,10,12,.84)!important}
+body.light .card,body.light .item,body.light .reference-trending,body.light .reference-extra-links{background-color:rgba(255,255,255,.88)!important}
+@media(max-width:759px){body{background-attachment:scroll!important}}
+
 </style></head>
 <body>
 <script>
