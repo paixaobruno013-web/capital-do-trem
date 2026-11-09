@@ -29,8 +29,16 @@ jobs:
         run: node scripts/check-inline-scripts.mjs
       - name: Conferir proteção e segurança do banco
         run: |
-          grep -q 'create policy "songs_insert_registered_users"' supabase/schema.sql
-          grep -q 'create policy "audio_upload_registered_users"' supabase/schema.sql
+          grep -q 'create policy "songs_insert_admin_only"' supabase/schema.sql
+          grep -q 'create policy "audio_upload_admin_only"' supabase/schema.sql
+          if grep -q 'create policy "songs_insert_registered_users"' supabase/schema.sql; then
+            echo "ERRO: usuários comuns ainda podem inserir músicas."
+            exit 1
+          fi
+          if grep -q 'create policy "audio_upload_registered_users"' supabase/schema.sql; then
+            echo "ERRO: usuários comuns ainda podem enviar arquivos musicais."
+            exit 1
+          fi
           grep -q 'create policy "songs_insert_admin_only"' supabase/migrations/2026-11-08-harden-music-upload-permissions.sql
           grep -q 'create policy "audio_upload_admin_only"' supabase/migrations/2026-11-08-harden-music-upload-permissions.sql
           grep -q 'create or replace function private.is_admin()' supabase/schema.sql
