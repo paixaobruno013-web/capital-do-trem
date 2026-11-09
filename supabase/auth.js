@@ -506,7 +506,17 @@ export async function getMyBasicProfile() {
     .select('user_id, display_name, account_type, bio, city, is_public')
     .eq('user_id', user.id).maybeSingle();
   if (error) throw error;
-  return data;
+  if (data) return data;
+  // Se o cadastro foi confirmado por e-mail e ainda não existe perfil básico,
+  // recupera o tipo escolhido no cadastro e cria o perfil na primeira entrada.
+  const metadata = user.user_metadata || {};
+  const accountType = metadata.account_type === 'artist' ? 'artist' : 'user';
+  const created = await saveMyBasicProfile({
+    display_name: metadata.name || (user.email || '').split('@')[0] || 'Participante',
+    account_type: accountType,
+    is_public: false
+  });
+  return created;
 }
 
 export async function saveMyBasicProfile(profile) {
