@@ -404,7 +404,7 @@ export async function uploadMySong({ file, title, artistName, description = '' }
   if (uploadError) throw uploadError;
   const { data, error } = await supabase.from('songs').insert({
     user_id:user.id,title:cleanTitle,artist_name:cleanArtist,description:cleanDescription,
-    storage_path:path,mime_type:mime,file_size:file.size,status:'published'
+    storage_path:path,mime_type:canonicalMime,file_size:file.size,status:'published'
   }).select('id,title,artist_name,status,created_at').single();
   if (error) {
     await supabase.storage.from('capital-do-trem-audio').remove([path]);
