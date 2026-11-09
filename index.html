@@ -1337,7 +1337,7 @@ function safeHttpsUrl(value){try{const url=new URL(value);return url.protocol===
   const songs=await api.getPublishedSongs();container.replaceChildren();
   const searchInput=document.getElementById('song-catalog-search');
   const countLabel=document.getElementById('song-catalog-count');
-  if(!songs.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='As músicas aprovadas pela equipe aparecerão aqui.';container.append(empty);return;}
+  if(!songs.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='As músicas publicadas pela comunidade aparecerão aqui.';container.append(empty);return;}
   for(const song of songs){
    const card=document.createElement('article');card.className='item';card.style.margin='10px 0';card.dataset.searchText=[song.title,song.artist_name,song.description].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
    const title=document.createElement('h3');title.textContent=song.title;
