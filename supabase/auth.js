@@ -378,9 +378,19 @@ export async function uploadMySong({ file, title, artistName, description = '' }
   if (!user) throw new Error('Entre na sua conta para enviar uma música.');
   // Qualquer conta registrada pode publicar sua própria música; o banco valida user_id e pasta.
   if (!(file instanceof File)) throw new Error('Selecione um arquivo de áudio.');
-  const mime = file.type.toLowerCase();
-  const allowed = ['audio/mpeg','audio/mp4','audio/aac','audio/wav','audio/x-wav','audio/ogg'];
-  if (!allowed.includes(mime)) throw new Error('Formato não aceito. Use MP3, M4A, AAC, WAV ou OGG.');
+  // Alguns seletores de arquivo do Android informam aliases ou MIME genérico.
+  // Aceita MIME conhecido ou extensão de áudio permitida e grava sempre o MIME canônico.
+  const mime = String(file.type || '').toLowerCase().split(';')[0].trim();
+  const mimeExtensions = {
+    'audio/mpeg':'mp3','audio/mp3':'mp3','audio/x-mp3':'mp3',
+    'audio/mp4':'m4a','audio/x-m4a':'m4a','audio/m4a':'m4a',
+    'audio/aac':'aac','audio/x-aac':'aac',
+    'audio/wav':'wav','audio/x-wav':'wav','audio/wave':'wav','audio/vnd.wave':'wav',
+    'audio/ogg':'ogg','application/ogg':'ogg'
+  };
+  const extensionFromName = String(file.name || '').toLowerCase().match(/\\.([a-z0-9]+)$/)?.[1] || '';
+  const extension = mimeExtensions[mime] || (['mp3','m4a','aac','wav','ogg'].includes(extensionFromName) ? extensionFromName : '');
+  if (!extension) throw new Error('Formato não aceito. Use MP3, M4A, AAC, WAV ou OGG.');
   if (file.size < 1 || file.size > 50 * 1024 * 1024) throw new Error('A música deve ter até 50 MB.');
   const cleanTitle = String(title || '').trim();
   const cleanArtist = String(artistName || '').trim();
@@ -388,9 +398,9 @@ export async function uploadMySong({ file, title, artistName, description = '' }
   if (cleanTitle.length < 1 || cleanTitle.length > 120) throw new Error('O título deve ter até 120 caracteres.');
   if (cleanArtist.length < 2 || cleanArtist.length > 100) throw new Error('Informe o nome artístico (até 100 caracteres).');
   if (cleanDescription.length > 1000) throw new Error('A descrição deve ter até 1.000 caracteres.');
-  const extension = ({'audio/mpeg':'mp3','audio/mp4':'m4a','audio/aac':'aac','audio/wav':'wav','audio/x-wav':'wav','audio/ogg':'ogg'})[mime];
+  const canonicalMime = ({mp3:'audio/mpeg',m4a:'audio/mp4',aac:'audio/aac',wav:'audio/wav',ogg:'audio/ogg'})[extension];
   const path = user.id + '/songs/' + crypto.randomUUID() + '.' + extension;
-  const { error: uploadError } = await supabase.storage.from('capital-do-trem-audio').upload(path,file,{contentType:mime,cacheControl:'3600',upsert:false});
+  const { error: uploadError } = await supabase.storage.from('capital-do-trem-audio').upload(path,file,{contentType:canonicalMime,cacheControl:'3600',upsert:false});
   if (uploadError) throw uploadError;
   const { data, error } = await supabase.from('songs').insert({
     user_id:user.id,title:cleanTitle,artist_name:cleanArtist,description:cleanDescription,
