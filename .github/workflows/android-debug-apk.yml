@@ -15,6 +15,18 @@ on:
       - 'capacitor.config.ts'
       - 'sw.js'
       - '.github/workflows/android-debug-apk.yml'
+      - 'offline.html'
+      - 'admin-media.js'
+      - 'emoji-picker.js'
+      - 'update.js'
+      - 'manifest.webmanifest'
+      - 'supabase-config.js'
+      - 'privacidade.html'
+      - 'avatar.html'
+      - 'mensagens.html'
+      - 'diagnostico.html'
+      - 'marca.svg'
+      - 'assets/**'
 
 permissions:
   contents: read
