@@ -33,6 +33,9 @@ emojiButton.type='button';emojiButton.id='emoji-toggle';emojiButton.textContent=
 const recordButton=document.createElement('button');
 recordButton.type='button';recordButton.id='record-audio';recordButton.textContent='🎙️';recordButton.setAttribute('aria-label','Gravar áudio');
 tools.append(emojiButton,recordButton);
+// Os botões eram criados, mas não eram inseridos no formulário: por isso sumiam da interface.
+// display:contents mantém os dois controles nas colunas próprias do composer mobile.
+form.insertBefore(tools,input);
 const emojiTray=document.getElementById('emoji-tray');
 emojiButton.addEventListener('click',()=>{
  if(!emojiTray)return;
