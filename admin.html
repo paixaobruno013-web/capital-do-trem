@@ -119,6 +119,17 @@ audio{width:100%;}
 <a class="command-link" href="#queue"><span class="glyph">⚙</span>Moderação</a>
 </nav>
 
+<section class="command-section" id="profile-image-section">
+ <h2>Imagem superior do aplicativo • perfil inicial</h2>
+ <p class="muted">Altere somente a imagem circular que aparece no topo da tela inicial. Esta opção não muda a abertura nem o painel inferior “AQUI A MÚSICA NÃO PARA!”. Para melhor nitidez, escolha o arquivo original em alta resolução (JPG, PNG ou WebP, até 5 MB).</p>
+ <div class="item">
+  <img id="profile-only-preview" src="./marca.svg" alt="Prévia da imagem superior do aplicativo" style="display:block;width:132px;height:132px;object-fit:cover;object-position:center;border:3px solid #ed1c24;border-radius:50%;background:#000;margin:12px auto;box-shadow:0 0 16px #ed1c2455;image-rendering:auto">
+  <label for="profile-only-file">Escolher imagem superior</label><input id="profile-only-file" type="file" accept="image/jpeg,image/png,image/webp">
+  <button id="profile-only-save" type="button">Salvar somente imagem superior</button>
+  <p id="profile-only-status" class="status" role="status" aria-live="polite">A imagem inferior do painel não será alterada.</p>
+ </div>
+</section>
+
 <section class="command-section" id="branding-section">
  <h2>Identidade visual oficial • logo circular</h2>
  <p class="muted">Escolha a arte original uma única vez. O sistema salvará o mesmo arquivo para a foto de perfil e para a abertura. JPG, PNG ou WebP até 5 MB.</p>
@@ -134,8 +145,8 @@ audio{width:100%;}
 
 
 <section class="command-section" id="opening-image-section">
- <h2>Abertura oficial • arte completa</h2>
- <p class="muted">Envie a imagem inteira da abertura. Esta opção altera somente a abertura e preserva a foto oficial do perfil. JPG, PNG ou WebP até 5 MB.</p>
+ <h2>Usar IMAGEM no lugar do vídeo de abertura</h2>
+ <p class="muted">Escolha esta opção quando quiser uma imagem fixa em vez do vídeo. Ao salvar, o vídeo de abertura é desativado automaticamente e a imagem permanece por 10 segundos. A animação da locomotiva e dos vagões continua preservada. Esta opção não altera a imagem superior do perfil. JPG, PNG ou WebP até 5 MB.</p>
  <div class="item">
   <img id="opening-image-preview" src="./marca.svg" alt="Prévia da abertura completa" style="display:block;width:100%;max-width:260px;max-height:420px;object-fit:contain;background:#000;margin:12px auto;border-radius:10px">
   <label for="opening-image-file">Selecionar imagem completa da abertura</label><input id="opening-image-file" type="file" accept="image/jpeg,image/png,image/webp">
@@ -276,6 +287,25 @@ homeBgSave.addEventListener('click',async()=>{
  }catch(error){homeBgStatus.textContent=error?.message||'Não foi possível salvar o fundo. Confira a conexão e tente novamente.';}
  finally{homeBgSave.disabled=false;}
 });
+// Controle independente da imagem circular superior do aplicativo.
+const profileOnlyFile=document.getElementById('profile-only-file');
+const profileOnlyPreview=document.getElementById('profile-only-preview');
+const profileOnlySave=document.getElementById('profile-only-save');
+const profileOnlyStatus=document.getElementById('profile-only-status');
+profileOnlyFile.addEventListener('change',()=>{
+ const file=profileOnlyFile.files?.[0];if(!file)return;
+ if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size<1||file.size>5*1024*1024){profileOnlyStatus.textContent='Escolha JPG, PNG ou WebP de até 5 MB.';profileOnlyFile.value='';return;}
+ const previewUrl=URL.createObjectURL(file);profileOnlyPreview.onload=()=>URL.revokeObjectURL(previewUrl);profileOnlyPreview.src=previewUrl;
+ profileOnlyStatus.textContent='Prévia pronta. A imagem inferior permanecerá intacta.';
+});
+profileOnlySave.addEventListener('click',async()=>{
+ const file=profileOnlyFile.files?.[0];if(!file){profileOnlyStatus.textContent='Primeiro escolha a imagem superior na galeria.';return;}
+ profileOnlySave.disabled=true;profileOnlyStatus.textContent='Enviando a imagem original e atualizando o topo do aplicativo…';
+ try{const url=await auth.saveAdminBrandingImage('profile',file);profileOnlyPreview.src=url;profileOnlyFile.value='';profileOnlyStatus.textContent='Imagem superior atualizada! A abertura e o painel inferior não foram alterados.';}
+ catch(error){profileOnlyStatus.textContent=error?.message||'Não foi possível salvar. Verifique a conexão e as permissões de armazenamento.';}
+ finally{profileOnlySave.disabled=false;}
+});
+
 const brandingFile=document.getElementById('branding-pair-file');
 const brandingPreview=document.getElementById('branding-profile-preview');
 const brandingSave=document.getElementById('branding-pair-save');
