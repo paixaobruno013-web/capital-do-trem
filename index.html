@@ -767,15 +767,18 @@ html.auth-check-pending body{visibility:hidden}
 
 
 header.header-has-custom-background{
- position:relative!important;isolation:isolate;overflow:hidden;
- background-color:transparent!important;
- background-image:linear-gradient(110deg,rgba(0,0,0,.12),rgba(0,0,0,.06) 55%,rgba(0,0,0,.14)),var(--header-bg-image)!important;
- background-size:var(--header-bg-fit,cover)!important;
- background-position:var(--header-bg-position,50% 50%)!important;
- background-repeat:no-repeat!important;
+ position:relative!important;isolation:isolate;overflow:hidden;background:transparent!important;
 }
-body.light header.header-has-custom-background{
- background-image:linear-gradient(110deg,rgba(255,255,255,.16),rgba(255,255,255,.10)),var(--header-bg-image)!important;
+header.header-has-custom-background::before{
+ content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+ background-image:linear-gradient(110deg,rgba(0,0,0,.12),rgba(0,0,0,.06) 55%,rgba(0,0,0,.14)),var(--header-bg-image);
+ background-size:100% 100%,var(--header-bg-fit,cover);
+ background-position:center,var(--header-bg-position,50% 50%);background-repeat:no-repeat;
+}
+header.header-has-custom-background>*{position:relative;z-index:1}
+header.header-has-custom-background>.theme{z-index:2}
+body.light header.header-has-custom-background::before{
+ background-image:linear-gradient(110deg,rgba(255,255,255,.16),rgba(255,255,255,.10)),var(--header-bg-image);
 }
 /* Fundo do painel central configurável pelo administrador. */
 .reference-banner.has-custom-background{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(110deg,rgba(0,0,0,.76),rgba(0,0,0,.48) 58%,rgba(0,0,0,.68))!important}
