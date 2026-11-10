@@ -787,16 +787,18 @@ export async function getPrivateConversationData() {
   if (membersError) throw membersError;
   if (blockError) throw blockError;
   const isGroupMember=!!membership&&!membership.left_at;
-  const memberIds=(memberRows||[]).map(row=>row.user_id).filter(id=>id!==user.id);
+  const allMemberIds=(memberRows||[]).map(row=>row.user_id);
+  const canStartPrivate=isGroupMember&&allMemberIds.includes(user.id);
+  const memberIds=allMemberIds.filter(id=>id!==user.id);
   let people=[];
-  if(isGroupMember&&memberIds.length){
+  if(canStartPrivate&&memberIds.length){
     const {data,error}=await supabase.from('profiles')
       .select('user_id,display_name,username,account_type,city,avatar_type,avatar_url,avatar_data')
       .eq('is_public',true).in('user_id',memberIds).order('display_name',{ascending:true}).limit(100);
     if(error)throw error;
     people=data||[];
   }
-  return { userId:user.id, isGroupMember, conversations:conversations||[], people, memberIds, blocked:(blocks||[]).map(row=>row.blocked_id) };
+  return { userId:user.id, isGroupMember, canStartPrivate, conversations:conversations||[], people, memberIds, blocked:(blocks||[]).map(row=>row.blocked_id) };
 }
 
 export async function requestPrivateConversation(otherUserId) {
