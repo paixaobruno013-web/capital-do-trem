@@ -87,6 +87,8 @@ img,video,audio{max-width:100%;}
 audio{width:100%;}
 :focus-visible{outline:2px solid var(--red);outline-offset:3px;}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}}
+
+.home-bg-preview{width:100%;max-width:520px;aspect-ratio:16/9;overflow:hidden;border:1px solid #ed1c24;border-radius:13px;background:#090909;margin:12px auto;box-shadow:0 0 14px #ed1c2433}.home-bg-preview img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 50%;filter:blur(0px)}.range-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px}.range-row input{grid-column:1/-1;padding:0;accent-color:#ed1c24}.range-row output{font-variant-numeric:tabular-nums;color:var(--red);font-weight:800}
 </style>
 </head>
 <body>
@@ -142,6 +144,27 @@ audio{width:100%;}
  </div>
 </section>
 
+<section class="command-section" id="home-background-section">
+ <h2>Plano de fundo do painel central</h2>
+ <p class="muted">Substitua a imagem da favela com o helicóptero e a frase “AQUI A MÚSICA NÃO PARA!”. A imagem aparece atrás do texto e dos botões, sem removê-los. JPG, PNG ou WebP até 8 MB.</p>
+ <div class="item">
+  <label for="home-background-file">Escolher nova imagem de fundo</label>
+  <input id="home-background-file" type="file" accept="image/jpeg,image/png,image/webp">
+  <div class="home-bg-preview"><img id="home-background-preview" src="" alt="Prévia do fundo do painel central"></div>
+  <label for="home-background-x">Enquadramento horizontal</label>
+  <div class="range-row"><span class="muted">Esquerda ↔ Direita</span><output id="home-background-x-value">50%</output><input id="home-background-x" type="range" min="0" max="100" value="50"></div>
+  <label for="home-background-y">Enquadramento vertical</label>
+  <div class="range-row"><span class="muted">Topo ↕ Base</span><output id="home-background-y-value">50%</output><input id="home-background-y" type="range" min="0" max="100" value="50"></div>
+  <label for="home-background-blur">Nitidez / desfoque</label>
+  <div class="range-row"><span class="muted">Nítida ↔ Embaçada</span><output id="home-background-blur-value">0 px</output><input id="home-background-blur" type="range" min="0" max="12" step="0.5" value="0"></div>
+  <label for="home-background-fit">Ajuste da imagem</label>
+  <select id="home-background-fit"><option value="cover">Preencher o painel (recorte ajustável)</option><option value="contain">Mostrar imagem inteira</option></select>
+  <button id="home-background-save" type="button">Salvar fundo e ajustes</button>
+  <button id="home-background-reset" class="secondary" type="button">Centralizar e deixar nítida</button>
+  <p id="home-background-status" class="status" role="status" aria-live="polite">Ajuste o recorte e a nitidez na prévia antes de salvar.</p>
+ </div>
+</section>
+
 <section class="command-section"><h2>Publicações e aprovações</h2><p class="muted">Acompanhe artistas, músicas, eventos e divulgações enviados para análise.</p><p id="queue-status" class="status" role="status" aria-live="polite"></p><div id="queue"></div></section>
 <section class="command-section"><div class="actions" style="justify-content:space-between;align-items:center"><h2>Koe Fala Tu • Moderação do chat</h2><button id="refresh-chat" class="secondary" type="button">Atualizar mensagens</button></div><p class="muted">Revise mensagens recentes e remova conteúdos ofensivos, spam ou informações impróprias.</p><div id="chat-moderation"></div></section>
 </section>
@@ -175,14 +198,55 @@ async function enterDashboard(user){
  await loadChatModeration();
 }
 
+const homeBgFile=document.getElementById('home-background-file');
+const homeBgPreview=document.getElementById('home-background-preview');
+const homeBgX=document.getElementById('home-background-x'),homeBgY=document.getElementById('home-background-y');
+const homeBgBlur=document.getElementById('home-background-blur'),homeBgFit=document.getElementById('home-background-fit');
+const homeBgStatus=document.getElementById('home-background-status');
+const homeBgSave=document.getElementById('home-background-save');
+let homeBgCurrentUrl='';
+function paintHomeBgPreview(){
+ const x=homeBgX.value,y=homeBgY.value,blur=homeBgBlur.value;
+ homeBgPreview.style.objectPosition=x+'% '+y+'%';
+ homeBgPreview.style.objectFit=homeBgFit.value;
+ homeBgPreview.style.filter='blur('+blur+'px)';
+ document.getElementById('home-background-x-value').textContent=x+'%';
+ document.getElementById('home-background-y-value').textContent=y+'%';
+ document.getElementById('home-background-blur-value').textContent=blur+' px';
+}
 async function loadBranding(){
  try{
   const branding=await auth.getPublicBranding();
   const url=branding.profileImageUrl||branding.openingImageUrl;
   if(url)document.getElementById('branding-profile-preview').src=url;
   if(branding.openingImageUrl)document.getElementById('opening-image-preview').src=branding.openingImageUrl;
- }catch(error){document.getElementById('branding-pair-status').textContent='Não foi possível carregar a imagem atual.';}
+  homeBgCurrentUrl=branding.homeBackgroundImageUrl||'';
+  if(homeBgCurrentUrl)homeBgPreview.src=homeBgCurrentUrl;
+  homeBgX.value=String(branding.homeBackgroundX??50);homeBgY.value=String(branding.homeBackgroundY??50);
+  homeBgBlur.value=String(branding.homeBackgroundBlur??0);homeBgFit.value=branding.homeBackgroundFit||'cover';
+  paintHomeBgPreview();
+ }catch(error){document.getElementById('branding-pair-status').textContent='Não foi possível carregar a imagem atual.';homeBgStatus.textContent='Não foi possível carregar os ajustes do fundo. Confira a conexão e as permissões.';}
 }
+homeBgFile.addEventListener('change',()=>{
+ const file=homeBgFile.files?.[0];if(!file)return;
+ if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>8*1024*1024){homeBgStatus.textContent='Escolha JPG, PNG ou WebP de até 8 MB.';homeBgFile.value='';return;}
+ homeBgPreview.src=URL.createObjectURL(file);homeBgStatus.textContent='Prévia carregada. Ajuste o enquadramento e toque em salvar.';
+});
+[homeBgX,homeBgY,homeBgBlur,homeBgFit].forEach(control=>control.addEventListener('input',paintHomeBgPreview));
+document.getElementById('home-background-reset').addEventListener('click',()=>{
+ homeBgX.value='50';homeBgY.value='50';homeBgBlur.value='0';homeBgFit.value='cover';paintHomeBgPreview();
+});
+homeBgSave.addEventListener('click',async()=>{
+ const file=homeBgFile.files?.[0]||null;
+ if(!file&&!homeBgCurrentUrl){homeBgStatus.textContent='Primeiro escolha uma imagem de fundo.';return;}
+ homeBgSave.disabled=true;homeBgStatus.textContent='Salvando imagem e ajustes do painel…';
+ try{
+  const url=await auth.saveAdminHomeBackground(file,{x:homeBgX.value,y:homeBgY.value,blur:homeBgBlur.value,fit:homeBgFit.value});
+  homeBgCurrentUrl=url;homeBgPreview.src=url;homeBgFile.value='';
+  homeBgStatus.textContent='Fundo e ajustes salvos! A imagem será atualizada para todos os usuários.';
+ }catch(error){homeBgStatus.textContent=error?.message||'Não foi possível salvar o fundo. Confira a conexão e tente novamente.';}
+ finally{homeBgSave.disabled=false;}
+});
 const brandingFile=document.getElementById('branding-pair-file');
 const brandingPreview=document.getElementById('branding-profile-preview');
 const brandingSave=document.getElementById('branding-pair-save');
