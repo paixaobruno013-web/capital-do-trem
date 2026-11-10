@@ -14,6 +14,7 @@ const files = [
   'chat-enhancements.js',
   'emoji-picker.js',
   'stories-ui.js',
+  'account-stories.js',
   'admin-stories.js',
   'avatar.html',
   'mensagens.html',
