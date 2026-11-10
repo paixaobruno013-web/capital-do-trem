@@ -1,12 +1,14 @@
 import { readFile } from 'node:fs/promises';
 
 const read = (path) => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [room, enhancements, emoji, privateChat, worker] = await Promise.all([
+const [room, enhancements, emoji, privateChat, worker, stories, home] = await Promise.all([
   read('bate-papo.html'),
   read('chat-enhancements.js'),
   read('emoji-picker.js'),
   read('mensagens.html'),
-  read('sw.js')
+  read('sw.js'),
+  read('stories-ui.js'),
+  read('index.html')
 ]);
 
 const checks = [
