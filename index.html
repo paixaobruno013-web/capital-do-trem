@@ -1633,13 +1633,13 @@ async function saveOfflineMusic(id,blob,title){
   auth.initSupabase();
   const branding=await auth.getPublicBranding();
   const safeUrl=value=>typeof value==='string'&&value.startsWith('https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/')?value:'';
-  const profile=safeUrl(branding.profileImageUrl),opening=safeUrl(branding.openingImageUrl),openingVideo=safeUrl(branding.openingVideoUrl);
+  const profile=safeUrl(branding.profileImageUrl),opening=safeUrl(branding.openingImageUrl),openingVideo=safeUrl(branding.openingVideoUrl);\n  // Cada abertura consulta uma URL nova para impedir que navegador/CDN reutilize vídeo antigo.\n  const freshMediaUrl=value=>value?value+(value.includes('?')?'&':'?')+'cdt_opening='+Date.now():'';\n  const currentOpeningImage=freshMediaUrl(opening),currentOpeningVideo=freshMediaUrl(openingVideo);
   if(profile){const logo=document.getElementById('site-logo');if(logo)logo.src=profile;}
   if(opening){
  const intro=document.querySelector('.intro-smoke__brand img');
  const screen=document.getElementById('intro-smoke');
  if(intro&&screen){
-  intro.src=opening;
+  intro.src=currentOpeningImage;
   intro.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';
   intro.style.objectFit=branding.openingFit==='contain'?'contain':'cover';
   intro.closest('.intro-smoke__brand')?.classList.add('custom-opening-image');
@@ -1693,12 +1693,12 @@ async function saveOfflineMusic(id,blob,title){
     const brand=document.querySelector('.intro-smoke__brand');
     if(brand)brand.style.display='none';
     const video=document.createElement('video');
-    video.className='opening-video-background';video.src=openingVideo;video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';const savedOpeningSound=(()=>{try{return localStorage.getItem('capitaldotrem_intro_sound_v1')!=='off';}catch{return true;}})();
+    video.className='opening-video-background';video.src=currentOpeningVideo;video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';const savedOpeningSound=(()=>{try{return localStorage.getItem('capitaldotrem_intro_sound_v1')!=='off'&&branding.openingVideoMuted!==true;}catch{return branding.openingVideoMuted!==true;}})();
     video.autoplay=true;video.muted=!savedOpeningSound;video.defaultMuted=!savedOpeningSound;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));video.playsInline=true;video.loop=true;video.preload='auto';video.setAttribute('aria-hidden','true');
     screen.insertBefore(video,screen.firstChild);screen.classList.add('custom-opening-screen');
     // O áudio fica sempre habilitado por padrão. Se o navegador bloquear autoplay com som,
     // mostramos um toque de ativação (limitação do próprio Android/iOS, não uma opção sem áudio).
-    const audioButton=document.createElement('button');audioButton.type='button';audioButton.textContent='🔊 TOQUE PARA OUVIR';
+    const audioButton=document.createElement('button');audioButton.type='button';audioButton.textContent='🔊 TOQUE PARA LIBERAR O SOM';
     audioButton.setAttribute('aria-label','Ativar áudio do vídeo de abertura');
     audioButton.style.cssText='position:absolute;z-index:10000;left:50%;top:12%;transform:translateX(-50%);padding:12px 18px;border:2px solid #ed1c24;border-radius:999px;background:#050505ef;color:#fff;font-weight:900;letter-spacing:.5px;box-shadow:0 0 16px #ed1c24;cursor:pointer;pointer-events:auto;touch-action:manipulation;display:none';
     const enableOpeningAudio=async()=>{try{video.muted=false;video.defaultMuted=false;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));await video.play();audioButton.remove();}catch(error){audioButton.style.display='block';console.warn('O navegador exige toque para liberar o áudio da abertura.',error);}};
