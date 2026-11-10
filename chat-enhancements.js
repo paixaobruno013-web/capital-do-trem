@@ -82,8 +82,8 @@ recordButton.addEventListener('click',async()=>{
   recorder.onstop=()=>{
    window.clearTimeout(recordingLimit);
    const actualType=String(recorder.mimeType||recordedChunks[0]?.type||'audio/webm').split(';')[0].toLowerCase();
-   const extension=actualType==='audio/mp4'?'m4a':'webm';
-   const canonicalType=actualType==='audio/mp4'?'audio/mp4':'audio/webm';
+   const formats={'audio/mp4':['m4a','audio/mp4'],'audio/webm':['webm','audio/webm'],'audio/ogg':['ogg','audio/ogg'],'audio/wav':['wav','audio/wav'],'audio/mpeg':['mp3','audio/mpeg'],'audio/aac':['aac','audio/aac']};
+   const [extension,canonicalType]=formats[actualType]||formats['audio/webm'];
    const blob=new Blob(recordedChunks,{type:canonicalType});
    try{
     if(!blob.size)throw new Error('A gravação ficou vazia. Grave novamente.');
