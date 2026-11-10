@@ -1731,8 +1731,8 @@ create policy chat_group_members_join_self
 drop policy if exists chat_group_members_update_self on public.chat_group_members;
 create policy chat_group_members_update_self
   on public.chat_group_members for update to authenticated
-  using (user_id=(select auth.uid()))
-  with check (user_id=(select auth.uid()));
+  using (user_id=(select auth.uid()) and (select private.is_registered_user()))
+  with check (user_id=(select auth.uid()) and (select private.is_registered_user()));
 
 create or replace function private.is_current_chat_group_member()
 returns boolean language sql stable security definer set search_path = ''
