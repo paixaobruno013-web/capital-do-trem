@@ -114,20 +114,20 @@ jobs:
 
       - name: Compilar aplicativo iOS para dispositivo (sem assinatura)
         run: |
-          xcodebuild \\
-            -project ios/App/App.xcodeproj \\
-            -scheme App \\
-            -configuration Release \\
-            -sdk iphoneos \\
-            -destination 'generic/platform=iOS' \\
-            -derivedDataPath ios/device-build \\
-            CODE_SIGNING_ALLOWED=NO \\
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath ios/device-build \
+            CODE_SIGNING_ALLOWED=NO \
             build
 
       - name: Empacotar aplicativo iOS para dispositivo
         run: |
-          ditto -c -k --sequesterRsrc --keepParent \\
-            ios/device-build/Build/Products/Release-iphoneos/App.app \\
+          ditto -c -k --sequesterRsrc --keepParent \
+            ios/device-build/Build/Products/Release-iphoneos/App.app \
             Capital-do-Trem-iOS-Device-Unsigned.zip
 
       - name: Publicar artefato iOS para dispositivo (sem assinatura)
