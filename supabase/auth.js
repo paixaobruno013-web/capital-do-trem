@@ -1194,3 +1194,89 @@ export async function startUserPresence() {
     document.removeEventListener('visibilitychange', onFocus);
   };
 }
+
+
+// ============================================================
+// Stories oficiais da Capital do Trem — somente administradores publicam.
+// Cada story expira automaticamente após 24 horas.
+// ============================================================
+export async function createAdminStory({ file, caption = '' }) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente o administrador pode publicar Stories.');
+  if (!(file instanceof File)) throw new Error('Escolha uma foto ou vídeo para o Story.');
+  const format = await getBrandingUploadFormat(file, { jpg: true, jpeg: true, png: true, webp: true, mp4: true, webm: true });
+  const isVideo = ['mp4', 'webm'].includes(format.extension);
+  const maxSize = isVideo ? 20 * 1024 * 1024 : 8 * 1024 * 1024;
+  if (file.size < 1 || file.size > maxSize) throw new Error(isVideo ? 'O vídeo deve ter até 20 MB.' : 'A imagem deve ter até 8 MB.');
+  const cleanCaption = String(caption || '').trim().slice(0, 280);
+  const path = user.id + '/stories/story-' + crypto.randomUUID() + '.' + format.extension;
+  const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, {
+    contentType: format.contentType, cacheControl: '3600', upsert: false
+  });
+  if (uploadError) throw uploadError;
+  const { data: publicData } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
+  if (!publicData?.publicUrl) {
+    await supabase.storage.from('capital-do-trem-media').remove([path]);
+    throw new Error('Não foi possível gerar o endereço público do Story.');
+  }
+  const { data, error } = await supabase.from('admin_stories').insert({
+    created_by: user.id,
+    media_path: path,
+    media_url: publicData.publicUrl,
+    media_type: isVideo ? 'video' : 'image',
+    caption: cleanCaption,
+    published: true,
+    expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+  }).select('id,media_url,media_type,caption,created_at,expires_at,published').single();
+  if (error) {
+    await supabase.storage.from('capital-do-trem-media').remove([path]);
+    throw error;
+  }
+  return data;
+}
+
+export async function getActiveAdminStories() {
+  const supabase = initSupabase();
+  const { data, error } = await supabase.from('admin_stories')
+    .select('id,media_url,media_type,caption,created_at,expires_at')
+    .eq('published', true)
+    .gt('expires_at', new Date().toISOString())
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function getAdminStories() {
+  const supabase = initSupabase();
+  if (!(await isCurrentUserAdmin())) throw new Error('Acesso administrativo não autorizado.');
+  const { data, error } = await supabase.from('admin_stories')
+    .select('id,media_url,media_type,caption,created_at,expires_at,published')
+    .order('created_at', { ascending: false })
+    .limit(30);
+  if (error) throw error;
+  return data || [];
+}
+
+export async function deleteAdminStory(id) {
+  const supabase = initSupabase();
+  if (!(await isCurrentUserAdmin())) throw new Error('Acesso administrativo não autorizado.');
+  const { data: story, error: readError } = await supabase.from('admin_stories')
+    .select('id,media_path').eq('id', id).single();
+  if (readError) throw readError;
+  const { error } = await supabase.from('admin_stories').delete().eq('id', id);
+  if (error) throw error;
+  if (story?.media_path) {
+    const { error: storageError } = await supabase.storage.from('capital-do-trem-media').remove([story.media_path]);
+    if (storageError) console.warn('Story removido, mas o arquivo de mídia não pôde ser apagado.', storageError);
+  }
+}
+
+export function subscribeAdminStories(callback) {
+  const supabase = initSupabase();
+  const channel = supabase.channel('capital-do-trem-admin-stories')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'admin_stories' }, callback)
+    .subscribe();
+  return () => { supabase.removeChannel(channel); };
+}
