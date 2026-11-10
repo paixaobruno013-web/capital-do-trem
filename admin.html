@@ -131,7 +131,7 @@ audio{width:100%;}
   <label for="header-background-y">Posição vertical</label>
   <div class="range-row"><span class="muted">Topo ↕ Base</span><output id="header-background-y-value">50%</output><input id="header-background-y" type="range" min="0" max="100" value="50"></div>
   <label for="header-background-blur">Nitidez / desfoque</label>
-  <div class="range-row"><span class="muted">Imagem limpa ↔ embaçada</span><output id="header-background-blur-value">0 px</output><input id="header-background-blur" type="range" min="0" max="12" step="0.5" value="0"></div>
+  <div class="range-row"><span class="muted">Imagem limpa ↔ embaçada</span><output id="header-background-blur-value">0 px</output><input id="header-background-blur" type="range" min="0" max="0" step="0.5" value="0" disabled></div>
   <label for="header-background-fit">Enquadramento</label>
   <select id="header-background-fit"><option value="cover">Preencher o cabeçalho (recorte ajustável)</option><option value="contain">Mostrar imagem inteira</option></select>
   <div class="actions"><button id="header-background-save" type="button">Salvar imagem e ajustes</button><button id="header-background-reset" class="secondary" type="button">Centralizar e deixar nítida</button></div>
@@ -172,6 +172,15 @@ audio{width:100%;}
  <p class="muted">Selecione se a abertura será uma imagem parada por 10 segundos ou um vídeo. A locomotiva e os vagões do carregamento permanecem.</p>
  <label for="opening-media-mode">Tipo de mídia da abertura</label>
  <select id="opening-media-mode"><option value="image">Imagem • 10 segundos</option><option value="video">Vídeo • 10 segundos de abertura</option></select>
+ <div class="item" id="opening-media-unified-uploader">
+  <strong>Enviar a mídia da abertura</strong>
+  <p class="muted">Este seletor aceita tanto imagem quanto vídeo. Escolha o tipo acima ou selecione o arquivo diretamente na galeria.</p>
+  <label for="opening-media-file">Escolher imagem ou vídeo</label>
+  <input id="opening-media-file" type="file" accept="image/*,video/*,.jpg,.jpeg,.png,.webp,.mp4,.webm">
+  <div id="opening-media-upload-preview" class="home-bg-preview" style="max-width:280px;aspect-ratio:9/16;background:#000"></div>
+  <button id="opening-media-upload-save" type="button">Salvar mídia escolhida na abertura</button>
+  <p id="opening-media-upload-status" class="status" role="status" aria-live="polite">Selecione uma imagem ou um vídeo para começar.</p>
+ </div>
  <p class="muted">Ajuste o enquadramento da imagem ou do vídeo para ocupar a tela da abertura. A prévia abaixo acompanha os controles, sem mexer na locomotiva, nos vagões ou na barra de carregamento.</p>
  <div class="item">
   <div class="home-bg-preview" style="max-width:280px;aspect-ratio:9/16;background:#000"><img id="opening-media-frame-preview" src="./marca.svg" alt="Prévia vertical da mídia de abertura" style="object-fit:cover;object-position:50% 50%"></div>
@@ -314,6 +323,61 @@ document.getElementById('header-background-remove').addEventListener('click',eve
  headerBgX.value='50';headerBgY.value='50';headerBgBlur.value='0';headerBgFit.value='cover';paintHeaderBgPreview();
 }));
 
+
+const openingMediaUnifiedFile=document.getElementById('opening-media-file');
+const openingMediaUnifiedPreview=document.getElementById('opening-media-upload-preview');
+const openingMediaUnifiedSave=document.getElementById('opening-media-upload-save');
+const openingMediaUnifiedStatus=document.getElementById('opening-media-upload-status');
+let openingMediaUnifiedObjectUrl='';
+function clearOpeningMediaUnifiedPreview(){
+ if(openingMediaUnifiedObjectUrl){URL.revokeObjectURL(openingMediaUnifiedObjectUrl);openingMediaUnifiedObjectUrl='';}
+ openingMediaUnifiedPreview.replaceChildren();
+}
+openingMediaUnifiedFile.addEventListener('change',()=>{
+ const file=openingMediaUnifiedFile.files?.[0];if(!file)return;
+ if(file.size<1){openingMediaUnifiedStatus.textContent='O arquivo está vazio. Escolha outro.';return;}
+ const ext=String(file.name||'').split('.').pop().toLowerCase();
+ const isVideo=(file.type||'').startsWith('video/')||['mp4','webm'].includes(ext);
+ const isImage=(file.type||'').startsWith('image/')||['jpg','jpeg','png','webp'].includes(ext);
+ if(!isVideo&&!isImage){openingMediaUnifiedStatus.textContent='Formato não reconhecido. Use JPG, PNG, WebP, MP4 ou WebM.';return;}
+ if(isVideo&&file.size>50*1024*1024){openingMediaUnifiedStatus.textContent='O vídeo precisa ter até 50 MB.';openingMediaUnifiedFile.value='';return;}
+ if(isImage&&file.size>5*1024*1024){openingMediaUnifiedStatus.textContent='A imagem precisa ter até 5 MB.';openingMediaUnifiedFile.value='';return;}
+ document.getElementById('opening-media-mode').value=isVideo?'video':'image';
+ document.getElementById('opening-media-mode').dispatchEvent(new Event('change'));
+ clearOpeningMediaUnifiedPreview();
+ openingMediaUnifiedObjectUrl=URL.createObjectURL(file);
+ let preview;
+ if(isVideo){preview=document.createElement('video');preview.controls=true;preview.playsInline=true;preview.muted=true;}
+ else{preview=document.createElement('img');preview.alt='Prévia da imagem de abertura';}
+ preview.src=openingMediaUnifiedObjectUrl;
+ preview.style.cssText='display:block;width:100%;height:100%;object-fit:contain;background:#000';
+ openingMediaUnifiedPreview.append(preview);
+ openingMediaUnifiedStatus.textContent=isVideo?'Vídeo selecionado. Confira a prévia e toque em salvar.':'Imagem selecionada. Ela ficará na abertura por 10 segundos.';
+});
+openingMediaUnifiedSave.addEventListener('click',async()=>{
+ const file=openingMediaUnifiedFile.files?.[0];
+ if(!file){openingMediaUnifiedStatus.textContent='Primeiro escolha uma imagem ou um vídeo.';return;}
+ const ext=String(file.name||'').split('.').pop().toLowerCase();
+ const isVideo=(file.type||'').startsWith('video/')||['mp4','webm'].includes(ext);
+ openingMediaUnifiedSave.disabled=true;
+ openingMediaUnifiedStatus.textContent=isVideo?'Enviando vídeo para a abertura…':'Enviando imagem para a abertura…';
+ try{
+  const options={x:openingMediaX.value,y:openingMediaY.value,fit:openingMediaFit.value};
+  const url=isVideo?await auth.saveAdminOpeningVideo(file,options):await auth.saveAdminOpeningImage(file,options);
+  if(isVideo){
+   openingVideoPreview.src=url;openingVideoPreview.style.display='block';openingVideoPreview.load();
+   openingVideoStatus.textContent='Vídeo publicado na abertura.';
+   openingStatus.textContent='';openingPreview.src='./marca.svg';
+  }else{
+   openingPreview.src=url;openingVideoPreview.removeAttribute('src');openingVideoPreview.load();openingVideoPreview.style.display='none';
+   openingStatus.textContent='Imagem publicada na abertura por 10 segundos.';
+  }
+  openingMediaUnifiedStatus.textContent=isVideo?'Vídeo salvo! A abertura usará o vídeo escolhido.':'Imagem salva! A abertura exibirá esta imagem por 10 segundos.';
+  openingMediaUnifiedFile.value='';
+ }catch(error){
+  openingMediaUnifiedStatus.textContent=[error?.message,error?.code&&('Código: '+error.code),error?.status&&('HTTP: '+error.status),error?.details,error?.hint].filter(Boolean).join(' • ')||'Não foi possível salvar a mídia.';
+ }finally{openingMediaUnifiedSave.disabled=false;}
+});
 document.getElementById('opening-media-mode').addEventListener('change',event=>{
  const mode=event.target.value;
  document.getElementById('opening-image-section').hidden=mode!=='image';
