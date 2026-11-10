@@ -16,7 +16,7 @@ create table if not exists public.user_stories (
   constraint user_stories_expiration_window check (expires_at > created_at and expires_at <= created_at + interval '24 hours'),
   constraint user_stories_own_storage_path check (media_path like author_id::text || '/stories/%')
 );
-create index if not exists user_stories_active_created_idx on public.user_stories (created_at) where expires_at > now();
+create index if not exists user_stories_expiration_created_idx on public.user_stories (expires_at, created_at);
 alter table public.user_stories enable row level security;
 revoke all privileges on public.user_stories from anon, authenticated;
 grant select on public.user_stories to anon, authenticated;
