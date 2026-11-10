@@ -856,11 +856,14 @@ export async function getPublicBranding() {
 // Normaliza MIME genérico/vazio devolvido por alguns seletores Android.
 function getBrandingUploadFormat(file, allowed) {
  const ext=String(file?.name||'').split('.').pop().toLowerCase();
+ const has=(key)=>Object.prototype.hasOwnProperty.call(allowed,key);
  const mimeExt={'image/jpeg':'jpg','image/jpg':'jpg','image/png':'png','image/webp':'webp','video/mp4':'mp4','video/webm':'webm'};
- const chosen=Object.hasOwn(allowed,ext)?ext:(Object.hasOwn(allowed,mimeExt[file?.type]||'')?mimeExt[file.type]:'');
- if(!chosen)throw new Error('Formato não reconhecido. Use JPG, PNG ou WebP para imagens; MP4 ou WebM para vídeos.');
- const contentType=chosen==='jpg'||chosen==='jpeg'?'image/jpeg':chosen==='png'?'image/png':chosen==='webp'?'image/webp':chosen==='mp4'?'video/mp4':'video/webm';
- return {extension:chosen==='jpeg'?'jpg':chosen,contentType};
+ const byMime=mimeExt[String(file?.type||'').toLowerCase()]||'';
+ const chosen=has(ext)?ext:(has(byMime)?byMime:'');
+ if(!chosen)throw new Error('Formato não reconhecido. Imagem: JPG, JPEG, PNG ou WebP. Vídeo: MP4 ou WebM.');
+ const normalized=chosen==='jpeg'?'jpg':chosen;
+ const contentType=normalized==='jpg'?'image/jpeg':normalized==='png'?'image/png':normalized==='webp'?'image/webp':normalized==='mp4'?'video/mp4':'video/webm';
+ return {extension:normalized,contentType};
 }
 
 // Publica um único arquivo e grava o mesmo endereço nas duas posições oficiais.
@@ -870,7 +873,7 @@ export async function saveAdminBrandingPair(file) {
   if (userError) throw userError;
   if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode alterar a identidade visual.');
   if (!(file instanceof File)) throw new Error('Escolha a arte oficial na galeria do celular.');
-  const format = getBrandingUploadFormat(file, { jpg: true, png: true, webp: true });
+  const format = getBrandingUploadFormat(file, { jpg: true, jpeg: true, png: true, webp: true });
   if (file.size < 1 || file.size > 5 * 1024 * 1024) throw new Error('A imagem deve ter até 5 MB.');
   const path = user.id + '/branding/official-logo-' + crypto.randomUUID() + '.' + format.extension;
   const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, { contentType: format.contentType, cacheControl: '3600', upsert: false });
