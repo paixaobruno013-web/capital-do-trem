@@ -1583,6 +1583,8 @@ async function saveOfflineMusic(id,blob,title){
  const screen=document.getElementById('intro-smoke');
  if(intro&&screen){
   intro.src=opening;
+  intro.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';
+  intro.style.objectFit=branding.openingFit==='contain'?'contain':'cover';
   intro.closest('.intro-smoke__brand')?.classList.add('custom-opening-image');
   screen.classList.add('custom-opening-screen');
   const bar=document.getElementById('opening-live-progress');
@@ -1634,7 +1636,7 @@ async function saveOfflineMusic(id,blob,title){
     const brand=document.querySelector('.intro-smoke__brand');
     if(brand)brand.style.display='none';
     const video=document.createElement('video');
-    video.className='opening-video-background';video.src=openingVideo;video.autoplay=true;video.muted=true;video.playsInline=true;video.loop=true;video.preload='auto';video.setAttribute('aria-hidden','true');
+    video.className='opening-video-background';video.src=openingVideo;video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';video.autoplay=true;video.muted=true;video.playsInline=true;video.loop=true;video.preload='auto';video.setAttribute('aria-hidden','true');
     screen.insertBefore(video,screen.firstChild);screen.classList.add('custom-opening-screen');
     const bar=document.getElementById('opening-live-progress');
     const startedAt=performance.now();let progress=3,ready=document.readyState==='complete',videoReady=false,finished=false,finishQueued=false;
