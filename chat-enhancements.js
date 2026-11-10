@@ -12,7 +12,7 @@ style.textContent=`
 .chat-tools button{background:var(--panel);border:1px solid var(--line);color:var(--fg);padding:8px 12px;min-height:42px}
 .emoji-panel{display:none;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;padding:10px;margin:8px 0;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
 .emoji-panel.open{display:grid}
-.emoji-choice{font-size:23px!important;padding:7px!important;min-height:44px!important;background:var(--bg)!important;border:1px solid var(--line)!important}
+.emoji-choice{font-size:23px!important;padding:7px!important;min-height:44px!important;background:var(--bg)!important;border:1px solid var(--line)!important}.emoji-choice.cdt-singer{font-size:25px!important;grid-column:span 2;border-color:#ed1c2466!important;background:linear-gradient(135deg,#ed1c241c,#ff4da61a)!important}
 @keyframes cdt-fire{0%,100%{transform:translateY(2px) scale(.96)}50%{transform:translateY(-6px) scale(1.1)}}
 @keyframes cdt-train{0%{transform:translateX(-4px)}50%{transform:translateX(4px)}100%{transform:translateX(-4px)}}
 @keyframes cdt-sing{0%,100%{transform:rotate(-6deg) translateY(0)}50%{transform:rotate(6deg) translateY(-4px)}}
@@ -38,12 +38,14 @@ const emojiPanel=document.createElement('div');
 emojiPanel.className='emoji-panel';
 form.before(tools,emojiPanel);
 
-const emojis=['🎤','🚂','🔥','😂','🤣','👍','❤️','👏','💯','😍','🙌','😎','🎶','🚀','💥','🤝','💪','🥳','😢','🙏','👑','💃','🕺','🎧'];
-const animated={'🎤':'cdt-sing','🚂':'cdt-train','🔥':'cdt-fire','😂':'cdt-laugh','🤣':'cdt-laugh'};
+const emojis=['🎤','🎙️','🎶','🎵','🎼','🎧','💿','📀','🎚️','🎛️','🎹','🎸','🥁','🪘','🪇','🎷','🎺','🎻','🪕','🪗','🪩','🚂','🔥','😂','🤣','👍','❤️','👏','💯','😍','🙌','😎','🚀','💥','🤝','💪','🥳','😢','🙏','👑','💃','🕺','👨🏽‍🎤🧢🕶️','👨🏻‍🎤🧢🕶️','👨🏿‍🎤🧢🕶️','👱🏻‍♀️🩷🕶️🎤','👱🏼‍♀️🩷🕶️🎤','👩🏽‍🎤🩷🕶️','👩🏾‍🎤🩷🕶️'];
+const singerEmojis=new Set(['👨🏽‍🎤🧢🕶️','👨🏻‍🎤🧢🕶️','👨🏿‍🎤🧢🕶️','👱🏻‍♀️🩷🕶️🎤','👱🏼‍♀️🩷🕶️🎤','👩🏽‍🎤🩷🕶️','👩🏾‍🎤🩷🕶️']);
+const animated={'🎤':'cdt-sing','🎙️':'cdt-sing','🚂':'cdt-train','🔥':'cdt-fire','😂':'cdt-laugh','🤣':'cdt-laugh'};
 for(const symbol of emojis){
  const button=document.createElement('button');
- button.type='button';button.className='emoji-choice';button.textContent=symbol;
- button.setAttribute('aria-label','Inserir '+symbol);
+ button.type='button';button.className='emoji-choice'+(singerEmojis.has(symbol)?' cdt-singer':'');button.textContent=symbol;
+ button.setAttribute('aria-label',singerEmojis.has(symbol)?'Inserir personagem cantor ou cantora com microfone': 'Inserir '+symbol);
+ if(singerEmojis.has(symbol))button.title='Personagem musical';
  if(animated[symbol])button.classList.add(animated[symbol]);
  button.addEventListener('click',()=>{
   const start=input.selectionStart??input.value.length;
@@ -81,13 +83,19 @@ recordButton.addEventListener('click',async()=>{
   };
   recorder.onstop=()=>{
    window.clearTimeout(recordingLimit);
-   const actualType=String(recorder.mimeType||recordedChunks[0]?.type||'audio/webm').split(';')[0].toLowerCase();
+   const reportedType=String(recorder.mimeType||recordedChunks[0]?.type||'').split(';')[0].toLowerCase().trim();
+   const aliases={'audio/x-m4a':'audio/mp4','audio/m4a':'audio/mp4','audio/x-wav':'audio/wav','audio/wave':'audio/wav','audio/vnd.wave':'audio/wav','audio/mp3':'audio/mpeg','audio/x-mp3':'audio/mpeg'};
+   const actualType=aliases[reportedType]||reportedType;
    const formats={'audio/mp4':['m4a','audio/mp4'],'audio/webm':['webm','audio/webm'],'audio/ogg':['ogg','audio/ogg'],'audio/wav':['wav','audio/wav'],'audio/mpeg':['mp3','audio/mpeg'],'audio/aac':['aac','audio/aac']};
-   const [extension,canonicalType]=formats[actualType]||formats['audio/webm'];
-   const blob=new Blob(recordedChunks,{type:canonicalType});
+   const format=formats[actualType];
    try{
+    if(!recordedChunks.length)throw new Error('A gravação ficou vazia. Grave novamente.');
+    if(!format)throw new Error('O formato de gravação deste navegador não foi reconhecido. Escolha um arquivo de áudio pelo botão Foto/áudio.');
+    const [extension,canonicalType]=format;
+    const blob=new Blob(recordedChunks,{type:canonicalType});
     if(!blob.size)throw new Error('A gravação ficou vazia. Grave novamente.');
     const file=new File([blob],'audio-da-conversa.'+extension,{type:canonicalType});
+    if(typeof DataTransfer==='undefined')throw new Error('Este navegador não permite anexar a gravação automaticamente. Use Foto/áudio para escolher o arquivo gravado.');
     const transfer=new DataTransfer();transfer.items.add(file);attachmentInput.files=transfer.files;
     attachmentInput.dispatchEvent(new Event('change',{bubbles:true}));
     status.textContent='Áudio gravado e anexado. Confira e toque em Enviar.';
