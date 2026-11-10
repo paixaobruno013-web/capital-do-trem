@@ -257,7 +257,7 @@ async function loadBranding(){
  try{
   const branding=await auth.getPublicBranding();
   const url=branding.profileImageUrl||branding.openingImageUrl;
-  if(url)document.getElementById('branding-profile-preview').src=url;
+  if(url){document.getElementById('branding-profile-preview').src=url;const topPreview=document.getElementById('profile-only-preview');if(topPreview)topPreview.src=branding.profileImageUrl||url;}
   if(branding.openingImageUrl)document.getElementById('opening-image-preview').src=branding.openingImageUrl;
   if(branding.openingVideoUrl){const video=document.getElementById('opening-video-preview');video.src=branding.openingVideoUrl;video.style.display='block';document.getElementById('opening-video-status').textContent='Vídeo de abertura atualmente publicado.';}
   homeBgCurrentUrl=branding.homeBackgroundImageUrl||'';
