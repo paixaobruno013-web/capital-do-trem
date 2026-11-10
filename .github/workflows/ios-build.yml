@@ -59,6 +59,9 @@ jobs:
       - name: Criar projeto iOS Capacitor
         run: npx cap add ios
 
+      - name: Configurar permissões nativas de privacidade do iOS
+        run: python3 scripts/prepare-ios-info.py ios/App/App/Info.plist
+
       - name: Configurar Python para gerar os ícones
         uses: actions/setup-python@v5
         with:
@@ -101,10 +104,36 @@ jobs:
             ios/build/Build/Products/Debug-iphonesimulator/App.app \
             Capital-do-Trem-iOS-Simulator.zip
 
-      - name: Publicar artefato para testes técnicos
+      - name: Publicar artefato para testes técnicos do simulador
         uses: actions/upload-artifact@v4
         with:
           name: capital-do-trem-ios-simulator
           path: Capital-do-Trem-iOS-Simulator.zip
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Compilar aplicativo iOS para dispositivo (sem assinatura)
+        run: |
+          xcodebuild \\
+            -project ios/App/App.xcodeproj \\
+            -scheme App \\
+            -configuration Release \\
+            -sdk iphoneos \\
+            -destination 'generic/platform=iOS' \\
+            -derivedDataPath ios/device-build \\
+            CODE_SIGNING_ALLOWED=NO \\
+            build
+
+      - name: Empacotar aplicativo iOS para dispositivo
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent \\
+            ios/device-build/Build/Products/Release-iphoneos/App.app \\
+            Capital-do-Trem-iOS-Device-Unsigned.zip
+
+      - name: Publicar artefato iOS para dispositivo (sem assinatura)
+        uses: actions/upload-artifact@v4
+        with:
+          name: capital-do-trem-ios-device-unsigned
+          path: Capital-do-Trem-iOS-Device-Unsigned.zip
           if-no-files-found: error
           retention-days: 14
