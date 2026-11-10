@@ -1,14 +1,16 @@
 import { readFile } from 'node:fs/promises';
 
 const read = (path) => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [room, enhancements, emoji, privateChat, worker, stories, home] = await Promise.all([
+const [room, enhancements, emoji, privateChat, worker, stories, home, auth, adminMedia] = await Promise.all([
   read('bate-papo.html'),
   read('chat-enhancements.js'),
   read('emoji-picker.js'),
   read('mensagens.html'),
   read('sw.js'),
   read('stories-ui.js'),
-  read('index.html')
+  read('index.html'),
+  read('supabase/auth.js'),
+  read('admin-media.js')
 ]);
 
 const checks = [
@@ -26,7 +28,12 @@ const checks = [
   ['Stories da comunidade não criam uma faixa de perfis duplicados', !/id="community-story-tray"/.test(home) && !/community-story-chip/.test(stories)],
   ['Stories são vinculados à foto do perfil existente pelo ID do usuário', /dataset\.profileUserId=profile\.user_id/.test(home) && /community-profile-avatar\[data-profile-user-id\]/.test(stories)],
   ['foto do perfil abre os Stories com suporte a teclado', /avatar\.addEventListener\('click', open\)/.test(stories) && /avatar\.addEventListener\('keydown'/.test(stories)],
-  ['aro verde e aro de visto são aplicados na foto existente', /has-active-story/.test(stories) && /has-seen-story/.test(stories) && /\.community-profile-avatar\.has-active-story/.test(home)]
+  ['aro verde e aro de visto são aplicados na foto existente', /has-active-story/.test(stories) && /has-seen-story/.test(stories) && /\.community-profile-avatar\.has-active-story/.test(home)],
+
+  ['configurações públicas da abertura ignoram cache HTTP antigo', /rest\\/v1\\/site_settings/.test(auth) && /cache:\\s*'no-store'/.test(auth) && /Cache-Control/.test(auth)],
+  ['vídeo de abertura recebe identificador único e é recarregado', /cdt_opening/.test(home) && /randomUUID/.test(home) && /video\\.load\\(\\)/.test(home)],
+  ['publicação do vídeo confirma URL gravada e resposta de vídeo', /saved\\.openingVideoUrl!==url/.test(adminMedia) && /method:'HEAD',cache:'no-store'/.test(adminMedia) && /content-type/.test(adminMedia)]
+
 
 ];
 
