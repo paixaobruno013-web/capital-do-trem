@@ -22,6 +22,10 @@ O Capital do Trem é um projeto de comunidade e divulgação da cultura musical,
 
 O Capital do Trem foi definido para continuar gratuito: sem mensalidade, assinatura ou compras dentro do aplicativo. Enquanto não houver orçamento para a taxa única de cadastro da Google Play, a distribuição será pelo site/PWA gratuito: abra https://paixaobruno013-web.github.io/capital-do-trem/ no Chrome do Android e use **⋮ → Adicionar à tela inicial** (ou **Instalar aplicativo**, se aparecer). Isso instala um atalho da versão web; não é um APK publicado na loja.
 
+## Instalar gratuitamente no iPhone
+
+Abra https://paixaobruno013-web.github.io/capital-do-trem/ no Safari, toque em **Compartilhar → Adicionar à Tela de Início** e, se disponível, ative **Abrir como App da Web**. O ícone será criado naquele iPhone. Essa opção é gratuita, mas é a versão web instalável, não uma publicação na App Store. Para App Store/TestFlight nativo, a Apple exige assinatura Developer paga.
+
 ## Aplicativos Android e iOS
 
 A estrutura inicial para empacotar o site como aplicativo nativo foi adicionada com Capacitor 8. Consulte [MOBILE-APP.md](./MOBILE-APP.md) para requisitos, comandos de preparação e etapas de publicação.
