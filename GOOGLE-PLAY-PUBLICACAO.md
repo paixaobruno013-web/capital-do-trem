@@ -1,5 +1,17 @@
 # Publicação do Capital do Trem na Google Play
 
+# Modelo de distribuição definido: gratuito e sem investimento
+
+A decisão do projeto é manter o Capital do Trem gratuito para baixar e usar, sem mensalidade, assinatura ou compras dentro do aplicativo. Não contratar serviços pagos nem iniciar etapas que exijam pagamento sem autorização expressa do responsável.
+
+**Plano imediato sem custo de cadastro em loja:** manter a versão web/PWA publicada no GitHub Pages e orientar os usuários Android a abrir o site no Chrome e usar o menu **⋮ → Adicionar à tela inicial** (ou **Instalar aplicativo**, quando essa opção aparecer). Isso cria um atalho instalável, mas não é um APK/AAB distribuído pela Play Store.
+
+**Google Play:** fica como etapa futura, pausada enquanto a decisão for não gastar. A conta de desenvolvedor exige taxa única de cadastro (US$ 25, conforme a regra consultada); portanto, não é uma opção de custo zero. Não há cobrança por download de um app gratuito, mas o cadastro inicial continua sendo pago.
+
+**Regra de produto:** não adicionar paywall, assinatura, plano premium ou cobrança para ouvir, curtir, comentar, baixar músicas, conversar ou acessar eventos. Qualquer futura fonte de apoio/patrocínio deverá ser opcional e não bloquear as funções comunitárias.
+
+---
+
 Atualizado em 10/11/2026. Este documento separa o que já existe no repositório do que ainda precisa ser comprovado antes do lançamento.
 
 ## Situação técnica verificada no repositório
