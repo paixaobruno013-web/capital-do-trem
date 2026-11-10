@@ -37,9 +37,9 @@
       ]
     },
     {
-      "name": "Koe Fala Tu",
-      "short_name": "Koe Fala Tu",
-      "description": "Abra o Koe Fala Tu, bate-papo da comunidade.",
+      "name": "Capital do Trem",
+      "short_name": "Capital do Trem",
+      "description": "Abra o Capital do Trem e participe do Fala Trem, bate-papo da comunidade.",
       "url": "./bate-papo.html",
       "icons": [
         {
