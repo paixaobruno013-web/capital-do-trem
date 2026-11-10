@@ -837,13 +837,16 @@ export async function getPublicBranding() {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('site_settings')
     .select('setting_key, setting_value')
-    .in('setting_key', ['official_profile_image_url', 'app_opening_image_url', 'app_opening_video_url', 'app_home_background_image_url', 'app_home_background_x', 'app_home_background_y', 'app_home_background_blur', 'app_home_background_fit', 'app_header_background_image_url', 'app_header_background_x', 'app_header_background_y', 'app_header_background_blur', 'app_header_background_fit']);
+    .in('setting_key', ['official_profile_image_url', 'app_opening_image_url', 'app_opening_video_url', 'app_opening_x', 'app_opening_y', 'app_opening_fit', 'app_home_background_image_url', 'app_home_background_x', 'app_home_background_y', 'app_home_background_blur', 'app_home_background_fit', 'app_header_background_image_url', 'app_header_background_x', 'app_header_background_y', 'app_header_background_blur', 'app_header_background_fit']);
   if (error) throw error;
   const settings = Object.fromEntries((data || []).map(row => [row.setting_key, row.setting_value]));
   return {
     profileImageUrl: settings.official_profile_image_url || '',
     openingImageUrl: settings.app_opening_image_url || '',
     openingVideoUrl: settings.app_opening_video_url || '',
+    openingX: Number(settings.app_opening_x ?? 50),
+    openingY: Number(settings.app_opening_y ?? 50),
+    openingFit: settings.app_opening_fit === 'contain' ? 'contain' : 'cover',
     homeBackgroundImageUrl: settings.app_home_background_image_url || '',
     homeBackgroundX: Number(settings.app_home_background_x ?? 50),
     homeBackgroundY: Number(settings.app_home_background_y ?? 50),
@@ -884,7 +887,7 @@ export async function saveAdminBrandingPair(file) {
 
 
 /* Atualiza somente a arte da abertura, preservando a foto oficial do perfil. */
-export async function saveAdminOpeningImage(file) {
+export async function saveAdminOpeningImage(file, options = {}) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
@@ -900,17 +903,37 @@ export async function saveAdminOpeningImage(file) {
   if (!publicData?.publicUrl) throw new Error('Não foi possível gerar o endereço público da abertura.');
   const { error: saveError } = await supabase.from('site_settings').upsert([
     { setting_key: 'app_opening_image_url', setting_value: publicData.publicUrl, updated_at: new Date().toISOString() },
-    { setting_key: 'app_opening_video_url', setting_value: '', updated_at: new Date().toISOString() }
+    { setting_key: 'app_opening_video_url', setting_value: '', updated_at: new Date().toISOString() },
+    { setting_key: 'app_opening_x', setting_value: String(Math.max(0, Math.min(100, Number(options.x ?? 50)))), updated_at: new Date().toISOString() },
+    { setting_key: 'app_opening_y', setting_value: String(Math.max(0, Math.min(100, Number(options.y ?? 50)))), updated_at: new Date().toISOString() },
+    { setting_key: 'app_opening_fit', setting_value: options.fit === 'contain' ? 'contain' : 'cover', updated_at: new Date().toISOString() }
   ], { onConflict: 'setting_key' });
   if (saveError) throw saveError;
   return publicData.publicUrl;
+}
+
+/* Salva somente o enquadramento da mídia atual da abertura, sem novo upload. */
+export async function saveAdminOpeningMediaSettings(options = {}) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode ajustar a abertura.');
+  const now = new Date().toISOString();
+  const rows = [
+    { setting_key: 'app_opening_x', setting_value: String(Math.max(0, Math.min(100, Number(options.x ?? 50)))), updated_at: now },
+    { setting_key: 'app_opening_y', setting_value: String(Math.max(0, Math.min(100, Number(options.y ?? 50)))), updated_at: now },
+    { setting_key: 'app_opening_fit', setting_value: options.fit === 'contain' ? 'contain' : 'cover', updated_at: now }
+  ];
+  const { error } = await supabase.from('site_settings').upsert(rows, { onConflict: 'setting_key' });
+  if (error) throw error;
+  return true;
 }
 
 /* Imagem de fundo do painel central, com enquadramento e desfoque ajustáveis. */
 
 
 /* Permite ao administrador substituir a abertura por vídeo MP4 ou WebM. */
-export async function saveAdminOpeningVideo(file) {
+export async function saveAdminOpeningVideo(file, options = {}) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
@@ -926,7 +949,10 @@ export async function saveAdminOpeningVideo(file) {
   const now = new Date().toISOString();
   const { error: saveError } = await supabase.from('site_settings').upsert([
     { setting_key: 'app_opening_video_url', setting_value: publicData.publicUrl, updated_at: now },
-    { setting_key: 'app_opening_image_url', setting_value: '', updated_at: now }
+    { setting_key: 'app_opening_image_url', setting_value: '', updated_at: now },
+    { setting_key: 'app_opening_x', setting_value: String(Math.max(0, Math.min(100, Number(options.x ?? 50)))), updated_at: now },
+    { setting_key: 'app_opening_y', setting_value: String(Math.max(0, Math.min(100, Number(options.y ?? 50)))), updated_at: now },
+    { setting_key: 'app_opening_fit', setting_value: options.fit === 'contain' ? 'contain' : 'cover', updated_at: now }
   ], { onConflict: 'setting_key' });
   if (saveError) throw saveError;
   return publicData.publicUrl;
@@ -1041,7 +1067,7 @@ export async function removeAdminBrandingAsset(kind) {
   const now = new Date().toISOString();
   const keysByKind = {
     profile: ['official_profile_image_url'],
-    opening: ['app_opening_image_url', 'app_opening_video_url'],
+    opening: ['app_opening_image_url', 'app_opening_video_url', 'app_opening_x', 'app_opening_y', 'app_opening_fit'],
     header: ['app_header_background_image_url', 'app_header_background_x', 'app_header_background_y', 'app_header_background_blur', 'app_header_background_fit'],
     home: ['app_home_background_image_url', 'app_home_background_x', 'app_home_background_y', 'app_home_background_blur', 'app_home_background_fit'],
     pair: ['official_profile_image_url', 'app_opening_image_url', 'app_opening_video_url']
@@ -1050,7 +1076,9 @@ export async function removeAdminBrandingAsset(kind) {
   if (!keys) throw new Error('Área de imagem inválida.');
   const rows = keys.map(setting_key => ({
     setting_key,
-    setting_value: (kind === 'home' && setting_key === 'app_home_background_fit') || (kind === 'header' && setting_key === 'app_header_background_fit') ? 'cover'
+    setting_value: (kind === 'opening' && setting_key === 'app_opening_fit') ? 'cover'
+      : (kind === 'opening' && (setting_key === 'app_opening_x' || setting_key === 'app_opening_y')) ? '50'
+      : (kind === 'home' && setting_key === 'app_home_background_fit') || (kind === 'header' && setting_key === 'app_header_background_fit') ? 'cover'
       : (kind === 'home' && setting_key === 'app_home_background_blur') || (kind === 'header' && setting_key === 'app_header_background_blur') ? '0'
       : (kind === 'home' && (setting_key === 'app_home_background_x' || setting_key === 'app_home_background_y')) || (kind === 'header' && (setting_key === 'app_header_background_x' || setting_key === 'app_header_background_y')) ? '50'
       : '',
