@@ -24,6 +24,30 @@ Atualizado em 10/11/2026. Este documento separa o que já existe no repositório
 - O ícone web atual é `marca.svg`. Isso não substitui os ícones PNG e os recursos gráficos exigidos para a ficha da loja e para o pacote Android.
 - O site público é https://paixaobruno013-web.github.io/capital-do-trem/
 
+## Distribuição gratuita para iPhone (sem App Store)
+
+Enquanto o projeto não tiver orçamento para a assinatura Apple Developer, a opção gratuita é distribuir a versão web instalável (PWA) pelo link público:
+
+https://paixaobruno013-web.github.io/capital-do-trem/
+
+No iPhone, a pessoa deve:
+1. Abrir o link no Safari.
+2. Tocar em Compartilhar.
+3. Escolher **Adicionar à Tela de Início**.
+4. Se aparecer a opção, ativar **Abrir como App da Web** e tocar em Adicionar.
+
+O ícone fica na tela inicial e abre o site em uma janela própria. A instalação é feita em cada iPhone pelo próprio usuário; compartilhar o link não instala automaticamente o app.
+
+**Limites importantes:** isso não coloca o Capital do Trem na App Store e não gera um IPA nativo. Algumas funções de um app nativo podem ter diferenças no navegador/PWA e precisam ser testadas em iPhone real.
+
+## App Store e TestFlight (etapa futura, paga)
+
+A distribuição de um app nativo pela App Store ou pelo TestFlight exige participação no Apple Developer Program, atualmente US$ 99 por ano (ou valor local exibido pela Apple). Uma conta Apple gratuita permite estudar e testar em dispositivos próprios com Xcode, mas não substitui a associação paga para distribuição pública/TestFlight.
+
+Fontes oficiais:
+- Apple Developer Program e valores: https://developer.apple.com/programs/
+- Adicionar um site à tela inicial do iPhone: https://support.apple.com/en-mide/guide/iphone/iph42ab2f3a7/27/ios/27
+
 ## Bloqueios antes de enviar à Play Store
 
 - [ ] Gerar o projeto Android nativo e confirmar que compila em ambiente limpo.
