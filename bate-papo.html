@@ -51,6 +51,7 @@ img,video,audio{max-width:100%;}
 audio{width:100%;}
 :focus-visible{outline:2px solid var(--red);outline-offset:3px;}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}}
+.cdt-chat-sticker{display:inline-block;width:min(150px,42vw);height:auto;max-height:170px;object-fit:contain;vertical-align:middle;margin:4px 5px;filter:drop-shadow(0 3px 8px #ed1c2455)}
 </style></head><body>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
 <header><img src="./marca.svg" alt="Capital do Trem"><div class="chat-brand"><span class="chat-live-dot" aria-hidden="true"></span><span>Koe Fala Tu</span><small>O ponto de encontro da comunidade</small></div><h1>Koe Fala Tu da quebrada</h1><p class="muted">Artistas e Usuários Uai, juntos na mesma conversa.</p><div class="actions"><a class="btn alt" href="./index.html">Início</a><a class="btn alt" href="./conta.html">Minha conta</a><a class="btn alt" href="./avatar.html">Meu avatar</a><a class="btn" href="./mensagens.html">✉️ Minhas conversas</a><button class="alt" id="theme" type="button">☀️ Claro</button></div></header>
@@ -82,8 +83,12 @@ function addMessage(m){
  identity.append(name,time);head.append(avatar,identity);
  const body=document.createElement('div');
  const animatedTokens={'🔥':'cdt-fire','🚂':'cdt-train','🎤':'cdt-sing','😂':'cdt-laugh','🤣':'cdt-laugh'};
- const parts=String(m.content||'').split(/(🔥|🚂|🎤|😂|🤣)/u);
- for(const part of parts){if(animatedTokens[part]){const emoji=document.createElement('span');emoji.className=animatedTokens[part];emoji.textContent=part;body.append(emoji);}else body.append(document.createTextNode(part));}
+ const parts=String(m.content||'').split(/(\\[CDT_(?:MASCULINO|FEMININA)\\]|🔥|🚂|🎤|😂|🤣)/u);
+ for(const part of parts){
+  if(part==='[CDT_MASCULINO]'||part==='[CDT_FEMININA]'){const sticker=document.createElement('img');sticker.className='cdt-chat-sticker';sticker.src=part==='[CDT_MASCULINO]'?'./assets/sticker-cdt-masculino.svg':'./assets/sticker-cdt-feminina.svg';sticker.alt=part==='[CDT_MASCULINO]'?'Figurinha Capital do Trem: cantor de boné, Juliet prata e microfone':'Figurinha Capital do Trem: cantora com mechas coloridas, Juliet branco e microfone';sticker.loading='lazy';body.append(sticker);}
+  else if(animatedTokens[part]){const emoji=document.createElement('span');emoji.className=animatedTokens[part];emoji.textContent=part;body.append(emoji);}
+  else body.append(document.createTextNode(part));
+ }
  box.append(head,body);
  if(m.attachment_url&&typeof m.attachment_url==='string'&&m.attachment_url.startsWith('https://')){
   const media=document.createElement('div');media.className='message-attachment';
