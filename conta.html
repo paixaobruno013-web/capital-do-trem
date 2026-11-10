@@ -111,6 +111,20 @@ audio{width:100%;}
 </div>
 <a id="admin-image-area-link" class="btn" href="./admin.html#header-background-section" hidden style="display:block;text-align:center;margin:14px 0;padding:14px 18px;border:1px solid rgba(237,28,36,.65);border-radius:12px;background:linear-gradient(110deg,#ed1c24,#9e1018);color:#fff;text-decoration:none;font-weight:900;box-shadow:0 0 14px rgba(237,28,36,.35)">🖼️ Área de alterações de imagens</a>
 <p class="muted">Sua sessão está ativa. Aqui você administra sua participação no Capital do Trem.</p>
+<section class="card" id="my-stories-panel" aria-labelledby="my-stories-title">
+<h3 id="my-stories-title">🟢 Meus Stories</h3>
+<div id="my-story-avatar" aria-label="Sua foto de perfil com Stories ativos">U</div>
+<p class="muted">Publique fotos, vídeos e mensagens na sua conta. Seus Stories ficam visíveis para a comunidade por 24 horas. Você pode excluir qualquer publicação sua.</p>
+<form id="my-story-form">
+<label for="my-story-file">Foto ou vídeo (JPG, PNG, WebP ou MP4/WebM)</label>
+<input id="my-story-file" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" required>
+<label for="my-story-caption">Escreva uma mensagem (opcional)</label>
+<textarea id="my-story-caption" maxlength="280" rows="2" placeholder="Compartilhe uma novidade com a comunidade..."></textarea>
+<button id="my-story-publish" type="submit">🟢 Publicar no meu Story</button>
+<p id="my-story-status" class="status" role="status" aria-live="polite"></p>
+</form>
+<h4>Minhas publicações</h4><div id="my-story-list" class="muted" aria-live="polite">Seus Stories aparecerão aqui.</div>
+</section>
 <div class="notice" style="display:flex;align-items:center;gap:12px;margin:14px 0">
  <strong id="profile-install-count" style="font-size:30px;color:var(--red);line-height:1">—</strong>
  <span><strong>instalações registradas</strong><br><small class="muted">Pessoas que já abriram o Capital do Trem neste aparelho.</small></span>
@@ -720,6 +734,7 @@ signOutButton.addEventListener('click',async()=>{
 });
 
 </script>
+<script type="module" src="./account-stories.js"></script>
 <script src="./update.js" defer></script>
 </body>
 </html>
