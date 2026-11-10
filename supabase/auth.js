@@ -880,6 +880,29 @@ export async function blockPrivateUser(otherUserId) {
 }
 
 
+// Denúncias e ações de moderação protegidas por funções do banco.
+export async function reportChatParticipant(targetUserId,reason,details='') {
+ const supabase=initSupabase();
+ const {data,error}=await supabase.rpc('report_chat_participant',{p_target_user_id:targetUserId,p_reason:reason,p_details:details});
+ if(error)throw error;
+ return data;
+}
+export async function moderateChatParticipant(targetUserId,action,reason='') {
+ const supabase=initSupabase();
+ const {data,error}=await supabase.rpc('moderate_chat_participant',{p_target_user_id:targetUserId,p_action:action,p_reason:reason});
+ if(error)throw error;
+ return data;
+}
+export async function getChatModerationReports(limit=100) {
+ const supabase=initSupabase();
+ if(!(await isCurrentUserAdmin()))throw new Error('Acesso administrativo não autorizado.');
+ const {data,error}=await supabase.from('chat_moderation_reports')
+  .select('id,reporter_id,target_user_id,reason,details,status,created_at')
+  .order('created_at',{ascending:false}).limit(Math.min(Math.max(Number(limit)||100,1),200));
+ if(error)throw error;
+ return data||[];
+}
+
 // Identidade visual oficial do aplicativo: leitura pública e gravação exclusiva de administradores.
 export async function getPublicBranding() {
   const supabase = initSupabase();
