@@ -291,7 +291,7 @@ function paintHeaderBgPreview(){
 }
 headerBgFile.addEventListener('change',()=>{
  const file=headerBgFile.files?.[0];if(!file)return;
- const ext=(file.name.split('.').pop()||'').toLowerCase();const validType=['image/jpeg','image/png','image/webp'].includes(file.type)||(['jpg','jpeg','png','webp'].includes(ext)&&(!file.type||file.type==='application/octet-stream'||file.type==='image/jpg'));if(!validType||file.size<1||file.size>8*1024*1024){headerBgStatus.textContent='Escolha JPG, PNG ou WebP de até 8 MB.';headerBgFile.value='';return;}
+ const ext=(file.name.split('.').pop()||'').toLowerCase();const validType=['image/jpeg','image/png','image/webp'].includes(file.type)||['jpg','jpeg','png','webp'].includes(ext);if(!validType||file.size<1||file.size>8*1024*1024){headerBgStatus.textContent='Escolha JPG, PNG ou WebP de até 8 MB.';headerBgFile.value='';return;}
  headerBgPreview.src=URL.createObjectURL(file);headerBgStatus.textContent='Prévia pronta. Ajuste a posição e a nitidez antes de salvar.';paintHeaderBgPreview();
 });
 [headerBgX,headerBgY,headerBgBlur,headerBgFit].forEach(control=>control.addEventListener('input',paintHeaderBgPreview));
@@ -344,7 +344,7 @@ document.getElementById('opening-media-save-settings').addEventListener('click',
 });
 openingVideoFile.addEventListener('change',()=>{
  const file=openingVideoFile.files?.[0];if(!file)return;
- const ext=(file.name.split('.').pop()||'').toLowerCase();const validType=['video/mp4','video/webm'].includes(file.type)||(['mp4','webm'].includes(ext)&&(!file.type||file.type==='application/octet-stream'));if(!validType||file.size<1||file.size>50*1024*1024){openingVideoStatus.textContent='Escolha um arquivo MP4 ou WebM válido de até 50 MB.';openingVideoFile.value='';return;}
+ const ext=(file.name.split('.').pop()||'').toLowerCase();const validType=['video/mp4','video/webm'].includes(file.type)||['mp4','webm'].includes(ext);if(!validType||file.size<1||file.size>50*1024*1024){openingVideoStatus.textContent='Escolha um arquivo MP4 ou WebM válido de até 50 MB.';openingVideoFile.value='';return;}
  openingVideoPreview.src=URL.createObjectURL(file);openingVideoPreview.style.display='block';document.getElementById('opening-media-frame-preview').src='./marca.svg';paintOpeningMediaPreview();openingVideoStatus.textContent='Prévia pronta. Ajuste o enquadramento e toque em usar este vídeo.';
 });
 openingVideoSave.addEventListener('click',async()=>{
