@@ -754,7 +754,7 @@ html.auth-check-pending body{visibility:hidden}
 /* Abertura: duração total de 7s; locomotiva à frente puxando os vagões por 5s. */
 .intro-smoke.custom-opening-screen{animation:none!important;opacity:1!important}
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train{
-  animation:opening-train-cross-sky 5s linear 1 both!important;
+  animation:opening-train-cross-sky 9.5s linear 1 both!important;
 }
 @keyframes opening-train-cross-sky{
   from{left:-190px}
@@ -766,6 +766,8 @@ html.auth-check-pending body{visibility:hidden}
 .reference-banner.has-custom-background{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(110deg,rgba(0,0,0,.76),rgba(0,0,0,.48) 58%,rgba(0,0,0,.68))!important}
 .reference-banner.has-custom-background::before{content:"";position:absolute;z-index:0;inset:0;border-radius:inherit;background-image:linear-gradient(110deg,rgba(0,0,0,.38),rgba(0,0,0,.22)),var(--home-bg-image);background-size:var(--home-bg-fit,cover);background-position:var(--home-bg-position,50% 50%);background-repeat:no-repeat;filter:blur(var(--home-bg-blur,0px));transform:scale(1.04);pointer-events:none}
 .reference-banner.has-custom-background>*{position:relative;z-index:1}
+
+.opening-video-background{position:absolute;z-index:1;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;background:#000}
 </style></head>
 <body>
 <script>
@@ -1571,7 +1573,7 @@ async function saveOfflineMusic(id,blob,title){
   auth.initSupabase();
   const branding=await auth.getPublicBranding();
   const safeUrl=value=>typeof value==='string'&&value.startsWith('https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/')?value:'';
-  const profile=safeUrl(branding.profileImageUrl),opening=safeUrl(branding.openingImageUrl);
+  const profile=safeUrl(branding.profileImageUrl),opening=safeUrl(branding.openingImageUrl),openingVideo=safeUrl(branding.openingVideoUrl);
   if(profile){const logo=document.getElementById('site-logo');if(logo)logo.src=profile;}
   if(opening){
  const intro=document.querySelector('.intro-smoke__brand img');
@@ -1613,6 +1615,30 @@ async function saveOfflineMusic(id,blob,title){
    homeBanner.style.setProperty('--home-bg-blur',Math.max(0,Math.min(12,Number(branding.homeBackgroundBlur??0)))+'px');
    homeBanner.style.setProperty('--home-bg-fit',branding.homeBackgroundFit==='contain'?'contain':'cover');
    homeBanner.classList.add('has-custom-background');
+  }
+   if(openingVideo){
+   const screen=document.getElementById('intro-smoke');
+   if(screen){
+    const brand=document.querySelector('.intro-smoke__brand');
+    if(brand)brand.style.display='none';
+    const video=document.createElement('video');
+    video.className='opening-video-background';video.src=openingVideo;video.autoplay=true;video.muted=true;video.playsInline=true;video.loop=true;video.preload='auto';video.setAttribute('aria-hidden','true');
+    screen.insertBefore(video,screen.firstChild);screen.classList.add('custom-opening-screen');
+    const bar=document.getElementById('opening-live-progress');
+    const startedAt=performance.now();let progress=3,ready=document.readyState==='complete',videoReady=false,finished=false,finishQueued=false;
+    const paint=()=>{if(bar)bar.style.width=progress+'%';};
+    const finish=()=>{
+     if(finished||finishQueued||!ready||!videoReady)return;
+     const remaining=Math.max(0,9500-(performance.now()-startedAt));finishQueued=true;
+     setTimeout(()=>{if(finished)return;finished=true;progress=100;paint();screen.classList.add('is-finished');setTimeout(()=>screen.remove(),600);},remaining);
+    };
+    const loader=setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}finish();if(finished)clearInterval(loader);},220);
+    video.addEventListener('loadeddata',()=>{videoReady=true;video.play().catch(()=>{});finish();},{once:true});
+    video.addEventListener('error',()=>{videoReady=true;finish();},{once:true});
+    if(video.readyState>=2)videoReady=true;
+    if(ready)finish();else window.addEventListener('load',()=>{ready=true;finish();},{once:true});
+    video.play().catch(()=>{});
+   }
   }
  }catch(error){console.warn('Identidade visual padrão mantida.',error);}
 })();
