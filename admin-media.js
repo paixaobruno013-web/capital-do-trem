@@ -20,7 +20,7 @@ async function upload(inputId,buttonId,statusId,fn,success,label,maxBytes){
  busy(button,true);
  say(statusId,'Enviando arquivo… aguarde a confirmação.');
  try{
-  auth.initSupabase();
+  await auth.initSupabase();
   const url=await fn(file);
   say(statusId,success);
   input.value='';
@@ -52,12 +52,20 @@ el('header-background-save-direct')?.addEventListener('click',async()=>{
 });
 
 const volumeInput=el('opening-video-volume');
+const audioMode=el('opening-video-audio-mode');
+const videoPreview=el('opening-video-preview-direct');
+function syncVideoPreviewAudio(){
+ if(videoPreview){videoPreview.muted=audioMode?.value!=='sound';videoPreview.volume=Math.max(0,Math.min(1,Number(volumeInput?.value??70)/100));}
+ if(volumeValue&&volumeInput)volumeValue.textContent=volumeInput.value+'%';
+}
 const volumeValue=el('opening-video-volume-value');
-volumeInput?.addEventListener('input',()=>{if(volumeValue)volumeValue.textContent=volumeInput.value+'%';});
+volumeInput?.addEventListener('input',syncVideoPreviewAudio);
+audioMode?.addEventListener('change',syncVideoPreviewAudio);
 auth.getPublicBranding().then(branding=>{
  const mode=el('opening-video-audio-mode');
  if(mode)mode.value=branding.openingVideoMuted?'muted':'sound';
- if(volumeInput){volumeInput.value=String(Math.round((branding.openingVideoVolume??0.7)*100));if(volumeValue)volumeValue.textContent=volumeInput.value+'%';}
+ if(volumeInput)volumeInput.value=String(Math.round((branding.openingVideoVolume??0.7)*100));
+ syncVideoPreviewAudio();
 }).catch(()=>{});
 el('opening-video-audio-save')?.addEventListener('click',async()=>{
  const button=el('opening-video-audio-save');
