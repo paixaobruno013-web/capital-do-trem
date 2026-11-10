@@ -105,6 +105,24 @@ body.light .messages{background:linear-gradient(180deg,#fff8f8,#f4f4f4)}
  .person,.conversation{min-height:64px}
 }
 @media(prefers-reduced-motion:reduce){.person,.conversation{transition:none}}
+
+#private-emoji-toggle{flex:0 0 44px;min-width:44px;border-radius:50%;padding:6px;font-size:21px}
+#compose .emoji-picker{display:none;width:100%;flex:0 0 100%;order:-1;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+#compose .emoji-picker.is-open{display:block}
+#compose.emoji-open{display:flex;flex-wrap:wrap}
+#compose.emoji-open #emoji-tray{display:block;max-height:min(48vh,390px);overflow:auto}
+#compose.emoji-open #message,#compose.emoji-open #send,#compose.emoji-open #private-emoji-toggle{display:none}
+#compose .emoji-close{min-height:30px;padding:4px 9px;border:1px solid var(--line);border-radius:999px;background:var(--panel2);color:var(--fg);font-size:11px;font-weight:700}
+#compose .emoji-picker-heading{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+#compose .emoji-picker-heading>span{margin-right:auto}
+#compose .emoji-recent-strip{display:flex;gap:5px;overflow-x:auto;padding:2px 2px 7px;touch-action:pan-x;-webkit-overflow-scrolling:touch}
+#compose .emoji-recent-strip .emoji-choice{flex:0 0 39px;min-width:39px;min-height:39px;font-size:22px}
+#compose .emoji-full-panel{margin-top:7px;padding:7px;border:1px solid var(--line);border-radius:12px;background:var(--panel2)}
+#compose .emoji-category-tabs{display:flex;gap:6px;overflow-x:auto;padding:1px 1px 8px;touch-action:pan-x}
+#compose .emoji-category-tabs button{flex:0 0 auto;min-height:32px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--fg);font-size:11px}
+#compose .emoji-category-tabs button[aria-pressed=true]{border-color:var(--red);color:var(--red)}
+#compose .emoji-category-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;max-height:190px;overflow-y:auto}
+#compose .emoji-category-grid .emoji-choice{width:100%;min-height:36px;padding:3px;border:0;background:transparent;color:var(--fg);font-size:22px}
 </style></head>
 <body><a class="skip" href="#main">Pular para o conteúdo</a>
 <header><img src="./marca.svg" alt="Capital do Trem"><h1>Minhas conversas</h1><p class="muted">Conversas individuais com convite e aceite antes de começar.</p><div class="actions"><a class="btn" href="./index.html">Início</a><a class="btn" href="./bate-papo.html">Fala Trem • Geral</a><a class="btn" href="./conta.html">Minha conta</a><button id="theme" type="button">☀️ Claro</button></div></header>
@@ -118,7 +136,7 @@ body.light .messages{background:linear-gradient(180deg,#fff8f8,#f4f4f4)}
 <div class="security-seal" role="note">
   <div class="security-seal-title"><span aria-hidden="true">🔒</span><span>Conexão criptografada</span><small>HTTPS</small></div>
   <p>Seus dados são protegidos durante a transmissão por HTTPS. Esta versão ainda não oferece criptografia ponta a ponta.</p>
-</div><div id="messages" class="messages" aria-live="polite"><p class="empty">Suas mensagens aparecerão aqui.</p></div><form id="compose" class="compose" hidden><div id="emoji-tray" data-emoji-picker data-input="#message"></div><input id="message" maxlength="2000" autocomplete="off" placeholder="Escreva sua mensagem…" aria-label="Mensagem privada"><button class="primary" id="send" type="submit">Enviar</button></form><p class="status" id="status" role="status" aria-live="polite"></p></section>
+</div><div id="messages" class="messages" aria-live="polite"><p class="empty">Suas mensagens aparecerão aqui.</p></div><form id="compose" class="compose" hidden><div id="emoji-tray" data-emoji-picker data-input="#message"></div><button id="private-emoji-toggle" type="button" aria-label="Abrir emojis" aria-expanded="false">😊</button><input id="message" maxlength="2000" autocomplete="off" placeholder="Escreva sua mensagem…" aria-label="Mensagem privada"><button class="primary" id="send" type="submit">Enviar</button></form><p class="status" id="status" role="status" aria-live="polite"></p></section>
 </div>
 <section class="panel"><h2>Privacidade e respeito</h2><p class="muted">Só participantes de uma conversa aceita conseguem ler as mensagens. Você pode bloquear uma pessoa; ela não poderá iniciar novas conversas com você nem enviar mensagens privadas enquanto o bloqueio estiver ativo. Não compartilhe senhas, códigos ou dados bancários.</p></section>
 </div>
@@ -224,6 +242,15 @@ $('search').addEventListener('input',drawPeople);$('conversation-search').addEve
 $('compose').addEventListener('submit',async e=>{e.preventDefault();if(!active&&!activeGroup)return;const value=$('message').value.trim();if(!value)return;$('send').disabled=true;try{if(activeGroup){const sent=await sendChatMessage(value);drawGroupMessage(sent);}else{const sent=await sendPrivateMessage(active.id,value);drawMessage(sent);}$('message').value='';$('status').textContent='Mensagem enviada.';}catch(err){$('status').textContent=err.message||'Não foi possível enviar.';}finally{$('send').disabled=false;}});
 $('back-to-list').addEventListener('click',()=>{$('private-layout').classList.remove('chat-open');});
 $('block').addEventListener('click',async()=>{if(!active)return;const id=partner(active);if(!confirm('Bloquear '+personName(id)+'? A pessoa não poderá iniciar novas conversas nem enviar mensagens privadas.'))return;try{await blockPrivateUser(id);clearSubscription();active=null;$('compose').hidden=true;$('block').hidden=true;$('private-layout').classList.remove('chat-open');$('chat-title').textContent='Conversa bloqueada';$('messages').replaceChildren(node('p','empty','Você bloqueou esta pessoa.'));$('status').textContent='Bloqueio aplicado.';await refresh();}catch(e){$('status').textContent=e.message||'Não foi possível bloquear.';}});
+const privateEmojiButton=$('private-emoji-toggle'),privateEmojiTray=$('emoji-tray');
+privateEmojiButton?.addEventListener('click',()=>{
+ const open=!privateEmojiTray.classList.contains('is-open');
+ privateEmojiTray.classList.toggle('is-open',open);
+ $('compose').classList.toggle('emoji-open',open);
+ privateEmojiButton.setAttribute('aria-expanded',String(open));
+ privateEmojiButton.textContent=open?'✕':'😊';
+ if(!open)$('message').focus();
+});
 const theme=$('theme');try{if(localStorage.getItem('capitaldotrem_theme_v1')==='light')document.body.classList.add('light');}catch{}function updateTheme(){const light=document.body.classList.contains('light');theme.textContent=light?'🌙 Escuro':'☀️ Claro';document.querySelector('meta[name="theme-color"]').content=light?'#f5f5f5':'#050505';}updateTheme();theme.addEventListener('click',()=>{document.body.classList.toggle('light');try{localStorage.setItem('capitaldotrem_theme_v1',document.body.classList.contains('light')?'light':'dark');}catch{}updateTheme();});
 (async()=>{try{const session=await getCurrentSession();if(!session){$('gate').textContent='Entre ou crie sua conta para usar as conversas privadas.';const link=node('a','btn','Entrar / Criar conta');link.href='./conta.html';$('gate').append(document.createTextNode(' '),link);return;}$('gate').hidden=true;$('app').hidden=false;try{const branding=await getPublicBranding();if(branding.profileImageUrl&&branding.profileImageUrl.startsWith('https://'))groupLogo=branding.profileImageUrl;}catch(error){}await refresh();await openGroupConversation();}catch(e){$('gate').textContent=e.message||'Não foi possível conectar às conversas privadas.';}})();
 window.setInterval(async()=>{
