@@ -175,8 +175,8 @@ async function openGroupConversation(){
  $('block').hidden=true;$('compose').hidden=false;$('message').maxLength=1000;$('message').placeholder='Mensagem para todo o grupo…';
  $('messages').replaceChildren(node('p','empty','Carregando conversa do grupo…'));drawConversations();
  try{
-  const rows=await getChatMessages(80);$('messages').replaceChildren();rows.forEach(drawGroupMessage);
   unsubscribe=subscribeChatMessages(m=>drawGroupMessage(m),s=>{if(s==='CHANNEL_ERROR'||s==='TIMED_OUT')$('status').textContent='Conexão do grupo instável. Atualize para reconectar.';});
+  const rows=await getChatMessages(80);$('messages').replaceChildren();rows.forEach(drawGroupMessage);
  }catch(e){$('messages').replaceChildren(node('p','empty',e.message||'Não foi possível carregar o grupo.'));}
 }
 async function openConversation(c){
