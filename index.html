@@ -353,7 +353,7 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
 @media(max-width:759px){.card,.item,.home-shortcuts button,.home-shortcuts a,header,nav#nav{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}}
 
 /* Abertura com arte integral: preservar todos os pixels e não sobrepor textos. */
-.intro-smoke.custom-opening-screen{background:#000}
+.intro-smoke.custom-opening-screen{background:#000;animation:none!important;opacity:1!important;visibility:visible!important}\n.intro-smoke.custom-opening-screen .intro-smoke__brand.custom-opening-image{opacity:1!important;animation:none!important}
 .intro-smoke.custom-opening-screen .intro-smoke__cloud,
 .intro-smoke.custom-opening-screen .intro-smoke__signature{display:none!important}
 .intro-smoke__brand.custom-opening-image{position:absolute;inset:0;width:100%;height:100%;max-width:none;justify-content:center;gap:0}
@@ -1588,7 +1588,7 @@ async function saveOfflineMusic(id,blob,title){
   const paint=()=>{if(bar)bar.style.width=progress+'%';};
   const finish=()=>{
    if(finished||finishQueued||!ready||!imageReady)return;
-   const remaining=Math.max(0,9500-(performance.now()-openingStartedAt));
+   const remaining=Math.max(0,10000-(performance.now()-openingStartedAt));
    finishQueued=true;
    setTimeout(()=>{
     if(finished)return;
@@ -1629,7 +1629,7 @@ async function saveOfflineMusic(id,blob,title){
     const paint=()=>{if(bar)bar.style.width=progress+'%';};
     const finish=()=>{
      if(finished||finishQueued||!ready||!videoReady)return;
-     const remaining=Math.max(0,9500-(performance.now()-startedAt));finishQueued=true;
+     const remaining=Math.max(0,10000-(performance.now()-startedAt));finishQueued=true;
      setTimeout(()=>{if(finished)return;finished=true;progress=100;paint();screen.classList.add('is-finished');setTimeout(()=>screen.remove(),600);},remaining);
     };
     const loader=setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}finish();if(finished)clearInterval(loader);},220);
