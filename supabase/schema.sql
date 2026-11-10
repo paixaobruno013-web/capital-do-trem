@@ -503,7 +503,7 @@ values (
   'capital-do-trem-media',
   true,
   52428800,
-  array['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/webm']
+  array['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/webm', 'audio/mpeg', 'audio/mp4', 'audio/aac', 'audio/ogg', 'audio/wav', 'audio/x-wav', 'audio/webm']
 )
 on conflict (id) do update
 set public = excluded.public,
