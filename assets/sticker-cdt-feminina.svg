@@ -1,20 +1,49 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<defs><linearGradient id="hair" x2="1" y2="1"><stop stop-color="#2b1718"/><stop offset=".42" stop-color="#f2c46d"/><stop offset=".72" stop-color="#d58b43"/><stop offset="1" stop-color="#59213d"/></linearGradient><linearGradient id="pink"><stop stop-color="#ffb7ed"/><stop offset=".5" stop-color="#ff4fc5"/><stop offset="1" stop-color="#8c1e7b"/></linearGradient><linearGradient id="skin"><stop stop-color="#f3c09a"/><stop offset="1" stop-color="#b96e55"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-<ellipse cx="256" cy="475" rx="158" ry="22" fill="#ff4fc5" opacity=".2"/>
-<path d="M94 464q7-111 87-134l75-18 76 18q80 25 87 134v25H94z" fill="#111116" stroke="#ed1c24" stroke-width="8"/>
-<path d="M183 319q73 42 146 0l-8 62q-64 35-130 0z" fill="url(#skin)"/>
-<path d="M129 214q-8-140 128-145 136 4 127 151l-8 157q-38 57-80 36l-31-45-37 45q-76 18-91-66z" fill="url(#hair)" stroke="#48232e" stroke-width="6"/>
-<path d="M166 187q-8-77 89-91 100 5 105 93l-12 87q-30-65-96-65-70 0-91 63z" fill="url(#skin)" stroke="#8b4d3d" stroke-width="5"/>
-<path d="M141 175q-10-91 85-112 101-22 151 62-48-16-85 12-42 31-82 12-35-17-69 26z" fill="#321a1d"/>
-<path d="M153 119q-30 110-4 223" fill="none" stroke="#e5a4ed" stroke-width="15"/><path d="M359 110q44 102 20 230" fill="none" stroke="#d94dc9" stroke-width="15"/><path d="M178 84q54-38 95-17" fill="none" stroke="#ff70ce" stroke-width="10"/>
-<path d="M156 208q40-29 83-3l-6 44q-41 15-77-2zM272 205q42-27 82 3l-1 39q-39 18-78 2z" fill="url(#pink)" stroke="#fff" stroke-width="10" filter="url(#glow)"/>
-<path d="M160 216l76 14M276 230l72-14" stroke="#fff" stroke-width="7" opacity=".85"/><path d="M241 220q15-10 29 0" stroke="#fff" stroke-width="8"/>
-<path d="M252 250q-9 31 8 36" fill="none" stroke="#9d5949" stroke-width="7" stroke-linecap="round"/><path d="M218 294q38 34 77 0" fill="none" stroke="#8b334c" stroke-width="9" stroke-linecap="round"/><path d="M231 296q27 15 51 0" fill="none" stroke="#fff" stroke-width="5"/>
-<path d="M156 267q-22 21-37-1M355 265q22 20 39-2" fill="none" stroke="#c17c61" stroke-width="7"/>
-<path d="M367 382q38 16 45 56l-27 13q-27-37-54-36z" fill="url(#skin)" stroke="#854b3d" stroke-width="5"/>
-<path d="M375 400q29-20 48 1l32 47q11 18-7 27-16 8-29-7l-38-35z" fill="#17191e" stroke="#fff" stroke-width="5"/>
-<path d="M426 413l28 38" stroke="#ff69d2" stroke-width="5"/>
-<path d="M424 362q15-14 29 0l20 49q7 18-10 25-17 7-25-11l-20-45z" fill="#fff" stroke="#d5dbe2" stroke-width="5"/>
-<path d="M434 352q22-14 39 4l8 14q-24 16-48 0z" fill="#ff4fc5" stroke="#fff" stroke-width="4"/>
-<text x="256" y="438" fill="#fff" font-size="27" font-weight="900" text-anchor="middle" font-family="Arial">CDT</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Figurinha feminina Capital do Trem, cantora com cabelo longo, óculos rosa e microfone">
+<defs>
+ <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe0c8"/><stop offset=".52" stop-color="#e9a98e"/><stop offset="1" stop-color="#bd725e"/></linearGradient>
+ <linearGradient id="hair" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#160f18"/><stop offset=".38" stop-color="#542039"/><stop offset=".62" stop-color="#c34b9b"/><stop offset=".82" stop-color="#e7a3d0"/><stop offset="1" stop-color="#281322"/></linearGradient>
+ <linearGradient id="pink" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0fb"/><stop offset=".35" stop-color="#ff8cdb"/><stop offset=".72" stop-color="#ed35ae"/><stop offset="1" stop-color="#7c145f"/></linearGradient>
+ <linearGradient id="jacket" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#24232c"/><stop offset="1" stop-color="#08090d"/></linearGradient>
+ <linearGradient id="metal"><stop stop-color="#fff"/><stop offset=".5" stop-color="#9ba5b4"/><stop offset="1" stop-color="#fff"/></linearGradient>
+ <filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<ellipse cx="256" cy="477" rx="158" ry="20" fill="#ff4fc5" opacity=".22"/>
+<!-- corpo e jaqueta -->
+<path d="M82 488q8-119 92-151l82-22 82 22q84 31 92 151v24H82z" fill="url(#jacket)" stroke="#ed1c24" stroke-width="8"/>
+<path d="M179 353q77 40 154 0l-10 65q-67 34-134 0z" fill="url(#skin)"/>
+<path d="M145 380q-43 34-51 109h76l48-91zM367 380q43 34 51 109h-76l-48-91z" fill="#171820" stroke="#ed1c24" stroke-width="4"/>
+<!-- cabelo longo atrás do rosto -->
+<path d="M128 228q-26-153 111-177 126-23 164 92 24 73-7 181l-20 95q-16 55-69 47l-42-50-30 55q-72 21-105-39-37-68-23-204z" fill="url(#hair)" stroke="#32152a" stroke-width="7"/>
+<path d="M146 179q-12-95 77-122M365 91q74 71 51 191M151 263q-5 89 25 145M386 258q20 91-5 151" fill="none" stroke="#f18bcf" stroke-width="13" stroke-linecap="round" opacity=".8"/>
+<path d="M170 104q46-58 105-49M350 109q42 49 46 104" fill="none" stroke="#ffb6e8" stroke-width="8" stroke-linecap="round" opacity=".8"/>
+<!-- orelhas e argolas -->
+<path d="M153 226q-33-15-31 27 4 38 35 30M360 226q34-15 32 27-4 38-35 30" fill="url(#skin)" stroke="#a95d53" stroke-width="5"/>
+<path d="M145 278q-3 35 17 35 19-2 18-31M368 278q3 35-17 35-19-2-18-31" fill="none" stroke="#ffd76c" stroke-width="6" stroke-linecap="round"/>
+<!-- rosto delicado -->
+<path d="M164 166q-4-57 91-70 100 5 103 80l-9 105q-8 82-92 103-84-21-92-103z" fill="url(#skin)" stroke="#9e5b50" stroke-width="5"/>
+<path d="M173 186q8-53 82-66 74 0 94 57-37-20-72-9-45 14-104 18z" fill="#281321"/>
+<!-- sobrancelhas, cílios e olhos acima dos óculos -->
+<path d="M178 205q28-22 56-4M279 201q31-19 56 5" fill="none" stroke="#552b32" stroke-width="8" stroke-linecap="round"/>
+<path d="M186 218l-9-9m20 7-5-12m15 11-1-12M291 214l2-12m13 10 6-11m8 15 10-8" stroke="#38202b" stroke-width="4" stroke-linecap="round"/>
+<!-- blush e nariz -->
+<ellipse cx="190" cy="270" rx="19" ry="10" fill="#f08d99" opacity=".3"/><ellipse cx="324" cy="270" rx="19" ry="10" fill="#f08d99" opacity=".3"/>
+<path d="M255 246q-10 25 2 32" fill="none" stroke="#b56b5e" stroke-width="5" stroke-linecap="round"/>
+<path d="M246 282q10 7 20 0" fill="none" stroke="#a65a52" stroke-width="3" stroke-linecap="round"/>
+<!-- óculos gatinho rosa, mais delicados -->
+<path d="M158 220q38-27 82-4l-7 47q-35 20-69-1zM272 216q43-23 83 4l-7 42q-34 23-69 1z" fill="url(#pink)" stroke="#fff4fc" stroke-width="8" filter="url(#glow)"/>
+<path d="M162 225q35-20 72-3M278 222q36-18 72 4" fill="none" stroke="#fff" stroke-width="5" opacity=".9"/>
+<path d="M240 229q16-12 32 0" fill="none" stroke="#fff" stroke-width="7"/>
+<path d="M173 233l52 19M286 249l52-17" stroke="#fff" stroke-width="4" opacity=".6"/>
+<!-- lábios definidos e sorriso -->
+<path d="M219 319q18-16 37-4 20-12 39 4-15 27-38 27-23 0-38-27z" fill="#a82d61" stroke="#7f2349" stroke-width="3"/>
+<path d="M231 319q25-10 50 0-24 8-50 0z" fill="#fff2ef"/>
+<path d="M236 337q20 11 40 0" fill="none" stroke="#e66c98" stroke-width="4" stroke-linecap="round"/>
+<!-- braço e microfone -->
+<path d="M356 387q41 8 56 54l-31 19q-28-36-59-33z" fill="url(#skin)" stroke="#9e5b50" stroke-width="5"/>
+<path d="M368 408q28-18 48 3l32 45q12 17-6 28-16 9-30-6l-39-37z" fill="#171820" stroke="#fff" stroke-width="5"/>
+<path d="M419 421l27 37" stroke="#ff6bd0" stroke-width="6"/>
+<path d="M424 361q15-15 30 0l20 50q7 19-11 26-18 7-26-12l-20-46z" fill="url(#metal)" stroke="#343640" stroke-width="5"/>
+<path d="M433 352q23-15 42 4l9 15q-25 17-50 0z" fill="#ff4fc5" stroke="#fff" stroke-width="4"/>
+<path d="M439 369l26 1" stroke="#fff" stroke-width="3" opacity=".85"/>
+<text x="256" y="455" fill="#fff" font-size="27" font-weight="900" text-anchor="middle" font-family="Arial">CDT</text>
 </svg>
