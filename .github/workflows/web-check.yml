@@ -25,6 +25,11 @@ jobs:
         run: node scripts/check-pwa.mjs
       - name: Verificar sintaxe do módulo Supabase
         run: node --input-type=module --check < supabase/auth.js
+      - name: Verificar sintaxe e presença do gravador de áudio do chat
+        run: |
+          node --check chat-enhancements.js
+          test -s www/chat-enhancements.js
+          grep -q 'audio/x-m4a' supabase/auth.js
       - name: Verificar sintaxe dos scripts das páginas
         run: node scripts/check-inline-scripts.mjs
       - name: Conferir proteção e segurança do banco
