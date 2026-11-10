@@ -1633,7 +1633,10 @@ async function saveOfflineMusic(id,blob,title){
   auth.initSupabase();
   const branding=await auth.getPublicBranding();
   const safeUrl=value=>typeof value==='string'&&value.startsWith('https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/')?value:'';
-  const profile=safeUrl(branding.profileImageUrl),opening=safeUrl(branding.openingImageUrl),openingVideo=safeUrl(branding.openingVideoUrl);\n  // Cada abertura consulta uma URL nova para impedir que navegador/CDN reutilize vídeo antigo.\n  const freshMediaUrl=value=>value?value+(value.includes('?')?'&':'?')+'cdt_opening='+Date.now():'';\n  const currentOpeningImage=freshMediaUrl(opening),currentOpeningVideo=freshMediaUrl(openingVideo);
+  const profile=safeUrl(branding.profileImageUrl),opening=safeUrl(branding.openingImageUrl),openingVideo=safeUrl(branding.openingVideoUrl); 
+  // Cada abertura consulta uma URL nova para impedir que navegador/CDN reutilize vídeo antigo.
+  const freshMediaUrl=value=>value?value+(value.includes('?')?'&':'?')+'cdt_opening='+Date.now():'';
+  const currentOpeningImage=freshMediaUrl(opening),currentOpeningVideo=freshMediaUrl(openingVideo);
   if(profile){const logo=document.getElementById('site-logo');if(logo)logo.src=profile;}
   if(opening){
  const intro=document.querySelector('.intro-smoke__brand img');
