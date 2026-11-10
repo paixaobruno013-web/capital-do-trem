@@ -27,6 +27,7 @@ jobs:
         run: |
           node --check stories-ui.js
           node --check admin-stories.js
+          node --check account-stories.js
       - name: Verificar sintaxe do módulo Supabase
         run: node --input-type=module --check < supabase/auth.js
       - name: Verificar sintaxe e presença do gravador de áudio do chat
