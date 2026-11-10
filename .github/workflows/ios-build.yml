@@ -25,6 +25,9 @@ on:
       - 'package.json'
       - 'capacitor.config.ts'
       - '.github/workflows/ios-build.yml'
+      - 'admin-media.js'
+      - 'emoji-picker.js'
+      - 'supabase-config.js'
 
 permissions:
   contents: read
