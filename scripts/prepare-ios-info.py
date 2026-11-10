@@ -17,6 +17,9 @@ info["NSMicrophoneUsageDescription"] = (
 info["NSLocationWhenInUseUsageDescription"] = (
     "O Capital do Trem usa sua localização somente quando você toca em “logo ali uai - localização” para encontrar eventos próximos."
 )
+info["NSCameraUsageDescription"] = (
+    "O Capital do Trem usa a câmera somente quando você toca para tirar uma foto ou gravar um vídeo para compartilhar no aplicativo."
+)
 info["NSPhotoLibraryUsageDescription"] = (
     "O Capital do Trem permite escolher fotos e vídeos da sua biblioteca para seu perfil, mensagens e conteúdos enviados pela equipe."
 )
@@ -26,7 +29,7 @@ with path.open("wb") as stream:
 
 with path.open("rb") as stream:
     checked = plistlib.load(stream)
-for key in ("NSMicrophoneUsageDescription", "NSLocationWhenInUseUsageDescription", "NSPhotoLibraryUsageDescription"):
+for key in ("NSMicrophoneUsageDescription", "NSLocationWhenInUseUsageDescription", "NSCameraUsageDescription", "NSPhotoLibraryUsageDescription"):
     if not checked.get(key):
         raise SystemExit(f"Permissão sem descrição: {key}")
 print("Info.plist iOS validado: microfone, localização e biblioteca de fotos.")
