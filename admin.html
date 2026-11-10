@@ -185,6 +185,12 @@ audio{width:100%;}
   <p class="muted">Escolha separadamente: vídeo MP4/WebM até 50 MB ou imagem JPG/PNG/WebP até 5 MB.</p>
   <label for="opening-video-file-direct">Selecionar VÍDEO (MP4/WebM)</label><input id="opening-video-file-direct" type="file" accept="video/mp4,video/webm,.mp4,.webm">
   <video id="opening-video-preview-direct" controls playsinline muted style="display:none;width:100%;max-width:260px;max-height:420px;background:#000"></video>
+  <label for="opening-video-audio-mode">Áudio do vídeo na abertura</label>
+  <select id="opening-video-audio-mode"><option value="muted">Sem áudio</option><option value="sound">Com áudio (o visitante toca para ativar)</option></select>
+  <label for="opening-video-volume">Volume do vídeo</label>
+  <div class="range-row"><span class="muted">0%</span><output id="opening-video-volume-value">70%</output><input id="opening-video-volume" type="range" min="0" max="100" value="70"></div>
+  <button id="opening-video-audio-save" class="secondary" type="button">SALVAR OPÇÕES DE ÁUDIO</button>
+  <p id="opening-video-audio-status" class="status" role="status" aria-live="polite">Padrão: sem áudio. Ajuste e salve quando quiser.</p>
   <button id="opening-video-save-direct" type="button">PUBLICAR VÍDEO NA ABERTURA</button>
   <label for="opening-image-file-direct">Selecionar IMAGEM (JPG/PNG/WebP)</label><input id="opening-image-file-direct" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp">
   <img id="opening-image-preview-direct" alt="Prévia da imagem de abertura" style="display:none;width:100%;max-width:260px;max-height:420px;object-fit:contain;background:#000">
