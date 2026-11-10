@@ -119,6 +119,19 @@ audio{width:100%;}
 <a class="command-link" href="#queue"><span class="glyph">⚙</span>Moderação</a>
 </nav>
 
+<section class="command-section" id="header-background-section">
+ <h2>Fundo do cabeçalho inicial • atrás da foto e do nome verificado</h2>
+ <p class="muted">Esta é a imagem que aparece atrás da foto circular e do nome Capital do Trem com o selo azul. Ela é independente da imagem inferior “AQUI A MÚSICA NÃO PARA!”.</p>
+ <div class="item">
+  <img id="header-background-preview" src="" alt="Prévia do fundo do cabeçalho" style="display:block;width:100%;max-width:420px;height:150px;object-fit:cover;background:#111;border-radius:12px;margin:12px auto">
+  <label for="header-background-file">Escolher imagem do fundo superior</label>
+  <input id="header-background-file" type="file" accept="image/jpeg,image/png,image/webp">
+  <button id="header-background-save" type="button">Salvar fundo do cabeçalho</button>
+  <button id="header-background-remove" class="secondary" type="button">Remover imagem do cabeçalho</button>
+  <p id="header-background-status" class="status" role="status" aria-live="polite">Não altera a foto circular nem o painel inferior.</p>
+ </div>
+</section>
+
 <section class="command-section" id="profile-image-section">
  <h2>Imagem superior do aplicativo • perfil inicial</h2>
  <p class="muted">Altere somente a imagem circular que aparece no topo da tela inicial. Esta opção não muda a abertura nem o painel inferior “AQUI A MÚSICA NÃO PARA!”. Para melhor nitidez, escolha o arquivo original em alta resolução (JPG, PNG ou WebP, até 5 MB).</p>
@@ -126,6 +139,7 @@ audio{width:100%;}
   <img id="profile-only-preview" src="./marca.svg" alt="Prévia da imagem superior do aplicativo" style="display:block;width:132px;height:132px;object-fit:cover;object-position:center;border:3px solid #ed1c24;border-radius:50%;background:#000;margin:12px auto;box-shadow:0 0 16px #ed1c2455;image-rendering:auto">
   <label for="profile-only-file">Escolher imagem superior</label><input id="profile-only-file" type="file" accept="image/jpeg,image/png,image/webp">
   <button id="profile-only-save" type="button">Salvar somente imagem superior</button>
+  <button id="profile-only-remove" class="secondary" type="button">Remover imagem superior</button>
   <p id="profile-only-status" class="status" role="status" aria-live="polite">A imagem inferior do painel não será alterada.</p>
  </div>
 </section>
@@ -138,11 +152,19 @@ audio{width:100%;}
   <p class="muted" style="text-align:center">Prévia da mesma logo que aparecerá no perfil e na abertura</p>
   <label for="branding-pair-file">Selecionar arte original</label><input id="branding-pair-file" type="file" accept="image/jpeg,image/png,image/webp">
   <button id="branding-pair-save" type="button">Atualizar perfil e abertura</button>
+  <button id="branding-pair-remove" class="secondary" type="button">Remover imagem do perfil e abertura</button>
   <p id="branding-pair-status" class="status" role="status" aria-live="polite"></p>
  </div>
  <p class="muted">A abertura terá a logo em um círculo maior, centralizado sobre fundo preto. A assinatura Bruno Chock continua somente na abertura.</p>
 </section>
 
+
+<section class="command-section" id="opening-media-choice">
+ <h2>Escolher tipo de abertura</h2>
+ <p class="muted">Selecione se a abertura será uma imagem parada por 10 segundos ou um vídeo. A locomotiva e os vagões do carregamento permanecem.</p>
+ <label for="opening-media-mode">Tipo de mídia da abertura</label>
+ <select id="opening-media-mode"><option value="image">Imagem • 10 segundos</option><option value="video">Vídeo • 10 segundos de abertura</option></select>
+</section>
 
 <section class="command-section" id="opening-image-section">
  <h2>Usar IMAGEM no lugar do vídeo de abertura</h2>
@@ -150,7 +172,8 @@ audio{width:100%;}
  <div class="item">
   <img id="opening-image-preview" src="./marca.svg" alt="Prévia da abertura completa" style="display:block;width:100%;max-width:260px;max-height:420px;object-fit:contain;background:#000;margin:12px auto;border-radius:10px">
   <label for="opening-image-file">Selecionar imagem completa da abertura</label><input id="opening-image-file" type="file" accept="image/jpeg,image/png,image/webp">
-  <button id="opening-image-save" type="button">Atualizar somente a abertura</button>
+  <button id="opening-image-save" type="button">Usar esta imagem na abertura</button>
+  <button id="opening-image-remove" class="secondary" type="button">Remover imagem da abertura</button>
   <p id="opening-image-status" class="status" role="status" aria-live="polite"></p>
  </div>
 </section>
@@ -163,7 +186,8 @@ audio{width:100%;}
   <video id="opening-video-preview" controls playsinline muted style="display:none;width:100%;max-width:520px;max-height:300px;object-fit:contain;background:#000;border-radius:12px;margin:12px auto"></video>
   <label for="opening-video-file">Selecionar vídeo de abertura</label>
   <input id="opening-video-file" type="file" accept="video/mp4,video/webm">
-  <button id="opening-video-save" type="button">Substituir vídeo de abertura</button>
+  <button id="opening-video-save" type="button">Usar este vídeo na abertura</button>
+  <button id="opening-video-remove" class="secondary" type="button">Remover vídeo / mídia da abertura</button>
   <p id="opening-video-status" class="status" role="status" aria-live="polite">Nenhum vídeo novo selecionado.</p>
  </div>
 </section>
@@ -183,6 +207,7 @@ audio{width:100%;}
   <label for="home-background-fit">Ajuste da imagem</label>
   <select id="home-background-fit"><option value="cover">Preencher o painel (recorte ajustável)</option><option value="contain">Mostrar imagem inteira</option></select>
   <button id="home-background-save" type="button">Salvar fundo e ajustes</button>
+  <button id="home-background-remove" class="secondary" type="button">Remover imagem de fundo do painel</button>
   <button id="home-background-reset" class="secondary" type="button">Centralizar e deixar nítida</button>
   <p id="home-background-status" class="status" role="status" aria-live="polite">Ajuste o recorte e a nitidez na prévia antes de salvar.</p>
  </div>
@@ -221,6 +246,37 @@ async function enterDashboard(user){
  await loadChatModeration();
 }
 
+async function removeImageSetting(kind,button,status,after){
+ if(!window.confirm('Remover esta imagem do aplicativo? Esta ação não pode ser desfeita na configuração.'))return;
+ button.disabled=true;status.textContent='Removendo a imagem…';
+ try{await auth.removeAdminBrandingAsset(kind);if(after)after();status.textContent='Imagem removida da configuração. As outras imagens foram preservadas.';}
+ catch(error){status.textContent=error?.message||'Não foi possível remover a imagem.';}
+ finally{button.disabled=false;}
+}
+// Fundo independente do cabeçalho, atrás da foto e do selo verificado.
+const headerBgFile=document.getElementById('header-background-file');
+const headerBgPreview=document.getElementById('header-background-preview');
+const headerBgSave=document.getElementById('header-background-save');
+const headerBgStatus=document.getElementById('header-background-status');
+headerBgFile.addEventListener('change',()=>{
+ const file=headerBgFile.files?.[0];if(!file)return;
+ if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size<1||file.size>8*1024*1024){headerBgStatus.textContent='Escolha JPG, PNG ou WebP de até 8 MB.';headerBgFile.value='';return;}
+ headerBgPreview.src=URL.createObjectURL(file);headerBgStatus.textContent='Prévia pronta. Toque em salvar para publicar.';
+});
+headerBgSave.addEventListener('click',async()=>{
+ const file=headerBgFile.files?.[0];if(!file){headerBgStatus.textContent='Escolha primeiro a imagem do cabeçalho.';return;}
+ headerBgSave.disabled=true;headerBgStatus.textContent='Enviando o fundo superior…';
+ try{const url=await auth.saveAdminBrandingImage('header',file);headerBgPreview.src=url;headerBgFile.value='';headerBgStatus.textContent='Fundo do cabeçalho atualizado!';}
+ catch(error){headerBgStatus.textContent=error?.message||'Não foi possível salvar o fundo.';}
+ finally{headerBgSave.disabled=false;}
+});
+document.getElementById('header-background-remove').addEventListener('click',event=>removeImageSetting('header',event.currentTarget,headerBgStatus,()=>{headerBgPreview.removeAttribute('src');headerBgFile.value='';}));
+
+document.getElementById('opening-media-mode').addEventListener('change',event=>{
+ const mode=event.target.value;
+ document.getElementById('opening-image-section').hidden=mode!=='image';
+ document.getElementById('opening-video-section').hidden=mode!=='video';
+});
 const openingVideoFile=document.getElementById('opening-video-file');
 const openingVideoPreview=document.getElementById('opening-video-preview');
 const openingVideoSave=document.getElementById('opening-video-save');
@@ -258,7 +314,12 @@ async function loadBranding(){
   const branding=await auth.getPublicBranding();
   const url=branding.profileImageUrl||branding.openingImageUrl;
   if(url){document.getElementById('branding-profile-preview').src=url;const topPreview=document.getElementById('profile-only-preview');if(topPreview)topPreview.src=branding.profileImageUrl||url;}
+  if(branding.headerBackgroundImageUrl)headerBgPreview.src=branding.headerBackgroundImageUrl;
   if(branding.openingImageUrl)document.getElementById('opening-image-preview').src=branding.openingImageUrl;
+  const openingMode=document.getElementById('opening-media-mode');
+  openingMode.value=branding.openingVideoUrl?'video':'image';
+  document.getElementById('opening-image-section').hidden=openingMode.value!=='image';
+  document.getElementById('opening-video-section').hidden=openingMode.value!=='video';
   if(branding.openingVideoUrl){const video=document.getElementById('opening-video-preview');video.src=branding.openingVideoUrl;video.style.display='block';document.getElementById('opening-video-status').textContent='Vídeo de abertura atualmente publicado.';}
   homeBgCurrentUrl=branding.homeBackgroundImageUrl||'';
   if(homeBgCurrentUrl)homeBgPreview.src=homeBgCurrentUrl;
@@ -287,6 +348,7 @@ homeBgSave.addEventListener('click',async()=>{
  }catch(error){homeBgStatus.textContent=error?.message||'Não foi possível salvar o fundo. Confira a conexão e tente novamente.';}
  finally{homeBgSave.disabled=false;}
 });
+document.getElementById('home-background-remove').addEventListener('click',event=>removeImageSetting('home',event.currentTarget,homeBgStatus,()=>{homeBgCurrentUrl='';homeBgPreview.removeAttribute('src');homeBgFile.value='';homeBgX.value='50';homeBgY.value='50';homeBgBlur.value='0';homeBgFit.value='cover';paintHomeBgPreview();}));
 // Controle independente da imagem circular superior do aplicativo.
 const profileOnlyFile=document.getElementById('profile-only-file');
 const profileOnlyPreview=document.getElementById('profile-only-preview');
@@ -306,6 +368,7 @@ profileOnlySave.addEventListener('click',async()=>{
  finally{profileOnlySave.disabled=false;}
 });
 
+document.getElementById('profile-only-remove').addEventListener('click',event=>removeImageSetting('profile',event.currentTarget,profileOnlyStatus,()=>{profileOnlyPreview.src='./marca.svg';profileOnlyFile.value='';}));
 const brandingFile=document.getElementById('branding-pair-file');
 const brandingPreview=document.getElementById('branding-profile-preview');
 const brandingSave=document.getElementById('branding-pair-save');
@@ -316,6 +379,7 @@ brandingFile.addEventListener('change',()=>{
  brandingPreview.src=URL.createObjectURL(file);brandingStatus.textContent='Prévia circular pronta. Toque em atualizar para publicar nas duas telas.';
 });
 
+document.getElementById('branding-pair-remove').addEventListener('click',event=>removeImageSetting('pair',event.currentTarget,brandingStatus,()=>{brandingPreview.src='./marca.svg';profileOnlyPreview.src='./marca.svg';openingPreview.src='./marca.svg';profileOnlyFile.value='';brandingFile.value='';openingFile.value='';}));
 const openingFile=document.getElementById('opening-image-file');
 const openingPreview=document.getElementById('opening-image-preview');
 const openingSave=document.getElementById('opening-image-save');
@@ -325,6 +389,8 @@ openingFile.addEventListener('change',()=>{
  if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){openingStatus.textContent='Escolha JPG, PNG ou WebP de até 5 MB.';openingFile.value='';return;}
  openingPreview.src=URL.createObjectURL(file);openingStatus.textContent='Prévia da arte completa pronta. Toque em atualizar somente a abertura.';
 });
+document.getElementById('opening-image-remove').addEventListener('click',event=>removeImageSetting('opening',event.currentTarget,openingStatus,()=>{openingPreview.src='./marca.svg';openingFile.value='';const video=document.getElementById('opening-video-preview');video.removeAttribute('src');video.load();video.style.display='none';document.getElementById('opening-video-status').textContent='A mídia da abertura foi removida.';}));
+document.getElementById('opening-video-remove').addEventListener('click',event=>removeImageSetting('opening',event.currentTarget,openingStatus,()=>{openingPreview.src='./marca.svg';openingFile.value='';const video=document.getElementById('opening-video-preview');video.removeAttribute('src');video.load();video.style.display='none';document.getElementById('opening-video-status').textContent='A mídia da abertura foi removida.';}));
 openingSave.addEventListener('click',async()=>{
  const file=openingFile.files?.[0];if(!file){openingStatus.textContent='Primeiro selecione a imagem completa na galeria.';return;}
  openingSave.disabled=true;openingStatus.textContent='Enviando a arte e atualizando somente a abertura…';
