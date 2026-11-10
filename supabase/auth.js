@@ -915,7 +915,7 @@ export async function getPublicBranding() {
     profileImageUrl: settings.official_profile_image_url || '',
     openingImageUrl: settings.app_opening_image_url || '',
     openingVideoUrl: settings.app_opening_video_url || '',
-    openingVideoMuted: settings.app_opening_video_muted !== 'false',
+    openingVideoMuted: settings.app_opening_video_muted === 'true',
     openingVideoVolume: Math.max(0, Math.min(1, Number(settings.app_opening_video_volume ?? 0.7))),
     openingX: Number(settings.app_opening_x ?? 50),
     openingY: Number(settings.app_opening_y ?? 50),
