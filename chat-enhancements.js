@@ -30,13 +30,13 @@ document.head.append(style);
 const tools=document.createElement('div');
 tools.className='chat-tools';
 const emojiButton=document.createElement('button');
-emojiButton.type='button';emojiButton.textContent='😊 Emojis / 🎭 Figurinhas';
+emojiButton.type='button';emojiButton.id='emoji-toggle';emojiButton.textContent='😊';emojiButton.setAttribute('aria-label','Abrir emojis e figurinhas');
 const recordButton=document.createElement('button');
-recordButton.type='button';recordButton.textContent='🎙️ Gravar áudio';
+recordButton.type='button';recordButton.id='record-audio';recordButton.textContent='🎙️';recordButton.setAttribute('aria-label','Gravar áudio');
 tools.append(emojiButton,recordButton);
 const emojiPanel=document.createElement('div');
 emojiPanel.className='emoji-panel';
-form.before(tools,emojiPanel);
+form.prepend(tools,emojiPanel);
 
 const emojis=['🎤','🎙️','🎶','🎵','🎼','🎧','💿','📀','🎚️','🎛️','🎹','🎸','🥁','🪘','🪇','🎷','🎺','🎻','🪕','🪗','🪩','🚂','🔥','😂','🤣','👍','❤️','👏','💯','😍','🙌','😎','🚀','💥','🤝','💪','🥳','😢','🙏','👑','💃','🕺','👨🏽‍🎤🧢🕶️','👨🏻‍🎤🧢🕶️','👨🏿‍🎤🧢🕶️','👱🏻‍♀️🩷🕶️🎤','👱🏼‍♀️🩷🕶️🎤','👩🏽‍🎤🩷🕶️','👩🏾‍🎤🩷🕶️'];
 const singerEmojis=new Set(['👨🏽‍🎤🧢🕶️','👨🏻‍🎤🧢🕶️','👨🏿‍🎤🧢🕶️','👱🏻‍♀️🩷🕶️🎤','👱🏼‍♀️🩷🕶️🎤','👩🏽‍🎤🩷🕶️','👩🏾‍🎤🩷🕶️']);
@@ -69,6 +69,7 @@ for(const sticker of stickers){
 emojiButton.addEventListener('click',()=>{
  const open=emojiPanel.classList.toggle('open');
  emojiButton.setAttribute('aria-expanded',String(open));
+ emojiButton.textContent=open?'✕':'😊';
 });
 
 let recorder=null,recordedChunks=[],recordingStream=null,recordingLimit=null;
@@ -115,7 +116,7 @@ recordButton.addEventListener('click',async()=>{
   };
   recorder.start(250);
   recordButton.textContent='⏹️ Parar gravação';
-  status.textContent='Gravando… toque em Parar quando terminar (limite de 60 segundos).';
+  status.textContent='Gravando… toque no botão de áudio para parar (limite de 60 segundos).';
   recordingLimit=window.setTimeout(()=>{if(recorder?.state==='recording')recorder.stop();},60000);
  }catch(error){
   recordingStream?.getTracks().forEach(track=>track.stop());recordingStream=null;
