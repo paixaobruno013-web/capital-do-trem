@@ -852,6 +852,17 @@ export async function getPublicBranding() {
   };
 }
 
+
+// Normaliza MIME genérico/vazio devolvido por alguns seletores Android.
+function getBrandingUploadFormat(file, allowed) {
+ const ext=String(file?.name||'').split('.').pop().toLowerCase();
+ const mimeExt={'image/jpeg':'jpg','image/jpg':'jpg','image/png':'png','image/webp':'webp','video/mp4':'mp4','video/webm':'webm'};
+ const chosen=Object.hasOwn(allowed,ext)?ext:(Object.hasOwn(allowed,mimeExt[file?.type]||'')?mimeExt[file.type]:'');
+ if(!chosen)throw new Error('Formato não reconhecido. Use JPG, PNG ou WebP para imagens; MP4 ou WebM para vídeos.');
+ const contentType=chosen==='jpg'||chosen==='jpeg'?'image/jpeg':chosen==='png'?'image/png':chosen==='webp'?'image/webp':chosen==='mp4'?'video/mp4':'video/webm';
+ return {extension:chosen==='jpeg'?'jpg':chosen,contentType};
+}
+
 // Publica um único arquivo e grava o mesmo endereço nas duas posições oficiais.
 export async function saveAdminBrandingPair(file) {
   const supabase = initSupabase();
@@ -859,11 +870,10 @@ export async function saveAdminBrandingPair(file) {
   if (userError) throw userError;
   if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode alterar a identidade visual.');
   if (!(file instanceof File)) throw new Error('Escolha a arte oficial na galeria do celular.');
-  const allowed = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
-  if (!allowed[file.type]) throw new Error('Use uma imagem JPG, PNG ou WebP.');
+  const format = getBrandingUploadFormat(file, { jpg: true, png: true, webp: true });
   if (file.size < 1 || file.size > 5 * 1024 * 1024) throw new Error('A imagem deve ter até 5 MB.');
-  const path = user.id + '/branding/official-logo-' + crypto.randomUUID() + '.' + allowed[file.type];
-  const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: false });
+  const path = user.id + '/branding/official-logo-' + crypto.randomUUID() + '.' + format.extension;
+  const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, { contentType: format.contentType, cacheControl: '3600', upsert: false });
   if (uploadError) throw uploadError;
   const { data: publicData } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
   if (!publicData?.publicUrl) throw new Error('Não foi possível gerar o endereço público da imagem.');
@@ -885,11 +895,10 @@ export async function saveAdminOpeningImage(file, options = {}) {
   if (userError) throw userError;
   if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode alterar a abertura.');
   if (!(file instanceof File)) throw new Error('Escolha a arte completa da abertura.');
-  const allowed = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
-  if (!allowed[file.type]) throw new Error('Use uma imagem JPG, PNG ou WebP.');
+  const format = getBrandingUploadFormat(file, { jpg: true, png: true, webp: true });
   if (file.size < 1 || file.size > 5 * 1024 * 1024) throw new Error('A imagem deve ter até 5 MB.');
-  const path = user.id + '/branding/opening-' + crypto.randomUUID() + '.' + allowed[file.type];
-  const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: false });
+  const path = user.id + '/branding/opening-' + crypto.randomUUID() + '.' + format.extension;
+  const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, { contentType: format.contentType, cacheControl: '3600', upsert: false });
   if (uploadError) throw uploadError;
   const { data: publicData } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
   if (!publicData?.publicUrl) throw new Error('Não foi possível gerar o endereço público da abertura.');
@@ -930,11 +939,11 @@ export async function saveAdminOpeningVideo(file, options = {}) {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode alterar o vídeo de abertura.');
-  const allowed = { 'video/mp4': 'mp4', 'video/webm': 'webm' };
-  if (!(file instanceof File) || !allowed[file.type]) throw new Error('Escolha um vídeo MP4 ou WebM.');
+  if (!(file instanceof File)) throw new Error('Escolha um vídeo MP4 ou WebM.');
+  const format = getBrandingUploadFormat(file, { mp4: true, webm: true });
   if (file.size < 1 || file.size > 50 * 1024 * 1024) throw new Error('O vídeo deve ter até 50 MB.');
-  const path = user.id + '/branding/opening-video-' + crypto.randomUUID() + '.' + allowed[file.type];
-  const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: false });
+  const path = user.id + '/branding/opening-video-' + crypto.randomUUID() + '.' + format.extension;
+  const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, { contentType: format.contentType, cacheControl: '3600', upsert: false });
   if (uploadError) throw uploadError;
   const { data: publicData } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
   if (!publicData?.publicUrl) throw new Error('Não foi possível gerar o endereço público do vídeo.');
@@ -1019,13 +1028,13 @@ export async function saveAdminHeaderBackground(file, options = {}) {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode alterar o fundo do cabeçalho.');
-  const allowed = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
   let imageUrl = '';
   if (file) {
-    if (!(file instanceof File) || !allowed[file.type]) throw new Error('Escolha uma imagem JPG, PNG ou WebP.');
+    if (!(file instanceof File)) throw new Error('Escolha uma imagem JPG, PNG ou WebP.');
+    const format = getBrandingUploadFormat(file, { jpg: true, png: true, webp: true });
     if (file.size < 1 || file.size > 8 * 1024 * 1024) throw new Error('A imagem deve ter até 8 MB.');
-    const path = user.id + '/branding/header-' + crypto.randomUUID() + '.' + allowed[file.type];
-    const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: false });
+    const path = user.id + '/branding/header-' + crypto.randomUUID() + '.' + format.extension;
+    const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, { contentType: format.contentType, cacheControl: '3600', upsert: false });
     if (uploadError) throw uploadError;
     const { data: publicData } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
     if (!publicData?.publicUrl) throw new Error('Não foi possível gerar o endereço público do fundo.');
