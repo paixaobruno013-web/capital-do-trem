@@ -7,6 +7,7 @@ on:
     paths:
       - 'index.html'
       - 'admin.html'
+      - 'bate-papo.html'
       - 'chat-enhancements.js'
       - 'supabase/**'
       - 'scripts/**'
