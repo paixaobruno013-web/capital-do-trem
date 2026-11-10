@@ -10,9 +10,8 @@ const style=document.createElement('style');
 style.textContent=`
 .chat-tools{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
 .chat-tools button{background:var(--panel);border:1px solid var(--line);color:var(--fg);padding:8px 12px;min-height:42px}
-.emoji-panel{display:none;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;padding:10px;margin:8px 0;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
 .emoji-panel.open{display:grid}
-.sticker-choice{grid-column:span 3!important;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px!important;min-height:112px!important;background:var(--bg)!important;border:1px solid #ed1c2466!important;color:var(--fg)!important}.sticker-choice img{width:76px;height:76px;object-fit:contain}.sticker-choice span{font-size:11px;font-weight:800;text-align:center}.emoji-choice{font-size:23px!important;padding:7px!important;min-height:44px!important;background:var(--bg)!important;border:1px solid var(--line)!important}.emoji-choice.cdt-singer{font-size:25px!important;grid-column:span 2;border-color:#ed1c2466!important;background:linear-gradient(135deg,#ed1c241c,#ff4da61a)!important}
+.emoji-choice{font-size:23px!important;padding:7px!important;min-height:44px!important;background:var(--bg)!important;border:1px solid var(--line)!important}.emoji-choice.cdt-singer{font-size:25px!important;grid-column:span 2;border-color:#ed1c2466!important;background:linear-gradient(135deg,#ed1c241c,#ff4da61a)!important}
 @keyframes cdt-fire{0%,100%{transform:translateY(2px) scale(.96)}50%{transform:translateY(-6px) scale(1.1)}}
 @keyframes cdt-train{0%{transform:translateX(-4px)}50%{transform:translateX(4px)}100%{transform:translateX(-4px)}}
 @keyframes cdt-sing{0%,100%{transform:rotate(-6deg) translateY(0)}50%{transform:rotate(6deg) translateY(-4px)}}
@@ -34,42 +33,15 @@ emojiButton.type='button';emojiButton.id='emoji-toggle';emojiButton.textContent=
 const recordButton=document.createElement('button');
 recordButton.type='button';recordButton.id='record-audio';recordButton.textContent='🎙️';recordButton.setAttribute('aria-label','Gravar áudio');
 tools.append(emojiButton,recordButton);
-const emojiPanel=document.createElement('div');
-emojiPanel.className='emoji-panel';
-form.prepend(tools,emojiPanel);
-
-const emojis=['🎤','🎙️','🎶','🎵','🎼','🎧','💿','📀','🎚️','🎛️','🎹','🎸','🥁','🪘','🪇','🎷','🎺','🎻','🪕','🪗','🪩','🚂','🔥','😂','🤣','👍','❤️','👏','💯','😍','🙌','😎','🚀','💥','🤝','💪','🥳','😢','🙏','👑','💃','🕺','👨🏽‍🎤🧢🕶️','👨🏻‍🎤🧢🕶️','👨🏿‍🎤🧢🕶️','👱🏻‍♀️🩷🕶️🎤','👱🏼‍♀️🩷🕶️🎤','👩🏽‍🎤🩷🕶️','👩🏾‍🎤🩷🕶️'];
-const singerEmojis=new Set(['👨🏽‍🎤🧢🕶️','👨🏻‍🎤🧢🕶️','👨🏿‍🎤🧢🕶️','👱🏻‍♀️🩷🕶️🎤','👱🏼‍♀️🩷🕶️🎤','👩🏽‍🎤🩷🕶️','👩🏾‍🎤🩷🕶️']);
-const animated={'🎤':'cdt-sing','🎙️':'cdt-sing','🚂':'cdt-train','🔥':'cdt-fire','😂':'cdt-laugh','🤣':'cdt-laugh'};
-for(const symbol of emojis){
- const button=document.createElement('button');
- button.type='button';button.className='emoji-choice'+(singerEmojis.has(symbol)?' cdt-singer':'');button.textContent=symbol;
- button.setAttribute('aria-label',singerEmojis.has(symbol)?'Inserir personagem cantor ou cantora com microfone': 'Inserir '+symbol);
- if(singerEmojis.has(symbol))button.title='Personagem musical';
- if(animated[symbol])button.classList.add(animated[symbol]);
- button.addEventListener('click',()=>{
-  const start=input.selectionStart??input.value.length;
-  const end=input.selectionEnd??input.value.length;
-  input.value=input.value.slice(0,start)+symbol+input.value.slice(end);
-  input.setSelectionRange(start+symbol.length,start+symbol.length);
-  input.dispatchEvent(new Event('input',{bubbles:true}));
-  input.focus();
- });
- emojiPanel.append(button);
-}
-
-const stickers=[{token:'[CDT_MASCULINO]',name:'Cantor Capital do Trem',src:'./assets/sticker-cdt-masculino.svg'},{token:'[CDT_FEMININA]',name:'Cantora Capital do Trem',src:'./assets/sticker-cdt-feminina.svg'}];
-for(const sticker of stickers){
- const button=document.createElement('button');button.type='button';button.className='sticker-choice';button.title=sticker.name;button.setAttribute('aria-label','Enviar figurinha: '+sticker.name);
- const image=document.createElement('img');image.src=sticker.src;image.alt='';image.loading='lazy';button.append(image);
- const label=document.createElement('span');label.textContent=sticker.name;button.append(label);
- button.addEventListener('click',()=>{const start=input.selectionStart??input.value.length;const end=input.selectionEnd??input.value.length;input.value=input.value.slice(0,start)+sticker.token+input.value.slice(end);input.setSelectionRange(start+sticker.token.length,start+sticker.token.length);input.dispatchEvent(new Event('input',{bubbles:true}));input.focus();emojiPanel.classList.remove('open');emojiButton.setAttribute('aria-expanded','false');});
- emojiPanel.append(button);
-}
+const emojiTray=document.getElementById('emoji-tray');
 emojiButton.addEventListener('click',()=>{
- const open=emojiPanel.classList.toggle('open');
+ if(!emojiTray)return;
+ const open=!emojiTray.classList.contains('is-open');
+ emojiTray.classList.toggle('is-open',open);
+ form.classList.toggle('emoji-open',open);
  emojiButton.setAttribute('aria-expanded',String(open));
  emojiButton.textContent=open?'✕':'😊';
+ if(!open)input.focus();
 });
 
 let recorder=null,recordedChunks=[],recordingStream=null,recordingLimit=null;
