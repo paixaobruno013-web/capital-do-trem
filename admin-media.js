@@ -34,8 +34,17 @@ bindPreview('opening-image-file-direct','opening-image-preview-direct','opening-
 bindPreview('header-background-file-direct','header-background-preview-direct','header-background-direct-status','Imagem do cabeçalho');
 el('opening-video-save-direct')?.addEventListener('click',()=>upload(
  'opening-video-file-direct','opening-video-save-direct','opening-media-direct-status',
- f=>auth.saveAdminOpeningVideo(f,{x:50,y:50,fit:'cover'}),
- 'VÍDEO PUBLICADO COM SUCESSO NA ABERTURA.','PUBLICAR VÍDEO NA ABERTURA',50*1024*1024
+ async f=>{
+   const url=await auth.saveAdminOpeningVideo(f,{x:50,y:50,fit:'cover'});
+   const saved=await auth.getPublicBranding();
+   if(saved.openingVideoUrl!==url)throw new Error('O upload terminou, mas a configuração pública ainda aponta para outro vídeo. Recarregue o painel e tente novamente.');
+   const response=await fetch(url+(url.includes('?')?'&':'?')+'cdt_verify='+Date.now(),{method:'HEAD',cache:'no-store'});
+   if(!response.ok)throw new Error('O vídeo foi enviado, mas o endereço publicado não respondeu corretamente ('+response.status+').');
+   const type=response.headers.get('content-type')||'';
+   if(!type.toLowerCase().includes('video/'))throw new Error('O endereço publicado não está retornando um arquivo de vídeo.');
+   return url;
+  },
+ 'VÍDEO PUBLICADO E CONFERIDO. A abertura já está apontando para o arquivo novo.','PUBLICAR VÍDEO NA ABERTURA',50*1024*1024
 ));
 el('opening-image-save-direct')?.addEventListener('click',()=>upload(
  'opening-image-file-direct','opening-image-save-direct','opening-media-direct-status',
