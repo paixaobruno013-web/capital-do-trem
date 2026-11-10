@@ -173,7 +173,7 @@ audio{width:100%;}
   <img id="opening-image-preview" src="./marca.svg" alt="Prévia da abertura completa" style="display:block;width:100%;max-width:260px;max-height:420px;object-fit:contain;background:#000;margin:12px auto;border-radius:10px">
   <label for="opening-image-file">Selecionar imagem completa da abertura</label><input id="opening-image-file" type="file" accept="image/jpeg,image/png,image/webp">
   <button id="opening-image-save" type="button">Usar esta imagem na abertura</button>
-  <button id="opening-image-remove" class="secondary" type="button">Remover imagem da abertura</button>
+  <button id="opening-image-remove" class="secondary" type="button">Remover mídia da abertura (imagem ou vídeo)</button>
   <p id="opening-image-status" class="status" role="status" aria-live="polite"></p>
  </div>
 </section>
@@ -187,7 +187,7 @@ audio{width:100%;}
   <label for="opening-video-file">Selecionar vídeo de abertura</label>
   <input id="opening-video-file" type="file" accept="video/mp4,video/webm">
   <button id="opening-video-save" type="button">Usar este vídeo na abertura</button>
-  <button id="opening-video-remove" class="secondary" type="button">Remover vídeo / mídia da abertura</button>
+  <button id="opening-video-remove" class="secondary" type="button">Remover mídia da abertura (imagem ou vídeo)</button>
   <p id="opening-video-status" class="status" role="status" aria-live="polite">Nenhum vídeo novo selecionado.</p>
  </div>
 </section>
@@ -363,12 +363,12 @@ profileOnlyFile.addEventListener('change',()=>{
 profileOnlySave.addEventListener('click',async()=>{
  const file=profileOnlyFile.files?.[0];if(!file){profileOnlyStatus.textContent='Primeiro escolha a imagem superior na galeria.';return;}
  profileOnlySave.disabled=true;profileOnlyStatus.textContent='Enviando a imagem original e atualizando o topo do aplicativo…';
- try{const url=await auth.saveAdminBrandingImage('profile',file);profileOnlyPreview.src=url;profileOnlyFile.value='';profileOnlyStatus.textContent='Imagem superior atualizada! A abertura e o painel inferior não foram alterados.';}
+ try{const url=await auth.saveAdminBrandingImage('profile',file);profileOnlyPreview.src=url;document.getElementById('branding-profile-preview').src=url;profileOnlyFile.value='';profileOnlyStatus.textContent='Imagem superior atualizada! A abertura e o painel inferior não foram alterados.';}
  catch(error){profileOnlyStatus.textContent=error?.message||'Não foi possível salvar. Verifique a conexão e as permissões de armazenamento.';}
  finally{profileOnlySave.disabled=false;}
 });
 
-document.getElementById('profile-only-remove').addEventListener('click',event=>removeImageSetting('profile',event.currentTarget,profileOnlyStatus,()=>{profileOnlyPreview.src='./marca.svg';profileOnlyFile.value='';}));
+document.getElementById('profile-only-remove').addEventListener('click',event=>removeImageSetting('profile',event.currentTarget,profileOnlyStatus,()=>{profileOnlyPreview.src='./marca.svg';document.getElementById('branding-profile-preview').src='./marca.svg';profileOnlyFile.value='';}));
 const brandingFile=document.getElementById('branding-pair-file');
 const brandingPreview=document.getElementById('branding-profile-preview');
 const brandingSave=document.getElementById('branding-pair-save');
