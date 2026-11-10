@@ -73,6 +73,9 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
+      - name: Permitir áudio automático no WebView Android
+        run: python3 scripts/configure-android-media.py android
+
       - name: Build debug APK
         working-directory: android
         run: ./gradlew --no-daemon assembleDebug
