@@ -13,8 +13,8 @@ source = path.read_text(encoding="utf-8")
 if "setMediaPlaybackRequiresUserGesture(false)" in source:
     print("Autoplay de mídia já está habilitado.")
     raise SystemExit(0)
-pattern = r"(public\\s+class\\s+MainActivity\\s+extends\\s+BridgeActivity\\s*\\{)"
-replacement = r"""\\1
+pattern = r"(public\s+class\s+MainActivity\s+extends\s+BridgeActivity\s*\{)"
+replacement = r"""\1
     @Override
     public void onCreate(android.os.Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
