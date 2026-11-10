@@ -837,12 +837,17 @@ export async function getPublicBranding() {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('site_settings')
     .select('setting_key, setting_value')
-    .in('setting_key', ['official_profile_image_url', 'app_opening_image_url']);
+    .in('setting_key', ['official_profile_image_url', 'app_opening_image_url', 'app_home_background_image_url', 'app_home_background_x', 'app_home_background_y', 'app_home_background_blur', 'app_home_background_fit']);
   if (error) throw error;
   const settings = Object.fromEntries((data || []).map(row => [row.setting_key, row.setting_value]));
   return {
     profileImageUrl: settings.official_profile_image_url || '',
-    openingImageUrl: settings.app_opening_image_url || ''
+    openingImageUrl: settings.app_opening_image_url || '',
+    homeBackgroundImageUrl: settings.app_home_background_image_url || '',
+    homeBackgroundX: Number(settings.app_home_background_x ?? 50),
+    homeBackgroundY: Number(settings.app_home_background_y ?? 50),
+    homeBackgroundBlur: Number(settings.app_home_background_blur ?? 0),
+    homeBackgroundFit: settings.app_home_background_fit === 'contain' ? 'contain' : 'cover'
   };
 }
 
@@ -892,6 +897,44 @@ export async function saveAdminOpeningImage(file) {
   if (saveError) throw saveError;
   return publicData.publicUrl;
 }
+
+/* Imagem de fundo do painel central, com enquadramento e desfoque ajustáveis. */
+export async function saveAdminHomeBackground(file, options = {}) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode alterar o fundo do painel.');
+  const allowed = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+  let imageUrl = '';
+  if (file) {
+    if (!(file instanceof File) || !allowed[file.type]) throw new Error('Escolha uma imagem JPG, PNG ou WebP.');
+    if (file.size < 1 || file.size > 8 * 1024 * 1024) throw new Error('A imagem deve ter até 8 MB.');
+    const path = user.id + '/branding/home-background-' + crypto.randomUUID() + '.' + allowed[file.type];
+    const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: false });
+    if (uploadError) throw uploadError;
+    const { data: publicData } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
+    if (!publicData?.publicUrl) throw new Error('Não foi possível gerar o endereço público do fundo.');
+    imageUrl = publicData.publicUrl;
+  } else {
+    const { data, error } = await supabase.from('site_settings').select('setting_value').eq('setting_key', 'app_home_background_image_url').maybeSingle();
+    if (error) throw error;
+    imageUrl = data?.setting_value || '';
+    if (!imageUrl) throw new Error('Escolha uma imagem de fundo antes de salvar os ajustes.');
+  }
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, Number(value) || 0));
+  const now = new Date().toISOString();
+  const rows = [
+    { setting_key: 'app_home_background_image_url', setting_value: imageUrl, updated_at: now },
+    { setting_key: 'app_home_background_x', setting_value: String(clamp(options.x ?? 50, 0, 100)), updated_at: now },
+    { setting_key: 'app_home_background_y', setting_value: String(clamp(options.y ?? 50, 0, 100)), updated_at: now },
+    { setting_key: 'app_home_background_blur', setting_value: String(clamp(options.blur ?? 0, 0, 12)), updated_at: now },
+    { setting_key: 'app_home_background_fit', setting_value: options.fit === 'contain' ? 'contain' : 'cover', updated_at: now }
+  ];
+  const { error: saveError } = await supabase.from('site_settings').upsert(rows, { onConflict: 'setting_key' });
+  if (saveError) throw saveError;
+  return imageUrl;
+}
+
 
 export async function saveAdminBrandingImage(kind, file) {
   const supabase = initSupabase();
