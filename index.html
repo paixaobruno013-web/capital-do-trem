@@ -861,7 +861,7 @@ function updateIntroControl(){
  introToggle.setAttribute('aria-pressed',String(introEnabled));
  introToggle.textContent=introEnabled?'🔊 Som de entrada: ligado':'🔇 Som de entrada: desligado';
  if(!introEnabled)introStatus.textContent='Vinheta desligada. Você pode ativá-la quando quiser.';
- else if(!introPlayed)introStatus.textContent='Vinheta de 10 segundos • toque na tela para ouvir';
+ else if(!introPlayed)introStatus.textContent='Vinheta de 7 segundos • toque na tela para ouvir';
 }
 function makeNoiseBuffer(ctx,duration=1){
  const length=Math.max(1,Math.floor(ctx.sampleRate*duration));
