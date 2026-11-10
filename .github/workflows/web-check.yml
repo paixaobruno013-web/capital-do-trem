@@ -37,6 +37,8 @@ jobs:
           grep -q 'audio/x-m4a' supabase/auth.js
       - name: Verificar sintaxe dos scripts das páginas
         run: node scripts/check-inline-scripts.mjs
+      - name: Verificar controles e regressões do chat
+        run: node scripts/check-chat-controls.mjs
       - name: Conferir proteção e segurança do banco
         run: |
           grep -q 'create policy "songs_insert_artist_or_admin"' supabase/schema.sql
