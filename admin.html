@@ -203,7 +203,7 @@ audio{width:100%;}
  <h2>Substituir vídeo de abertura</h2>
  <p class="muted">Envie um vídeo MP4 ou WebM de até 50 MB. O vídeo será exibido em tela cheia na abertura do aplicativo; para permitir reprodução automática no Android e iPhone, ele começa sem áudio. A vinheta sonora do aplicativo continua independente.</p>
  <div class="item">
-  <video id="opening-video-preview" controls playsinline muted style="display:none;width:100%;max-width:520px;max-height:300px;object-fit:contain;background:#000;border-radius:12px;margin:12px auto"></video>
+  <video id="opening-video-preview" controls playsinline muted style="display:none;width:100%;max-width:280px;height:497px;max-height:none;aspect-ratio:9/16;object-fit:cover;object-position:50% 50%;background:#000;border-radius:12px;margin:12px auto"></video>
   <label for="opening-video-file">Selecionar vídeo de abertura</label>
   <input id="opening-video-file" type="file" accept="video/mp4,video/webm">
   <button id="opening-video-save" type="button">Usar este vídeo na abertura</button>
@@ -382,7 +382,7 @@ async function loadBranding(){
   if(branding.openingImageUrl)document.getElementById('opening-image-preview').src=branding.openingImageUrl;
   openingMediaX.value=String(branding.openingX??50);openingMediaY.value=String(branding.openingY??50);openingMediaFit.value=branding.openingFit||'cover';
   const mediaPreview=document.getElementById('opening-media-frame-preview');
-  mediaPreview.src=branding.openingVideoUrl||branding.openingImageUrl||'./marca.svg';paintOpeningMediaPreview();
+  mediaPreview.src=branding.openingImageUrl||'./marca.svg';paintOpeningMediaPreview();
   const openingMode=document.getElementById('opening-media-mode');
   openingMode.value=branding.openingVideoUrl?'video':'image';
   document.getElementById('opening-image-section').hidden=openingMode.value!=='image';
