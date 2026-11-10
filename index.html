@@ -1673,17 +1673,17 @@ async function saveOfflineMusic(id,blob,title){
     const video=document.createElement('video');
     video.className='opening-video-background';video.src=openingVideo;video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';video.autoplay=true;video.muted=true;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));video.playsInline=true;video.loop=true;video.preload='auto';video.setAttribute('aria-hidden','true');
     screen.insertBefore(video,screen.firstChild);screen.classList.add('custom-opening-screen');
-    if(branding.openingVideoMuted===false){
-     const audioButton=document.createElement('button');audioButton.type='button';audioButton.textContent='🔊 TOQUE PARA ATIVAR O ÁUDIO';
-     audioButton.setAttribute('aria-label','Ativar áudio do vídeo de abertura');
-     audioButton.style.cssText='position:absolute;z-index:10000;left:50%;bottom:22%;transform:translateX(-50%);padding:12px 18px;border:2px solid #ed1c24;border-radius:999px;background:#050505ef;color:#fff;font-weight:900;letter-spacing:.5px;box-shadow:0 0 16px #ed1c24;cursor:pointer;pointer-events:auto;touch-action:manipulation';
-     audioButton.addEventListener('click',async()=>{try{video.muted=false;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));await video.play();audioButton.textContent='🔊 ÁUDIO ATIVADO';setTimeout(()=>audioButton.remove(),650);}catch(error){audioButton.textContent='TOQUE NOVAMENTE PARA OUVIR';console.warn('O navegador bloqueou o áudio da abertura.',error);}},{once:false});
-     screen.appendChild(audioButton);
-    }
+    // O celular bloqueia áudio automático: o vídeo começa mudo e oferece ativação por toque.
+    // O botão fica disponível mesmo quando a preferência salva era "sem áudio", para o público poder optar.
+    const audioButton=document.createElement('button');audioButton.type='button';audioButton.textContent='🔊 TOQUE PARA ATIVAR O ÁUDIO';
+    audioButton.setAttribute('aria-label','Ativar áudio do vídeo de abertura');
+    audioButton.style.cssText='position:absolute;z-index:10000;left:50%;bottom:22%;transform:translateX(-50%);padding:12px 18px;border:2px solid #ed1c24;border-radius:999px;background:#050505ef;color:#fff;font-weight:900;letter-spacing:.5px;box-shadow:0 0 16px #ed1c24;cursor:pointer;pointer-events:auto;touch-action:manipulation';
+    audioButton.addEventListener('click',async()=>{try{video.muted=false;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));await video.play();audioButton.textContent='🔊 ÁUDIO ATIVADO';setTimeout(()=>audioButton.remove(),900);}catch(error){audioButton.textContent='TOQUE NOVAMENTE PARA OUVIR';console.warn('O navegador bloqueou o áudio da abertura.',error);}},{once:false});
+    screen.appendChild(audioButton);
     const movingTrain=document.getElementById('opening-live-train');
     if(movingTrain){
-     movingTrain.style.setProperty('animation','none','important');
-     movingTrain.style.setProperty('left','-190px','important');
+     movingTrain.style.setProperty('animation','none');
+     movingTrain.style.removeProperty('left'); // não travar left com !important: a animação precisa movimentá-lo.
      void movingTrain.offsetWidth;
      movingTrain.style.setProperty('animation','opening-train-cross-sky 9.5s linear 1 both','important');
     }
@@ -1753,11 +1753,31 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
  box-shadow:none!important;transform:translateY(-58%)!important;
  animation:opening-train-cross-sky 9.5s linear 1 both!important;
 }
+/* Neutraliza estilos antigos de span que transformavam a locomotiva e a carga em barras vermelhas. */
+.intro-smoke.custom-opening-screen .opening-live-track #opening-live-train,
+.intro-smoke.custom-opening-screen .opening-live-track #opening-live-train *{
+ box-sizing:border-box!important;background-color:transparent;
+}
+.intro-smoke.custom-opening-screen .opening-live-track #opening-live-train > .opening-wagon{
+ display:flex!important;flex:0 0 auto!important;position:relative!important;
+ width:auto!important;height:40px!important;min-width:42px!important;
+ align-items:center!important;justify-content:flex-end!important;
+ border:0!important;border-radius:0!important;box-shadow:none!important;
+}
+.intro-smoke.custom-opening-screen .opening-live-track #opening-live-train .opening-wagon-load{
+ display:flex!important;width:auto!important;height:auto!important;min-height:19px!important;
+ align-items:center!important;justify-content:center!important;
+ background:transparent!important;border:0!important;overflow:visible!important;
+}
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train .opening-wagon-deck{
- display:block!important;width:100%!important;height:9px!important;min-height:9px!important;
+ display:block!important;position:relative!important;width:100%!important;height:9px!important;min-height:9px!important;
  border:2px solid #ff2634!important;border-top:3px solid #ff2634!important;
  border-radius:2px!important;background:linear-gradient(180deg,#444,#111)!important;
  box-shadow:0 0 5px rgba(255,20,28,.7)!important;
+}
+.intro-smoke.custom-opening-screen .opening-live-track #opening-live-train .opening-locomotive{
+ display:inline-block!important;flex:0 0 auto!important;width:auto!important;height:auto!important;
+ background:transparent!important;font-size:36px!important;line-height:1!important;
 }
 @keyframes opening-train-cross-sky{
  from{left:-230px}
