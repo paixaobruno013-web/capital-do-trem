@@ -1,4 +1,4 @@
-const CACHE='capital-do-trem-v235';;;
+const CACHE='capital-do-trem-v236';;;
 const CORE_FILES=['./','./index.html','./offline.html','./marca.svg','./manifest.webmanifest','./update.js','./assets/favela-header.webp','./assets/banner-speakers.webp'];
 const OPTIONAL_FILES=['./admin.html','./admin-media.js','./admin-private-gallery.js','./participant-private-gallery.js','./privacidade.html','./conta.html','./supabase/auth.js','./diagnostico.html','./bate-papo.html','./chat-enhancements.js','./emoji-picker.js','./stories-ui.js','./admin-stories.js','./account-stories.js','./avatar.html','./mensagens.html'];
 
