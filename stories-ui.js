@@ -4,13 +4,13 @@ import {
 } from './supabase/auth.js';
 
 const logo = document.getElementById('site-logo');
-const tray = document.getElementById('community-story-tray');
 const viewer = document.getElementById('capital-story-viewer');
 const mediaBox = document.getElementById('capital-story-media');
 const captionBox = document.getElementById('capital-story-caption');
 const progress = document.querySelector('#capital-story-progress span');
 const toast = document.getElementById('capital-story-toast');
-const SEEN_KEY = 'capitaldotrem_stories_seen_v2';
+const profileDirectory = document.getElementById('community-profiles');
+const SEEN_KEY = 'capitaldotrem_stories_seen_v3';
 let officialStories = [];
 let userStories = [];
 let stories = [];
@@ -18,6 +18,7 @@ let currentIndex = 0;
 let advanceTimer = null;
 let toastTimer = null;
 let unsubscribers = [];
+let profileObserver;
 
 function seenIds() {
   try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]')); }
@@ -26,51 +27,55 @@ function seenIds() {
 function rememberSeen(id) {
   const seen = seenIds();
   seen.add(id);
-  try { localStorage.setItem(SEEN_KEY, JSON.stringify([...seen].slice(-250))); } catch {}
+  try { localStorage.setItem(SEEN_KEY, JSON.stringify([...seen].slice(-300))); } catch {}
 }
-function updateOfficialRing() {
-  if (!logo) return;
-  const active = officialStories.filter(s => new Date(s.expires_at).getTime() > Date.now());
-  logo.classList.toggle('has-active-story', active.length > 0);
-  logo.setAttribute('aria-label', active.length ? 'Abrir Stories oficiais da Capital do Trem. Há novidades.' : 'Foto oficial da Capital do Trem');
-  logo.title = active.length ? 'Ver Stories oficiais' : 'Capital do Trem';
-  logo.setAttribute('role', 'button');
-  logo.tabIndex = 0;
-}
-function renderTray() {
-  if (!tray) return;
-  tray.replaceChildren();
+function userStoryGroups() {
   const groups = new Map();
   for (const story of userStories) {
     if (!groups.has(story.author_id)) groups.set(story.author_id, []);
     groups.get(story.author_id).push(story);
   }
+  for (const items of groups.values()) items.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+  return groups;
+}
+function updateOfficialRing() {
+  if (!logo) return;
+  const active = officialStories.filter(s => new Date(s.expires_at).getTime() > Date.now());
+  const unseen = active.some(s => !seenIds().has(s.id));
+  logo.classList.toggle('has-active-story', unseen);
+  logo.classList.toggle('has-seen-story', active.length > 0 && !unseen);
+  logo.setAttribute('aria-label', active.length ? 'Abrir Stories oficiais da Capital do Trem. Há novidades.' : 'Foto oficial da Capital do Trem');
+  logo.title = active.length ? 'Ver Stories oficiais' : 'Capital do Trem';
+  logo.setAttribute('role', 'button');
+  logo.tabIndex = 0;
+}
+function updateUserProfileRings() {
+  if (!profileDirectory) return;
+  const groups = userStoryGroups();
   const seen = seenIds();
-  for (const [authorId, items] of groups) {
-    const latest = items[items.length - 1];
-    const chip = document.createElement('button');
-    chip.type = 'button';
-    chip.className = 'community-story-chip' + (items.every(s => seen.has(s.id)) ? ' seen' : '');
-    const avatar = document.createElement('span');
-    avatar.className = 'community-story-avatar';
-    if (latest.avatar_url) {
-      const img = document.createElement('img');
-      img.src = latest.avatar_url;
-      img.alt = '';
-      img.loading = 'lazy';
-      avatar.append(img);
-    } else {
-      const initial = document.createElement('span');
-      initial.textContent = (latest.display_name || latest.username || 'U').trim().charAt(0).toUpperCase();
-      avatar.append(initial);
+  for (const avatar of profileDirectory.querySelectorAll('.community-profile-avatar[data-profile-user-id]')) {
+    const userId = avatar.dataset.profileUserId;
+    const items = (groups.get(userId) || []).filter(s => new Date(s.expires_at).getTime() > Date.now());
+    const unseen = items.some(s => !seen.has(s.id));
+    avatar.classList.toggle('has-active-story', unseen);
+    avatar.classList.toggle('has-seen-story', items.length > 0 && !unseen);
+    avatar.setAttribute('role', 'button');
+    avatar.tabIndex = 0;
+    const card = avatar.closest('.community-profile-card');
+    const name = card?.querySelector('.community-profile-copy strong')?.textContent || 'este perfil';
+    avatar.setAttribute('aria-label', items.length ? 'Abrir Stories de ' + name : 'Foto de perfil de ' + name);
+    avatar.title = items.length ? 'Ver Stories de ' + name : 'Foto de perfil';
+    if (avatar.dataset.storyClickBound !== '1') {
+      const open = () => {
+        const current = userStoryGroups().get(avatar.dataset.profileUserId) || [];
+        if (current.some(s => new Date(s.expires_at).getTime() > Date.now())) openViewer(current, name);
+      };
+      avatar.addEventListener('click', open);
+      avatar.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); }
+      });
+      avatar.dataset.storyClickBound = '1';
     }
-    const name = document.createElement('span');
-    name.className = 'community-story-name';
-    name.textContent = latest.display_name || (latest.username ? '@' + latest.username : 'Usuário Uai');
-    chip.append(avatar, name);
-    chip.setAttribute('aria-label', 'Ver Stories de ' + name.textContent);
-    chip.addEventListener('click', () => openViewer(items, name.textContent));
-    tray.append(chip);
   }
 }
 function showToast(message) {
@@ -94,7 +99,8 @@ function renderStory(index) {
   currentIndex = (index + stories.length) % stories.length;
   const story = stories[currentIndex];
   rememberSeen(story.id);
-  renderTray();
+  updateOfficialRing();
+  updateUserProfileRings();
   mediaBox.replaceChildren();
   const media = document.createElement(story.media_type === 'video' ? 'video' : 'img');
   media.src = story.media_url;
@@ -121,10 +127,7 @@ function renderStory(index) {
 }
 function openViewer(items, label = 'Stories') {
   stories = (items || []).filter(s => new Date(s.expires_at).getTime() > Date.now());
-  if (!stories.length) {
-    showToast('Ainda não há Stories ativos por aqui.');
-    return;
-  }
+  if (!stories.length) return;
   const seen = seenIds();
   const firstUnseen = stories.findIndex(s => !seen.has(s.id));
   viewer.classList.add('is-open');
@@ -138,23 +141,23 @@ async function refreshStories({ notify = false, previousAdmin = new Set(), previ
     officialStories = admins;
     userStories = users;
     updateOfficialRing();
-    renderTray();
+    updateUserProfileRings();
     if (notify) {
       const newOfficial = admins.some(s => !previousAdmin.has(s.id));
       const newUser = users.some(s => !previousUsers.has(s.id));
       if (newOfficial || newUser) {
-        showToast(newOfficial ? '🟢 Nova atualização oficial nos Stories da Capital do Trem!' : '🟢 Tem Story novo na comunidade!');
+        showToast(newOfficial ? '🟢 Nova atualização oficial nos Stories da Capital do Trem!' : '🟢 Tem Story novo nos perfis da comunidade!');
         try { navigator.vibrate?.([100, 60, 100]); } catch {}
       }
     }
   } catch (error) {
-    console.info('Stories ainda aguardam a ativação do banco:', error?.message || error);
+    console.info('Stories aguardando conexão:', error?.message || error);
   }
 }
-if (logo && viewer) {
+if (viewer) {
   const openOfficial = () => openViewer(officialStories, 'Stories oficiais da Capital do Trem');
-  logo.addEventListener('click', openOfficial);
-  logo.addEventListener('keydown', event => {
+  logo?.addEventListener('click', openOfficial);
+  logo?.addEventListener('keydown', event => {
     if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openOfficial(); }
   });
   document.getElementById('capital-story-close')?.addEventListener('click', closeViewer);
@@ -167,6 +170,10 @@ if (logo && viewer) {
     if (event.key === 'ArrowRight') renderStory(currentIndex + 1);
     if (event.key === 'ArrowLeft') renderStory(currentIndex - 1);
   });
+  if (profileDirectory) {
+    profileObserver = new MutationObserver(updateUserProfileRings);
+    profileObserver.observe(profileDirectory, { childList: true, subtree: true });
+  }
   try {
     initSupabase();
     await refreshStories();
@@ -184,8 +191,11 @@ if (logo && viewer) {
       }
     };
     unsubscribers.push(subscribeAdminStories(handleChange), subscribeUserStories(handleChange));
-    window.addEventListener('pagehide', () => unsubscribers.forEach(unsub => unsub()));
+    window.addEventListener('pagehide', () => {
+      unsubscribers.forEach(unsub => unsub());
+      profileObserver?.disconnect();
+    }, { once: true });
   } catch (error) {
-    console.info('Não foi possível iniciar os Stories neste momento:', error?.message || error);
+    console.info('Não foi possível iniciar os Stories:', error?.message || error);
   }
 }
