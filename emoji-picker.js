@@ -17,11 +17,13 @@ function makeButton(e){const b=document.createElement('button');b.type='button';
 function build(root){
  const input=document.querySelector(root.dataset.input||'#message');if(!input)return;
  root.classList.add('emoji-picker');
+ root.classList.remove('is-open');
  const quick=document.createElement('div');quick.className='emoji-quick';
  const heading=document.createElement('div');heading.className='emoji-picker-heading';
  const label=document.createElement('span');label.textContent='Mais usados';
  const toggle=document.createElement('button');toggle.type='button';toggle.className='emoji-all-toggle';toggle.textContent='Todos os emojis ▾';toggle.setAttribute('aria-expanded','false');
- heading.append(label,toggle);
+ const close=document.createElement('button');close.type='button';close.className='emoji-close';close.textContent='Fechar ✕';close.setAttribute('aria-label','Fechar emojis');
+ heading.append(label,toggle,close);
  const strip=document.createElement('div');strip.className='emoji-recent-strip';strip.setAttribute('aria-label','Emojis mais usados. Deslize para o lado para ver mais');
  quick.append(heading,strip);
  const panel=document.createElement('section');panel.className='emoji-full-panel';panel.hidden=true;
@@ -30,8 +32,9 @@ function build(root){
  function renderGroup(index){tabs.querySelectorAll('button').forEach((b,i)=>b.setAttribute('aria-pressed',String(i===index)));grid.replaceChildren();GROUPS[index].items.split(' ').forEach(e=>grid.append(makeButton(e)))}
  GROUPS.forEach((g,i)=>{const b=document.createElement('button');b.type='button';b.textContent=g.name;b.setAttribute('aria-pressed',String(i===0));b.addEventListener('click',()=>renderGroup(i));tabs.append(b)});
  renderRecent();renderGroup(0);
+ close.addEventListener('click',()=>{root.classList.remove('is-open');root.closest('form')?.classList.remove('emoji-open');const trigger=document.getElementById('emoji-toggle')||document.getElementById('private-emoji-toggle');if(trigger){trigger.setAttribute('aria-expanded','false');trigger.textContent='😊';}input.focus();});
  toggle.addEventListener('click',()=>{panel.hidden=!panel.hidden;toggle.setAttribute('aria-expanded',String(!panel.hidden));toggle.textContent=panel.hidden?'Todos os emojis ▾':'Fechar ✕';if(!panel.hidden)panel.scrollIntoView({block:'nearest',behavior:'smooth'})});
- root.addEventListener('click',event=>{const b=event.target.closest('button[data-emoji]');if(!b)return;const e=b.dataset.emoji,start=input.selectionStart??input.value.length,end=input.selectionEnd??input.value.length;if(typeof input.setRangeText==='function')input.setRangeText(e,start,end,'end');else input.value=input.value.slice(0,start)+e+input.value.slice(end);input.dispatchEvent(new Event('input',{bubbles:true}));input.focus();remember(e);renderRecent()});
+ root.addEventListener('click',event=>{const b=event.target.closest('button[data-emoji]');if(!b)return;const e=b.dataset.emoji,start=input.selectionStart??input.value.length,end=input.selectionEnd??input.value.length;if(typeof input.setRangeText==='function')input.setRangeText(e,start,end,'end');else input.value=input.value.slice(0,start)+e+input.value.slice(end);input.dispatchEvent(new Event('input',{bubbles:true}));remember(e);renderRecent();root.classList.remove('is-open');root.closest('form')?.classList.remove('emoji-open');const trigger=document.getElementById('emoji-toggle')||document.getElementById('private-emoji-toggle');if(trigger){trigger.setAttribute('aria-expanded','false');trigger.textContent='😊';}input.focus()});
 }
 document.querySelectorAll('[data-emoji-picker]').forEach(build);
 })();
