@@ -29,6 +29,7 @@ on:
       - 'emoji-picker.js'
       - 'stories-ui.js'
       - 'admin-stories.js'
+      - 'account-stories.js'
       - 'supabase-config.js'
 
 permissions:
