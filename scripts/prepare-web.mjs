@@ -13,6 +13,8 @@ const files = [
   'bate-papo.html',
   'chat-enhancements.js',
   'emoji-picker.js',
+  'stories-ui.js',
+  'admin-stories.js',
   'avatar.html',
   'mensagens.html',
   'diagnostico.html',
