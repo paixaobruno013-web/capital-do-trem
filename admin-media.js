@@ -42,13 +42,30 @@ el('opening-image-save-direct')?.addEventListener('click',()=>upload(
  f=>auth.saveAdminOpeningImage(f,{x:50,y:50,fit:'cover'}),
  'IMAGEM PUBLICADA. ELA FICARÁ NA ABERTURA POR 10 SEGUNDOS.','PUBLICAR IMAGEM NA ABERTURA (10 SEGUNDOS)',5*1024*1024
 ));
+async function verifyHeaderBackground(url){
+ await new Promise((resolve,reject)=>{
+  const image=new Image();
+  image.onload=resolve;
+  image.onerror=()=>reject(new Error('O arquivo foi enviado, mas a imagem não abriu pelo endereço público.'));
+  image.src=url+(url.includes('?')?'&':'?')+'cdt_verify='+Date.now();
+ });
+ const saved=await auth.getPublicBranding();
+ if(saved.headerBackgroundImageUrl!==url)throw new Error('A imagem abriu, mas a configuração do cabeçalho não foi confirmada na leitura pública.');
+}
 el('header-background-save-direct')?.addEventListener('click',async()=>{
- const url=await upload(
-  'header-background-file-direct','header-background-save-direct','header-background-direct-status',
-  f=>auth.saveAdminHeaderBackground(f,{x:50,y:50,blur:0,fit:'cover'}),
-  'FUNDO DO CABEÇALHO PUBLICADO SEM DESFOQUE.','PUBLICAR FUNDO DO CABEÇALHO',8*1024*1024
- );
- if(url){const preview=el('header-background-preview-direct');if(preview)preview.src=url;}
+ const status='header-background-direct-status';
+ try{
+  const url=await upload(
+   'header-background-file-direct','header-background-save-direct',status,
+   f=>auth.saveAdminHeaderBackground(f,{x:50,y:50,blur:0,fit:'cover'}),
+   'Imagem enviada. Conferindo gravação e exibição…','PUBLICAR FUNDO DO CABEÇALHO',8*1024*1024
+  );
+  if(!url)return;
+  await verifyHeaderBackground(url);
+  const preview=el('header-background-preview-direct');
+  if(preview){preview.src=url;preview.style.display='block';}
+  say(status,'CONFIRMADO: imagem enviada, aberta e configuração gravada. Atualize a tela inicial para visualizar o novo cabeçalho.');
+ }catch(e){say(status,'NÃO FOI POSSÍVEL CONFIRMAR O FUNDO: '+[e?.message,e?.code,e?.status,e?.details,e?.hint].filter(Boolean).join(' | '));}
 });
 
 const volumeInput=el('opening-video-volume');
