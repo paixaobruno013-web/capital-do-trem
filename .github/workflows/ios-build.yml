@@ -27,6 +27,8 @@ on:
       - '.github/workflows/ios-build.yml'
       - 'admin-media.js'
       - 'emoji-picker.js'
+      - 'stories-ui.js'
+      - 'admin-stories.js'
       - 'supabase-config.js'
 
 permissions:
