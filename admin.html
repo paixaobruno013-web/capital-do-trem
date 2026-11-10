@@ -267,6 +267,19 @@ audio{width:100%;}
  </div>
 </section>
 
+<section class="command-section" id="admin-stories-section">
+<h2>Stories do administrador</h2>
+<p class="muted">Publique avisos, novidades, fotos ou vídeos. O aro da foto oficial ficará verde enquanto houver Stories novos. Cada Story fica disponível por 24 horas.</p>
+<form id="admin-story-form">
+<label for="admin-story-file">Foto ou vídeo do Story</label>
+<input id="admin-story-file" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" required>
+<label for="admin-story-caption">Mensagem (opcional)</label>
+<textarea id="admin-story-caption" maxlength="280" placeholder="Ex.: Tem novidade chegando no Capital do Trem!"></textarea>
+<button id="admin-story-publish" type="submit">🟢 Publicar Story e avisar os usuários</button>
+<p id="admin-story-status" class="status" role="status" aria-live="polite"></p>
+</form>
+<h3>Stories publicados</h3><div id="admin-story-list"><p class="muted">Entre no painel para carregar os Stories.</p></div>
+</section>
 <section class="command-section"><h2>Publicações e aprovações</h2><p class="muted">Acompanhe artistas, músicas, eventos e divulgações enviados para análise.</p><p id="queue-status" class="status" role="status" aria-live="polite"></p><div id="queue"></div></section>
 <section class="command-section"><div class="actions" style="justify-content:space-between;align-items:center"><h2>Koe Fala Tu • Moderação do chat</h2><button id="refresh-chat" class="secondary" type="button">Atualizar mensagens</button></div><p class="muted">Revise mensagens recentes e remova conteúdos ofensivos, spam ou informações impróprias.</p><div id="chat-moderation"></div></section>
 </section>
@@ -631,6 +644,7 @@ try{
 }catch(error){loginStatus.textContent='Painel ainda indisponível: configure as credenciais do Supabase e aplique o banco de dados.';}
 
 </script>
+<script type="module" src="./admin-stories.js"></script>
 <script src="./update.js" defer></script>
 <script type="module" src="./admin-media.js"></script>
 </body></html>
