@@ -37,8 +37,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
  .connection-status{margin:0 0 12px;padding:11px 13px;border:1px solid var(--red);border-radius:10px;background:var(--panel2);color:var(--fg)}.connection-status[hidden]{display:none}
  .skip-link{position:absolute;left:12px;top:-60px;z-index:1000;background:var(--red);color:#fff;padding:12px 16px;border-radius:9px;font-weight:800;text-decoration:none}.skip-link:focus{top:12px}
 /* Abertura cinematográfica: fumaça leve atravessando a marca. */
-.intro-smoke{position:fixed;inset:0;z-index:9998;display:grid;place-items:center;overflow:hidden;background:#000;pointer-events:none;animation:intro-screen-out 7s ease-in-out forwards}
-.intro-smoke__brand{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;opacity:0;animation:intro-brand-in 6.7s ease-out forwards}
+.intro-smoke{position:fixed;inset:0;z-index:9998;display:grid;place-items:center;overflow:hidden;background:#000;pointer-events:none;animation:intro-screen-out 10s ease-in-out forwards}
+.intro-smoke__brand{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;opacity:0;animation:intro-brand-in 9.5s ease-out forwards}
 .intro-smoke__brand img{width:clamp(92px,24vw,150px);height:auto;max-height:150px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(255,255,255,.18))}
 .intro-smoke__brand.custom-opening-image{width:100%;height:100%;justify-content:center;gap:0}
 .intro-smoke__brand.custom-opening-image img{position:absolute;inset:0;width:100vw;height:100vh;max-height:none;object-fit:cover;filter:none}
@@ -861,7 +861,7 @@ function updateIntroControl(){
  introToggle.setAttribute('aria-pressed',String(introEnabled));
  introToggle.textContent=introEnabled?'🔊 Som de entrada: ligado':'🔇 Som de entrada: desligado';
  if(!introEnabled)introStatus.textContent='Vinheta desligada. Você pode ativá-la quando quiser.';
- else if(!introPlayed)introStatus.textContent='Vinheta de 7 segundos • toque na tela para ouvir';
+ else if(!introPlayed)introStatus.textContent='Vinheta de 10 segundos • toque na tela para ouvir';
 }
 function makeNoiseBuffer(ctx,duration=1){
  const length=Math.max(1,Math.floor(ctx.sampleRate*duration));
@@ -1578,7 +1578,7 @@ async function saveOfflineMusic(id,blob,title){
   const paint=()=>{if(bar)bar.style.width=progress+'%';};
   const finish=()=>{
    if(finished||finishQueued||!ready||!imageReady)return;
-   const remaining=Math.max(0,7000-(performance.now()-openingStartedAt));
+   const remaining=Math.max(0,9500-(performance.now()-openingStartedAt));
    finishQueued=true;
    setTimeout(()=>{
     if(finished)return;
