@@ -1837,4 +1837,16 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
 }
 </style>
 
+
+<style id="opening-remove-red-progress-line">
+/* Remove somente a linha vermelha de carregamento; preserva o trem e a abertura. */
+.intro-smoke.custom-opening-screen .opening-live-track::before,
+.intro-smoke.custom-opening-screen .opening-live-track > #opening-live-progress{
+  display:none!important;
+  visibility:hidden!important;
+  opacity:0!important;
+  box-shadow:none!important;
+}
+</style>
+
 </body></html>
