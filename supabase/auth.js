@@ -648,6 +648,42 @@ export async function addSongComment(songId, content) {
   return data;
 }
 
+// Participação voluntária no grupo geral. A autorização real também é aplicada pelo RLS no banco.
+export async function getChatGroupMembership() {
+  const supabase=initSupabase();
+  const {data:{user},error:userError}=await supabase.auth.getUser();
+  if(userError)throw userError;
+  if(!user)throw new Error('Entre na sua conta para verificar sua participação.');
+  const {data,error}=await supabase.from('chat_group_members')
+    .select('user_id,joined_at,left_at').eq('user_id',user.id).maybeSingle();
+  if(error)throw error;
+  return {isMember:!!data&&!data.left_at,membership:data||null};
+}
+
+export async function joinChatGroup() {
+  const supabase=initSupabase();
+  const {data:{user},error:userError}=await supabase.auth.getUser();
+  if(userError)throw userError;
+  if(!user)throw new Error('Entre na sua conta para participar do grupo.');
+  const {data,error}=await supabase.from('chat_group_members')
+    .upsert({user_id:user.id,joined_at:new Date().toISOString(),left_at:null},{onConflict:'user_id'})
+    .select('user_id,joined_at,left_at').single();
+  if(error)throw error;
+  return data;
+}
+
+export async function leaveChatGroup() {
+  const supabase=initSupabase();
+  const {data:{user},error:userError}=await supabase.auth.getUser();
+  if(userError)throw userError;
+  if(!user)throw new Error('Entre na sua conta.');
+  const {data,error}=await supabase.from('chat_group_members')
+    .update({left_at:new Date().toISOString()}).eq('user_id',user.id)
+    .select('user_id,left_at').single();
+  if(error)throw error;
+  return data;
+}
+
 // Bate-papo geral em tempo real para todos os usuários autenticados.
 export async function getChatMessages(limit = 60) {
   const supabase = initSupabase();
@@ -740,15 +776,27 @@ export async function getPrivateConversationData() {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para acessar suas conversas.');
-  const [{ data: conversations, error: conversationError }, { data: people, error: peopleError }, { data: blocks, error: blockError }] = await Promise.all([
+  const [{ data: conversations, error: conversationError }, { data: membership, error: membershipError }, { data: memberRows, error: membersError }, { data: blocks, error: blockError }] = await Promise.all([
     supabase.from('private_conversations').select('id,participant_one,participant_two,initiated_by,status,created_at,updated_at').or('participant_one.eq.' + user.id + ',participant_two.eq.' + user.id).order('updated_at',{ascending:false}).limit(100),
-    supabase.from('profiles').select('user_id,display_name,username,account_type,city,avatar_type,avatar_url,avatar_data').eq('is_public',true).neq('user_id',user.id).order('display_name',{ascending:true}).limit(100),
+    supabase.from('chat_group_members').select('user_id,joined_at,left_at').eq('user_id',user.id).maybeSingle(),
+    supabase.rpc('active_chat_group_member_ids'),
     supabase.from('private_blocks').select('blocked_id').eq('blocker_id',user.id)
   ]);
   if (conversationError) throw conversationError;
-  if (peopleError) throw peopleError;
+  if (membershipError) throw membershipError;
+  if (membersError) throw membersError;
   if (blockError) throw blockError;
-  return { userId:user.id, conversations:conversations||[], people:people||[], blocked:(blocks||[]).map(row=>row.blocked_id) };
+  const isGroupMember=!!membership&&!membership.left_at;
+  const memberIds=(memberRows||[]).map(row=>row.user_id).filter(id=>id!==user.id);
+  let people=[];
+  if(isGroupMember&&memberIds.length){
+    const {data,error}=await supabase.from('profiles')
+      .select('user_id,display_name,username,account_type,city,avatar_type,avatar_url,avatar_data')
+      .eq('is_public',true).in('user_id',memberIds).order('display_name',{ascending:true}).limit(100);
+    if(error)throw error;
+    people=data||[];
+  }
+  return { userId:user.id, isGroupMember, conversations:conversations||[], people, memberIds, blocked:(blocks||[]).map(row=>row.blocked_id) };
 }
 
 export async function requestPrivateConversation(otherUserId) {
