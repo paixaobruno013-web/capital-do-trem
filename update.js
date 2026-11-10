@@ -204,21 +204,6 @@
    return field.value!==field.defaultValue&&field.value.trim()!=='';
   });
  }
- let autoUpdateTimer=null;
- function applyWaitingUpdate(){
-  if(!registration?.waiting||!navigator.serviceWorker.controller)return false;
-  if(hasUnsavedWork()){showUpdate();return false;}
-  if(reloading)return true;
-  button.disabled=true;button.textContent='Atualizando automaticamente…';
-  registration.waiting.postMessage({type:'SKIP_WAITING'});
-  return true;
- }
- function scheduleAutoUpdate(){
-  clearTimeout(autoUpdateTimer);
-  autoUpdateTimer=window.setTimeout(()=>{
-   if(!applyWaitingUpdate())showUpdate();
-  },12000);
- }
  navigator.serviceWorker.addEventListener('controllerchange',()=>{
   if(reloading)return;
   reloading=true;
@@ -226,12 +211,12 @@
  });
  navigator.serviceWorker.register('./sw.js').then(reg=>{
   registration=reg;
-  if(reg.waiting&&navigator.serviceWorker.controller)scheduleAutoUpdate();
+  if(reg.waiting&&navigator.serviceWorker.controller)showUpdate();
   reg.addEventListener('updatefound',()=>{
    const worker=reg.installing;
    if(!worker)return;
    worker.addEventListener('statechange',()=>{
-    if(worker.state==='installed'&&navigator.serviceWorker.controller)scheduleAutoUpdate();
+    if(worker.state==='installed'&&navigator.serviceWorker.controller)showUpdate();
    });
   });
   let checkingUpdate=false;
@@ -247,8 +232,8 @@
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)check();});
   // Confere atualizações periodicamente enquanto o app permanece aberto.
   window.setInterval(check,30*60*1000);
-  window.addEventListener('focus',()=>{if(reg.waiting)scheduleAutoUpdate();});
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&reg.waiting)scheduleAutoUpdate();});
+  window.addEventListener('focus',()=>{if(reg.waiting)showUpdate();});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&reg.waiting)showUpdate();});
   check();
  }).catch(()=>{});
  const addBanner=()=>{if(!banner.isConnected)document.body.append(banner);};
@@ -297,14 +282,9 @@
   const notice=document.createElement('aside');
   notice.setAttribute('role','status');
   notice.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(90px + env(safe-area-inset-bottom,0px));z-index:10003;max-width:520px;margin:auto;padding:13px 15px;border:1px solid #ed1c24;border-radius:12px;background:#111;color:#fff;font:600 14px/1.45 system-ui,sans-serif;box-shadow:0 8px 28px #0009';
-  notice.textContent='O Capital do Trem identificou uma instabilidade e está tentando recuperar o funcionamento. Se você estiver preenchendo algo, salve antes de recarregar.';
+  notice.textContent='O Capital do Trem identificou uma instabilidade. Ele não será reiniciado automaticamente; tente atualizar manualmente quando terminar sua atividade.';
   document.body.append(notice);
-  let last=0;
-  try{last=Number(localStorage.getItem('capital-do-trem-last-recovery')||0);}catch{}
-  if(navigator.onLine&&safeToRecover()&&now-last>30*60*1000){
-   try{localStorage.setItem('capital-do-trem-last-recovery',String(now));}catch{}
-   window.setTimeout(()=>{if(safeToRecover())location.reload();},1800);
-  }
+  // Não recarrega automaticamente: o usuário decide quando atualizar.
  }
  window.addEventListener('error',event=>{
   if(event.target&&event.target!==window){
