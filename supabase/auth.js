@@ -28,6 +28,18 @@ export function initSupabase() {
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true
+    },
+    // Configurações da abertura não podem vir de cache HTTP antigo.
+    global: {
+      fetch: (input, init = {}) => {
+        const requestUrl = input instanceof Request ? input.url : String(input);
+        if (requestUrl.includes('/rest/v1/site_settings')) {
+          const headers = new Headers(init.headers || (input instanceof Request ? input.headers : undefined));
+          headers.set('Cache-Control', 'no-cache');
+          return fetch(input, { ...init, cache: 'no-store', headers });
+        }
+        return fetch(input, init);
+      }
     }
   });
 
