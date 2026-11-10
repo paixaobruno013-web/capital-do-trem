@@ -8,7 +8,7 @@
 <path d="M141 189q-8-112 115-123 116 5 124 105l-27 18q-28-45-91-43-73 0-110 47z" fill="#090a0e" stroke="#ed1c24" stroke-width="8"/>
 <path d="M113 177q135-58 280 0 24 9 37 26-165 39-354 0 12-18 37-26z" fill="#08090d" stroke="#ed1c24" stroke-width="7"/>
 <path d="M170 155q84-28 171 0l-7 24q-80-18-157 0z" fill="#ed1c24"/>
-<text x="256" y="160" fill="#fff" font-size="19" font-weight="900" text-anchor="middle" font-family="Arial">CAPITAL</text><text x="256" y="179" fill="#fff" font-size="16" font-weight="900" text-anchor="middle" font-family="Arial">DO TREM</text>
+<text x="256" y="160" fill="#fff" font-size="19" font-weight="900" text-anchor="middle" font-family="Arial">CAPITAL</text><text x="256" y="179" fill="#fff" font-size="16" font-weight="900" text-anchor="middle" font-family="Arial">DO TREM</text><image href="../marca.svg" x="235" y="124" width="42" height="42"/>
 <path d="M160 225q40-30 83-3l-5 44q-42 15-78-2zM270 222q42-27 82 3l-1 39q-39 18-78 2z" fill="#111820" stroke="url(#metal)" stroke-width="10" filter="url(#glow)"/>
 <path d="M163 234l76 14M274 248l72-14" stroke="url(#lens)" stroke-width="8" opacity=".9"/><path d="M242 238q15-10 29 0" stroke="#d9e2e9" stroke-width="8"/>
 <path d="M251 260q-10 32 8 37" fill="none" stroke="#623629" stroke-width="7" stroke-linecap="round"/><path d="M221 310q35 25 71 0" fill="none" stroke="#51251f" stroke-width="8" stroke-linecap="round"/>
