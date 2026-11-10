@@ -19,6 +19,7 @@ let advanceTimer = null;
 let toastTimer = null;
 let unsubscribers = [];
 let profileObserver;
+let lastTrigger = null;
 
 function seenIds() {
   try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]')); }
@@ -68,7 +69,7 @@ function updateUserProfileRings() {
     if (avatar.dataset.storyClickBound !== '1') {
       const open = () => {
         const current = userStoryGroups().get(avatar.dataset.profileUserId) || [];
-        if (current.some(s => new Date(s.expires_at).getTime() > Date.now())) openViewer(current, name);
+        if (current.some(s => new Date(s.expires_at).getTime() > Date.now())) openViewer(current, name, avatar);
       };
       avatar.addEventListener('click', open);
       avatar.addEventListener('keydown', event => {
@@ -91,7 +92,8 @@ function closeViewer() {
   viewer?.classList.remove('is-open');
   viewer?.setAttribute('aria-hidden', 'true');
   if (mediaBox) mediaBox.replaceChildren();
-  if (logo) logo.focus();
+  (lastTrigger || logo)?.focus?.();
+  lastTrigger = null;
 }
 function renderStory(index) {
   clearAdvance();
@@ -125,11 +127,12 @@ function renderStory(index) {
     });
   }
 }
-function openViewer(items, label = 'Stories') {
+function openViewer(items, label = 'Stories', trigger = null) {
   stories = (items || []).filter(s => new Date(s.expires_at).getTime() > Date.now());
   if (!stories.length) return;
   const seen = seenIds();
   const firstUnseen = stories.findIndex(s => !seen.has(s.id));
+  lastTrigger = trigger;
   viewer.classList.add('is-open');
   viewer.setAttribute('aria-hidden', 'false');
   viewer.setAttribute('aria-label', label);
@@ -155,7 +158,7 @@ async function refreshStories({ notify = false, previousAdmin = new Set(), previ
   }
 }
 if (viewer) {
-  const openOfficial = () => openViewer(officialStories, 'Stories oficiais da Capital do Trem');
+  const openOfficial = () => openViewer(officialStories, 'Stories oficiais da Capital do Trem', logo);
   logo?.addEventListener('click', openOfficial);
   logo?.addEventListener('keydown', event => {
     if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openOfficial(); }
