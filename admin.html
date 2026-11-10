@@ -172,6 +172,18 @@ audio{width:100%;}
  <p class="muted">Selecione se a abertura será uma imagem parada por 10 segundos ou um vídeo. A locomotiva e os vagões do carregamento permanecem.</p>
  <label for="opening-media-mode">Tipo de mídia da abertura</label>
  <select id="opening-media-mode"><option value="image">Imagem • 10 segundos</option><option value="video">Vídeo • 10 segundos de abertura</option></select>
+ <p class="muted">Ajuste o enquadramento da imagem ou do vídeo para ocupar a tela da abertura. A prévia abaixo acompanha os controles, sem mexer na locomotiva, nos vagões ou na barra de carregamento.</p>
+ <div class="item">
+  <div class="home-bg-preview" style="max-width:280px;aspect-ratio:9/16;background:#000"><img id="opening-media-frame-preview" src="./marca.svg" alt="Prévia vertical da mídia de abertura" style="object-fit:cover;object-position:50% 50%"></div>
+  <label for="opening-media-x">Posição horizontal</label>
+  <div class="range-row"><span class="muted">Esquerda ↔ Direita</span><output id="opening-media-x-value">50%</output><input id="opening-media-x" type="range" min="0" max="100" value="50"></div>
+  <label for="opening-media-y">Posição vertical</label>
+  <div class="range-row"><span class="muted">Topo ↕ Base</span><output id="opening-media-y-value">50%</output><input id="opening-media-y" type="range" min="0" max="100" value="50"></div>
+  <label for="opening-media-fit">Ajuste da tela</label>
+  <select id="opening-media-fit"><option value="cover">Preencher a tela (recorta as bordas)</option><option value="contain">Mostrar a imagem/vídeo inteiro</option></select>
+  <div class="actions"><button id="opening-media-save-settings" type="button">Salvar enquadramento</button><button id="opening-media-reset" class="secondary" type="button">Centralizar</button></div>
+  <p id="opening-media-settings-status" class="status" role="status" aria-live="polite">Mova a imagem para ajustar o enquadramento e confira a prévia antes de salvar.</p>
+ </div>
 </section>
 
 <section class="command-section" id="opening-image-section">
@@ -311,15 +323,34 @@ const openingVideoFile=document.getElementById('opening-video-file');
 const openingVideoPreview=document.getElementById('opening-video-preview');
 const openingVideoSave=document.getElementById('opening-video-save');
 const openingVideoStatus=document.getElementById('opening-video-status');
+const openingMediaX=document.getElementById('opening-media-x'),openingMediaY=document.getElementById('opening-media-y'),openingMediaFit=document.getElementById('opening-media-fit');
+const openingMediaFramePreview=document.getElementById('opening-media-frame-preview');
+const openingMediaSettingsStatus=document.getElementById('opening-media-settings-status');
+function paintOpeningMediaPreview(){
+ const x=openingMediaX.value,y=openingMediaY.value,fit=openingMediaFit.value;
+ openingMediaFramePreview.style.objectPosition=x+'% '+y+'%';openingMediaFramePreview.style.objectFit=fit;
+ openingPreview.style.objectPosition=x+'% '+y+'%';openingPreview.style.objectFit=fit;
+ openingVideoPreview.style.objectPosition=x+'% '+y+'%';openingVideoPreview.style.objectFit=fit;
+ document.getElementById('opening-media-x-value').textContent=x+'%';
+ document.getElementById('opening-media-y-value').textContent=y+'%';
+}
+[openingMediaX,openingMediaY,openingMediaFit].forEach(control=>control.addEventListener('input',paintOpeningMediaPreview));
+document.getElementById('opening-media-reset').addEventListener('click',()=>{openingMediaX.value='50';openingMediaY.value='50';openingMediaFit.value='cover';paintOpeningMediaPreview();});
+document.getElementById('opening-media-save-settings').addEventListener('click',async()=>{
+ const button=document.getElementById('opening-media-save-settings');button.disabled=true;openingMediaSettingsStatus.textContent='Salvando o enquadramento da abertura…';
+ try{await auth.saveAdminOpeningMediaSettings({x:openingMediaX.value,y:openingMediaY.value,fit:openingMediaFit.value});openingMediaSettingsStatus.textContent='Enquadramento da abertura salvo!';}
+ catch(error){openingMediaSettingsStatus.textContent=error?.message||'Não foi possível salvar o enquadramento.';}
+ finally{button.disabled=false;}
+});
 openingVideoFile.addEventListener('change',()=>{
  const file=openingVideoFile.files?.[0];if(!file)return;
  if(!['video/mp4','video/webm'].includes(file.type)||file.size>50*1024*1024){openingVideoStatus.textContent='Escolha MP4 ou WebM de até 50 MB.';openingVideoFile.value='';return;}
- openingVideoPreview.src=URL.createObjectURL(file);openingVideoPreview.style.display='block';openingVideoStatus.textContent='Prévia pronta. Toque em substituir vídeo de abertura para publicar.';
+ openingVideoPreview.src=URL.createObjectURL(file);openingVideoPreview.style.display='block';document.getElementById('opening-media-frame-preview').src='./marca.svg';paintOpeningMediaPreview();openingVideoStatus.textContent='Prévia pronta. Ajuste o enquadramento e toque em usar este vídeo.';
 });
 openingVideoSave.addEventListener('click',async()=>{
  const file=openingVideoFile.files?.[0];if(!file){openingVideoStatus.textContent='Primeiro selecione um vídeo MP4 ou WebM.';return;}
  openingVideoSave.disabled=true;openingVideoStatus.textContent='Enviando vídeo e atualizando a abertura…';
- try{const url=await auth.saveAdminOpeningVideo(file);openingVideoPreview.src=url;openingVideoPreview.load();openingVideoFile.value='';openingVideoStatus.textContent='Vídeo de abertura atualizado! A imagem antiga deixou de ser usada na abertura.';}
+ try{const url=await auth.saveAdminOpeningVideo(file,{x:openingMediaX.value,y:openingMediaY.value,fit:openingMediaFit.value});openingVideoPreview.src=url;openingVideoPreview.load();openingVideoFile.value='';openingVideoStatus.textContent='Vídeo de abertura atualizado! A imagem antiga deixou de ser usada na abertura.';}
  catch(error){openingVideoStatus.textContent=error?.message||'Não foi possível salvar o vídeo. Confira a conexão e o limite de armazenamento.';}
  finally{openingVideoSave.disabled=false;}
 });
@@ -349,6 +380,9 @@ async function loadBranding(){
   headerBgX.value=String(branding.headerBackgroundX??50);headerBgY.value=String(branding.headerBackgroundY??50);
   headerBgBlur.value=String(branding.headerBackgroundBlur??0);headerBgFit.value=branding.headerBackgroundFit||'cover';paintHeaderBgPreview();
   if(branding.openingImageUrl)document.getElementById('opening-image-preview').src=branding.openingImageUrl;
+  openingMediaX.value=String(branding.openingX??50);openingMediaY.value=String(branding.openingY??50);openingMediaFit.value=branding.openingFit||'cover';
+  const mediaPreview=document.getElementById('opening-media-frame-preview');
+  mediaPreview.src=branding.openingVideoUrl||branding.openingImageUrl||'./marca.svg';paintOpeningMediaPreview();
   const openingMode=document.getElementById('opening-media-mode');
   openingMode.value=branding.openingVideoUrl?'video':'image';
   document.getElementById('opening-image-section').hidden=openingMode.value!=='image';
@@ -420,14 +454,14 @@ const openingStatus=document.getElementById('opening-image-status');
 openingFile.addEventListener('change',()=>{
  const file=openingFile.files?.[0];if(!file)return;
  if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){openingStatus.textContent='Escolha JPG, PNG ou WebP de até 5 MB.';openingFile.value='';return;}
- openingPreview.src=URL.createObjectURL(file);openingStatus.textContent='Prévia da arte completa pronta. Toque em atualizar somente a abertura.';
+ openingPreview.src=URL.createObjectURL(file);document.getElementById('opening-media-frame-preview').src=openingPreview.src;paintOpeningMediaPreview();openingStatus.textContent='Prévia da arte completa pronta. Ajuste o enquadramento e salve.';
 });
 document.getElementById('opening-image-remove').addEventListener('click',event=>removeImageSetting('opening',event.currentTarget,openingStatus,()=>{openingPreview.src='./marca.svg';openingFile.value='';const video=document.getElementById('opening-video-preview');video.removeAttribute('src');video.load();video.style.display='none';document.getElementById('opening-video-status').textContent='A mídia da abertura foi removida.';}));
 document.getElementById('opening-video-remove').addEventListener('click',event=>removeImageSetting('opening',event.currentTarget,openingStatus,()=>{openingPreview.src='./marca.svg';openingFile.value='';const video=document.getElementById('opening-video-preview');video.removeAttribute('src');video.load();video.style.display='none';document.getElementById('opening-video-status').textContent='A mídia da abertura foi removida.';}));
 openingSave.addEventListener('click',async()=>{
  const file=openingFile.files?.[0];if(!file){openingStatus.textContent='Primeiro selecione a imagem completa na galeria.';return;}
  openingSave.disabled=true;openingStatus.textContent='Enviando a arte e atualizando somente a abertura…';
- try{const url=await auth.saveAdminOpeningImage(file);openingPreview.src=url;openingFile.value='';openingStatus.textContent='Abertura atualizada! A foto do perfil foi preservada.';}
+ try{const url=await auth.saveAdminOpeningImage(file,{x:openingMediaX.value,y:openingMediaY.value,fit:openingMediaFit.value});openingPreview.src=url;openingFile.value='';openingStatus.textContent='Abertura atualizada! A foto do perfil foi preservada.';}
  catch(error){openingStatus.textContent=error?.message||'Não foi possível salvar. Confira sua conexão e tente novamente.';}
  finally{openingSave.disabled=false;}
 });
