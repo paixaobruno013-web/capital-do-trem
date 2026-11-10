@@ -23,6 +23,10 @@ jobs:
         run: npm run build:web
       - name: Conferir arquivos e ícones do PWA
         run: node scripts/check-pwa.mjs
+      - name: Verificar sintaxe dos módulos de Stories
+        run: |
+          node --check stories-ui.js
+          node --check admin-stories.js
       - name: Verificar sintaxe do módulo Supabase
         run: node --input-type=module --check < supabase/auth.js
       - name: Verificar sintaxe e presença do gravador de áudio do chat
