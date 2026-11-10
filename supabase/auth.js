@@ -1045,6 +1045,7 @@ export async function saveAdminOpeningVideo(file, options = {}) {
   const { error: saveError } = await supabase.from('site_settings').upsert([
     { setting_key: 'app_opening_video_url', setting_value: publicData.publicUrl, updated_at: now },
     { setting_key: 'app_opening_image_url', setting_value: '', updated_at: now },
+    { setting_key: 'app_opening_video_muted', setting_value: 'false', updated_at: now },
     { setting_key: 'app_opening_x', setting_value: String(Math.max(0, Math.min(100, Number(options.x ?? 50)))), updated_at: now },
     { setting_key: 'app_opening_y', setting_value: String(Math.max(0, Math.min(100, Number(options.y ?? 50)))), updated_at: now },
     { setting_key: 'app_opening_fit', setting_value: options.fit === 'contain' ? 'contain' : 'cover', updated_at: now }
