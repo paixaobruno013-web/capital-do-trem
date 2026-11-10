@@ -771,10 +771,17 @@ header.header-has-custom-background{
 }
 header.header-has-custom-background::before{
  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
- background-image:linear-gradient(110deg,rgba(0,0,0,.12),rgba(0,0,0,.06) 55%,rgba(0,0,0,.14)),var(--header-bg-image);
- background-size:100% 100%,var(--header-bg-fit,cover);
- background-position:center,var(--header-bg-position,50% 50%);background-repeat:no-repeat;
+ background-image:var(--header-bg-image);
+ background-size:var(--header-bg-fit,cover);
+ background-position:var(--header-bg-position,50% 50%);background-repeat:no-repeat;
+ filter:none!important;opacity:1!important;image-rendering:auto;
 }
+/* No celular, o fundo fixo de demonstração não pode cobrir a imagem escolhida pelo administrador. */
+@media(max-width:759px){
+ body:not(.light) header.header-has-custom-background{background-image:none!important;background-color:transparent!important}
+ body:not(.light) header.header-has-custom-background::before{background-image:var(--header-bg-image)!important}
+}
+
 header.header-has-custom-background>*{position:relative;z-index:1}
 header.header-has-custom-background>.theme{z-index:2}
 body.light header.header-has-custom-background::before{
@@ -1654,11 +1661,18 @@ async function saveOfflineMusic(id,blob,title){
     video.className='opening-video-background';video.src=openingVideo;video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';video.autoplay=true;video.muted=true;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));video.playsInline=true;video.loop=true;video.preload='auto';video.setAttribute('aria-hidden','true');
     screen.insertBefore(video,screen.firstChild);screen.classList.add('custom-opening-screen');
     if(branding.openingVideoMuted===false){
-     const audioButton=document.createElement('button');audioButton.type='button';audioButton.textContent='🔊 ATIVAR ÁUDIO';
+     const audioButton=document.createElement('button');audioButton.type='button';audioButton.textContent='🔊 TOQUE PARA ATIVAR O ÁUDIO';
      audioButton.setAttribute('aria-label','Ativar áudio do vídeo de abertura');
-     audioButton.style.cssText='position:absolute;z-index:8;left:50%;bottom:22%;transform:translateX(-50%);padding:12px 18px;border:2px solid #ed1c24;border-radius:999px;background:#050505ef;color:#fff;font-weight:900;letter-spacing:.5px;box-shadow:0 0 16px #ed1c24;cursor:pointer';
-     audioButton.addEventListener('click',()=>{video.muted=false;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));video.play().catch(()=>{});audioButton.remove();},{once:true});
+     audioButton.style.cssText='position:absolute;z-index:10000;left:50%;bottom:22%;transform:translateX(-50%);padding:12px 18px;border:2px solid #ed1c24;border-radius:999px;background:#050505ef;color:#fff;font-weight:900;letter-spacing:.5px;box-shadow:0 0 16px #ed1c24;cursor:pointer;pointer-events:auto;touch-action:manipulation';
+     audioButton.addEventListener('click',async()=>{try{video.muted=false;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));await video.play();audioButton.textContent='🔊 ÁUDIO ATIVADO';setTimeout(()=>audioButton.remove(),650);}catch(error){audioButton.textContent='TOQUE NOVAMENTE PARA OUVIR';console.warn('O navegador bloqueou o áudio da abertura.',error);}},{once:false});
      screen.appendChild(audioButton);
+    }
+    const movingTrain=document.getElementById('opening-live-train');
+    if(movingTrain){
+     movingTrain.style.setProperty('animation','none','important');
+     movingTrain.style.setProperty('left','-190px','important');
+     void movingTrain.offsetWidth;
+     movingTrain.style.setProperty('animation','opening-train-cross-sky 9.5s linear 1 both','important');
     }
     const bar=document.getElementById('opening-live-progress');
     const startedAt=performance.now();let progress=3,ready=document.readyState==='complete',videoReady=false,finished=false,finishQueued=false;
