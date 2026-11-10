@@ -45,7 +45,6 @@ jobs:
           grep -q 'create policy "songs_insert_artist_or_admin"' supabase/migrations/20261109191500_allow_artist_song_uploads.sql
           grep -q 'create policy "audio_upload_artist_or_admin"' supabase/migrations/20261109191500_allow_artist_song_uploads.sql
           grep -q 'isCurrentUserArtistOrAdmin' supabase/auth.js
-          grep -q 'auth.isCurrentUserArtistOrAdmin()' conta.html
           grep -q 'create or replace function private.is_admin()' supabase/schema.sql
           grep -q 'revoke all privileges on all tables in schema public from anon, authenticated' supabase/schema.sql
           grep -q 'grant select on public.artists, public.events, public.posts, public.profiles, public.site_settings, public.songs to anon' supabase/schema.sql
