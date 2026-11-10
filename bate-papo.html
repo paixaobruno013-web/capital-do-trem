@@ -149,7 +149,7 @@ document.getElementById('camera-open').addEventListener('click',()=>{const picke
 
 function updateCounter(){counter.textContent=`${input.value.length}/1000 caracteres`;}
 input.addEventListener('input',updateCounter);
-let unsubscribe=null,seen=new Set();
+let unsubscribe=null,seen=new Set(),currentUserId=null;
 const MAX_VISIBLE_MESSAGES=100;
 function addMessage(m){
  if(!m||!m.id||seen.has(m.id))return;
