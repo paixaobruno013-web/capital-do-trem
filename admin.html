@@ -121,6 +121,14 @@ audio{width:100%;}
 
 <section class="command-section" id="header-background-section">
  <h2>Fundo do cabeçalho inicial • atrás da foto e do nome verificado</h2>
+ <div class="item" id="header-background-direct-panel">
+  <h3>Envio direto do fundo do cabeçalho</h3>
+  <p class="muted">Imagem original JPG/PNG/WebP até 8 MB, sem desfoque.</p>
+  <label for="header-background-file-direct">Selecionar imagem do cabeçalho</label><input id="header-background-file-direct" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp">
+  <img id="header-background-preview-direct" alt="Prévia do fundo do cabeçalho" style="display:none;width:100%;max-width:320px;max-height:220px;object-fit:contain;background:#000">
+  <button id="header-background-save-direct" type="button">PUBLICAR FUNDO DO CABEÇALHO</button>
+  <p id="header-background-direct-status" class="status" role="status" aria-live="polite">Selecione uma imagem e toque em publicar.</p>
+ </div>
  <p class="muted">Esta é a imagem que aparece atrás da foto circular e do nome Capital do Trem com o selo azul. Ela é independente da imagem inferior “AQUI A MÚSICA NÃO PARA!”.</p>
  <div class="item">
   <div class="home-bg-preview"><img id="header-background-preview" src="" alt="Prévia do fundo do cabeçalho"></div>
@@ -172,6 +180,17 @@ audio{width:100%;}
  <p class="muted">Selecione se a abertura será uma imagem parada por 10 segundos ou um vídeo. A locomotiva e os vagões do carregamento permanecem.</p>
  <label for="opening-media-mode">Tipo de mídia da abertura</label>
  <select id="opening-media-mode"><option value="image">Imagem • 10 segundos</option><option value="video">Vídeo • 10 segundos de abertura</option></select>
+ <div class="item" id="opening-media-direct-panel">
+  <h3>Envio direto da mídia de abertura</h3>
+  <p class="muted">Escolha separadamente: vídeo MP4/WebM até 50 MB ou imagem JPG/PNG/WebP até 5 MB.</p>
+  <label for="opening-video-file-direct">Selecionar VÍDEO (MP4/WebM)</label><input id="opening-video-file-direct" type="file" accept="video/mp4,video/webm,.mp4,.webm">
+  <video id="opening-video-preview-direct" controls playsinline muted style="display:none;width:100%;max-width:260px;max-height:420px;background:#000"></video>
+  <button id="opening-video-save-direct" type="button">PUBLICAR VÍDEO NA ABERTURA</button>
+  <label for="opening-image-file-direct">Selecionar IMAGEM (JPG/PNG/WebP)</label><input id="opening-image-file-direct" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp">
+  <img id="opening-image-preview-direct" alt="Prévia da imagem de abertura" style="display:none;width:100%;max-width:260px;max-height:420px;object-fit:contain;background:#000">
+  <button id="opening-image-save-direct" type="button">PUBLICAR IMAGEM NA ABERTURA (10 SEGUNDOS)</button>
+  <p id="opening-media-direct-status" class="status" role="status" aria-live="polite">Selecione um vídeo ou uma imagem.</p>
+ </div>
  <div class="item" id="opening-media-unified-uploader">
   <strong>Enviar a mídia da abertura</strong>
   <p class="muted">Este seletor aceita tanto imagem quanto vídeo. Escolha o tipo acima ou selecione o arquivo diretamente na galeria.</p>
@@ -607,4 +626,5 @@ try{
 
 </script>
 <script src="./update.js" defer></script>
+<script type="module" src="./admin-media.js"></script>
 </body></html>
