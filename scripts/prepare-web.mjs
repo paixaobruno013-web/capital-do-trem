@@ -9,8 +9,6 @@ const files = [
   'conta.html',
   'admin.html',
   'admin-media.js',
-  'admin-private-gallery.js',
-  'participant-private-gallery.js',
   'privacidade.html',
   'bate-papo.html',
   'chat-enhancements.js',
