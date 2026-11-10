@@ -64,37 +64,46 @@ let recorder=null,recordedChunks=[],recordingStream=null,recordingLimit=null;
 recordButton.addEventListener('click',async()=>{
  if(recorder?.state==='recording'){recorder.stop();return;}
  if(!navigator.mediaDevices?.getUserMedia||typeof MediaRecorder==='undefined'){
-  status.textContent='Seu navegador não oferece gravação de áudio. Use o botão Foto/áudio para anexar um arquivo.';
+  status.textContent='Este navegador não oferece gravação. Use Foto/áudio para escolher um arquivo do celular.';
   return;
  }
  try{
-  recordingStream=await navigator.mediaDevices.getUserMedia({audio:true});
-  const mime=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':'audio/webm';
-  recorder=new MediaRecorder(recordingStream,MediaRecorder.isTypeSupported(mime)?{mimeType:mime}:{});
+  recordingStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+  const supported=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/mp4;codecs=mp4a.40.2'];
+  const mimeType=supported.find(type=>MediaRecorder.isTypeSupported(type));
+  recorder=mimeType?new MediaRecorder(recordingStream,{mimeType}):new MediaRecorder(recordingStream);
   recordedChunks=[];
   recorder.ondataavailable=event=>{if(event.data?.size)recordedChunks.push(event.data);};
-  recorder.onerror=()=>{status.textContent='Não foi possível gravar o áudio. Tente novamente.';};
+  recorder.onerror=()=>{
+   status.textContent='Falha durante a gravação. Confira a permissão do microfone e tente novamente.';
+   recordingStream?.getTracks().forEach(track=>track.stop());recordingStream=null;
+   recordButton.textContent='🎙️ Gravar áudio';recordButton.disabled=false;
+  };
   recorder.onstop=()=>{
    window.clearTimeout(recordingLimit);
-   const type=recorder.mimeType||'audio/webm';
-   const blob=new Blob(recordedChunks,{type});
-   const file=new File([blob],'audio-da-conversa.webm',{type:'audio/webm'});
+   const actualType=String(recorder.mimeType||recordedChunks[0]?.type||'audio/webm').split(';')[0].toLowerCase();
+   const extension=actualType==='audio/mp4'?'m4a':'webm';
+   const canonicalType=actualType==='audio/mp4'?'audio/mp4':'audio/webm';
+   const blob=new Blob(recordedChunks,{type:canonicalType});
    try{
+    if(!blob.size)throw new Error('A gravação ficou vazia. Grave novamente.');
+    const file=new File([blob],'audio-da-conversa.'+extension,{type:canonicalType});
     const transfer=new DataTransfer();transfer.items.add(file);attachmentInput.files=transfer.files;
     attachmentInput.dispatchEvent(new Event('change',{bubbles:true}));
-    status.textContent='Áudio gravado. Confira o anexo e toque em Enviar.';
-   }catch(error){status.textContent='Não foi possível preparar o áudio gravado. Use o anexo de áudio do celular.';}
+    status.textContent='Áudio gravado e anexado. Confira e toque em Enviar.';
+   }catch(error){status.textContent=error?.message||'Não foi possível preparar o áudio. Use Foto/áudio para escolher um arquivo.';}
    recordingStream?.getTracks().forEach(track=>track.stop());
    recordingStream=null;recordedChunks=[];
    recordButton.textContent='🎙️ Gravar áudio';recordButton.disabled=false;
   };
-  recorder.start();
+  recorder.start(250);
   recordButton.textContent='⏹️ Parar gravação';
-  status.textContent='Gravando… limite de 60 segundos.';
+  status.textContent='Gravando… toque em Parar quando terminar (limite de 60 segundos).';
   recordingLimit=window.setTimeout(()=>{if(recorder?.state==='recording')recorder.stop();},60000);
  }catch(error){
   recordingStream?.getTracks().forEach(track=>track.stop());recordingStream=null;
-  status.textContent='Libere o acesso ao microfone nas permissões do celular e tente novamente.';
+  recordButton.textContent='🎙️ Gravar áudio';recordButton.disabled=false;
+  status.textContent=error?.name==='NotAllowedError'?'Permita o acesso ao microfone nas configurações do celular e tente novamente.':(error?.message||'Não foi possível iniciar a gravação neste aparelho.');
  }
 });
 
