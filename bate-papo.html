@@ -122,30 +122,32 @@ import {getCurrentSession,getChatGroupMembership,joinChatGroup,leaveChatGroup,ge
 const gate=document.getElementById('gate'),area=document.getElementById('chat-area'),connection=document.getElementById('chat-connection'),list=document.getElementById('messages'),form=document.getElementById('composer'),input=document.getElementById('message'),send=document.getElementById('send'),status=document.getElementById('status');
 const counter=document.getElementById('message-counter'),attachmentInput=document.getElementById('chat-attachment'),cameraInput=document.getElementById('chat-camera'),attachmentName=document.getElementById('attachment-name');
 let selectedAttachment=null;
-const CHAT_DRAFT_KEY='capitaldotrem_fala_trem_draft_v2';
+const CHAT_DRAFT_KEY='capitaldotrem_fala_trem_draft_v3';
+const CAMERA_RETURN_KEY='capitaldotrem_return_to_chat_after_camera';
 let savedChatState=null;
 function saveChatState(){
- try{sessionStorage.setItem(CHAT_DRAFT_KEY,JSON.stringify({text:input.value||'',listScroll:list.scrollTop||0,pageScroll:window.scrollY||0,updatedAt:Date.now()}));}catch(error){}
+ try{localStorage.setItem(CHAT_DRAFT_KEY,JSON.stringify({text:input.value||'',listScroll:list.scrollTop||0,pageScroll:window.scrollY||0,updatedAt:Date.now()}));}catch(error){}
 }
 function restoreChatState(){
  try{
-  const raw=sessionStorage.getItem(CHAT_DRAFT_KEY);if(!raw)return;
+  const raw=localStorage.getItem(CHAT_DRAFT_KEY);if(!raw)return;
   const data=JSON.parse(raw);if(!data||Date.now()-Number(data.updatedAt||0)>12*60*60*1000)return;
   savedChatState=data;
   if(!input.value&&typeof data.text==='string')input.value=data.text;
   updateCounter();
  }catch(error){}
 }
+function clearCameraReturnFlag(){try{localStorage.removeItem(CAMERA_RETURN_KEY);}catch(error){}}
 restoreChatState();
 input.addEventListener('input',saveChatState);
 window.addEventListener('pagehide',saveChatState);
-document.addEventListener('visibilitychange',()=>{if(document.hidden)saveChatState();});
-window.addEventListener('pageshow',()=>{if(!input.value)restoreChatState();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)saveChatState();else clearCameraReturnFlag();});
+window.addEventListener('pageshow',()=>{if(!input.value)restoreChatState();clearCameraReturnFlag();});
 
 function chooseAttachment(file){selectedAttachment=file||null;attachmentName.textContent=selectedAttachment?`Anexo: ${selectedAttachment.name} (${(selectedAttachment.size/1024/1024).toFixed(1)} MB)`:'';}
 attachmentInput.addEventListener('change',()=>chooseAttachment(attachmentInput.files?.[0]));
-cameraInput.addEventListener('change',()=>{if(cameraInput.files?.[0]){attachmentInput.value='';chooseAttachment(cameraInput.files[0]);}}); 
-document.getElementById('camera-open').addEventListener('click',()=>{const picker=document.createElement('div');picker.className='panel';picker.style.position='fixed';picker.style.inset='auto 12px 90px';picker.style.zIndex='50';picker.innerHTML='';const title=document.createElement('strong');title.textContent='Adicionar foto ou vídeo';const camera=document.createElement('button');camera.type='button';camera.textContent='📸 Abrir câmera';const gallery=document.createElement('button');gallery.type='button';gallery.className='alt';gallery.textContent='🖼️ Escolher da galeria';const close=document.createElement('button');close.type='button';close.className='alt';close.textContent='Cancelar';picker.append(title,camera,gallery,close);document.body.append(picker);camera.onclick=()=>{saveChatState();picker.remove();cameraInput.click();};gallery.onclick=()=>{saveChatState();picker.remove();attachmentInput.click();};close.onclick=()=>picker.remove();});
+cameraInput.addEventListener('change',()=>{clearCameraReturnFlag();if(cameraInput.files?.[0]){attachmentInput.value='';chooseAttachment(cameraInput.files[0]);}}); 
+document.getElementById('camera-open').addEventListener('click',()=>{const picker=document.createElement('div');picker.className='panel';picker.style.position='fixed';picker.style.inset='auto 12px 90px';picker.style.zIndex='50';picker.innerHTML='';const title=document.createElement('strong');title.textContent='Adicionar foto ou vídeo';const camera=document.createElement('button');camera.type='button';camera.textContent='📸 Abrir câmera';const gallery=document.createElement('button');gallery.type='button';gallery.className='alt';gallery.textContent='🖼️ Escolher da galeria';const close=document.createElement('button');close.type='button';close.className='alt';close.textContent='Cancelar';picker.append(title,camera,gallery,close);document.body.append(picker);camera.onclick=()=>{saveChatState();try{localStorage.setItem(CAMERA_RETURN_KEY,String(Date.now()));}catch(error){}picker.remove();cameraInput.click();};gallery.onclick=()=>{saveChatState();picker.remove();attachmentInput.click();};close.onclick=()=>picker.remove();});
 
 function updateCounter(){counter.textContent=`${input.value.length}/1000 caracteres`;}
 input.addEventListener('input',updateCounter);
@@ -222,7 +224,7 @@ document.getElementById('leave-group').addEventListener('click',async()=>{
 const gallery=document.getElementById('media-gallery'),galleryGrid=document.getElementById('media-gallery-grid'),galleryEmpty=document.getElementById('gallery-empty');
 async function showGallery(){gallery.hidden=false;galleryGrid.replaceChildren();galleryEmpty.hidden=true;try{const items=(await getChatMessages(100)).filter(m=>m.attachment_url&&['image','video'].includes(m.attachment_type));for(const item of items){const a=document.createElement('a');a.href=item.attachment_url;a.target='_blank';a.rel='noopener';a.setAttribute('aria-label',item.attachment_type==='video'?'Abrir vídeo':'Abrir foto');if(item.attachment_type==='video'){const v=document.createElement('video');v.src=item.attachment_url;v.muted=true;v.preload='metadata';a.append(v);}else{const img=document.createElement('img');img.src=item.attachment_url;img.alt='Foto compartilhada na conversa';img.loading='lazy';a.append(img);}galleryGrid.append(a);}galleryEmpty.hidden=items.length>0;}catch(e){galleryEmpty.hidden=false;galleryEmpty.textContent='Não foi possível carregar a galeria agora.';}}
 document.getElementById('gallery-open').addEventListener('click',showGallery);document.getElementById('gallery-close').addEventListener('click',()=>gallery.hidden=true);
-let sending=false;form.addEventListener('submit',async e=>{e.preventDefault();if(sending)return;const value=input.value.trim();if(!value&&!selectedAttachment)return;sending=true;send.disabled=true;input.disabled=true;attachmentInput.disabled=true;cameraInput.disabled=true;status.textContent=selectedAttachment?'Enviando anexo…':'Enviando…';try{const uploaded=selectedAttachment?await uploadChatAttachment(selectedAttachment):null;const m=await sendChatMessage(value,uploaded);addMessage(m);input.value='';try{sessionStorage.removeItem(CHAT_DRAFT_KEY);}catch(error){}attachmentInput.value='';cameraInput.value='';selectedAttachment=null;attachmentName.textContent='';updateCounter();status.textContent='Mensagem enviada.';}catch(err){status.textContent=err.message||'Não foi possível enviar a mensagem.';}finally{sending=false;send.disabled=false;input.disabled=false;attachmentInput.disabled=false;cameraInput.disabled=false;input.focus();}});
+let sending=false;form.addEventListener('submit',async e=>{e.preventDefault();if(sending)return;const value=input.value.trim();if(!value&&!selectedAttachment)return;sending=true;send.disabled=true;input.disabled=true;attachmentInput.disabled=true;cameraInput.disabled=true;status.textContent=selectedAttachment?'Enviando anexo…':'Enviando…';try{const uploaded=selectedAttachment?await uploadChatAttachment(selectedAttachment):null;const m=await sendChatMessage(value,uploaded);addMessage(m);input.value='';try{localStorage.removeItem(CHAT_DRAFT_KEY);}catch(error){}attachmentInput.value='';cameraInput.value='';selectedAttachment=null;attachmentName.textContent='';updateCounter();status.textContent='Mensagem enviada.';}catch(err){status.textContent=err.message||'Não foi possível enviar a mensagem.';}finally{sending=false;send.disabled=false;input.disabled=false;attachmentInput.disabled=false;cameraInput.disabled=false;input.focus();}});
 const theme=document.getElementById('theme');try{if(localStorage.getItem('capitaldotrem_theme_v1')==='light')document.body.classList.add('light');}catch{}function label(){const light=document.body.classList.contains('light');theme.textContent=light?'🌙 Escuro':'☀️ Claro';theme.setAttribute('aria-pressed',String(light));document.querySelector('meta[name="theme-color"]').content=light?'#f5f5f5':'#050505';}label();theme.addEventListener('click',()=>{const next=document.body.classList.contains('light')?'dark':'light';document.body.classList.toggle('light',next==='light');try{localStorage.setItem('capitaldotrem_theme_v1',next);}catch{}label();});window.addEventListener('storage',event=>{if(event.key==='capitaldotrem_theme_v1'){document.body.classList.toggle('light',event.newValue==='light');label();}});
 window.addEventListener('pagehide',()=>{saveChatState();if(unsubscribe)unsubscribe();});
 </script><script src="./emoji-picker.js" defer></script><script type="module" src="./chat-enhancements.js"></script><script src="./update.js" defer></script>
