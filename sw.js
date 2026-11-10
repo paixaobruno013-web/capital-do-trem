@@ -1,4 +1,4 @@
-const CACHE='capital-do-trem-v244';;;
+const CACHE='capital-do-trem-v245';;;
 const CORE_FILES=['./','./index.html','./offline.html','./marca.svg','./manifest.webmanifest','./update.js','./assets/favela-header.webp','./assets/banner-speakers.webp'];
 const OPTIONAL_FILES=['./admin.html','./admin-media.js','./privacidade.html','./conta.html','./supabase/auth.js','./diagnostico.html','./bate-papo.html','./chat-enhancements.js','./emoji-picker.js','./stories-ui.js','./admin-stories.js','./account-stories.js','./avatar.html','./mensagens.html'];
 
@@ -37,7 +37,7 @@ self.addEventListener('fetch',event=>{
   const isPage=event.request.mode==='navigate'||url.pathname.endsWith('.html')||url.pathname.endsWith('/');
   if(isPage){
     event.respondWith(
-      fetch(event.request).then(response=>{
+      fetch(event.request,{cache:'no-store'}).then(response=>{
         if(response&&response.ok){
           const copy=response.clone();
           caches.open(CACHE).then(cache=>cache.put(event.request,copy));
