@@ -1723,7 +1723,7 @@ grant select, insert, update on public.chat_group_members to authenticated;
 drop policy if exists chat_group_members_read_self_or_admin on public.chat_group_members;
 create policy chat_group_members_read_self_or_admin
   on public.chat_group_members for select to authenticated
-  using (user_id=(select auth.uid()) or (select private.is_admin()));
+  using ((select private.is_registered_user()) and (left_at is null or user_id=(select auth.uid()) or (select private.is_admin())));
 drop policy if exists chat_group_members_join_self on public.chat_group_members;
 create policy chat_group_members_join_self
   on public.chat_group_members for insert to authenticated
@@ -1761,7 +1761,7 @@ revoke all on function private.can_start_private_chat(uuid) from public, anon;
 grant execute on function private.can_start_private_chat(uuid) to authenticated;
 
 create or replace function public.active_chat_group_member_ids()
-returns table(user_id uuid) language sql stable security definer set search_path = ''
+returns table(user_id uuid) language sql stable security invoker set search_path = ''
 as $function$
   select gm.user_id from public.chat_group_members gm
   where gm.left_at is null and (select auth.uid()) is not null
