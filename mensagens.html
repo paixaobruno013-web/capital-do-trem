@@ -167,6 +167,10 @@ function drawPeople(){
   box.append(node('p','empty','Entre no grupo geral para ver quem está participando e poder enviar convites privados.'));
   const join=node('button','primary','Entrar no grupo');join.addEventListener('click',joinGroupFromPrivate);box.append(join);return;
  }
+ if(!state.canStartPrivate){
+  box.append(node('p','empty','Envie pelo menos uma mensagem no grupo geral para liberar convites privados.'));
+  const go=node('button','primary','Ir para o grupo');go.addEventListener('click',openGroupConversation);box.append(go);return;
+ }
  const people=state.people.filter(p=>!state.blocked.includes(p.user_id)&&((p.display_name||'').toLocaleLowerCase('pt-BR').includes(term)||(p.username||'').toLocaleLowerCase('pt-BR').includes(term)||(p.city||'').toLocaleLowerCase('pt-BR').includes(term)));
  if(!people.length){box.append(node('p','empty','Ainda não há outros participantes ativos no grupo.'));return;}
  for(const p of people){
@@ -180,8 +184,8 @@ function drawPeople(){
 }
 async function joinGroupFromPrivate(){
  const buttons=$('people').querySelectorAll('button');buttons.forEach(b=>b.disabled=true);
- $('status').textContent='Entrando no grupo…';
- try{await joinChatGroup();await refresh();await openGroupConversation();}
+ $('status').textContent=state?.isGroupMember?'Abrindo o grupo…':'Entrando no grupo…';
+ try{if(!state?.isGroupMember)await joinChatGroup();await refresh();await openGroupConversation();}
  catch(e){$('status').textContent=e.message||'Não foi possível entrar no grupo.';buttons.forEach(b=>b.disabled=false);}
 }
 function drawConversations(){
@@ -203,6 +207,7 @@ function drawConversations(){
 }
 function drawIncoming(){
  const box=$('incoming');box.replaceChildren();const pending=state.conversations.filter(c=>c.status==='pending'&&c.initiated_by!==state.userId);$('pending-count').textContent=String(pending.length);
+ if(pending.length&&!state.canStartPrivate){box.append(node('p','empty','Para aceitar convites privados, participe do grupo e envie pelo menos uma mensagem.'));const go=node('button','primary',state.isGroupMember?'Ir para o grupo':'Entrar no grupo');go.addEventListener('click',joinGroupFromPrivate);box.append(go);return;}
  if(!pending.length){box.append(node('p','empty','Nenhum convite recebido.'));return;}
  for(const c of pending){const row=node('div','person'),copy=node('div','person-copy'),name=node('strong',null,personName(partner(c))),meta=node('span','small','Quer conversar com você.'),accept=node('button','primary','Aceitar'),decline=node('button',null,'Recusar'),actions=node('div','actions');copy.append(name,meta);actions.append(accept,decline);for(const [btn,decision] of [[accept,'accepted'],[decline,'declined']])btn.addEventListener('click',async()=>{btn.disabled=true;try{await decidePrivateConversation(c.id,decision);await refresh();if(decision==='accepted'){const latest=state.conversations.find(x=>x.id===c.id);if(latest)openConversation(latest);}}catch(e){$('status').textContent=e.message||'Não foi possível atualizar o convite.';btn.disabled=false;}});row.append(avatarNode(profileFor(partner(c))),copy,actions);box.append(row);}
 }
@@ -237,8 +242,8 @@ async function openGroupConversation(){
   const prompt=node('div','empty'),copy=node('p',null,'Ao entrar, você poderá ler e enviar mensagens e iniciar conversas privadas com outros participantes ativos.');
   const join=node('button','primary','Entrar no grupo');join.addEventListener('click',joinGroupFromPrivate);prompt.append(copy,join);$('messages').replaceChildren(prompt);return;
  }
- $('thread-presence').textContent='● Grupo oficial • você participa';
- $('chat-hint').textContent='Conversa coletiva da comunidade Capital do Trem. Respeito em primeiro lugar.';
+ $('thread-presence').textContent=state.canStartPrivate?'● Grupo oficial • você participa':'● Envie uma mensagem para liberar convites privados';
+ $('chat-hint').textContent=state.canStartPrivate?'Conversa coletiva da comunidade Capital do Trem. Respeito em primeiro lugar.':'Depois da sua primeira mensagem no grupo, você poderá convidar outros participantes para conversas privadas.';
  $('messages').replaceChildren(node('p','empty','Carregando conversa do grupo…'));
  try{
   unsubscribe=subscribeChatMessages(m=>drawGroupMessage(m),s=>{if(s==='CHANNEL_ERROR'||s==='TIMED_OUT')$('status').textContent='Conexão do grupo instável. Atualize para reconectar.';});
