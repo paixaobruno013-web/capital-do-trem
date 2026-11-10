@@ -14,6 +14,7 @@ body.light{color-scheme:light;--bg:#f5f5f5;--panel:#fff;--fg:#111;--muted:#555;-
 /* Fala Trem — identidade visual e leitura confortável no celular */
 .chat-brand{display:inline-flex;align-items:center;gap:9px;padding:8px 14px;border:1px solid #ed1c2466;border-radius:999px;background:linear-gradient(110deg,#ed1c241f,#ed1c2408);color:var(--fg);font-size:13px;font-weight:950;letter-spacing:2px}
 .chat-brand small{font-size:10px;font-weight:650;letter-spacing:.3px;color:var(--muted);padding-left:8px;border-left:1px solid var(--line)}
+.membership-card{padding:18px;border:1px solid #ed1c2477;border-radius:14px;background:var(--panel);margin:12px 0}.membership-card p{color:var(--muted)}
 .chat-live-dot{width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red)}
 .chat-panel{border-radius:20px;background:linear-gradient(145deg,var(--panel),color-mix(in srgb,var(--panel) 84%,var(--red)));box-shadow:0 12px 36px #0003}
 .room-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
@@ -111,13 +112,13 @@ audio{width:100%;}
 </style></head><body>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
 <header><img src="./marca.svg" alt="Capital do Trem"><div class="chat-brand"><span class="chat-live-dot" aria-hidden="true"></span><span>Fala Trem</span><small>O ponto de encontro da comunidade</small></div><h1>Fala Trem da quebrada</h1><p class="muted">Artistas e Usuários Uai, juntos na mesma conversa.</p><div class="actions"><a class="btn alt" href="./index.html">Início</a><a class="btn alt" href="./conta.html">Minha conta</a><a class="btn alt" href="./avatar.html">Meu avatar</a><a class="btn" href="./mensagens.html">✉️ Minhas conversas</a><button class="alt" id="theme" type="button">☀️ Claro</button></div></header>
-<main id="main-content"><section class="panel chat-panel"><div class="room-heading"><div><span class="eyebrow">CAPITAL DO TREM • COMUNIDADE</span><h2>💬 Sala geral</h2></div><span class="room-tag">Fala Trem</span></div><div class="security-seal" role="note">
+<main id="main-content"><section class="panel chat-panel"><div class="room-heading"><div><span class="eyebrow">CAPITAL DO TREM • COMUNIDADE</span><h2>💬 Sala geral</h2></div><div style="display:flex;align-items:center;gap:8px"><span class="room-tag">Fala Trem</span><button id="leave-group" class="alt" type="button" hidden>Sair do grupo</button></div></div><div class="security-seal" role="note">
   <div class="security-seal-title"><span aria-hidden="true">🔒</span><span>Conexão criptografada</span><small>HTTPS</small></div>
   <p>Seus dados são protegidos durante a transmissão por HTTPS. Esta versão ainda não oferece criptografia ponta a ponta.</p>
 </div>
 <p class="muted">Respeito em primeiro lugar. Não compartilhe dados pessoais, ameaças ou conteúdo ofensivo. A equipe poderá moderar o espaço.</p><div id="gate" class="status" role="status" aria-live="polite">Verificando sua conta…</div><div id="chat-area" hidden><p id="chat-connection" class="status" role="status" aria-live="polite">Conectando à sala em tempo real…</p><div class="actions" style="justify-content:flex-end;margin:8px 0"><button id="gallery-open" class="alt" type="button">🖼️ Galeria da conversa</button></div><section id="media-gallery" class="panel" hidden><div class="room-heading"><h3>Fotos e vídeos compartilhados</h3><button id="gallery-close" class="alt" type="button">Fechar</button></div><div id="media-gallery-grid" class="media-gallery-grid"></div><p id="gallery-empty" class="muted" hidden>Nenhuma foto ou vídeo compartilhado ainda.</p></section><div id="messages" aria-live="polite" aria-relevant="additions" aria-label="Mensagens do bate-papo"></div><form id="composer" class="composer"><div id="emoji-tray" data-emoji-picker data-input="#message"></div><label class="sr-only" for="message">Sua mensagem para o bate-papo</label><input id="message" maxlength="1000" autocomplete="off" placeholder="Escreva sua mensagem…" aria-describedby="message-counter"><input id="chat-attachment" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,audio/mpeg,audio/mp3,audio/x-mp3,audio/mp4,audio/x-m4a,audio/m4a,audio/aac,audio/x-aac,audio/ogg,application/ogg,audio/wav,audio/x-wav,audio/wave,audio/vnd.wave,audio/webm" hidden><input id="chat-camera" type="file" accept="image/*,video/*" capture="environment" hidden><small id="attachment-name" class="muted" aria-live="polite"></small><small id="message-counter" class="muted" aria-live="polite">0/1000 caracteres</small><button id="camera-open" class="alt" type="button" aria-label="Abrir câmera ou galeria">📷</button><button id="send" type="submit">Enviar</button></form><p id="status" class="status" role="status" aria-live="polite"></p></div></section></main>
 <script type="module">
-import {getCurrentSession,getChatMessages,sendChatMessage,subscribeChatMessages,uploadChatAttachment} from './supabase/auth.js';
+import {getCurrentSession,getChatGroupMembership,joinChatGroup,leaveChatGroup,getChatMessages,sendChatMessage,subscribeChatMessages,uploadChatAttachment} from './supabase/auth.js';
 const gate=document.getElementById('gate'),area=document.getElementById('chat-area'),connection=document.getElementById('chat-connection'),list=document.getElementById('messages'),form=document.getElementById('composer'),input=document.getElementById('message'),send=document.getElementById('send'),status=document.getElementById('status');
 const counter=document.getElementById('message-counter'),attachmentInput=document.getElementById('chat-attachment'),cameraInput=document.getElementById('chat-camera'),attachmentName=document.getElementById('attachment-name');
 let selectedAttachment=null;
@@ -188,8 +189,35 @@ function addMessage(m){
  if(wasNearBottom||list.children.length===1)list.scrollTop=list.scrollHeight;
 }
 window.addEventListener('capital-chat-message',event=>addMessage(event.detail));
-try{const session=await getCurrentSession();if(!session){gate.textContent='Para participar do bate-papo, entre ou crie sua conta.';const link=document.createElement('a');link.className='btn';link.href='./conta.html';link.textContent='Entrar / Criar conta';gate.append(document.createTextNode(' '),link);}else{area.hidden=false;gate.textContent='Você está conectado à sala geral.';unsubscribe=subscribeChatMessages(addMessage,connectionStatus=>{if(connectionStatus==='SUBSCRIBED')connection.textContent='Conectado: novas mensagens aparecem automaticamente.';else if(connectionStatus==='CHANNEL_ERROR'||connectionStatus==='TIMED_OUT')connection.textContent='Conexão instável. O chat está tentando se reconectar.';else if(connectionStatus==='CLOSED')connection.textContent='Conexão encerrada. Recarregue a página para entrar novamente.';else connection.textContent='Conectando à sala em tempo real…';});const messages=await getChatMessages(80);messages.forEach(addMessage);if(savedChatState)requestAnimationFrame(()=>{list.scrollTop=Number(savedChatState.listScroll)||list.scrollHeight;window.scrollTo(0,Number(savedChatState.pageScroll)||0);});}}
-catch(e){gate.textContent='Não foi possível conectar ao Fala Trem agora. Confira sua internet, entre novamente e atualize a página. Se persistir, a equipe verificará as permissões do banco.';console.error(e);}
+function showJoinGate(){
+ area.hidden=true;gate.hidden=false;gate.replaceChildren();
+ const title=document.createElement('strong');title.textContent='O Fala Trem é um grupo de participação voluntária.';
+ const copy=document.createElement('p');copy.textContent='Entre no grupo para ver as mensagens, conversar com a comunidade e liberar convites para conversas privadas com outros participantes.';
+ const join=document.createElement('button');join.type='button';join.textContent='Entrar no grupo';join.addEventListener('click',async()=>{join.disabled=true;join.textContent='Entrando…';try{await joinChatGroup();await startGroupChat();}catch(e){copy.textContent=e.message||'Não foi possível entrar no grupo.';join.disabled=false;join.textContent='Tentar novamente';}});
+ gate.append(title,copy,join);
+}
+async function startGroupChat(){
+ const membership=await getChatGroupMembership();
+ if(!membership.isMember){showJoinGate();return;}
+ gate.hidden=true;area.hidden=false;$('leave-group').hidden=false;
+ connection.textContent='Conectando à sala em tempo real…';
+ if(unsubscribe){unsubscribe();unsubscribe=null;}
+ unsubscribe=subscribeChatMessages(addMessage,connectionStatus=>{if(connectionStatus==='SUBSCRIBED')connection.textContent='Conectado: novas mensagens aparecem automaticamente.';else if(connectionStatus==='CHANNEL_ERROR'||connectionStatus==='TIMED_OUT')connection.textContent='Conexão instável. O chat está tentando se reconectar.';else if(connectionStatus==='CLOSED')connection.textContent='Conexão encerrada. Entre novamente no grupo para reconectar.';else connection.textContent='Conectando à sala em tempo real…';});
+ const messages=await getChatMessages(80);list.replaceChildren();seen.clear();messages.forEach(addMessage);
+ if(savedChatState)requestAnimationFrame(()=>{list.scrollTop=Number(savedChatState.listScroll)||list.scrollHeight;window.scrollTo(0,Number(savedChatState.pageScroll)||0);});
+}
+try{
+ const session=await getCurrentSession();
+ if(!session){gate.textContent='Para participar do bate-papo, entre ou crie sua conta.';const link=document.createElement('a');link.className='btn';link.href='./conta.html';link.textContent='Entrar / Criar conta';gate.append(document.createTextNode(' '),link);}
+ else {const membership=await getChatGroupMembership();if(membership.isMember)await startGroupChat();else showJoinGate();}
+}catch(e){gate.textContent=e.message||'Não foi possível conectar ao Fala Trem agora. Confira sua internet e tente novamente.';console.error(e);}
+document.getElementById('leave-group').addEventListener('click',async()=>{
+ if(!confirm('Sair do grupo Fala Trem? Você deixará de ver as mensagens do grupo e não poderá iniciar novas conversas privadas com outros participantes.'))return;
+ const button=document.getElementById('leave-group');button.disabled=true;
+ try{await leaveChatGroup();if(unsubscribe){unsubscribe();unsubscribe=null;}seen.clear();list.replaceChildren();gallery.hidden=true;showJoinGate();}
+ catch(e){status.textContent=e.message||'Não foi possível sair do grupo.';}
+ finally{button.disabled=false;}
+});
 const gallery=document.getElementById('media-gallery'),galleryGrid=document.getElementById('media-gallery-grid'),galleryEmpty=document.getElementById('gallery-empty');
 async function showGallery(){gallery.hidden=false;galleryGrid.replaceChildren();galleryEmpty.hidden=true;try{const items=(await getChatMessages(100)).filter(m=>m.attachment_url&&['image','video'].includes(m.attachment_type));for(const item of items){const a=document.createElement('a');a.href=item.attachment_url;a.target='_blank';a.rel='noopener';a.setAttribute('aria-label',item.attachment_type==='video'?'Abrir vídeo':'Abrir foto');if(item.attachment_type==='video'){const v=document.createElement('video');v.src=item.attachment_url;v.muted=true;v.preload='metadata';a.append(v);}else{const img=document.createElement('img');img.src=item.attachment_url;img.alt='Foto compartilhada na conversa';img.loading='lazy';a.append(img);}galleryGrid.append(a);}galleryEmpty.hidden=items.length>0;}catch(e){galleryEmpty.hidden=false;galleryEmpty.textContent='Não foi possível carregar a galeria agora.';}}
 document.getElementById('gallery-open').addEventListener('click',showGallery);document.getElementById('gallery-close').addEventListener('click',()=>gallery.hidden=true);
