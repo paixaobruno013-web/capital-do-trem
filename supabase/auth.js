@@ -1064,7 +1064,7 @@ export async function saveAdminHeaderBackground(file, options = {}) {
     { setting_key: 'app_header_background_image_url', setting_value: imageUrl, updated_at: now },
     { setting_key: 'app_header_background_x', setting_value: String(clamp(options.x ?? 50, 0, 100)), updated_at: now },
     { setting_key: 'app_header_background_y', setting_value: String(clamp(options.y ?? 50, 0, 100)), updated_at: now },
-    { setting_key: 'app_header_background_blur', setting_value: String(clamp(options.blur ?? 0, 0, 12)), updated_at: now },
+    { setting_key: 'app_header_background_blur', setting_value: '0', updated_at: now },
     { setting_key: 'app_header_background_fit', setting_value: options.fit === 'contain' ? 'contain' : 'cover', updated_at: now }
   ];
   const { error: saveError } = await supabase.from('site_settings').upsert(rows, { onConflict: 'setting_key' });
