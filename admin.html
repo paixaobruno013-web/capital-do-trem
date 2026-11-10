@@ -125,7 +125,7 @@ audio{width:100%;}
  <div class="item">
   <div class="home-bg-preview"><img id="header-background-preview" src="" alt="Prévia do fundo do cabeçalho"></div>
   <label for="header-background-file">Escolher imagem do fundo superior</label>
-  <input id="header-background-file" type="file" accept="image/jpeg,image/png,image/webp">
+  <input id="header-background-file" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp">
   <label for="header-background-x">Posição horizontal</label>
   <div class="range-row"><span class="muted">Esquerda ↔ Direita</span><output id="header-background-x-value">50%</output><input id="header-background-x" type="range" min="0" max="100" value="50"></div>
   <label for="header-background-y">Posição vertical</label>
@@ -205,7 +205,7 @@ audio{width:100%;}
  <div class="item">
   <video id="opening-video-preview" controls playsinline muted style="display:none;width:100%;max-width:280px;height:497px;max-height:none;aspect-ratio:9/16;object-fit:cover;object-position:50% 50%;background:#000;border-radius:12px;margin:12px auto"></video>
   <label for="opening-video-file">Selecionar vídeo de abertura</label>
-  <input id="opening-video-file" type="file" accept="video/mp4,video/webm">
+  <input id="opening-video-file" type="file" accept="video/mp4,video/webm,video/*,.mp4,.webm">
   <button id="opening-video-save" type="button">Usar este vídeo na abertura</button>
   <button id="opening-video-remove" class="secondary" type="button">Remover mídia da abertura (imagem ou vídeo)</button>
   <p id="opening-video-status" class="status" role="status" aria-live="polite">Nenhum vídeo novo selecionado.</p>
@@ -291,7 +291,7 @@ function paintHeaderBgPreview(){
 }
 headerBgFile.addEventListener('change',()=>{
  const file=headerBgFile.files?.[0];if(!file)return;
- if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size<1||file.size>8*1024*1024){headerBgStatus.textContent='Escolha JPG, PNG ou WebP de até 8 MB.';headerBgFile.value='';return;}
+ const ext=(file.name.split('.').pop()||'').toLowerCase();const validType=['image/jpeg','image/png','image/webp'].includes(file.type)||(['jpg','jpeg','png','webp'].includes(ext)&&(!file.type||file.type==='application/octet-stream'||file.type==='image/jpg'));if(!validType||file.size<1||file.size>8*1024*1024){headerBgStatus.textContent='Escolha JPG, PNG ou WebP de até 8 MB.';headerBgFile.value='';return;}
  headerBgPreview.src=URL.createObjectURL(file);headerBgStatus.textContent='Prévia pronta. Ajuste a posição e a nitidez antes de salvar.';paintHeaderBgPreview();
 });
 [headerBgX,headerBgY,headerBgBlur,headerBgFit].forEach(control=>control.addEventListener('input',paintHeaderBgPreview));
@@ -344,7 +344,7 @@ document.getElementById('opening-media-save-settings').addEventListener('click',
 });
 openingVideoFile.addEventListener('change',()=>{
  const file=openingVideoFile.files?.[0];if(!file)return;
- if(!['video/mp4','video/webm'].includes(file.type)||file.size>50*1024*1024){openingVideoStatus.textContent='Escolha MP4 ou WebM de até 50 MB.';openingVideoFile.value='';return;}
+ const ext=(file.name.split('.').pop()||'').toLowerCase();const validType=['video/mp4','video/webm'].includes(file.type)||(['mp4','webm'].includes(ext)&&(!file.type||file.type==='application/octet-stream'));if(!validType||file.size<1||file.size>50*1024*1024){openingVideoStatus.textContent='Escolha um arquivo MP4 ou WebM válido de até 50 MB.';openingVideoFile.value='';return;}
  openingVideoPreview.src=URL.createObjectURL(file);openingVideoPreview.style.display='block';document.getElementById('opening-media-frame-preview').src='./marca.svg';paintOpeningMediaPreview();openingVideoStatus.textContent='Prévia pronta. Ajuste o enquadramento e toque em usar este vídeo.';
 });
 openingVideoSave.addEventListener('click',async()=>{
