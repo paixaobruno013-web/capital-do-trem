@@ -70,6 +70,16 @@ jobs:
       - name: Generate Android project
         run: npx cap add android
 
+      - name: Preparar ícones com a imagem oficial do perfil
+        env:
+          PROFILE_ICON_URL: https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/31937786-c321-445f-ae1c-de018eca95c8/avatar/b338f7a8-8964-4063-9086-64a9bd603f4f.jpg
+        run: |
+          mkdir -p assets
+          curl --fail --location --retry 3 "$PROFILE_ICON_URL" --output /tmp/capital-do-trem-profile.jpg
+          python -m pip install --quiet Pillow
+          python scripts/prepare-app-icons.py /tmp/capital-do-trem-profile.jpg assets
+          npx --yes @capacitor/assets@3.0.0 generate --android --assetPath assets --iconBackgroundColor '#080809' --iconBackgroundColorDark '#080809'
+
       - name: Sync Capacitor
         run: npx cap sync android
 
