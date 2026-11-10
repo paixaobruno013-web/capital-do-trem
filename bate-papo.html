@@ -87,9 +87,15 @@ audio{width:100%;}
 .composer .chat-tools{display:contents}
 .composer #emoji-tray{display:none!important}
 .composer #emoji-tray.is-open{display:block!important;grid-column:1/-1;grid-row:1}
-.composer .emoji-panel{grid-column:1/-1;grid-row:1;max-height:190px;overflow:auto}
+
 .composer input#message{grid-column:2;grid-row:2;width:100%;min-width:0}
 .composer #emoji-toggle{grid-column:1;grid-row:2;min-width:0;padding:8px 4px;font-size:21px}
+.composer.emoji-open{grid-template-columns:minmax(0,1fr)}
+.composer.emoji-open #emoji-tray.is-open{grid-column:1;grid-row:1;display:block!important;max-height:min(48vh,390px);overflow:auto;border:1px solid var(--line);border-radius:12px;padding:8px;background:var(--panel)}
+.composer.emoji-open #message,.composer.emoji-open #camera-open,.composer.emoji-open #record-audio,.composer.emoji-open #send,.composer.emoji-open .chat-tools{display:none!important}
+.emoji-close{min-height:30px!important;padding:4px 9px!important;border:1px solid var(--line)!important;border-radius:999px!important;background:var(--panel)!important;color:var(--fg)!important;font-size:11px!important;font-weight:700}
+.emoji-picker-heading{flex-wrap:wrap}
+.emoji-picker-heading>span{margin-right:auto}
 .composer #camera-open{grid-column:3;grid-row:2;min-width:0;padding:8px 4px}
 .composer #record-audio{grid-column:4;grid-row:2;min-width:0;padding:8px 4px}
 .composer button#send{grid-column:5;grid-row:2;min-width:0;padding:8px 5px}
