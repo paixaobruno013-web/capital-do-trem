@@ -766,9 +766,10 @@ html.auth-check-pending body{visibility:hidden}
 }
 
 
-header.header-has-custom-background{position:relative;isolation:isolate;overflow:hidden}
-header.header-has-custom-background::after{content:"";position:absolute;z-index:-2;inset:-2%;background-image:linear-gradient(110deg,rgba(0,0,0,.12),rgba(0,0,0,.06) 55%,rgba(0,0,0,.14)),var(--header-bg-image);background-size:var(--header-bg-fit,cover);background-position:var(--header-bg-position,50% 50%);background-repeat:no-repeat;filter:none;transform:scale(1.01);pointer-events:none}
-body.light header.header-has-custom-background::after{background-image:linear-gradient(110deg,rgba(255,255,255,.16),rgba(255,255,255,.10)),var(--header-bg-image)}
+header.header-has-custom-background{position:relative;isolation:isolate;overflow:hidden;background:transparent!important}
+header.header-has-custom-background::before{content:"";position:absolute;z-index:0;inset:0;background-image:linear-gradient(110deg,rgba(0,0,0,.12),rgba(0,0,0,.06) 55%,rgba(0,0,0,.14)),var(--header-bg-image);background-size:var(--header-bg-fit,cover);background-position:var(--header-bg-position,50% 50%);background-repeat:no-repeat;filter:none;pointer-events:none}
+header.header-has-custom-background>*{position:relative;z-index:1}
+body.light header.header-has-custom-background::before{background-image:linear-gradient(110deg,rgba(255,255,255,.16),rgba(255,255,255,.10)),var(--header-bg-image)}
 /* Fundo do painel central configurável pelo administrador. */
 .reference-banner.has-custom-background{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(110deg,rgba(0,0,0,.76),rgba(0,0,0,.48) 58%,rgba(0,0,0,.68))!important}
 .reference-banner.has-custom-background::before{content:"";position:absolute;z-index:0;inset:0;border-radius:inherit;background-image:linear-gradient(110deg,rgba(0,0,0,.38),rgba(0,0,0,.22)),var(--home-bg-image);background-size:var(--home-bg-fit,cover);background-position:var(--home-bg-position,50% 50%);background-repeat:no-repeat;filter:blur(var(--home-bg-blur,0px));transform:scale(1.04);pointer-events:none}
@@ -1640,8 +1641,15 @@ async function saveOfflineMusic(id,blob,title){
     const brand=document.querySelector('.intro-smoke__brand');
     if(brand)brand.style.display='none';
     const video=document.createElement('video');
-    video.className='opening-video-background';video.src=openingVideo;video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';video.autoplay=true;video.muted=true;video.playsInline=true;video.loop=true;video.preload='auto';video.setAttribute('aria-hidden','true');
+    video.className='opening-video-background';video.src=openingVideo;video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';video.autoplay=true;video.muted=true;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));video.playsInline=true;video.loop=true;video.preload='auto';video.setAttribute('aria-hidden','true');
     screen.insertBefore(video,screen.firstChild);screen.classList.add('custom-opening-screen');
+    if(branding.openingVideoMuted===false){
+     const audioButton=document.createElement('button');audioButton.type='button';audioButton.textContent='🔊 ATIVAR ÁUDIO';
+     audioButton.setAttribute('aria-label','Ativar áudio do vídeo de abertura');
+     audioButton.style.cssText='position:absolute;z-index:8;left:50%;bottom:22%;transform:translateX(-50%);padding:12px 18px;border:2px solid #ed1c24;border-radius:999px;background:#050505ef;color:#fff;font-weight:900;letter-spacing:.5px;box-shadow:0 0 16px #ed1c24;cursor:pointer';
+     audioButton.addEventListener('click',()=>{video.muted=false;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));video.play().catch(()=>{});audioButton.remove();},{once:true});
+     screen.appendChild(audioButton);
+    }
     const bar=document.getElementById('opening-live-progress');
     const startedAt=performance.now();let progress=3,ready=document.readyState==='complete',videoReady=false,finished=false,finishQueued=false;
     const paint=()=>{if(bar)bar.style.width=progress+'%';};
