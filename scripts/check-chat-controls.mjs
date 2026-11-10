@@ -30,9 +30,9 @@ const checks = [
   ['foto do perfil abre os Stories com suporte a teclado', /avatar\.addEventListener\('click', open\)/.test(stories) && /avatar\.addEventListener\('keydown'/.test(stories)],
   ['aro verde e aro de visto são aplicados na foto existente', /has-active-story/.test(stories) && /has-seen-story/.test(stories) && /\.community-profile-avatar\.has-active-story/.test(home)],
 
-  ['configurações públicas da abertura ignoram cache HTTP antigo', /rest\\/v1\\/site_settings/.test(auth) && /cache:\\s*'no-store'/.test(auth) && /Cache-Control/.test(auth)],
-  ['vídeo de abertura recebe identificador único e é recarregado', /cdt_opening/.test(home) && /randomUUID/.test(home) && /video\\.load\\(\\)/.test(home)],
-  ['publicação do vídeo confirma URL gravada e resposta de vídeo', /saved\\.openingVideoUrl!==url/.test(adminMedia) && /method:'HEAD',cache:'no-store'/.test(adminMedia) && /content-type/.test(adminMedia)]
+  ['configurações públicas da abertura ignoram cache HTTP antigo', auth.includes('/rest/v1/site_settings') && auth.includes("cache: 'no-store'") && auth.includes('Cache-Control')],
+  ['vídeo de abertura recebe identificador único e é recarregado', home.includes('cdt_opening') && home.includes('randomUUID') && home.includes('video.load()')],
+  ['publicação do vídeo confirma URL gravada e resposta de vídeo', adminMedia.includes('saved.openingVideoUrl!==url') && adminMedia.includes("method:'HEAD',cache:'no-store'") && adminMedia.includes('content-type') ]
 
 
 ];
