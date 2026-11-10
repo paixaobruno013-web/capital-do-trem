@@ -870,7 +870,8 @@ export async function saveAdminBrandingPair(file) {
   const now = new Date().toISOString();
   const { error: saveError } = await supabase.from('site_settings').upsert([
     { setting_key: 'official_profile_image_url', setting_value: publicData.publicUrl, updated_at: now },
-    { setting_key: 'app_opening_image_url', setting_value: publicData.publicUrl, updated_at: now }
+    { setting_key: 'app_opening_image_url', setting_value: publicData.publicUrl, updated_at: now },
+    { setting_key: 'app_opening_video_url', setting_value: '', updated_at: now }
   ], { onConflict: 'setting_key' });
   if (saveError) throw saveError;
   return publicData.publicUrl;
@@ -893,7 +894,8 @@ export async function saveAdminOpeningImage(file) {
   const { data: publicData } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
   if (!publicData?.publicUrl) throw new Error('Não foi possível gerar o endereço público da abertura.');
   const { error: saveError } = await supabase.from('site_settings').upsert([
-    { setting_key: 'app_opening_image_url', setting_value: publicData.publicUrl, updated_at: new Date().toISOString() }
+    { setting_key: 'app_opening_image_url', setting_value: publicData.publicUrl, updated_at: new Date().toISOString() },
+    { setting_key: 'app_opening_video_url', setting_value: '', updated_at: new Date().toISOString() }
   ], { onConflict: 'setting_key' });
   if (saveError) throw saveError;
   return publicData.publicUrl;
@@ -980,9 +982,9 @@ export async function saveAdminBrandingImage(kind, file) {
   if (uploadError) throw uploadError;
   const { data: publicData } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
   if (!publicData?.publicUrl) throw new Error('Não foi possível gerar o endereço público da imagem.');
-  const { error: saveError } = await supabase.from('site_settings').upsert({
-    setting_key: keys[kind], setting_value: publicData.publicUrl, updated_at: new Date().toISOString()
-  }, { onConflict: 'setting_key' });
+  const rows = [{ setting_key: keys[kind], setting_value: publicData.publicUrl, updated_at: new Date().toISOString() }];
+  if (kind === 'opening') rows.push({ setting_key: 'app_opening_video_url', setting_value: '', updated_at: new Date().toISOString() });
+  const { error: saveError } = await supabase.from('site_settings').upsert(rows, { onConflict: 'setting_key' });
   if (saveError) throw saveError;
   return publicData.publicUrl;
 }
