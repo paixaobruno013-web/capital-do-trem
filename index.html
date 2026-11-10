@@ -1849,4 +1849,34 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
 }
 </style>
 
+
+<style id="capital-stories-styles">
+#site-logo{cursor:pointer;transition:border-color .2s,box-shadow .2s}
+#site-logo.has-active-story{border:3px solid #22c55e!important;box-shadow:0 0 0 3px rgba(34,197,94,.2),0 0 13px rgba(34,197,94,.85),0 0 28px rgba(34,197,94,.38)!important}
+#site-logo.has-seen-story{border:3px solid #777!important;box-shadow:0 0 0 2px rgba(130,130,130,.18),0 0 10px rgba(130,130,130,.25)!important}
+#capital-story-toast{position:fixed;z-index:10020;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(92vw,420px);padding:13px 16px;border:1px solid #22c55e;border-radius:13px;background:#07130b;color:#fff;font-weight:800;text-align:center;box-shadow:0 8px 30px #0009;display:none}
+#capital-story-viewer{position:fixed;z-index:10030;inset:0;background:rgba(0,0,0,.96);display:none;align-items:center;justify-content:center;padding:16px}
+#capital-story-viewer.is-open{display:flex}
+#capital-story-card{position:relative;width:min(100%,480px);height:min(88dvh,820px);background:#090909;border:1px solid #333;border-radius:18px;overflow:hidden;display:flex;flex-direction:column}
+#capital-story-progress{height:3px;background:#555;flex:0 0 3px}
+#capital-story-progress span{display:block;height:100%;width:100%;background:#22c55e;transform-origin:left;transform:scaleX(0)}
+#capital-story-media{flex:1;min-height:0;display:grid;place-items:center;background:#000}
+#capital-story-media img,#capital-story-media video{display:block;width:100%;height:100%;object-fit:contain;background:#000}
+#capital-story-caption{padding:12px 15px;color:#fff;min-height:48px;overflow-wrap:anywhere}
+#capital-story-controls{position:absolute;inset:3px 0 52px;display:flex;justify-content:space-between;pointer-events:none}
+#capital-story-controls button,#capital-story-close{pointer-events:auto;border:0;background:rgba(0,0,0,.38);color:#fff;font-size:25px;width:48px;min-height:54px}
+#capital-story-close{position:absolute;right:8px;top:8px;width:42px;height:42px;min-height:42px;border-radius:50%;z-index:2;background:rgba(0,0,0,.65)}
+@media(min-width:760px){#capital-story-viewer{padding:24px}}
+</style>
+<div id="capital-story-toast" role="status" aria-live="polite"></div>
+<div id="capital-story-viewer" aria-hidden="true">
+ <section id="capital-story-card" role="dialog" aria-modal="true" aria-label="Stories oficiais da Capital do Trem">
+  <div id="capital-story-progress"><span></span></div>
+  <button id="capital-story-close" type="button" aria-label="Fechar Stories">×</button>
+  <div id="capital-story-media"></div>
+  <div id="capital-story-controls"><button id="capital-story-prev" type="button" aria-label="Story anterior">‹</button><button id="capital-story-next" type="button" aria-label="Próximo Story">›</button></div>
+  <p id="capital-story-caption"></p>
+ </section>
+</div>
+<script type="module" src="./stories-ui.js"></script>
 </body></html>
