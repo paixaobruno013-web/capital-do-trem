@@ -393,16 +393,8 @@ export async function moderateItem(table, id, status) {
 }
 
 
- // Publicação direta de música: o áudio entra no catálogo assim que o envio termina.
+ // Publicação de músicas: somente administradores e membros da equipe autorizados.
 export async function isCurrentUserArtistOrAdmin() {
-  const supabase = initSupabase();
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError) throw userError;
-  if (!user) return false;
-  const { data: profile, error } = await supabase.from('profiles')
-    .select('account_type').eq('user_id', user.id).maybeSingle();
-  if (error) throw error;
-  if (profile?.account_type === 'artist') return true;
   return await isCurrentUserAdmin();
 }
 
@@ -411,8 +403,8 @@ export async function uploadMySong({ file, title, artistName, description = '' }
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para enviar uma música.');
-  // Qualquer perfil Artista/DJ e a administração podem enviar músicas.
-  if (!(await isCurrentUserArtistOrAdmin())) throw new Error('O envio de músicas está disponível somente para perfis Artista/DJ.');
+  // A autorização é confirmada pela função administrativa no banco; tipo de perfil artístico não concede publicação.
+  if (!(await isCurrentUserAdmin())) throw new Error('Somente a administração e a equipe autorizada podem publicar músicas.');
   if (!(file instanceof File)) throw new Error('Selecione um arquivo de áudio.');
   // Alguns seletores de arquivo do Android informam aliases ou MIME genérico.
   // Aceita MIME conhecido ou extensão de áudio permitida e grava sempre o MIME canônico.
