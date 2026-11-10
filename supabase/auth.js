@@ -668,12 +668,13 @@ export async function uploadChatAttachment(file) {
   const imageTypes = ['image/jpeg','image/png','image/webp'];
   const rawMime = String(file.type || '').toLowerCase().split(';')[0].trim();
   const extension = String(file.name || '').toLowerCase().match(/\.([a-z0-9]+)$/)?.[1] || '';
-  const audioMimeByExtension = {mp3:'audio/mpeg',m4a:'audio/mp4',mp4:'audio/mp4',aac:'audio/aac',ogg:'audio/ogg',oga:'audio/ogg',wav:'audio/wav',webm:'audio/webm'};
-  const canonicalAudioMime = rawMime==='audio/x-wav'||rawMime==='audio/wave'||rawMime==='audio/vnd.wave'?'audio/wav':rawMime==='audio/x-m4a'?'audio/mp4':rawMime;
+  const audioMimeByExtension = {mp3:'audio/mpeg',m4a:'audio/mp4',aac:'audio/aac',ogg:'audio/ogg',oga:'audio/ogg',wav:'audio/wav',webm:'audio/webm'};
+  const audioAliases = {'audio/x-wav':'audio/wav','audio/wave':'audio/wav','audio/vnd.wave':'audio/wav','audio/x-m4a':'audio/mp4','audio/m4a':'audio/mp4','audio/mp3':'audio/mpeg','audio/x-mp3':'audio/mpeg','audio/x-aac':'audio/aac','application/ogg':'audio/ogg'};
+  const canonicalAudioMime = audioAliases[rawMime] || rawMime;
   const allowedAudio = ['audio/mpeg','audio/mp4','audio/aac','audio/ogg','audio/wav','audio/webm'];
-  const resolvedAudioMime = allowedAudio.includes(canonicalAudioMime)?canonicalAudioMime:(audioMimeByExtension[extension]||'');
+  const resolvedAudioMime = allowedAudio.includes(canonicalAudioMime)?canonicalAudioMime:((!rawMime||rawMime==='application/octet-stream')?(audioMimeByExtension[extension]||''):'');
   const isImage = imageTypes.includes(rawMime);
-  const isAudio = Boolean(resolvedAudioMime);
+  const isAudio = Boolean(resolvedAudioMime) && !rawMime.startsWith('video/');
   if (!isImage && !isAudio) throw new Error('Formato não permitido. Envie JPG, PNG, WebP ou áudio MP3, M4A, AAC, OGG, WAV ou WebM.');
   const max = isImage ? 8*1024*1024 : 20*1024*1024;
   if (file.size < 1 || file.size > max) throw new Error(isImage ? 'A imagem deve ter até 8 MB.' : 'O áudio deve ter até 20 MB.');
