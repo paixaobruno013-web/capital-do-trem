@@ -144,6 +144,18 @@ audio{width:100%;}
  </div>
 </section>
 
+
+<section class="command-section" id="opening-video-section">
+ <h2>Substituir vídeo de abertura</h2>
+ <p class="muted">Envie um vídeo MP4 ou WebM de até 50 MB. O vídeo será exibido em tela cheia na abertura do aplicativo; para permitir reprodução automática no Android e iPhone, ele começa sem áudio. A vinheta sonora do aplicativo continua independente.</p>
+ <div class="item">
+  <video id="opening-video-preview" controls playsinline muted style="display:none;width:100%;max-width:520px;max-height:300px;object-fit:contain;background:#000;border-radius:12px;margin:12px auto"></video>
+  <label for="opening-video-file">Selecionar vídeo de abertura</label>
+  <input id="opening-video-file" type="file" accept="video/mp4,video/webm">
+  <button id="opening-video-save" type="button">Substituir vídeo de abertura</button>
+  <p id="opening-video-status" class="status" role="status" aria-live="polite">Nenhum vídeo novo selecionado.</p>
+ </div>
+</section>
 <section class="command-section" id="home-background-section">
  <h2>Plano de fundo do painel central</h2>
  <p class="muted">Substitua a imagem da favela com o helicóptero e a frase “AQUI A MÚSICA NÃO PARA!”. A imagem aparece atrás do texto e dos botões, sem removê-los. JPG, PNG ou WebP até 8 MB.</p>
@@ -198,6 +210,22 @@ async function enterDashboard(user){
  await loadChatModeration();
 }
 
+const openingVideoFile=document.getElementById('opening-video-file');
+const openingVideoPreview=document.getElementById('opening-video-preview');
+const openingVideoSave=document.getElementById('opening-video-save');
+const openingVideoStatus=document.getElementById('opening-video-status');
+openingVideoFile.addEventListener('change',()=>{
+ const file=openingVideoFile.files?.[0];if(!file)return;
+ if(!['video/mp4','video/webm'].includes(file.type)||file.size>50*1024*1024){openingVideoStatus.textContent='Escolha MP4 ou WebM de até 50 MB.';openingVideoFile.value='';return;}
+ openingVideoPreview.src=URL.createObjectURL(file);openingVideoPreview.style.display='block';openingVideoStatus.textContent='Prévia pronta. Toque em substituir vídeo de abertura para publicar.';
+});
+openingVideoSave.addEventListener('click',async()=>{
+ const file=openingVideoFile.files?.[0];if(!file){openingVideoStatus.textContent='Primeiro selecione um vídeo MP4 ou WebM.';return;}
+ openingVideoSave.disabled=true;openingVideoStatus.textContent='Enviando vídeo e atualizando a abertura…';
+ try{const url=await auth.saveAdminOpeningVideo(file);openingVideoPreview.src=url;openingVideoPreview.load();openingVideoFile.value='';openingVideoStatus.textContent='Vídeo de abertura atualizado! A imagem antiga deixou de ser usada na abertura.';}
+ catch(error){openingVideoStatus.textContent=error?.message||'Não foi possível salvar o vídeo. Confira a conexão e o limite de armazenamento.';}
+ finally{openingVideoSave.disabled=false;}
+});
 const homeBgFile=document.getElementById('home-background-file');
 const homeBgPreview=document.getElementById('home-background-preview');
 const homeBgX=document.getElementById('home-background-x'),homeBgY=document.getElementById('home-background-y');
@@ -220,6 +248,7 @@ async function loadBranding(){
   const url=branding.profileImageUrl||branding.openingImageUrl;
   if(url)document.getElementById('branding-profile-preview').src=url;
   if(branding.openingImageUrl)document.getElementById('opening-image-preview').src=branding.openingImageUrl;
+  if(branding.openingVideoUrl){const video=document.getElementById('opening-video-preview');video.src=branding.openingVideoUrl;video.style.display='block';document.getElementById('opening-video-status').textContent='Vídeo de abertura atualmente publicado.';}
   homeBgCurrentUrl=branding.homeBackgroundImageUrl||'';
   if(homeBgCurrentUrl)homeBgPreview.src=homeBgCurrentUrl;
   homeBgX.value=String(branding.homeBackgroundX??50);homeBgY.value=String(branding.homeBackgroundY??50);
