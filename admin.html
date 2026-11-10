@@ -306,7 +306,7 @@ headerBgSave.addEventListener('click',async()=>{
   const url=await auth.saveAdminHeaderBackground(file,{x:headerBgX.value,y:headerBgY.value,blur:headerBgBlur.value,fit:headerBgFit.value});
   headerBgCurrentUrl=url;headerBgPreview.src=url;headerBgFile.value='';paintHeaderBgPreview();
   headerBgStatus.textContent='Imagem e ajustes do cabeçalho salvos!';
- }catch(error){headerBgStatus.textContent=error?.message||'Não foi possível salvar o fundo.';}
+ }catch(error){const detail=[error?.message,error?.code&&('Código: '+error.code),error?.status&&('HTTP: '+error.status),error?.details,error?.hint].filter(Boolean).join(' • ');headerBgStatus.textContent=detail||'Não foi possível salvar o fundo. Confira sua conexão e a conta administradora.';}
  finally{headerBgSave.disabled=false;}
 });
 document.getElementById('header-background-remove').addEventListener('click',event=>removeImageSetting('header',event.currentTarget,headerBgStatus,()=>{
@@ -351,7 +351,7 @@ openingVideoSave.addEventListener('click',async()=>{
  const file=openingVideoFile.files?.[0];if(!file){openingVideoStatus.textContent='Primeiro selecione um vídeo MP4 ou WebM.';return;}
  openingVideoSave.disabled=true;openingVideoStatus.textContent='Enviando vídeo e atualizando a abertura…';
  try{const url=await auth.saveAdminOpeningVideo(file,{x:openingMediaX.value,y:openingMediaY.value,fit:openingMediaFit.value});openingVideoPreview.src=url;openingVideoPreview.load();openingVideoFile.value='';openingVideoStatus.textContent='Vídeo de abertura atualizado! A imagem antiga deixou de ser usada na abertura.';}
- catch(error){openingVideoStatus.textContent=error?.message||'Não foi possível salvar o vídeo. Confira a conexão e o limite de armazenamento.';}
+ catch(error){const detail=[error?.message,error?.code&&('Código: '+error.code),error?.status&&('HTTP: '+error.status),error?.details,error?.hint].filter(Boolean).join(' • ');openingVideoStatus.textContent=detail||'Não foi possível salvar o vídeo. Confira sua conexão e a conta administradora.';}
  finally{openingVideoSave.disabled=false;}
 });
 const homeBgFile=document.getElementById('home-background-file');
