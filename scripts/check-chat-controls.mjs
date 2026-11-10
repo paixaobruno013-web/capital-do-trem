@@ -31,7 +31,10 @@ const checks = [
   ['aro verde e aro de visto são aplicados na foto existente', /has-active-story/.test(stories) && /has-seen-story/.test(stories) && /\.community-profile-avatar\.has-active-story/.test(home)],
 
   ['configurações públicas da abertura ignoram cache HTTP antigo', auth.includes('/rest/v1/site_settings') && auth.includes("cache: 'no-store'") && auth.includes('Cache-Control')],
-  ['vídeo de abertura recebe identificador único e é recarregado', home.includes('cdt_opening') && home.includes('randomUUID') && home.includes('video.load()')],
+  ['vídeo de abertura usa URL estável para reaproveitar cache do arquivo enviado', home.includes('const currentOpeningImage=opening,currentOpeningVideo=openingVideo') && !home.includes('cdt_opening') && !home.includes('randomUUID')],
+  ['imagem de poster aparece enquanto o vídeo carrega', home.includes("video.poster=currentOpeningImage||profile||'./marca.svg'") && home.includes("video.preload='metadata'")],
+  ['vídeo só aparece depois do primeiro quadro estar pronto', home.includes("video.addEventListener('loadeddata'") && home.includes("video.style.opacity='1'")],
+  ['abertura termina em 7 segundos sem depender do carregamento do vídeo ou da página', home.includes('const remaining=Math.max(0,7000-(performance.now()-startedAt))') && !home.includes('!ready||!videoReady')],
   ['publicação do vídeo confirma URL gravada e resposta de vídeo', adminMedia.includes('saved.openingVideoUrl!==url') && adminMedia.includes("method:'HEAD',cache:'no-store'") && adminMedia.includes('content-type') ]
 
 
