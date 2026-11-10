@@ -908,7 +908,7 @@ export async function saveAdminOpeningImage(file, options = {}) {
   if (userError) throw userError;
   if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode alterar a abertura.');
   if (!(file instanceof File)) throw new Error('Escolha a arte completa da abertura.');
-  const format = await getBrandingUploadFormat(file, { jpg: true, png: true, webp: true });
+  const format = await getBrandingUploadFormat(file, { jpg: true, jpeg: true, png: true, webp: true });
   if (file.size < 1 || file.size > 5 * 1024 * 1024) throw new Error('A imagem deve ter até 5 MB.');
   const path = user.id + '/branding/opening-' + crypto.randomUUID() + '.' + format.extension;
   const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, { contentType: format.contentType, cacheControl: '3600', upsert: false });
@@ -1015,7 +1015,7 @@ export async function saveAdminBrandingImage(kind, file) {
   if (userError) throw userError;
   if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode alterar a identidade visual.');
   const keys = { profile: 'official_profile_image_url', opening: 'app_opening_image_url', header: 'app_header_background_image_url' };
-  if (!Object.hasOwn(keys, kind)) throw new Error('Tipo de imagem inválido.');
+  if (!Object.prototype.hasOwnProperty.call(keys, kind)) throw new Error('Tipo de imagem inválido.');
   if (!(file instanceof File)) throw new Error('Escolha uma imagem na galeria do celular.');
   const allowed = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
   if (!allowed[file.type]) throw new Error('Use uma imagem JPG, PNG ou WebP.');
