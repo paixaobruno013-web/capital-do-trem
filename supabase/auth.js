@@ -837,7 +837,7 @@ export async function getPublicBranding() {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('site_settings')
     .select('setting_key, setting_value')
-    .in('setting_key', ['official_profile_image_url', 'app_opening_image_url', 'app_opening_video_url', 'app_home_background_image_url', 'app_home_background_x', 'app_home_background_y', 'app_home_background_blur', 'app_home_background_fit']);
+    .in('setting_key', ['official_profile_image_url', 'app_opening_image_url', 'app_opening_video_url', 'app_home_background_image_url', 'app_home_background_x', 'app_home_background_y', 'app_home_background_blur', 'app_home_background_fit', 'app_header_background_image_url']);
   if (error) throw error;
   const settings = Object.fromEntries((data || []).map(row => [row.setting_key, row.setting_value]));
   return {
@@ -848,7 +848,8 @@ export async function getPublicBranding() {
     homeBackgroundX: Number(settings.app_home_background_x ?? 50),
     homeBackgroundY: Number(settings.app_home_background_y ?? 50),
     homeBackgroundBlur: Number(settings.app_home_background_blur ?? 0),
-    homeBackgroundFit: settings.app_home_background_fit === 'contain' ? 'contain' : 'cover'
+    homeBackgroundFit: settings.app_home_background_fit === 'contain' ? 'contain' : 'cover',
+    headerBackgroundImageUrl: settings.app_header_background_image_url || ''
   };
 }
 
@@ -969,7 +970,7 @@ export async function saveAdminBrandingImage(kind, file) {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode alterar a identidade visual.');
-  const keys = { profile: 'official_profile_image_url', opening: 'app_opening_image_url' };
+  const keys = { profile: 'official_profile_image_url', opening: 'app_opening_image_url', header: 'app_header_background_image_url' };
   if (!Object.hasOwn(keys, kind)) throw new Error('Tipo de imagem inválido.');
   if (!(file instanceof File)) throw new Error('Escolha uma imagem na galeria do celular.');
   const allowed = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
@@ -989,6 +990,35 @@ export async function saveAdminBrandingImage(kind, file) {
   return publicData.publicUrl;
 }
 
+
+// Remove a imagem configurada sem apagar arquivos ou alterar outras áreas do aplicativo.
+export async function removeAdminBrandingAsset(kind) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode remover imagens.');
+  const now = new Date().toISOString();
+  const keysByKind = {
+    profile: ['official_profile_image_url'],
+    opening: ['app_opening_image_url', 'app_opening_video_url'],
+    header: ['app_header_background_image_url'],
+    home: ['app_home_background_image_url', 'app_home_background_x', 'app_home_background_y', 'app_home_background_blur', 'app_home_background_fit'],
+    pair: ['official_profile_image_url', 'app_opening_image_url', 'app_opening_video_url']
+  };
+  const keys = keysByKind[kind];
+  if (!keys) throw new Error('Área de imagem inválida.');
+  const rows = keys.map(setting_key => ({
+    setting_key,
+    setting_value: kind === 'home' && setting_key === 'app_home_background_fit' ? 'cover'
+      : kind === 'home' && setting_key === 'app_home_background_blur' ? '0'
+      : kind === 'home' && (setting_key === 'app_home_background_x' || setting_key === 'app_home_background_y') ? '50'
+      : '',
+    updated_at: now
+  }));
+  const { error } = await supabase.from('site_settings').upsert(rows, { onConflict: 'setting_key' });
+  if (error) throw error;
+  return true;
+}
 
 // Registro de instalações (uma identificação aleatória por instalação local do app).
 export async function registerAppInstallation() {
