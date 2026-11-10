@@ -502,8 +502,8 @@ values (
   'capital-do-trem-media',
   'capital-do-trem-media',
   true,
-  5242880,
-  array['image/jpeg', 'image/png', 'image/webp']
+  52428800,
+  array['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/webm']
 )
 on conflict (id) do update
 set public = excluded.public,
