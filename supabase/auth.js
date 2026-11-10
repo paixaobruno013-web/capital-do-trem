@@ -664,28 +664,27 @@ export async function uploadChatAttachment(file) {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para enviar mídia.');
-  if (!(file instanceof File)) throw new Error('Selecione uma imagem ou áudio.');
-  const imageTypes = ['image/jpeg','image/png','image/webp'];
+  if (!(file instanceof File)) throw new Error('Selecione uma foto, vídeo ou áudio.');
   const rawMime = String(file.type || '').toLowerCase().split(';')[0].trim();
-  const extension = String(file.name || '').toLowerCase().match(/\.([a-z0-9]+)$/)?.[1] || '';
-  const audioMimeByExtension = {mp3:'audio/mpeg',m4a:'audio/mp4',aac:'audio/aac',ogg:'audio/ogg',oga:'audio/ogg',wav:'audio/wav',webm:'audio/webm'};
-  const audioAliases = {'audio/x-wav':'audio/wav','audio/wave':'audio/wav','audio/vnd.wave':'audio/wav','audio/x-m4a':'audio/mp4','audio/m4a':'audio/mp4','audio/mp3':'audio/mpeg','audio/x-mp3':'audio/mpeg','audio/x-aac':'audio/aac','application/ogg':'audio/ogg'};
-  const canonicalAudioMime = audioAliases[rawMime] || rawMime;
-  const allowedAudio = ['audio/mpeg','audio/mp4','audio/aac','audio/ogg','audio/wav','audio/webm'];
-  const resolvedAudioMime = allowedAudio.includes(canonicalAudioMime)?canonicalAudioMime:((!rawMime||rawMime==='application/octet-stream')?(audioMimeByExtension[extension]||''):'');
-  const isImage = imageTypes.includes(rawMime);
-  const isAudio = Boolean(resolvedAudioMime) && !rawMime.startsWith('video/');
-  if (!isImage && !isAudio) throw new Error('Formato não permitido. Envie JPG, PNG, WebP ou áudio MP3, M4A, AAC, OGG, WAV ou WebM.');
+  const extension = String(file.name || '').toLowerCase().match(/\\.([a-z0-9]+)$/)?.[1] || '';
+  const imageExt = {jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp'};
+  const videoExt = {mp4:'video/mp4',webm:'video/webm'};
+  const audioExt = {mp3:'audio/mpeg',m4a:'audio/mp4',aac:'audio/aac',ogg:'audio/ogg',oga:'audio/ogg',wav:'audio/wav'};
+  const aliases = {'audio/x-wav':'audio/wav','audio/wave':'audio/wav','audio/vnd.wave':'audio/wav','audio/x-m4a':'audio/mp4','audio/m4a':'audio/mp4','audio/mp3':'audio/mpeg','audio/x-mp3':'audio/mpeg','audio/x-aac':'audio/aac','application/ogg':'audio/ogg'};
+  const mime = aliases[rawMime] || rawMime || imageExt[extension] || videoExt[extension] || audioExt[extension] || '';
+  const isImage = ['image/jpeg','image/png','image/webp'].includes(mime);
+  const isVideo = ['video/mp4','video/webm'].includes(mime);
+  const isAudio = ['audio/mpeg','audio/mp4','audio/aac','audio/ogg','audio/wav','audio/webm'].includes(mime);
+  if (!isImage && !isVideo && !isAudio) throw new Error('Formato não permitido. Use JPG, PNG, WebP, MP4, WebM ou áudio MP3, M4A, AAC, OGG e WAV.');
   const max = isImage ? 8*1024*1024 : 20*1024*1024;
-  if (file.size < 1 || file.size > max) throw new Error(isImage ? 'A imagem deve ter até 8 MB.' : 'O áudio deve ter até 20 MB.');
-  const ext = isImage ? ({'image/jpeg':'jpg','image/png':'png','image/webp':'webp'}[rawMime]) : ({'audio/mpeg':'mp3','audio/mp4':'m4a','audio/aac':'aac','audio/ogg':'ogg','audio/wav':'wav','audio/webm':'webm'}[resolvedAudioMime]);
-  const uploadMime = isImage ? rawMime : resolvedAudioMime;
+  if (file.size < 1 || file.size > max) throw new Error(isImage ? 'A imagem deve ter até 8 MB.' : 'O vídeo ou áudio deve ter até 20 MB.');
+  const ext = isImage ? ({'image/jpeg':'jpg','image/png':'png','image/webp':'webp'}[mime]) : isVideo ? ({'video/mp4':'mp4','video/webm':'webm'}[mime]) : ({'audio/mpeg':'mp3','audio/mp4':'m4a','audio/aac':'aac','audio/ogg':'ogg','audio/wav':'wav','audio/webm':'webm'}[mime]);
   const path = user.id + '/chat/' + crypto.randomUUID() + '.' + ext;
-  const { error } = await supabase.storage.from('capital-do-trem-media').upload(path,file,{contentType:uploadMime,cacheControl:'3600',upsert:false});
+  const { error } = await supabase.storage.from('capital-do-trem-media').upload(path,file,{contentType:mime,cacheControl:'3600',upsert:false});
   if (error) throw error;
   const { data } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
   if (!data?.publicUrl) throw new Error('Não foi possível gerar o link da mídia.');
-  return { url:data.publicUrl, type:isImage?'image':'audio', name:file.name, mime:uploadMime, size:file.size };
+  return { url:data.publicUrl, type:isImage?'image':isVideo?'video':'audio', name:file.name, mime, size:file.size };
 }
 
 export async function sendChatMessage(content, attachment = null) {
@@ -695,7 +694,7 @@ export async function sendChatMessage(content, attachment = null) {
   if (!user) throw new Error('Entre na sua conta para participar do bate-papo.');
   const cleanContent = String(content || '').trim();
   if ((!cleanContent && !attachment) || cleanContent.length > 1000) throw new Error('Escreva uma mensagem ou anexe uma mídia. O texto pode ter até 1.000 caracteres.');
-  const payload = { author_id:user.id, content:cleanContent || (attachment?.type === 'image' ? '📷 Imagem' : '🎵 Áudio') };
+  const payload = { author_id:user.id, content:cleanContent || (attachment?.type === 'image' ? '📷 Imagem' : attachment?.type === 'video' ? '🎬 Vídeo' : '🎵 Áudio') };
   if (attachment) Object.assign(payload,{attachment_url:attachment.url,attachment_type:attachment.type,attachment_name:attachment.name,attachment_mime:attachment.mime,attachment_size:attachment.size});
   const { data, error } = await supabase.from('chat_messages').insert(payload)
     .select('id, author_id, author_name, content, created_at, author_avatar_type, author_avatar_url, author_avatar_data, attachment_url, attachment_type, attachment_name, attachment_mime, attachment_size').single();
