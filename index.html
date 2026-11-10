@@ -737,7 +737,7 @@ html.auth-check-pending body{visibility:hidden}
   transform:translateY(-58%)!important;font-size:clamp(27px,7vw,36px)!important;
   line-height:1!important;white-space:nowrap!important;
   filter:drop-shadow(0 2px 4px #000) drop-shadow(0 0 7px rgba(255,20,28,.7))!important;
-  animation:opening-train-cross-sky 5s linear 1 both!important;
+  animation:opening-train-cross-sky 9.5s linear 1 both!important;
 }
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train .opening-locomotive{
   transform:none!important;
@@ -761,6 +761,11 @@ html.auth-check-pending body{visibility:hidden}
   to{left:calc(100vw + 190px)}
 }
 
+
+/* Fundo do painel central configurável pelo administrador. */
+.reference-banner.has-custom-background{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(110deg,rgba(0,0,0,.76),rgba(0,0,0,.48) 58%,rgba(0,0,0,.68))!important}
+.reference-banner.has-custom-background::before{content:"";position:absolute;z-index:0;inset:0;border-radius:inherit;background-image:linear-gradient(110deg,rgba(0,0,0,.38),rgba(0,0,0,.22)),var(--home-bg-image);background-size:var(--home-bg-fit,cover);background-position:var(--home-bg-position,50% 50%);background-repeat:no-repeat;filter:blur(var(--home-bg-blur,0px));transform:scale(1.04);pointer-events:none}
+.reference-banner.has-custom-background>*{position:relative;z-index:1}
 </style></head>
 <body>
 <script>
@@ -1600,6 +1605,15 @@ async function saveOfflineMusic(id,blob,title){
   if(ready)finish();else window.addEventListener('load',()=>{ready=true;finish();},{once:true});
  }
 }
+   const homeBgUrl=safeUrl(branding.homeBackgroundImageUrl);
+  const homeBanner=document.querySelector('.reference-banner');
+  if(homeBgUrl&&homeBanner){
+   homeBanner.style.setProperty('--home-bg-image','url("'+homeBgUrl.replace(/"/g,'%22')+'")');
+   homeBanner.style.setProperty('--home-bg-position',(Number(branding.homeBackgroundX??50))+'% '+(Number(branding.homeBackgroundY??50))+'%');
+   homeBanner.style.setProperty('--home-bg-blur',Math.max(0,Math.min(12,Number(branding.homeBackgroundBlur??0)))+'px');
+   homeBanner.style.setProperty('--home-bg-fit',branding.homeBackgroundFit==='contain'?'contain':'cover');
+   homeBanner.classList.add('has-custom-background');
+  }
  }catch(error){console.warn('Identidade visual padrão mantida.',error);}
 })();
 </script>
