@@ -63,7 +63,7 @@ body.light .messages{background:linear-gradient(180deg,#fff8f8,#f4f4f4)}
 #status{padding:3px 5px}
 .empty{padding:22px 12px}
 #search,#conversation-search{border-radius:999px;padding:12px 15px;background:var(--bg);border-color:#ed1c2438}
-#incoming .person{background:#ed1c2410;border:1px solid #ed1c2428}
+#incoming .person{background:#ed1c2410;border:1px solid #ed1c2428}\n.official-group{background:linear-gradient(100deg,#ed1c2425,#ed1c2408)!important;border:1px solid #ed1c2477!important;box-shadow:0 0 14px #ed1c241c}\n.group-avatar{box-shadow:0 0 15px #ed1c2455!important}
 @media(max-width:680px){
  main{padding:10px 9px 28px}
  .layout{display:block}
@@ -87,19 +87,23 @@ body.light .messages{background:linear-gradient(180deg,#fff8f8,#f4f4f4)}
 <div id="app" hidden>
 <section class="panel"><div class="section-title"><h2>Convites recebidos</h2><span class="pill" id="pending-count">0</span></div><div id="incoming" class="list"><p class="empty">Nenhum convite por enquanto.</p></div></section>
 <div class="layout" id="private-layout">
-<section class="panel" id="sidebar-panel"><div class="section-title"><h2>Pessoas da comunidade</h2><button id="refresh" type="button">Atualizar</button></div><p class="small">Somente perfis públicos aparecem aqui. A outra pessoa precisa aceitar seu convite.</p><input id="search" type="search" placeholder="Buscar por nome ou cidade" aria-label="Buscar pessoas"><div id="people" class="list"><p class="empty">Carregando pessoas…</p></div><div class="section-title" style="margin-top:18px"><h2>Minhas conversas</h2></div><input id="conversation-search" type="search" placeholder="Buscar conversa pelo nome" aria-label="Buscar conversa" style="margin:8px 0"><div id="conversations" class="list"><p class="empty">Carregando…</p></div></section>
-<section class="panel" id="thread-panel"><div class="section-title"><div style="display:flex;align-items:center;gap:9px;min-width:0"><button id="back-to-list" type="button" aria-label="Voltar às conversas">‹</button><div><h2 id="chat-title">Escolha uma conversa</h2><span class="small" id="thread-presence">Suas mensagens privadas</span></div></div><button id="block" type="button" hidden>Bloquear</button></div><p class="small" id="chat-hint">Selecione uma conversa aceita para enviar mensagens privadas.</p><div id="messages" class="messages" aria-live="polite"><p class="empty">Suas mensagens aparecerão aqui.</p></div><form id="compose" class="compose" hidden><input id="message" maxlength="2000" autocomplete="off" placeholder="Escreva sua mensagem…" aria-label="Mensagem privada"><button class="primary" id="send" type="submit">Enviar</button></form><p class="status" id="status" role="status" aria-live="polite"></p></section>
+<section class="panel" id="sidebar-panel"><div class="section-title"><h2>Pessoas da comunidade</h2><button id="refresh" type="button">Atualizar</button></div><p class="small">Somente perfis públicos aparecem aqui. A outra pessoa precisa aceitar seu convite.</p><input id="search" type="search" placeholder="Buscar por nome ou cidade" aria-label="Buscar pessoas"><div id="people" class="list"><p class="empty">Carregando pessoas…</p></div><div class="section-title" style="margin-top:18px"><h2>Conversas</h2><span class="pill">Grupo + privadas</span></div><p class="small">O grupo oficial fica sempre no topo. Suas conversas individuais aparecem logo abaixo.</p><input id="conversation-search" type="search" placeholder="Buscar conversa pelo nome" aria-label="Buscar conversa" style="margin:8px 0"><div id="conversations" class="list"><p class="empty">Carregando…</p></div></section>
+<section class="panel" id="thread-panel"><div class="section-title"><div style="display:flex;align-items:center;gap:9px;min-width:0"><button id="back-to-list" type="button" aria-label="Voltar às conversas">‹</button><div><h2 id="chat-title">Escolha uma conversa</h2><span class="small" id="thread-presence">Escolha o grupo ou uma conversa privada</span></div></div><button id="block" type="button" hidden>Bloquear</button></div><p class="small" id="chat-hint">Selecione uma conversa aceita para enviar mensagens privadas.</p><div id="messages" class="messages" aria-live="polite"><p class="empty">Suas mensagens aparecerão aqui.</p></div><form id="compose" class="compose" hidden><input id="message" maxlength="2000" autocomplete="off" placeholder="Escreva sua mensagem…" aria-label="Mensagem privada"><button class="primary" id="send" type="submit">Enviar</button></form><p class="status" id="status" role="status" aria-live="polite"></p></section>
 </div>
 <section class="panel"><h2>Privacidade e respeito</h2><p class="muted">Só participantes de uma conversa aceita conseguem ler as mensagens. Você pode bloquear uma pessoa; ela não poderá iniciar novas conversas com você nem enviar mensagens privadas enquanto o bloqueio estiver ativo. Não compartilhe senhas, códigos ou dados bancários.</p></section>
 </div>
 </main>
 <script type="module">
-import {getCurrentSession,getPrivateConversationData,getOnlineUserIds,requestPrivateConversation,decidePrivateConversation,getPrivateMessages,sendPrivateMessage,subscribePrivateMessages,blockPrivateUser} from './supabase/auth.js';
-const $=id=>document.getElementById(id);let state=null,active=null,unsubscribe=null,onlineIds=new Set();
+import {getCurrentSession,getPrivateConversationData,getOnlineUserIds,requestPrivateConversation,decidePrivateConversation,getPrivateMessages,sendPrivateMessage,subscribePrivateMessages,blockPrivateUser,getChatMessages,sendChatMessage,subscribeChatMessages,getPublicBranding} from './supabase/auth.js';
+const $=id=>document.getElementById(id);let state=null,active=null,activeGroup=false,unsubscribe=null,onlineIds=new Set(),groupLogo="./marca.svg";
 const esc=s=>String(s||'');const fmt=v=>new Date(v).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
 function personName(id){const p=state?.people.find(p=>p.user_id===id);return p?`${p.display_name||'Usuário Uai'} (@${p.username||'sem_usuario'})`:'Usuário Uai';}
 function partner(c){return c.participant_one===state.userId?c.participant_two:c.participant_one;}
 function node(tag,cls,text){const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;}
+function groupAvatarNode(){
+ const avatar=node('span','profile-avatar');avatar.classList.add('group-avatar');avatar.style.borderColor='var(--red)';
+ const img=node('img');img.src=groupLogo;img.alt='';img.loading='eager';avatar.append(img);return avatar;
+}
 function profileFor(id){return state?.people.find(p=>p.user_id===id)||null;}
 function avatarNode(profile){
  const avatar=node('span','profile-avatar');avatar.setAttribute('aria-hidden','true');
@@ -124,13 +128,19 @@ function drawPeople(){
 }
 function drawConversations(){
  const box=$('conversations');box.replaceChildren();
- const term=$('conversation-search').value.trim().toLocaleLowerCase('pt-BR');const list=state.conversations.filter(c=>c.status==='accepted'&&personName(partner(c)).toLocaleLowerCase('pt-BR').includes(term));
- if(!list.length){box.append(node('p','empty','Você ainda não tem conversas aceitas.'));return;}
+ const term=$('conversation-search').value.trim().toLocaleLowerCase('pt-BR');
+ const group=node('button','conversation');group.type='button';group.classList.add('official-group');
+ const copy=node('span','conversation-copy'),name=node('strong',null,'Koe Fala Tu • Grupo Capital do Trem'),meta=node('span','small','Conversa coletiva • todos podem interagir'),tag=node('span','pill','GRUPO');
+ copy.append(name,meta);group.append(groupAvatarNode(),copy,tag);
+ if(activeGroup)group.setAttribute('aria-current','true');
+ group.addEventListener('click',openGroupConversation);box.append(group);
+ const list=state.conversations.filter(c=>c.status==='accepted'&&personName(partner(c)).toLocaleLowerCase('pt-BR').includes(term));
+ if(!list.length){box.append(node('p','empty','Nenhuma conversa privada ainda. Escolha alguém na comunidade para iniciar uma conversa.'));return;}
  for(const c of list){
   const id=partner(c),row=node('button','conversation');row.type='button';
-  const copy=node('span','conversation-copy'),label=node('strong',null,personName(id)),meta=node('span','small','Conversa privada • '+fmt(c.updated_at)),online=onlineIds.has(id),status=node('span','online-status'),dot=node('i','online-status-dot'+(online?' is-online':''));
+  const copy=node('span','conversation-copy'),label=node('strong',null,personName(id)),meta=node('span','small','Privada • '+fmt(c.updated_at)),online=onlineIds.has(id),status=node('span','online-status'),dot=node('i','online-status-dot'+(online?' is-online':''));
   dot.setAttribute('aria-label',online?'Online':'Offline');status.append(dot,document.createTextNode(online?'Online':'Offline'));
-  copy.append(label,meta);row.append(avatarNode(profileFor(id)),copy,status);row.addEventListener('click',()=>openConversation(c));if(active?.id===c.id)row.setAttribute('aria-current','true');box.append(row);
+  copy.append(label,meta);row.append(avatarNode(profileFor(id)),copy,status);row.addEventListener('click',()=>openConversation(c));if(active?.id===c.id&&!activeGroup)row.setAttribute('aria-current','true');box.append(row);
  }
 }
 function drawIncoming(){
@@ -139,8 +149,33 @@ function drawIncoming(){
  for(const c of pending){const row=node('div','person'),copy=node('div','person-copy'),name=node('strong',null,personName(partner(c))),meta=node('span','small','Quer conversar com você.'),accept=node('button','primary','Aceitar'),decline=node('button',null,'Recusar'),actions=node('div','actions');copy.append(name,meta);actions.append(accept,decline);for(const [btn,decision] of [[accept,'accepted'],[decline,'declined']])btn.addEventListener('click',async()=>{btn.disabled=true;try{await decidePrivateConversation(c.id,decision);await refresh();if(decision==='accepted'){const latest=state.conversations.find(x=>x.id===c.id);if(latest)openConversation(latest);}}catch(e){$('status').textContent=e.message||'Não foi possível atualizar o convite.';btn.disabled=false;}});row.append(avatarNode(profileFor(partner(c))),copy,actions);box.append(row);}
 }
 function drawMessage(m){if($('messages').querySelector('[data-id="'+m.id+'"]'))return;const b=node('div','bubble'+(m.sender_id===state.userId?' mine':''),m.content);b.dataset.id=m.id;const t=node('time',null,fmt(m.created_at));b.append(t);$('messages').append(b);$('messages').scrollTop=$('messages').scrollHeight;}
+function drawGroupMessage(m){
+ if($('messages').querySelector('[data-id="'+m.id+'"]'))return;
+ const box=node('div','bubble'+(m.author_id===state.userId?' mine':''),m.content||'');
+ box.dataset.id=m.id;
+ const who=node('strong',null,m.author_name||'Usuário Uai');
+ who.style.display='block';who.style.fontSize='11px';who.style.marginBottom='4px';who.style.opacity='.9';
+ box.prepend(who);
+ if(m.attachment_url&&typeof m.attachment_url==='string'&&m.attachment_url.startsWith('https://')){
+  if(m.attachment_type==='image'){const img=node('img');img.src=m.attachment_url;img.alt='Imagem compartilhada no grupo';img.loading='lazy';img.style.cssText='display:block;max-width:100%;max-height:260px;border-radius:10px;margin-top:7px';box.append(img);}
+  else if(m.attachment_type==='audio'){const audio=node('audio');audio.controls=true;audio.src=m.attachment_url;audio.preload='metadata';box.append(audio);}
+ }
+ const t=node('time',null,fmt(m.created_at));box.append(t);$('messages').append(box);$('messages').scrollTop=$('messages').scrollHeight;
+}
+async function openGroupConversation(){
+ clearSubscription();active=null;activeGroup=true;$('private-layout').classList.add('chat-open');
+ $('chat-title').textContent='Koe Fala Tu • Grupo Capital do Trem';
+ $('thread-presence').textContent='● Grupo oficial • todos podem interagir';
+ $('chat-hint').textContent='Conversa coletiva da comunidade Capital do Trem. Respeito em primeiro lugar.';
+ $('block').hidden=true;$('compose').hidden=false;$('message').maxLength=1000;$('message').placeholder='Mensagem para todo o grupo…';
+ $('messages').replaceChildren(node('p','empty','Carregando conversa do grupo…'));drawConversations();
+ try{
+  const rows=await getChatMessages(80);$('messages').replaceChildren();rows.forEach(drawGroupMessage);
+  unsubscribe=subscribeChatMessages(m=>drawGroupMessage(m),s=>{if(s==='CHANNEL_ERROR'||s==='TIMED_OUT')$('status').textContent='Conexão do grupo instável. Atualize para reconectar.';});
+ }catch(e){$('messages').replaceChildren(node('p','empty',e.message||'Não foi possível carregar o grupo.'));}
+}
 async function openConversation(c){
- clearSubscription();active=c;$('private-layout').classList.add('chat-open');$('chat-title').textContent=personName(partner(c));$('thread-presence').textContent=onlineIds.has(partner(c))?'● Online agora':'Conversa privada • somente vocês dois';$('chat-hint').textContent='Conversa privada • somente vocês dois podem acessar';$('block').hidden=false;$('compose').hidden=false;$('messages').replaceChildren(node('p','empty','Carregando mensagens…'));drawConversations();
+ clearSubscription();active=c;activeGroup=false;$('private-layout').classList.add('chat-open');$('chat-title').textContent=personName(partner(c));$('thread-presence').textContent=onlineIds.has(partner(c))?'● Online agora':'Conversa privada • somente vocês dois';$('message').maxLength=2000;$('message').placeholder='Escreva sua mensagem privada…';$('chat-hint').textContent='Conversa privada • somente vocês dois podem acessar';$('block').hidden=false;$('compose').hidden=false;$('messages').replaceChildren(node('p','empty','Carregando mensagens…'));drawConversations();
  try{const rows=await getPrivateMessages(c.id);$('messages').replaceChildren();rows.forEach(drawMessage);unsubscribe=await subscribePrivateMessages(c.id,m=>drawMessage(m),s=>{if(s==='CHANNEL_ERROR'||s==='TIMED_OUT')$('status').textContent='Conexão instável. Atualize a página para reconectar.';});}
  catch(e){$('messages').replaceChildren(node('p','empty',e.message||'Não foi possível carregar as mensagens.'));}
 }
@@ -148,14 +183,14 @@ async function refresh(){
  state=await getPrivateConversationData();
  try{onlineIds=await getOnlineUserIds();}catch(error){/* Mantém o último status disponível quando a rede oscilar. */}
  drawIncoming();drawPeople();drawConversations();
- if(active){const fresh=state.conversations.find(c=>c.id===active.id);if(fresh?.status==='accepted')active=fresh;else{active=null;clearSubscription();$('private-layout').classList.remove('chat-open');$('chat-title').textContent='Escolha uma conversa';$('compose').hidden=true;$('block').hidden=true;}}
+ if(active&&!activeGroup){const fresh=state.conversations.find(c=>c.id===active.id);if(fresh?.status==='accepted')active=fresh;else{active=null;clearSubscription();$('private-layout').classList.remove('chat-open');$('chat-title').textContent='Escolha uma conversa';$('compose').hidden=true;$('block').hidden=true;}}
 }
 $('search').addEventListener('input',drawPeople);$('conversation-search').addEventListener('input',drawConversations);$('refresh').addEventListener('click',async()=>{try{await refresh();$('status').textContent='Lista atualizada.';}catch(e){$('status').textContent=e.message;}});
-$('compose').addEventListener('submit',async e=>{e.preventDefault();if(!active)return;const value=$('message').value.trim();if(!value)return;$('send').disabled=true;try{const sent=await sendPrivateMessage(active.id,value);drawMessage(sent);$('message').value='';$('status').textContent='Mensagem enviada.';}catch(err){$('status').textContent=err.message||'Não foi possível enviar.';}finally{$('send').disabled=false;}});
+$('compose').addEventListener('submit',async e=>{e.preventDefault();if(!active&&!activeGroup)return;const value=$('message').value.trim();if(!value)return;$('send').disabled=true;try{if(activeGroup){const sent=await sendChatMessage(value);drawGroupMessage(sent);}else{const sent=await sendPrivateMessage(active.id,value);drawMessage(sent);}$('message').value='';$('status').textContent='Mensagem enviada.';}catch(err){$('status').textContent=err.message||'Não foi possível enviar.';}finally{$('send').disabled=false;}});
 $('back-to-list').addEventListener('click',()=>{$('private-layout').classList.remove('chat-open');});
 $('block').addEventListener('click',async()=>{if(!active)return;const id=partner(active);if(!confirm('Bloquear '+personName(id)+'? A pessoa não poderá iniciar novas conversas nem enviar mensagens privadas.'))return;try{await blockPrivateUser(id);clearSubscription();active=null;$('compose').hidden=true;$('block').hidden=true;$('private-layout').classList.remove('chat-open');$('chat-title').textContent='Conversa bloqueada';$('messages').replaceChildren(node('p','empty','Você bloqueou esta pessoa.'));$('status').textContent='Bloqueio aplicado.';await refresh();}catch(e){$('status').textContent=e.message||'Não foi possível bloquear.';}});
 const theme=$('theme');try{if(localStorage.getItem('capitaldotrem_theme_v1')==='light')document.body.classList.add('light');}catch{}function updateTheme(){const light=document.body.classList.contains('light');theme.textContent=light?'🌙 Escuro':'☀️ Claro';document.querySelector('meta[name="theme-color"]').content=light?'#f5f5f5':'#050505';}updateTheme();theme.addEventListener('click',()=>{document.body.classList.toggle('light');try{localStorage.setItem('capitaldotrem_theme_v1',document.body.classList.contains('light')?'light':'dark');}catch{}updateTheme();});
-(async()=>{try{const session=await getCurrentSession();if(!session){$('gate').textContent='Entre ou crie sua conta para usar as conversas privadas.';const link=node('a','btn','Entrar / Criar conta');link.href='./conta.html';$('gate').append(document.createTextNode(' '),link);return;}$('gate').hidden=true;$('app').hidden=false;await refresh();}catch(e){$('gate').textContent=e.message||'Não foi possível conectar às conversas privadas.';}})();
+(async()=>{try{const session=await getCurrentSession();if(!session){$('gate').textContent='Entre ou crie sua conta para usar as conversas privadas.';const link=node('a','btn','Entrar / Criar conta');link.href='./conta.html';$('gate').append(document.createTextNode(' '),link);return;}$('gate').hidden=true;$('app').hidden=false;try{const branding=await getPublicBranding();if(branding.profileImageUrl&&branding.profileImageUrl.startsWith('https://'))groupLogo=branding.profileImageUrl;}catch(error){}await refresh();await openGroupConversation();}catch(e){$('gate').textContent=e.message||'Não foi possível conectar às conversas privadas.';}})();
 window.setInterval(async()=>{
  if(document.hidden||!navigator.onLine||!state)return;
  try{onlineIds=await getOnlineUserIds();drawPeople();drawConversations();}catch(error){}
