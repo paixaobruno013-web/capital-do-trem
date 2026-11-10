@@ -81,7 +81,7 @@ body.light .messages{background:linear-gradient(180deg,#fff8f8,#f4f4f4)}
 @media(prefers-reduced-motion:reduce){.person,.conversation{transition:none}}
 </style></head>
 <body><a class="skip" href="#main">Pular para o conteúdo</a>
-<header><img src="./marca.svg" alt="Capital do Trem"><h1>Minhas conversas</h1><p class="muted">Conversas individuais com convite e aceite antes de começar.</p><div class="actions"><a class="btn" href="./index.html">Início</a><a class="btn" href="./bate-papo.html">Koe Fala Tu • Geral</a><a class="btn" href="./conta.html">Minha conta</a><button id="theme" type="button">☀️ Claro</button></div></header>
+<header><img src="./marca.svg" alt="Capital do Trem"><h1>Minhas conversas</h1><p class="muted">Conversas individuais com convite e aceite antes de começar.</p><div class="actions"><a class="btn" href="./index.html">Início</a><a class="btn" href="./bate-papo.html">Fala Trem • Geral</a><a class="btn" href="./conta.html">Minha conta</a><button id="theme" type="button">☀️ Claro</button></div></header>
 <main id="main">
 <div id="gate" class="panel notice">Verificando sua conta…</div>
 <div id="app" hidden>
@@ -130,7 +130,7 @@ function drawConversations(){
  const box=$('conversations');box.replaceChildren();
  const term=$('conversation-search').value.trim().toLocaleLowerCase('pt-BR');
  const group=node('button','conversation');group.type='button';group.classList.add('official-group');
- const copy=node('span','conversation-copy'),name=node('strong',null,'Koe Fala Tu • Grupo Capital do Trem'),meta=node('span','small','Conversa coletiva • todos podem interagir'),tag=node('span','pill','GRUPO');
+ const copy=node('span','conversation-copy'),name=node('strong',null,'Fala Trem • Grupo Capital do Trem'),meta=node('span','small','Conversa coletiva • todos podem interagir'),tag=node('span','pill','GRUPO');
  copy.append(name,meta);group.append(groupAvatarNode(),copy,tag);
  if(activeGroup)group.setAttribute('aria-current','true');
  group.addEventListener('click',openGroupConversation);box.append(group);
@@ -169,7 +169,7 @@ function drawGroupMessage(m){
 }
 async function openGroupConversation(){
  clearSubscription();active=null;activeGroup=true;$('private-layout').classList.add('chat-open');
- $('chat-title').textContent='Koe Fala Tu • Grupo Capital do Trem';
+ $('chat-title').textContent='Fala Trem • Grupo Capital do Trem';
  $('thread-presence').textContent='● Grupo oficial • todos podem interagir';
  $('chat-hint').textContent='Conversa coletiva da comunidade Capital do Trem. Respeito em primeiro lugar.';
  $('block').hidden=true;$('compose').hidden=false;$('message').maxLength=1000;$('message').placeholder='Mensagem para todo o grupo…';
