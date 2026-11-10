@@ -18,7 +18,11 @@ O Capital do Trem é um projeto de comunidade e divulgação da cultura musical,
 - Instagram: https://www.instagram.com/capital.do.trem?cplk=bHFubGZqNG5ua2Q4
 - YouTube: https://youtube.com/@capitaldotrem?si=3UPziMb7JOMzvLlm
 
-## Configurar o banco de dados\n\nConsulte [SUPABASE-SETUP.md](./SUPABASE-SETUP.md) para abrir o SQL original, evitar tradução automática no celular e configurar o Supabase com segurança.\n\n## Aplicativos Android e iOS
+## Configurar o banco de dados\n\nConsulte [SUPABASE-SETUP.md](./SUPABASE-SETUP.md) para abrir o SQL original, evitar tradução automática no celular e configurar o Supabase com segurança.\n\n## Gratuito para a comunidade
+
+O Capital do Trem foi definido para continuar gratuito: sem mensalidade, assinatura ou compras dentro do aplicativo. Enquanto não houver orçamento para a taxa única de cadastro da Google Play, a distribuição será pelo site/PWA gratuito: abra https://paixaobruno013-web.github.io/capital-do-trem/ no Chrome do Android e use **⋮ → Adicionar à tela inicial** (ou **Instalar aplicativo**, se aparecer). Isso instala um atalho da versão web; não é um APK publicado na loja.
+
+## Aplicativos Android e iOS
 
 A estrutura inicial para empacotar o site como aplicativo nativo foi adicionada com Capacitor 8. Consulte [MOBILE-APP.md](./MOBILE-APP.md) para requisitos, comandos de preparação e etapas de publicação.
 
