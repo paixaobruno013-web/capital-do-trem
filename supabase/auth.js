@@ -854,13 +854,23 @@ export async function getPublicBranding() {
 
 
 // Normaliza MIME genérico/vazio devolvido por alguns seletores Android.
-function getBrandingUploadFormat(file, allowed) {
- const ext=String(file?.name||'').split('.').pop().toLowerCase();
+async function getBrandingUploadFormat(file, allowed) {
  const has=(key)=>Object.prototype.hasOwnProperty.call(allowed,key);
+ const ext=String(file?.name||'').split('.').pop().toLowerCase();
  const mimeExt={'image/jpeg':'jpg','image/jpg':'jpg','image/png':'png','image/webp':'webp','video/mp4':'mp4','video/webm':'webm'};
+ let detected='';
+ try {
+  const b=new Uint8Array(await file.slice(0,16).arrayBuffer());
+  if(b[0]===0xff&&b[1]===0xd8&&b[2]===0xff)detected='jpg';
+  else if(b[0]===0x89&&b[1]===0x50&&b[2]===0x4e&&b[3]===0x47)detected='png';
+  else if(String.fromCharCode(...b.slice(0,4))==='RIFF'&&String.fromCharCode(...b.slice(8,12))==='WEBP')detected='webp';
+  else if(String.fromCharCode(...b.slice(4,8))==='ftyp')detected='mp4';
+  else if(b[0]===0x1a&&b[1]===0x45&&b[2]===0xdf&&b[3]===0xa3)detected='webm';
+ } catch {}
  const byMime=mimeExt[String(file?.type||'').toLowerCase()]||'';
- const chosen=has(ext)?ext:(has(byMime)?byMime:'');
- if(!chosen)throw new Error('Formato não reconhecido. Imagem: JPG, JPEG, PNG ou WebP. Vídeo: MP4 ou WebM.');
+ const candidates=[detected,byMime,ext];
+ const chosen=candidates.find(candidate=>candidate&&has(candidate));
+ if(!chosen)throw new Error('Não reconheci o arquivo. Use imagem JPG/PNG/WebP ou vídeo MP4/WebM. Se veio do WhatsApp, salve o arquivo no aparelho e tente novamente.');
  const normalized=chosen==='jpeg'?'jpg':chosen;
  const contentType=normalized==='jpg'?'image/jpeg':normalized==='png'?'image/png':normalized==='webp'?'image/webp':normalized==='mp4'?'video/mp4':'video/webm';
  return {extension:normalized,contentType};
@@ -873,7 +883,7 @@ export async function saveAdminBrandingPair(file) {
   if (userError) throw userError;
   if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode alterar a identidade visual.');
   if (!(file instanceof File)) throw new Error('Escolha a arte oficial na galeria do celular.');
-  const format = getBrandingUploadFormat(file, { jpg: true, jpeg: true, png: true, webp: true });
+  const format = await getBrandingUploadFormat(file, { jpg: true, jpeg: true, png: true, webp: true });
   if (file.size < 1 || file.size > 5 * 1024 * 1024) throw new Error('A imagem deve ter até 5 MB.');
   const path = user.id + '/branding/official-logo-' + crypto.randomUUID() + '.' + format.extension;
   const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, { contentType: format.contentType, cacheControl: '3600', upsert: false });
@@ -898,7 +908,7 @@ export async function saveAdminOpeningImage(file, options = {}) {
   if (userError) throw userError;
   if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode alterar a abertura.');
   if (!(file instanceof File)) throw new Error('Escolha a arte completa da abertura.');
-  const format = getBrandingUploadFormat(file, { jpg: true, png: true, webp: true });
+  const format = await getBrandingUploadFormat(file, { jpg: true, png: true, webp: true });
   if (file.size < 1 || file.size > 5 * 1024 * 1024) throw new Error('A imagem deve ter até 5 MB.');
   const path = user.id + '/branding/opening-' + crypto.randomUUID() + '.' + format.extension;
   const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, { contentType: format.contentType, cacheControl: '3600', upsert: false });
@@ -943,7 +953,7 @@ export async function saveAdminOpeningVideo(file, options = {}) {
   if (userError) throw userError;
   if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode alterar o vídeo de abertura.');
   if (!(file instanceof File)) throw new Error('Escolha um vídeo MP4 ou WebM.');
-  const format = getBrandingUploadFormat(file, { mp4: true, webm: true });
+  const format = await getBrandingUploadFormat(file, { mp4: true, webm: true });
   if (file.size < 1 || file.size > 50 * 1024 * 1024) throw new Error('O vídeo deve ter até 50 MB.');
   const path = user.id + '/branding/opening-video-' + crypto.randomUUID() + '.' + format.extension;
   const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, { contentType: format.contentType, cacheControl: '3600', upsert: false });
@@ -1034,7 +1044,7 @@ export async function saveAdminHeaderBackground(file, options = {}) {
   let imageUrl = '';
   if (file) {
     if (!(file instanceof File)) throw new Error('Escolha uma imagem JPG, PNG ou WebP.');
-    const format = getBrandingUploadFormat(file, { jpg: true, png: true, webp: true });
+    const format = await getBrandingUploadFormat(file, { jpg: true, png: true, webp: true });
     if (file.size < 1 || file.size > 8 * 1024 * 1024) throw new Error('A imagem deve ter até 8 MB.');
     const path = user.id + '/branding/header-' + crypto.randomUUID() + '.' + format.extension;
     const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, { contentType: format.contentType, cacheControl: '3600', upsert: false });
