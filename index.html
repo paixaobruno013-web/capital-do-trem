@@ -56,7 +56,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .intro-smoke__cloud{position:absolute;z-index:1;left:-65%;top:22%;width:125%;height:58%;opacity:0;filter:blur(22px);background:radial-gradient(ellipse at 18% 52%,rgba(225,225,225,0) 0 12%,rgba(225,225,225,.35) 22%,rgba(190,190,190,.22) 34%,transparent 53%),radial-gradient(ellipse at 38% 35%,rgba(245,245,245,.32) 0 9%,rgba(190,190,190,.2) 25%,transparent 49%),radial-gradient(ellipse at 60% 62%,rgba(220,220,220,.28) 0 12%,rgba(160,160,160,.16) 29%,transparent 52%);animation:intro-smoke-pass 6.45s cubic-bezier(.2,.65,.3,1) forwards}
 .intro-smoke__cloud:before,.intro-smoke__cloud:after{content:"";position:absolute;inset:-18% 8%;border-radius:50%;background:radial-gradient(ellipse,rgba(210,210,210,.2),transparent 68%);filter:blur(28px)}
 .intro-smoke__cloud:after{inset:12% -8% 0 28%;background:radial-gradient(ellipse,rgba(245,245,245,.18),transparent 70%)}
-.intro-smoke-skip{display:none!important}
+html.intro-smoke-skip .intro-smoke{display:none!important}
 @keyframes intro-smoke-pass{0%{transform:translate3d(-12%,18%,0) scale(.82);opacity:0}15%{opacity:.88}72%{opacity:.7}100%{transform:translate3d(150%,-12%,0) scale(1.2);opacity:0}}
 @keyframes intro-brand-in{0%,18%{opacity:0;transform:translateY(10px) scale(.97)}42%,78%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-5px) scale(1.02)}}
 @keyframes intro-screen-out{0%,78%{opacity:1}100%{opacity:0;visibility:hidden}}
