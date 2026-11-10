@@ -837,7 +837,7 @@ export async function getPublicBranding() {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('site_settings')
     .select('setting_key, setting_value')
-    .in('setting_key', ['official_profile_image_url', 'app_opening_image_url', 'app_opening_video_url', 'app_home_background_image_url', 'app_home_background_x', 'app_home_background_y', 'app_home_background_blur', 'app_home_background_fit', 'app_header_background_image_url']);
+    .in('setting_key', ['official_profile_image_url', 'app_opening_image_url', 'app_opening_video_url', 'app_home_background_image_url', 'app_home_background_x', 'app_home_background_y', 'app_home_background_blur', 'app_home_background_fit', 'app_header_background_image_url', 'app_header_background_x', 'app_header_background_y', 'app_header_background_blur', 'app_header_background_fit']);
   if (error) throw error;
   const settings = Object.fromEntries((data || []).map(row => [row.setting_key, row.setting_value]));
   return {
@@ -849,7 +849,11 @@ export async function getPublicBranding() {
     homeBackgroundY: Number(settings.app_home_background_y ?? 50),
     homeBackgroundBlur: Number(settings.app_home_background_blur ?? 0),
     homeBackgroundFit: settings.app_home_background_fit === 'contain' ? 'contain' : 'cover',
-    headerBackgroundImageUrl: settings.app_header_background_image_url || ''
+    headerBackgroundImageUrl: settings.app_header_background_image_url || '',
+    headerBackgroundX: Number(settings.app_header_background_x ?? 50),
+    headerBackgroundY: Number(settings.app_header_background_y ?? 50),
+    headerBackgroundBlur: Number(settings.app_header_background_blur ?? 0),
+    headerBackgroundFit: settings.app_header_background_fit === 'contain' ? 'contain' : 'cover'
   };
 }
 
@@ -991,6 +995,43 @@ export async function saveAdminBrandingImage(kind, file) {
 }
 
 
+// Salva a imagem do cabeçalho e seus ajustes de enquadramento de forma independente do painel inferior.
+export async function saveAdminHeaderBackground(file, options = {}) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode alterar o fundo do cabeçalho.');
+  const allowed = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+  let imageUrl = '';
+  if (file) {
+    if (!(file instanceof File) || !allowed[file.type]) throw new Error('Escolha uma imagem JPG, PNG ou WebP.');
+    if (file.size < 1 || file.size > 8 * 1024 * 1024) throw new Error('A imagem deve ter até 8 MB.');
+    const path = user.id + '/branding/header-' + crypto.randomUUID() + '.' + allowed[file.type];
+    const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: false });
+    if (uploadError) throw uploadError;
+    const { data: publicData } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
+    if (!publicData?.publicUrl) throw new Error('Não foi possível gerar o endereço público do fundo.');
+    imageUrl = publicData.publicUrl;
+  } else {
+    const { data, error } = await supabase.from('site_settings').select('setting_value').eq('setting_key', 'app_header_background_image_url').maybeSingle();
+    if (error) throw error;
+    imageUrl = data?.setting_value || '';
+    if (!imageUrl) throw new Error('Escolha uma imagem de cabeçalho antes de salvar os ajustes.');
+  }
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, Number(value) || 0));
+  const now = new Date().toISOString();
+  const rows = [
+    { setting_key: 'app_header_background_image_url', setting_value: imageUrl, updated_at: now },
+    { setting_key: 'app_header_background_x', setting_value: String(clamp(options.x ?? 50, 0, 100)), updated_at: now },
+    { setting_key: 'app_header_background_y', setting_value: String(clamp(options.y ?? 50, 0, 100)), updated_at: now },
+    { setting_key: 'app_header_background_blur', setting_value: String(clamp(options.blur ?? 0, 0, 12)), updated_at: now },
+    { setting_key: 'app_header_background_fit', setting_value: options.fit === 'contain' ? 'contain' : 'cover', updated_at: now }
+  ];
+  const { error: saveError } = await supabase.from('site_settings').upsert(rows, { onConflict: 'setting_key' });
+  if (saveError) throw saveError;
+  return imageUrl;
+}
+
 // Remove a imagem configurada sem apagar arquivos ou alterar outras áreas do aplicativo.
 export async function removeAdminBrandingAsset(kind) {
   const supabase = initSupabase();
@@ -1001,7 +1042,7 @@ export async function removeAdminBrandingAsset(kind) {
   const keysByKind = {
     profile: ['official_profile_image_url'],
     opening: ['app_opening_image_url', 'app_opening_video_url'],
-    header: ['app_header_background_image_url'],
+    header: ['app_header_background_image_url', 'app_header_background_x', 'app_header_background_y', 'app_header_background_blur', 'app_header_background_fit'],
     home: ['app_home_background_image_url', 'app_home_background_x', 'app_home_background_y', 'app_home_background_blur', 'app_home_background_fit'],
     pair: ['official_profile_image_url', 'app_opening_image_url', 'app_opening_video_url']
   };
@@ -1009,9 +1050,9 @@ export async function removeAdminBrandingAsset(kind) {
   if (!keys) throw new Error('Área de imagem inválida.');
   const rows = keys.map(setting_key => ({
     setting_key,
-    setting_value: kind === 'home' && setting_key === 'app_home_background_fit' ? 'cover'
-      : kind === 'home' && setting_key === 'app_home_background_blur' ? '0'
-      : kind === 'home' && (setting_key === 'app_home_background_x' || setting_key === 'app_home_background_y') ? '50'
+    setting_value: (kind === 'home' && setting_key === 'app_home_background_fit') || (kind === 'header' && setting_key === 'app_header_background_fit') ? 'cover'
+      : (kind === 'home' && setting_key === 'app_home_background_blur') || (kind === 'header' && setting_key === 'app_header_background_blur') ? '0'
+      : (kind === 'home' && (setting_key === 'app_home_background_x' || setting_key === 'app_home_background_y')) || (kind === 'header' && (setting_key === 'app_header_background_x' || setting_key === 'app_header_background_y')) ? '50'
       : '',
     updated_at: now
   }));
