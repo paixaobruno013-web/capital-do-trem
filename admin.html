@@ -123,10 +123,18 @@ audio{width:100%;}
  <h2>Fundo do cabeçalho inicial • atrás da foto e do nome verificado</h2>
  <p class="muted">Esta é a imagem que aparece atrás da foto circular e do nome Capital do Trem com o selo azul. Ela é independente da imagem inferior “AQUI A MÚSICA NÃO PARA!”.</p>
  <div class="item">
-  <img id="header-background-preview" src="" alt="Prévia do fundo do cabeçalho" style="display:block;width:100%;max-width:420px;height:150px;object-fit:cover;background:#111;border-radius:12px;margin:12px auto">
+  <div class="home-bg-preview"><img id="header-background-preview" src="" alt="Prévia do fundo do cabeçalho"></div>
   <label for="header-background-file">Escolher imagem do fundo superior</label>
   <input id="header-background-file" type="file" accept="image/jpeg,image/png,image/webp">
-  <button id="header-background-save" type="button">Salvar fundo do cabeçalho</button>
+  <label for="header-background-x">Posição horizontal</label>
+  <div class="range-row"><span class="muted">Esquerda ↔ Direita</span><output id="header-background-x-value">50%</output><input id="header-background-x" type="range" min="0" max="100" value="50"></div>
+  <label for="header-background-y">Posição vertical</label>
+  <div class="range-row"><span class="muted">Topo ↕ Base</span><output id="header-background-y-value">50%</output><input id="header-background-y" type="range" min="0" max="100" value="50"></div>
+  <label for="header-background-blur">Nitidez / desfoque</label>
+  <div class="range-row"><span class="muted">Imagem limpa ↔ embaçada</span><output id="header-background-blur-value">0 px</output><input id="header-background-blur" type="range" min="0" max="12" step="0.5" value="0"></div>
+  <label for="header-background-fit">Enquadramento</label>
+  <select id="header-background-fit"><option value="cover">Preencher o cabeçalho (recorte ajustável)</option><option value="contain">Mostrar imagem inteira</option></select>
+  <div class="actions"><button id="header-background-save" type="button">Salvar imagem e ajustes</button><button id="header-background-reset" class="secondary" type="button">Centralizar e deixar nítida</button></div>
   <button id="header-background-remove" class="secondary" type="button">Remover imagem do cabeçalho</button>
   <p id="header-background-status" class="status" role="status" aria-live="polite">Não altera a foto circular nem o painel inferior.</p>
  </div>
@@ -258,19 +266,41 @@ const headerBgFile=document.getElementById('header-background-file');
 const headerBgPreview=document.getElementById('header-background-preview');
 const headerBgSave=document.getElementById('header-background-save');
 const headerBgStatus=document.getElementById('header-background-status');
+const headerBgX=document.getElementById('header-background-x'),headerBgY=document.getElementById('header-background-y');
+const headerBgBlur=document.getElementById('header-background-blur'),headerBgFit=document.getElementById('header-background-fit');
+let headerBgCurrentUrl='';
+function paintHeaderBgPreview(){
+ const x=headerBgX.value,y=headerBgY.value,blur=headerBgBlur.value;
+ headerBgPreview.style.objectPosition=x+'% '+y+'%';headerBgPreview.style.objectFit=headerBgFit.value;
+ headerBgPreview.style.filter='blur('+blur+'px)';
+ document.getElementById('header-background-x-value').textContent=x+'%';
+ document.getElementById('header-background-y-value').textContent=y+'%';
+ document.getElementById('header-background-blur-value').textContent=blur+' px';
+}
 headerBgFile.addEventListener('change',()=>{
  const file=headerBgFile.files?.[0];if(!file)return;
  if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size<1||file.size>8*1024*1024){headerBgStatus.textContent='Escolha JPG, PNG ou WebP de até 8 MB.';headerBgFile.value='';return;}
- headerBgPreview.src=URL.createObjectURL(file);headerBgStatus.textContent='Prévia pronta. Toque em salvar para publicar.';
+ headerBgPreview.src=URL.createObjectURL(file);headerBgStatus.textContent='Prévia pronta. Ajuste a posição e a nitidez antes de salvar.';paintHeaderBgPreview();
+});
+[headerBgX,headerBgY,headerBgBlur,headerBgFit].forEach(control=>control.addEventListener('input',paintHeaderBgPreview));
+document.getElementById('header-background-reset').addEventListener('click',()=>{
+ headerBgX.value='50';headerBgY.value='50';headerBgBlur.value='0';headerBgFit.value='cover';paintHeaderBgPreview();
 });
 headerBgSave.addEventListener('click',async()=>{
- const file=headerBgFile.files?.[0];if(!file){headerBgStatus.textContent='Escolha primeiro a imagem do cabeçalho.';return;}
- headerBgSave.disabled=true;headerBgStatus.textContent='Enviando o fundo superior…';
- try{const url=await auth.saveAdminBrandingImage('header',file);headerBgPreview.src=url;headerBgFile.value='';headerBgStatus.textContent='Fundo do cabeçalho atualizado!';}
- catch(error){headerBgStatus.textContent=error?.message||'Não foi possível salvar o fundo.';}
+ const file=headerBgFile.files?.[0]||null;
+ if(!file&&!headerBgCurrentUrl){headerBgStatus.textContent='Escolha primeiro a imagem do cabeçalho.';return;}
+ headerBgSave.disabled=true;headerBgStatus.textContent='Salvando imagem e ajustes do cabeçalho…';
+ try{
+  const url=await auth.saveAdminHeaderBackground(file,{x:headerBgX.value,y:headerBgY.value,blur:headerBgBlur.value,fit:headerBgFit.value});
+  headerBgCurrentUrl=url;headerBgPreview.src=url;headerBgFile.value='';paintHeaderBgPreview();
+  headerBgStatus.textContent='Imagem e ajustes do cabeçalho salvos!';
+ }catch(error){headerBgStatus.textContent=error?.message||'Não foi possível salvar o fundo.';}
  finally{headerBgSave.disabled=false;}
 });
-document.getElementById('header-background-remove').addEventListener('click',event=>removeImageSetting('header',event.currentTarget,headerBgStatus,()=>{headerBgPreview.removeAttribute('src');headerBgFile.value='';}));
+document.getElementById('header-background-remove').addEventListener('click',event=>removeImageSetting('header',event.currentTarget,headerBgStatus,()=>{
+ headerBgCurrentUrl='';headerBgPreview.removeAttribute('src');headerBgFile.value='';
+ headerBgX.value='50';headerBgY.value='50';headerBgBlur.value='0';headerBgFit.value='cover';paintHeaderBgPreview();
+}));
 
 document.getElementById('opening-media-mode').addEventListener('change',event=>{
  const mode=event.target.value;
@@ -314,7 +344,10 @@ async function loadBranding(){
   const branding=await auth.getPublicBranding();
   const url=branding.profileImageUrl||branding.openingImageUrl;
   if(url){document.getElementById('branding-profile-preview').src=url;const topPreview=document.getElementById('profile-only-preview');if(topPreview)topPreview.src=branding.profileImageUrl||url;}
-  if(branding.headerBackgroundImageUrl)headerBgPreview.src=branding.headerBackgroundImageUrl;
+  headerBgCurrentUrl=branding.headerBackgroundImageUrl||'';
+  if(headerBgCurrentUrl)headerBgPreview.src=headerBgCurrentUrl;
+  headerBgX.value=String(branding.headerBackgroundX??50);headerBgY.value=String(branding.headerBackgroundY??50);
+  headerBgBlur.value=String(branding.headerBackgroundBlur??0);headerBgFit.value=branding.headerBackgroundFit||'cover';paintHeaderBgPreview();
   if(branding.openingImageUrl)document.getElementById('opening-image-preview').src=branding.openingImageUrl;
   const openingMode=document.getElementById('opening-media-mode');
   openingMode.value=branding.openingVideoUrl?'video':'image';
