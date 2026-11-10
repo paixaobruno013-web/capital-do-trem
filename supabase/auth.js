@@ -829,13 +829,15 @@ export async function getPublicBranding() {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('site_settings')
     .select('setting_key, setting_value')
-    .in('setting_key', ['official_profile_image_url', 'app_opening_image_url', 'app_opening_video_url', 'app_opening_x', 'app_opening_y', 'app_opening_fit', 'app_home_background_image_url', 'app_home_background_x', 'app_home_background_y', 'app_home_background_blur', 'app_home_background_fit', 'app_header_background_image_url', 'app_header_background_x', 'app_header_background_y', 'app_header_background_blur', 'app_header_background_fit']);
+    .in('setting_key', ['official_profile_image_url', 'app_opening_image_url', 'app_opening_video_url', 'app_opening_video_muted', 'app_opening_video_volume', 'app_opening_x', 'app_opening_y', 'app_opening_fit', 'app_home_background_image_url', 'app_home_background_x', 'app_home_background_y', 'app_home_background_blur', 'app_home_background_fit', 'app_header_background_image_url', 'app_header_background_x', 'app_header_background_y', 'app_header_background_blur', 'app_header_background_fit']);
   if (error) throw error;
   const settings = Object.fromEntries((data || []).map(row => [row.setting_key, row.setting_value]));
   return {
     profileImageUrl: settings.official_profile_image_url || '',
     openingImageUrl: settings.app_opening_image_url || '',
     openingVideoUrl: settings.app_opening_video_url || '',
+    openingVideoMuted: settings.app_opening_video_muted !== 'false',
+    openingVideoVolume: Math.max(0, Math.min(1, Number(settings.app_opening_video_volume ?? 0.7))),
     openingX: Number(settings.app_opening_x ?? 50),
     openingY: Number(settings.app_opening_y ?? 50),
     openingFit: settings.app_opening_fit === 'contain' ? 'contain' : 'cover',
@@ -1034,6 +1036,24 @@ export async function saveAdminBrandingImage(kind, file) {
   return publicData.publicUrl;
 }
 
+
+
+// Preferências de áudio do vídeo de abertura, separadas do envio do arquivo.
+export async function saveAdminOpeningVideoSettings(options = {}) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode ajustar o áudio da abertura.');
+  const volume = Math.max(0, Math.min(1, Number(options.volume ?? 0.7)));
+  const now = new Date().toISOString();
+  const rows = [
+    { setting_key: 'app_opening_video_muted', setting_value: options.muted === false ? 'false' : 'true', updated_at: now },
+    { setting_key: 'app_opening_video_volume', setting_value: String(volume), updated_at: now }
+  ];
+  const { error } = await supabase.from('site_settings').upsert(rows, { onConflict: 'setting_key' });
+  if (error) throw error;
+  return { muted: options.muted !== false, volume };
+}
 
 // Salva a imagem do cabeçalho e seus ajustes de enquadramento de forma independente do painel inferior.
 export async function saveAdminHeaderBackground(file, options = {}) {
