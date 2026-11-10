@@ -762,6 +762,9 @@ html.auth-check-pending body{visibility:hidden}
 }
 
 
+header.header-has-custom-background{position:relative;isolation:isolate;overflow:hidden}
+header.header-has-custom-background::after{content:"";position:absolute;z-index:-2;inset:0;background-image:linear-gradient(110deg,rgba(0,0,0,.66),rgba(0,0,0,.42) 55%,rgba(0,0,0,.68)),var(--header-bg-image);background-size:cover;background-position:center;background-repeat:no-repeat;pointer-events:none}
+body.light header.header-has-custom-background::after{background-image:linear-gradient(110deg,rgba(255,255,255,.78),rgba(255,255,255,.56)),var(--header-bg-image)}
 /* Fundo do painel central configurável pelo administrador. */
 .reference-banner.has-custom-background{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(110deg,rgba(0,0,0,.76),rgba(0,0,0,.48) 58%,rgba(0,0,0,.68))!important}
 .reference-banner.has-custom-background::before{content:"";position:absolute;z-index:0;inset:0;border-radius:inherit;background-image:linear-gradient(110deg,rgba(0,0,0,.38),rgba(0,0,0,.22)),var(--home-bg-image);background-size:var(--home-bg-fit,cover);background-position:var(--home-bg-position,50% 50%);background-repeat:no-repeat;filter:blur(var(--home-bg-blur,0px));transform:scale(1.04);pointer-events:none}
@@ -1607,6 +1610,12 @@ async function saveOfflineMusic(id,blob,title){
   if(ready)finish();else window.addEventListener('load',()=>{ready=true;finish();},{once:true});
  }
 }
+   const headerBgUrl=safeUrl(branding.headerBackgroundImageUrl);
+  const appHeader=document.querySelector('body>header');
+  if(appHeader&&headerBgUrl){
+   appHeader.style.setProperty('--header-bg-image','url("'+headerBgUrl.replace(/"/g,'%22')+'")');
+   appHeader.classList.add('header-has-custom-background');
+  }
    const homeBgUrl=safeUrl(branding.homeBackgroundImageUrl);
   const homeBanner=document.querySelector('.reference-banner');
   if(homeBgUrl&&homeBanner){
