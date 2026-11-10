@@ -626,6 +626,37 @@ async function loadChatModeration(){
    });
    card.append(author,date,content,remove);area.append(card);
   }
+  const reports=await auth.getChatModerationReports(100);
+  const reportHeading=node('h3','', 'Denúncias recebidas');
+  area.append(reportHeading);
+  if(!reports.length) area.append(node('p','muted','Nenhuma denúncia registrada.'));
+  for(const report of reports){
+   const card=node('article','item');
+   card.append(node('strong','',report.reason.replaceAll('_',' ')),node('p','muted','Recebida em '+new Date(report.created_at).toLocaleString('pt-BR')));
+   if(report.details)card.append(node('p','',report.details));
+   card.append(node('small','muted','Participante denunciado: '+report.target_user_id));
+   const actions=node('div','actions');
+   const dismiss=node('button','secondary','Arquivar / liberar');
+   dismiss.addEventListener('click',async()=>{
+    dismiss.disabled=true;
+    try{await auth.moderateChatParticipant(report.target_user_id,'release','Análise administrativa');await loadChatModeration();}
+    catch(error){queueStatus.textContent=error.message||'Não foi possível concluir a análise.';dismiss.disabled=false;}
+   });
+   const remove=node('button','secondary','Remover do grupo');
+   remove.addEventListener('click',async()=>{
+    remove.disabled=true;
+    try{await auth.moderateChatParticipant(report.target_user_id,'remove_group','Denúncia analisada pela administração.');await loadChatModeration();}
+    catch(error){queueStatus.textContent=error.message||'Não foi possível remover o participante.';remove.disabled=false;}
+   });
+   const ban=node('button','secondary','Bloquear no aplicativo');
+   ban.addEventListener('click',async()=>{
+    if(!confirm('Bloquear esta conta no Capital do Trem?'))return;
+    ban.disabled=true;
+    try{await auth.moderateChatParticipant(report.target_user_id,'block_app','Bloqueio administrativo após análise de denúncia.');await loadChatModeration();}
+    catch(error){queueStatus.textContent=error.message||'Não foi possível bloquear a conta.';ban.disabled=false;}
+   });
+   actions.append(dismiss,remove,ban);card.append(actions);area.append(card);
+  }
  }catch(error){area.replaceChildren(node('p','muted','Não foi possível carregar a moderação do Koe Fala Tu agora. Confira a conexão e as permissões do banco e tente atualizar a fila.'));}
 }
 loginForm.addEventListener('submit',async event=>{
