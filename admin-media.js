@@ -54,6 +54,11 @@ el('header-background-save-direct')?.addEventListener('click',async()=>{
 const volumeInput=el('opening-video-volume');
 const volumeValue=el('opening-video-volume-value');
 volumeInput?.addEventListener('input',()=>{if(volumeValue)volumeValue.textContent=volumeInput.value+'%';});
+auth.getPublicBranding().then(branding=>{
+ const mode=el('opening-video-audio-mode');
+ if(mode)mode.value=branding.openingVideoMuted?'muted':'sound';
+ if(volumeInput){volumeInput.value=String(Math.round((branding.openingVideoVolume??0.7)*100));if(volumeValue)volumeValue.textContent=volumeInput.value+'%';}
+}).catch(()=>{});
 el('opening-video-audio-save')?.addEventListener('click',async()=>{
  const button=el('opening-video-audio-save');
  busy(button,true,'SALVANDO OPÇÕES…');
