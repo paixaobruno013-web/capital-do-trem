@@ -832,7 +832,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
  <div class="opening-live-loader" id="opening-live-loader" role="status" aria-live="polite"><div class="opening-live-spinner" aria-hidden="true"></div><strong>Carregando...</strong><div class="opening-live-track"><span id="opening-live-progress"></span><span class="opening-live-train" id="opening-live-train" aria-hidden="true"><span class="opening-wagon opening-wagon-speakers opening-wagon-rear" aria-label="Primeiro vagão: alto-falante"><span class="opening-wagon-load opening-speaker-backward">🔊</span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-dancers" aria-label="Segundo vagão: rapaz e moça dançando"><span class="opening-wagon-load"><span class="opening-dancer female" aria-label="moça dançando">💃<i class="arm arm-left"></i><i class="arm arm-right"></i></span><span class="opening-dancer male" aria-label="rapaz dançando">🕺<i class="arm arm-left"></i><i class="arm arm-right"></i></span></span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-speakers opening-wagon-front" aria-label="Terceiro vagão: alto-falante"><span class="opening-wagon-load opening-speaker-forward">🔊</span><span class="opening-wagon-deck"></span></span><span class="opening-locomotive" aria-label="Locomotiva à frente puxando os três vagões">🚂</span></span></div></div>
 </div>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
-<header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem <span class="verified-badge" role="img" aria-label="Perfil oficial verificado">✓</span></h1><p class="tag">A música da nossa quebrada!</p><div id="community-story-tray" aria-label="Stories da comunidade" aria-live="polite"></div><div class="header-action-groups"><div class="header-action-row"><a class="btn alt" href="./conta.html">👤 Minha conta</a><a class="btn alt" href="./mensagens.html">✉️ Minhas conversas</a><a class="btn alt" href="./avatar.html">🎭 Meu avatar</a><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button></div><div class="header-action-row"><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn instagram-button" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a></div><div class="header-action-row"><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som de entrada: ligado</button></div></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Abertura visual de 7 segundos • toque para ouvir a vinheta</p><div class="header-location-row"><button class="btn alt" id="quick-location" type="button">📍 Logo ali Uai - Localização</button></div></header>
+<header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem <span class="verified-badge" role="img" aria-label="Perfil oficial verificado">✓</span></h1><p class="tag">A música da nossa quebrada!</p><div id="community-story-tray" aria-label="Stories da comunidade" aria-live="polite"></div><div class="header-action-groups"><div class="header-action-row"><a class="btn alt" href="./conta.html">👤 Minha conta</a><a class="btn alt" href="./mensagens.html">✉️ Minhas conversas</a><a class="btn alt" href="./avatar.html">🎭 Meu avatar</a><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button></div><div class="header-action-row"><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn instagram-button" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a></div><div class="header-action-row"><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som da abertura: ligado</button></div></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Abertura de 7 segundos com som ligado por padrão. Você pode desativar permanentemente neste aparelho.</p><div class="header-location-row"><button class="btn alt" id="quick-location" type="button">📍 Logo ali Uai - Localização</button></div></header>
 <main id="main-content" tabindex="-1">
 <p id="connection-status" class="connection-status" role="status" aria-live="polite" hidden></p>
 <section class="hero reference-banner"><h2>AQUI A MÚSICA<br><strong>NÃO PARA!</strong></h2><p>Conectando a quebrada!</p><div class="social"><button class="btn" data-go="musicas">▶ Ouvir músicas</button><button class="btn alt" data-go="comunidade">Comunidade</button></div></section>
@@ -917,9 +917,9 @@ let introAudioContext=null;
 let introMaster=null;
 function updateIntroControl(){
  introToggle.setAttribute('aria-pressed',String(introEnabled));
- introToggle.textContent=introEnabled?'🔊 Som de entrada: ligado':'🔇 Som de entrada: desligado';
- if(!introEnabled)introStatus.textContent='Vinheta desligada. Você pode ativá-la quando quiser.';
- else if(!introPlayed)introStatus.textContent='Vinheta de 7 segundos • toque na tela para ouvir';
+ introToggle.textContent=introEnabled?'🔊 Som da abertura: ligado':'🔇 Som da abertura: desligado (salvo)';
+ if(!introEnabled)introStatus.textContent='Som desativado permanentemente neste aparelho. Toque no botão para reativar.';
+ else if(!introPlayed)introStatus.textContent='Som ligado por padrão • se o navegador bloquear, toque na tela para liberar.';
 }
 function makeNoiseBuffer(ctx,duration=1){
  const length=Math.max(1,Math.floor(ctx.sampleRate*duration));
@@ -1023,6 +1023,7 @@ introToggle.addEventListener('click',()=>{
  }
  if(introEnabled){introPlayed=false;updateIntroControl();playCapitalIntro();}
  else updateIntroControl();
+ window.dispatchEvent(new CustomEvent('capitaldotrem:opening-audio-change',{detail:{enabled:introEnabled}}));
 });
 function unlockIntroFromGesture(event){
  if(!introEnabled||introPlayed)return;
@@ -1681,7 +1682,8 @@ async function saveOfflineMusic(id,blob,title){
     const brand=document.querySelector('.intro-smoke__brand');
     if(brand)brand.style.display='none';
     const video=document.createElement('video');
-    video.className='opening-video-background';video.src=openingVideo;video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';video.autoplay=true;video.muted=false;video.defaultMuted=false;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));video.playsInline=true;video.loop=true;video.preload='auto';video.setAttribute('aria-hidden','true');
+    video.className='opening-video-background';video.src=openingVideo;video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';const savedOpeningSound=(()=>{try{return localStorage.getItem('capitaldotrem_intro_sound_v1')!=='off';}catch{return true;}})();
+    video.autoplay=true;video.muted=!savedOpeningSound;video.defaultMuted=!savedOpeningSound;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));video.playsInline=true;video.loop=true;video.preload='auto';video.setAttribute('aria-hidden','true');
     screen.insertBefore(video,screen.firstChild);screen.classList.add('custom-opening-screen');
     // O áudio fica sempre habilitado por padrão. Se o navegador bloquear autoplay com som,
     // mostramos um toque de ativação (limitação do próprio Android/iOS, não uma opção sem áudio).
@@ -1689,6 +1691,8 @@ async function saveOfflineMusic(id,blob,title){
     audioButton.setAttribute('aria-label','Ativar áudio do vídeo de abertura');
     audioButton.style.cssText='position:absolute;z-index:10000;left:50%;top:12%;transform:translateX(-50%);padding:12px 18px;border:2px solid #ed1c24;border-radius:999px;background:#050505ef;color:#fff;font-weight:900;letter-spacing:.5px;box-shadow:0 0 16px #ed1c24;cursor:pointer;pointer-events:auto;touch-action:manipulation;display:none';
     const enableOpeningAudio=async()=>{try{video.muted=false;video.defaultMuted=false;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));await video.play();audioButton.remove();}catch(error){audioButton.style.display='block';console.warn('O navegador exige toque para liberar o áudio da abertura.',error);}};
+    const applyOpeningSoundPreference=enabled=>{if(enabled){enableOpeningAudio();}else{video.muted=true;video.defaultMuted=true;audioButton.style.display='none';}};
+    window.addEventListener('capitaldotrem:opening-audio-change',event=>applyOpeningSoundPreference(Boolean(event.detail?.enabled)));
     audioButton.addEventListener('click',enableOpeningAudio);
     screen.appendChild(audioButton);
     video.addEventListener('play',()=>{if(!video.muted)audioButton.remove();});
@@ -1708,11 +1712,12 @@ async function saveOfflineMusic(id,blob,title){
      setTimeout(()=>{if(finished)return;finished=true;progress=100;paint();screen.classList.add('is-finished');setTimeout(()=>screen.remove(),600);},remaining);
     };
     const loader=setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}finish();if(finished)clearInterval(loader);},220);
-    video.addEventListener('loadeddata',()=>{videoReady=true;enableOpeningAudio();finish();},{once:true});
+    video.addEventListener('loadeddata',()=>{videoReady=true;if(savedOpeningSound)enableOpeningAudio();finish();},{once:true});
     video.addEventListener('error',()=>{videoReady=true;finish();},{once:true});
     if(video.readyState>=2)videoReady=true;
     if(ready)finish();else window.addEventListener('load',()=>{ready=true;finish();},{once:true});
-    enableOpeningAudio();
+    if(savedOpeningSound)enableOpeningAudio();
+    else video.play().catch(()=>{});
    }
   }
  }catch(error){console.warn('Identidade visual padrão mantida.',error);}
