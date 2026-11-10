@@ -837,12 +837,13 @@ export async function getPublicBranding() {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('site_settings')
     .select('setting_key, setting_value')
-    .in('setting_key', ['official_profile_image_url', 'app_opening_image_url', 'app_home_background_image_url', 'app_home_background_x', 'app_home_background_y', 'app_home_background_blur', 'app_home_background_fit']);
+    .in('setting_key', ['official_profile_image_url', 'app_opening_image_url', 'app_opening_video_url', 'app_home_background_image_url', 'app_home_background_x', 'app_home_background_y', 'app_home_background_blur', 'app_home_background_fit']);
   if (error) throw error;
   const settings = Object.fromEntries((data || []).map(row => [row.setting_key, row.setting_value]));
   return {
     profileImageUrl: settings.official_profile_image_url || '',
     openingImageUrl: settings.app_opening_image_url || '',
+    openingVideoUrl: settings.app_opening_video_url || '',
     homeBackgroundImageUrl: settings.app_home_background_image_url || '',
     homeBackgroundX: Number(settings.app_home_background_x ?? 50),
     homeBackgroundY: Number(settings.app_home_background_y ?? 50),
@@ -899,6 +900,31 @@ export async function saveAdminOpeningImage(file) {
 }
 
 /* Imagem de fundo do painel central, com enquadramento e desfoque ajustáveis. */
+
+
+/* Permite ao administrador substituir a abertura por vídeo MP4 ou WebM. */
+export async function saveAdminOpeningVideo(file) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode alterar o vídeo de abertura.');
+  const allowed = { 'video/mp4': 'mp4', 'video/webm': 'webm' };
+  if (!(file instanceof File) || !allowed[file.type]) throw new Error('Escolha um vídeo MP4 ou WebM.');
+  if (file.size < 1 || file.size > 50 * 1024 * 1024) throw new Error('O vídeo deve ter até 50 MB.');
+  const path = user.id + '/branding/opening-video-' + crypto.randomUUID() + '.' + allowed[file.type];
+  const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: false });
+  if (uploadError) throw uploadError;
+  const { data: publicData } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
+  if (!publicData?.publicUrl) throw new Error('Não foi possível gerar o endereço público do vídeo.');
+  const now = new Date().toISOString();
+  const { error: saveError } = await supabase.from('site_settings').upsert([
+    { setting_key: 'app_opening_video_url', setting_value: publicData.publicUrl, updated_at: now },
+    { setting_key: 'app_opening_image_url', setting_value: '', updated_at: now }
+  ], { onConflict: 'setting_key' });
+  if (saveError) throw saveError;
+  return publicData.publicUrl;
+}
+
 export async function saveAdminHomeBackground(file, options = {}) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
