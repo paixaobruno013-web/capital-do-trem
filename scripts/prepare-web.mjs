@@ -8,6 +8,7 @@ const files = [
   'offline.html',
   'conta.html',
   'admin.html',
+  'admin-media.js',
   'privacidade.html',
   'bate-papo.html',
   'chat-enhancements.js',
