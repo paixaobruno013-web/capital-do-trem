@@ -90,7 +90,7 @@ el('opening-video-audio-save')?.addEventListener('click',async()=>{
  say('opening-video-audio-status','Salvando preferências de áudio…');
  try{
   await auth.saveAdminOpeningVideoSettings({muted:el('opening-video-audio-mode')?.value!=='sound',volume:Number(volumeInput?.value??70)/100});
-  say('opening-video-audio-status','OPÇÕES DE ÁUDIO SALVAS. '+(el('opening-video-audio-mode')?.value==='sound'?'O visitante poderá tocar em ATIVAR ÁUDIO durante a abertura.':'O vídeo será reproduzido sem áudio.'));
+  say('opening-video-audio-status','OPÇÕES DE ÁUDIO SALVAS. '+(el('opening-video-audio-mode')?.value==='sound'?'O áudio ficará ligado por padrão; navegadores externos podem aplicar restrições de autoplay com som.':'O vídeo será reproduzido sem áudio.'));
  }catch(e){say('opening-video-audio-status','ERRO AO SALVAR ÁUDIO: '+[e?.message,e?.code,e?.status,e?.details,e?.hint].filter(Boolean).join(' | '));}
  finally{busy(button,false,'SALVAR OPÇÕES DE ÁUDIO');}
 });
