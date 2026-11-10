@@ -806,7 +806,11 @@ body.light header.header-has-custom-background::before{
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train .opening-wagon-front{order:3!important}
 @keyframes opening-train-cross-sky{from{left:-230px}to{left:calc(100vw + 230px)}}
 @media(prefers-reduced-motion:reduce){.intro-smoke.custom-opening-screen .opening-live-track #opening-live-train{animation:opening-train-cross-sky 5s linear 1 both!important}}
-</style></head>
+</style><script>
+// Se o Android encerrar o processo enquanto a câmera nativa está aberta, retoma a conversa em vez de reiniciar na página inicial.
+try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(localStorage.getItem(key)||0);if(started&&Date.now()-started<3*60*1000){localStorage.removeItem(key);location.replace('./bate-papo.html?retorno-camera=1');}}catch(error){}
+</script>
+</head>
 <body>
 <script>
 (function(){
@@ -1677,15 +1681,17 @@ async function saveOfflineMusic(id,blob,title){
     const brand=document.querySelector('.intro-smoke__brand');
     if(brand)brand.style.display='none';
     const video=document.createElement('video');
-    video.className='opening-video-background';video.src=openingVideo;video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';video.autoplay=true;video.muted=true;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));video.playsInline=true;video.loop=true;video.preload='auto';video.setAttribute('aria-hidden','true');
+    video.className='opening-video-background';video.src=openingVideo;video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';video.autoplay=true;video.muted=false;video.defaultMuted=false;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));video.playsInline=true;video.loop=true;video.preload='auto';video.setAttribute('aria-hidden','true');
     screen.insertBefore(video,screen.firstChild);screen.classList.add('custom-opening-screen');
-    // O celular bloqueia áudio automático: o vídeo começa mudo e oferece ativação por toque.
-    // O botão fica disponível mesmo quando a preferência salva era "sem áudio", para o público poder optar.
-    const audioButton=document.createElement('button');audioButton.type='button';audioButton.textContent='🔊 TOQUE PARA ATIVAR O ÁUDIO';
+    // O áudio fica sempre habilitado por padrão. Se o navegador bloquear autoplay com som,
+    // mostramos um toque de ativação (limitação do próprio Android/iOS, não uma opção sem áudio).
+    const audioButton=document.createElement('button');audioButton.type='button';audioButton.textContent='🔊 TOQUE PARA OUVIR';
     audioButton.setAttribute('aria-label','Ativar áudio do vídeo de abertura');
-    audioButton.style.cssText='position:absolute;z-index:10000;left:50%;top:12%;transform:translateX(-50%);padding:12px 18px;border:2px solid #ed1c24;border-radius:999px;background:#050505ef;color:#fff;font-weight:900;letter-spacing:.5px;box-shadow:0 0 16px #ed1c24;cursor:pointer;pointer-events:auto;touch-action:manipulation';
-    audioButton.addEventListener('click',async()=>{try{video.muted=false;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));await video.play();audioButton.textContent='🔊 ÁUDIO ATIVADO';setTimeout(()=>audioButton.remove(),900);}catch(error){audioButton.textContent='TOQUE NOVAMENTE PARA OUVIR';console.warn('O navegador bloqueou o áudio da abertura.',error);}},{once:false});
+    audioButton.style.cssText='position:absolute;z-index:10000;left:50%;top:12%;transform:translateX(-50%);padding:12px 18px;border:2px solid #ed1c24;border-radius:999px;background:#050505ef;color:#fff;font-weight:900;letter-spacing:.5px;box-shadow:0 0 16px #ed1c24;cursor:pointer;pointer-events:auto;touch-action:manipulation;display:none';
+    const enableOpeningAudio=async()=>{try{video.muted=false;video.defaultMuted=false;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));await video.play();audioButton.remove();}catch(error){audioButton.style.display='block';console.warn('O navegador exige toque para liberar o áudio da abertura.',error);}};
+    audioButton.addEventListener('click',enableOpeningAudio);
     screen.appendChild(audioButton);
+    video.addEventListener('play',()=>{if(!video.muted)audioButton.remove();});
     const movingTrain=document.getElementById('opening-live-train');
     if(movingTrain){
      movingTrain.style.setProperty('animation','none');
@@ -1702,11 +1708,11 @@ async function saveOfflineMusic(id,blob,title){
      setTimeout(()=>{if(finished)return;finished=true;progress=100;paint();screen.classList.add('is-finished');setTimeout(()=>screen.remove(),600);},remaining);
     };
     const loader=setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}finish();if(finished)clearInterval(loader);},220);
-    video.addEventListener('loadeddata',()=>{videoReady=true;video.play().catch(()=>{});finish();},{once:true});
+    video.addEventListener('loadeddata',()=>{videoReady=true;enableOpeningAudio();finish();},{once:true});
     video.addEventListener('error',()=>{videoReady=true;finish();},{once:true});
     if(video.readyState>=2)videoReady=true;
     if(ready)finish();else window.addEventListener('load',()=>{ready=true;finish();},{once:true});
-    video.play().catch(()=>{});
+    enableOpeningAudio();
    }
   }
  }catch(error){console.warn('Identidade visual padrão mantida.',error);}
