@@ -1634,14 +1634,9 @@ async function saveOfflineMusic(id,blob,title){
   const branding=await auth.getPublicBranding();
   const safeUrl=value=>typeof value==='string'&&value.startsWith('https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/')?value:'';
   const profile=safeUrl(branding.profileImageUrl),opening=safeUrl(branding.openingImageUrl),openingVideo=safeUrl(branding.openingVideoUrl); 
-  // Cada abertura consulta uma URL nova para impedir que navegador/CDN reutilize vídeo antigo.
-  const freshMediaUrl=value=>{
-   if(!value)return '';
-   const separator=value.includes('?')?'&':'?';
-   const nonce=(globalThis.crypto&&typeof globalThis.crypto.randomUUID==='function')?globalThis.crypto.randomUUID():String(Date.now())+'-'+String(Math.random()).slice(2);
-   return value+separator+'cdt_opening='+encodeURIComponent(nonce);
-  };
-  const currentOpeningImage=freshMediaUrl(opening),currentOpeningVideo=freshMediaUrl(openingVideo);
+  // Uploads recebem caminhos únicos no Storage; não é necessário furar o cache a cada abertura.
+  // Manter a URL estável permite reutilizar o arquivo já baixado e reduz espera/rede móvel.
+  const currentOpeningImage=opening,currentOpeningVideo=openingVideo;
   if(profile){const logo=document.getElementById('site-logo');if(logo)logo.src=profile;}
   if(opening){
  const intro=document.querySelector('.intro-smoke__brand img');
@@ -1701,13 +1696,13 @@ async function saveOfflineMusic(id,blob,title){
     const brand=document.querySelector('.intro-smoke__brand');
     if(brand)brand.style.display='none';
     const video=document.createElement('video');
-    video.className='opening-video-background';video.src=currentOpeningVideo;video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';const savedOpeningSound=(()=>{try{return localStorage.getItem('capitaldotrem_intro_sound_v1')!=='off'&&branding.openingVideoMuted!==true;}catch{return branding.openingVideoMuted!==true;}})();
-    video.autoplay=true;video.muted=!savedOpeningSound;video.defaultMuted=!savedOpeningSound;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));video.playsInline=true;video.loop=true;video.preload='auto';video.setAttribute('aria-hidden','true');
+    video.className='opening-video-background';video.src=currentOpeningVideo;video.poster=currentOpeningImage||profile||'./marca.svg';video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';video.style.opacity='0';video.style.transition='opacity .25s ease';const savedOpeningSound=(()=>{try{return localStorage.getItem('capitaldotrem_intro_sound_v1')!=='off'&&branding.openingVideoMuted!==true;}catch{return branding.openingVideoMuted!==true;}})();
+    video.autoplay=true;video.muted=!savedOpeningSound;video.defaultMuted=!savedOpeningSound;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));video.playsInline=true;video.loop=true;video.preload='metadata';video.setAttribute('aria-hidden','true');
     screen.insertBefore(video,screen.firstChild);screen.classList.add('custom-opening-screen');
-    // Força nova leitura do arquivo publicado, sem reaproveitar resposta HTTP anterior.
+    // A imagem de poster aparece imediatamente; o vídeo baixa dados em segundo plano.
     video.load();
-    // O áudio fica sempre habilitado por padrão. Se o navegador bloquear autoplay com som,
-    // mostramos um toque de ativação (limitação do próprio Android/iOS, não uma opção sem áudio).
+    // O áudio fica habilitado por padrão. Se Android/iOS bloquear autoplay com som,
+    // o botão de ativação aparece somente quando o navegador confirmar o bloqueio.
     const audioButton=document.createElement('button');audioButton.type='button';audioButton.textContent='🔊 TOQUE PARA LIBERAR O SOM';
     audioButton.setAttribute('aria-label','Ativar áudio do vídeo de abertura');
     audioButton.style.cssText='position:absolute;z-index:10000;left:50%;top:12%;transform:translateX(-50%);padding:12px 18px;border:2px solid #ed1c24;border-radius:999px;background:#050505ef;color:#fff;font-weight:900;letter-spacing:.5px;box-shadow:0 0 16px #ed1c24;cursor:pointer;pointer-events:auto;touch-action:manipulation;display:none';
@@ -1725,20 +1720,23 @@ async function saveOfflineMusic(id,blob,title){
      movingTrain.style.setProperty('animation','opening-train-cross-sky 5s linear 1 both','important');
     }
     const bar=document.getElementById('opening-live-progress');
-    const startedAt=performance.now();let progress=3,ready=document.readyState==='complete',videoReady=false,finished=false,finishQueued=false;
+    const startedAt=performance.now();let progress=3,finished=false;
     const paint=()=>{if(bar)bar.style.width=progress+'%';};
+    // A abertura nunca fica presa esperando rede, vídeo ou window.load: limite real de 7 segundos.
     const finish=()=>{
-     if(finished||finishQueued||!ready||!videoReady)return;
-     const remaining=Math.max(0,7000-(performance.now()-startedAt));finishQueued=true;
-     setTimeout(()=>{if(finished)return;finished=true;progress=100;paint();screen.classList.add('is-finished');setTimeout(()=>screen.remove(),600);},remaining);
+     if(finished)return;
+     const remaining=Math.max(0,7000-(performance.now()-startedAt));
+     window.setTimeout(()=>{if(finished)return;finished=true;progress=100;paint();screen.classList.add('is-finished');window.setTimeout(()=>screen.remove(),600);},remaining);
     };
-    const loader=setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}finish();if(finished)clearInterval(loader);},220);
-    video.addEventListener('loadeddata',()=>{videoReady=true;if(savedOpeningSound)enableOpeningAudio();finish();},{once:true});
-    video.addEventListener('error',()=>{videoReady=true;finish();},{once:true});
-    if(video.readyState>=2)videoReady=true;
-    if(ready)finish();else window.addEventListener('load',()=>{ready=true;finish();},{once:true});
-    if(savedOpeningSound)enableOpeningAudio();
-    else video.play().catch(()=>{});
+    const loader=setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}if(finished)clearInterval(loader);},220);
+    video.addEventListener('loadeddata',()=>{
+     video.style.opacity='1';
+     video.play().then(()=>{if(savedOpeningSound&&!video.muted)audioButton.remove();}).catch(error=>{
+      if(savedOpeningSound){audioButton.style.display='block';console.warn('O navegador exige toque para liberar o áudio da abertura.',error);}
+     });
+    },{once:true});
+    video.addEventListener('error',()=>{console.warn('Vídeo de abertura indisponível; mantendo a imagem de poster.');},{once:true});
+    finish();
    }
   }
  }catch(error){console.warn('Identidade visual padrão mantida.',error);}
