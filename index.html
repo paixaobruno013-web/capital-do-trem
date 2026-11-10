@@ -810,8 +810,14 @@ body.light header.header-has-custom-background::before{
 <body>
 <script>
 (function(){
+ const INTRO_SESSION_KEY='capitaldotrem_intro_seen_session_v1';
  let show=true;
  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)show=false;
+ // A abertura acontece uma vez por sessão; voltar do chat/conta para o início não a repete.
+ try{
+  if(sessionStorage.getItem(INTRO_SESSION_KEY)==='1')show=false;
+  else sessionStorage.setItem(INTRO_SESSION_KEY,'1');
+ }catch(error){/* Se o armazenamento estiver bloqueado, mantém a abertura normal. */}
  if(!show)document.documentElement.classList.add('intro-smoke-skip');
 })();
 </script>
