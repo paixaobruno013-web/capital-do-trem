@@ -1788,4 +1788,47 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
 }
 </style>
 
+
+<style id="opening-train-final-motion-fix">
+/* Correção definitiva: não animar "left", pois uma regra antiga o fixava com !important.
+   A propriedade individual "translate" move o conjunto inteiro sem separar os vagões. */
+.intro-smoke.custom-opening-screen .opening-live-track > #opening-live-train{
+  left:0!important;
+  top:50%!important;
+  translate:-100% 0;
+  transform:translateY(-58%)!important;
+  display:flex!important;
+  flex-flow:row nowrap!important;
+  align-items:flex-end!important;
+  justify-content:flex-start!important;
+  width:max-content!important;
+  height:42px!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+  gap:3px!important;
+  white-space:nowrap!important;
+  will-change:translate;
+  animation:opening-train-cross-sky 9.5s linear 1 both!important;
+}
+.intro-smoke.custom-opening-screen .opening-live-track > #opening-live-train .opening-wagon-rear{order:1!important}
+.intro-smoke.custom-opening-screen .opening-live-track > #opening-live-train .opening-wagon-dancers{order:2!important}
+.intro-smoke.custom-opening-screen .opening-live-track > #opening-live-train .opening-wagon-front{order:3!important}
+.intro-smoke.custom-opening-screen .opening-live-track > #opening-live-train .opening-locomotive{
+  order:4!important;
+  transform:scaleX(-1)!important;
+  font-size:36px!important;
+}
+@keyframes opening-train-cross-sky{
+  from{translate:-100% 0}
+  to{translate:calc(100vw + 100%) 0}
+}
+@media(prefers-reduced-motion:reduce){
+  .intro-smoke.custom-opening-screen .opening-live-track > #opening-live-train{
+    animation:none!important;
+    translate:-50% 0;
+  }
+}
+</style>
+
 </body></html>
