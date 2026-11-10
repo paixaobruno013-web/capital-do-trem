@@ -1280,3 +1280,98 @@ export function subscribeAdminStories(callback) {
     .subscribe();
   return () => { supabase.removeChannel(channel); };
 }
+
+
+// ============================================================
+// Stories pessoais da comunidade — cada conta gerencia os próprios.
+// Stories públicos para a comunidade e expiração automática em 24h.
+// ============================================================
+export async function createMyStory({ file, caption = '' }) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para publicar um Story.');
+  if (!(file instanceof File)) throw new Error('Escolha uma foto ou vídeo.');
+  const format = await getBrandingUploadFormat(file, { jpg: true, jpeg: true, png: true, webp: true, mp4: true, webm: true });
+  const isVideo = ['mp4', 'webm'].includes(format.extension);
+  const maxSize = isVideo ? 20 * 1024 * 1024 : 8 * 1024 * 1024;
+  if (file.size < 1 || file.size > maxSize) throw new Error(isVideo ? 'O vídeo deve ter até 20 MB.' : 'A imagem deve ter até 8 MB.');
+  const profile = await getMyBasicProfile();
+  const avatar = await getMyAvatar().catch(() => null);
+  const cleanCaption = String(caption || '').trim().slice(0, 280);
+  const path = user.id + '/stories/' + crypto.randomUUID() + '.' + format.extension;
+  const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, {
+    contentType: format.contentType, cacheControl: '3600', upsert: false
+  });
+  if (uploadError) throw uploadError;
+  const { data: publicData } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
+  const mediaUrl = publicData?.publicUrl;
+  if (!mediaUrl) {
+    await supabase.storage.from('capital-do-trem-media').remove([path]);
+    throw new Error('Não foi possível gerar o endereço público do Story.');
+  }
+  const { data, error } = await supabase.from('user_stories').insert({
+    author_id: user.id,
+    display_name: String(profile.display_name || 'Usuário Uai').slice(0, 80),
+    username: String(profile.username || '').slice(0, 32),
+    avatar_url: avatar?.avatar_url || null,
+    media_path: path,
+    media_url: mediaUrl,
+    media_type: isVideo ? 'video' : 'image',
+    caption: cleanCaption,
+    expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+  }).select('id,author_id,display_name,username,avatar_url,media_url,media_type,caption,created_at,expires_at').single();
+  if (error) {
+    await supabase.storage.from('capital-do-trem-media').remove([path]);
+    throw error;
+  }
+  return data;
+}
+
+export async function getActiveUserStories() {
+  const supabase = initSupabase();
+  const { data, error } = await supabase.from('user_stories')
+    .select('id,author_id,display_name,username,avatar_url,media_url,media_type,caption,created_at,expires_at')
+    .gt('expires_at', new Date().toISOString())
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function getMyStories() {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para ver seus Stories.');
+  const { data, error } = await supabase.from('user_stories')
+    .select('id,media_path,media_url,media_type,caption,created_at,expires_at')
+    .eq('author_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(30);
+  if (error) throw error;
+  return data || [];
+}
+
+export async function deleteMyStory(id) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para excluir um Story.');
+  const { data: story, error: readError } = await supabase.from('user_stories')
+    .select('id,media_path').eq('id', id).eq('author_id', user.id).single();
+  if (readError) throw readError;
+  const { error } = await supabase.from('user_stories').delete().eq('id', id).eq('author_id', user.id);
+  if (error) throw error;
+  if (story?.media_path) {
+    const { error: storageError } = await supabase.storage.from('capital-do-trem-media').remove([story.media_path]);
+    if (storageError) console.warn('Story removido, mas o arquivo de mídia não pôde ser apagado.', storageError);
+  }
+}
+
+export function subscribeUserStories(callback) {
+  const supabase = initSupabase();
+  const channel = supabase.channel('capital-do-trem-user-stories')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'user_stories' }, callback)
+    .subscribe();
+  return () => { supabase.removeChannel(channel); };
+}
