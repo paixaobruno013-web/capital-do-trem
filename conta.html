@@ -116,7 +116,7 @@ audio{width:100%;}
  <span><strong>instalações registradas</strong><br><small class="muted">Pessoas que já abriram o Capital do Trem neste aparelho.</small></span>
 </div>
 <div id="artist-profile-area" hidden>
-<h3>🎤 Minha ficha artística</h3><p class="muted">Preencha estes dados se sua conta for de artista. A ficha artística será enviada para análise da equipe. Eventos e divulgações são publicados diretamente. Após selecionar Artista / DJ no perfil, você também poderá enviar suas músicas para o catálogo.</p>
+<h3>🎤 Minha ficha artística</h3><p class="muted">Preencha estes dados se sua conta for de artista. A ficha artística será enviada para análise da equipe. Eventos e divulgações podem ser enviados pela sua conta. A publicação de músicas no catálogo é exclusiva da administração e da equipe autorizada.</p>
 <form id="artist-profile-form">
 <label for="artist-name">Nome artístico</label><input id="artist-name" maxlength="100" required>
 <label for="artist-style">Estilo musical</label><input id="artist-style" maxlength="80" placeholder="Ex.: Funk consciente, rap, pagode">
@@ -130,8 +130,8 @@ audio{width:100%;}
 
 </div>
 <section class="card" id="admin-songs-panel" hidden aria-labelledby="admin-songs-title">
-<h3 id="admin-songs-title">🎵 Divulgue sua música</h3>
-<p class="muted">Todos os perfis Artista / DJ podem enviar músicas diretamente para o catálogo. Usuários Uai podem ouvir, curtir, comentar e baixar. Envie MP3, M4A, AAC, WAV ou OGG (até 50 MB).</p>
+<h3 id="admin-songs-title">🎵 Publicação de músicas — equipe</h3>
+<p class="muted">Área exclusiva da administração e da equipe autorizada. Artistas e Usuários Uai podem ouvir, curtir, comentar e baixar as músicas publicadas. Envie MP3, M4A, AAC, WAV ou OGG (até 50 MB).</p>
 <form id="artist-song-form">
 <label for="song-title">Nome da música</label><input id="song-title" maxlength="120" required>
 <label for="song-artist-name">Nome artístico</label><input id="song-artist-name" maxlength="100" required>
@@ -326,9 +326,9 @@ const songStatus=document.getElementById('song-status');
 const mySongs=document.getElementById('my-songs');
 const songPanel=document.getElementById('admin-songs-panel');
 async function loadAdminSongAccess(){
- // O formulário de envio aparece para todos os perfis Artista / DJ e administradores.
+ // O formulário de publicação aparece somente para a administração e equipe autorizada.
  try{
-  const allowed=await auth.isCurrentUserArtistOrAdmin();
+  const allowed=await auth.isCurrentUserAdmin();
   songPanel.hidden=!allowed;
   if(allowed)await loadMySongs();
  }catch(error){songPanel.hidden=true;}
@@ -353,10 +353,10 @@ songForm.addEventListener('submit',async event=>{
  const button=document.getElementById('submit-song');
  const file=document.getElementById('song-audio-file').files[0];
  if(!file){songStatus.textContent='Selecione o arquivo de áudio.';return;}
- button.disabled=true;songStatus.textContent='Enviando e publicando sua música…';
+ button.disabled=true;songStatus.textContent='Enviando música para publicação pela equipe…';
  try{
   await auth.uploadMySong({file,title:document.getElementById('song-title').value.trim(),artistName:document.getElementById('song-artist-name').value.trim()});
-  songForm.reset();songStatus.textContent='Música publicada com sucesso! Ela já está no catálogo.';
+  songForm.reset();songStatus.textContent='Música enviada e publicada no catálogo.';
   await loadMySongs();
  }catch(error){songStatus.textContent=error?.message||'Não foi possível enviar a música. Confira o formato, tamanho e conexão.';}
  finally{button.disabled=false;}
