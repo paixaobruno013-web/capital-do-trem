@@ -50,5 +50,20 @@ el('header-background-save-direct')?.addEventListener('click',async()=>{
  );
  if(url){const preview=el('header-background-preview-direct');if(preview)preview.src=url;}
 });
+
+const volumeInput=el('opening-video-volume');
+const volumeValue=el('opening-video-volume-value');
+volumeInput?.addEventListener('input',()=>{if(volumeValue)volumeValue.textContent=volumeInput.value+'%';});
+el('opening-video-audio-save')?.addEventListener('click',async()=>{
+ const button=el('opening-video-audio-save');
+ busy(button,true,'SALVANDO OPÇÕES…');
+ say('opening-video-audio-status','Salvando preferências de áudio…');
+ try{
+  await auth.saveAdminOpeningVideoSettings({muted:el('opening-video-audio-mode')?.value!=='sound',volume:Number(volumeInput?.value??70)/100});
+  say('opening-video-audio-status','OPÇÕES DE ÁUDIO SALVAS. '+(el('opening-video-audio-mode')?.value==='sound'?'O visitante poderá tocar em ATIVAR ÁUDIO durante a abertura.':'O vídeo será reproduzido sem áudio.'));
+ }catch(e){say('opening-video-audio-status','ERRO AO SALVAR ÁUDIO: '+[e?.message,e?.code,e?.status,e?.details,e?.hint].filter(Boolean).join(' | '));}
+ finally{busy(button,false,'SALVAR OPÇÕES DE ÁUDIO');}
+});
+
 say('opening-media-direct-status','CONTROLES PRONTOS. Escolha um vídeo ou imagem e publique.');
 say('header-background-direct-status','CONTROLE PRONTO. Escolha a imagem e publique.');
