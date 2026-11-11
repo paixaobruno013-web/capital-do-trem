@@ -36,6 +36,7 @@ Foi adicionado o workflow `.github/workflows/store-package-validation.yml`. Na e
 - [x] Formatos compatíveis incluem imagens, MP4/WebM/MOV, áudio e documentos PDF/Office; limite de 20 MB por arquivo e 12 MB para imagens.
 - [x] Fluxo de exclusão de conta atualizado para localizar e remover arquivos de grupo e de conversas privadas; Edge Function `delete-account` implantada na versão 2, com JWT obrigatório.
 - [x] Cinco índices de chaves estrangeiras adicionados após revisão do Performance Advisor.
+- [x] A abertura impede a exibição da marca antiga enquanto a arte oficial carrega; o vídeo usa poster de alta prioridade e a duração fica fixa em 10 segundos, com trem de 9,8 segundos, mesmo quando o vídeo demora.
 - [ ] Testar envio e leitura com duas contas reais, incluindo bloqueio, saída do grupo e exclusão de uma conta de teste.
 - [ ] Testar seleção de arquivos em Android real e iPhone real; a compilação nativa em CI não substitui esses testes.
 
