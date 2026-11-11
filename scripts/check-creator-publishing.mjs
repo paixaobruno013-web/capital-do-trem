@@ -7,7 +7,7 @@ const [home, story, eventComposer, account, auth, prepare, eventPolicy, songPoli
   read('conta.html'),
   read('supabase/auth.js'),
   read('scripts/prepare-web.mjs'),
-  read('supabase/migrations/20261111190000_allow_all_users_to_publish_events.sql'),
+  read('supabase/migrations/20261111173858_allow_all_users_to_publish_events.sql'),
   read('supabase/migrations/20261111173000_artist_song_submissions_with_producer.sql')
 ]);
 const checks = [
