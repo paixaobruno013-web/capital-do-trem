@@ -121,6 +121,8 @@ jobs:
         run: node scripts/check-account-deletion.mjs
       - name: Verificar biblioteca musical sincronizada
         run: node scripts/check-music-library.mjs
+      - name: Verificar álbum privado do administrador
+        run: node scripts/check-private-admin-gallery.mjs
       - name: Conferir arquivos essenciais
         run: |
           test -s www/index.html
