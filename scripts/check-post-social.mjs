@@ -1,10 +1,10 @@
 import { readFile } from 'node:fs/promises';
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [auth, home, chat, migration] = await Promise.all([
+const [auth, home, chat, migration, stories] = await Promise.all([
   read('supabase/auth.js'),
   read('index.html'),
   read('bate-papo.html'),
-  read('supabase/migrations/20261111143000_post_likes_comments.sql')
+  read('supabase/migrations/20261111143000_post_likes_comments.sql'),\n  read('stories-ui.js')
 ]);
 const checks = [\n  ['Stories pessoais salvam a duração selecionada da música', /createMyStory\\(\\{[^}]*musicDurationSeconds = 15/s.test(auth) && /music_duration_seconds: Math\\.max\\(5, Math\\.min\\(60, Math\\.round\\(Number\\(musicDurationSeconds\\) \\|\\| 15\\)\\)\\)/.test(auth)],\n  ['barra de progresso do Story acompanha a duração do trecho musical', /let storySeconds = 7/.test(stories) && /progress.style.transition = 'transform ' \\+ storySeconds \\+ 's linear'/.test(stories)],
   ['curtidas únicas por usuário e publicação', /primary key \(post_id, user_id\)/.test(migration)],
