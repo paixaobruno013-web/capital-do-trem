@@ -1371,7 +1371,7 @@ export async function startUserPresence() {
 // Stories oficiais da Capital do Trem — somente administradores publicam.
 // Cada story expira automaticamente após 24 horas.
 // ============================================================
-export async function createAdminStory({ file, caption = '', musicSongId = '', musicStartSeconds = 0, musicVolume = 0.8 }) {
+export async function createAdminStory({ file, caption = '', musicSongId = '', musicStartSeconds = 0, musicVolume = 0.8, musicDurationSeconds = 15 }) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
@@ -1382,13 +1382,13 @@ export async function createAdminStory({ file, caption = '', musicSongId = '', m
   const maxSize = isVideo ? 20 * 1024 * 1024 : 8 * 1024 * 1024;
   if (file.size < 1 || file.size > maxSize) throw new Error(isVideo ? 'O vídeo deve ter até 20 MB.' : 'A imagem deve ter até 8 MB.');
   const cleanCaption = String(caption || '').trim().slice(0, 280);
-  let music = { music_song_id: null, music_url: null, music_title: '', music_artist: '', music_start_seconds: 0, music_volume: 0.8 };
+  let music = { music_song_id: null, music_url: null, music_title: '', music_artist: '', music_start_seconds: 0, music_volume: 0.8, music_duration_seconds: 15 };
   if (musicSongId) {
     const { data: song, error: songError } = await supabase.from('songs').select('id,title,artist_name,storage_path').eq('id', musicSongId).eq('status', 'published').single();
     if (songError || !song) throw new Error('Essa música não está disponível para uso nos Stories.');
     const { data: signed, error: signedError } = await supabase.storage.from('capital-do-trem-audio').createSignedUrl(song.storage_path, 25 * 60 * 60);
     if (signedError || !signed?.signedUrl) throw new Error('Não foi possível preparar a música para o Story.');
-    music = { music_song_id: song.id, music_url: signed.signedUrl, music_title: String(song.title || '').slice(0,120), music_artist: String(song.artist_name || '').slice(0,100), music_start_seconds: Math.max(0, Math.min(3600, Number(musicStartSeconds) || 0)), music_volume: Math.max(0, Math.min(1, Number(musicVolume) || 0)) };
+    music = { music_song_id: song.id, music_url: signed.signedUrl, music_title: String(song.title || '').slice(0,120), music_artist: String(song.artist_name || '').slice(0,100), music_start_seconds: Math.max(0, Math.min(3600, Number(musicStartSeconds) || 0)), music_volume: Math.max(0, Math.min(1, Number(musicVolume) || 0)), music_duration_seconds: Math.max(5, Math.min(60, Math.round(Number(musicDurationSeconds) || 15))) };
   }
   const path = user.id + '/stories/story-' + crypto.randomUUID() + '.' + format.extension;
   const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, {
@@ -1409,7 +1409,7 @@ export async function createAdminStory({ file, caption = '', musicSongId = '', m
     ...music,
     published: true,
     expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-  }).select('id,media_url,media_type,caption,music_url,music_title,music_artist,music_start_seconds,music_volume,created_at,expires_at,published').single();
+  }).select('id,media_url,media_type,caption,music_url,music_title,music_artist,music_start_seconds,music_volume,music_duration_seconds,created_at,expires_at,published').single();
   if (error) {
     await supabase.storage.from('capital-do-trem-media').remove([path]);
     throw error;
