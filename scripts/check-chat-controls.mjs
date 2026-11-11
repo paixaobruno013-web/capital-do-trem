@@ -30,8 +30,8 @@ const checks = [
   ['service worker inclui os módulos de chat e mensagens privadas', /chat-enhancements\.js/.test(worker) && /emoji-picker\.js/.test(worker) && /mensagens\.html/.test(worker)],
 
   ['seletor mantém campo de mensagem e envio visíveis enquanto aberto', !/emoji-open #message[^{}]*display:none/.test(privateChat) && !/emoji-open #send[^{}]*display:none/.test(privateChat) && !/emoji-open #message[^{}]*display:none/.test(room) && !/emoji-open #send[^{}]*display:none/.test(room)],
-  ['seletor insere emoji na posição do cursor e atualiza recentes', /setRangeText\\(e,start,end,'end'\\)/.test(emoji) && /remember\\(e\\)/.test(emoji)],
-  ['grupo mantém câmera, gravação de áudio e envio disponíveis com emojis abertos', !/composer\\.emoji-open[^{}]*display:none/.test(room) && /id=\"camera-open\"/.test(room) && /id=\"send\"/.test(room)],
+  ['seletor insere emoji na posição do cursor e atualiza recentes', /setRangeText\(e,start,end,'end'\)/.test(emoji) && /remember\(e\)/.test(emoji)],
+  ['grupo mantém câmera, gravação de áudio e envio disponíveis com emojis abertos', !/composer\.emoji-open[^{}]*display:none/.test(room) && /id=\"camera-open\"/.test(room) && /id=\"send\"/.test(room)],
   ['aplicativo usa Capacitor 8 em versões alinhadas para Android e iOS', /\"@capacitor\\/(android|core|ios)\": \"8\\.6\\.0\"/.test(packageJson) && /appId: 'com\\.capitaldotrem\\.app'/.test(capacitorConfig)],
   ['compilação Android valida SDK e alvo de API 36', /platforms;android-36/.test(androidWorkflow) && /targetSdkVersion/.test((await read(' .github/workflows/store-package-validation.yml'.trim())) )],
   ['compilação iOS usa Xcode em macOS e sincroniza Capacitor', /runs-on: macos-latest/.test(iosWorkflow) && /npx cap sync ios/.test(iosWorkflow) && /xcodebuild/.test(iosWorkflow)],
