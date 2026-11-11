@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [home, story, eventComposer, account, auth, prepare, eventPolicy, songPolicy, directSongPolicy, artistAccountPolicy, schema, androidConfig, iosConfig] = await Promise.all([
+const [home, story, eventComposer, account, auth, prepare, eventPolicy, songPolicy, directSongPolicy, artistAccountPolicy, schema, androidConfig, iosConfig, youtubeFeed, videoPolicy] = await Promise.all([
   read('index.html'),
   read('home-story-composer.js'),
   read('event-social-composer.js'),
@@ -13,7 +13,9 @@ const [home, story, eventComposer, account, auth, prepare, eventPolicy, songPoli
   read('supabase/migrations/20261111174839_restrict_artist_music_to_artist_accounts.sql'),
   read('supabase/schema.sql'),
   read('scripts/configure-android-media.py'),
-  read('scripts/prepare-ios-info.py')
+  read('scripts/prepare-ios-info.py'),
+  read('youtube-feed.js'),
+  read('supabase/migrations/20261111190000_video_feed_interactions.sql')
 ]);
 const checks = [
   ['atalho + de Stories fica na tela inicial', home.includes('id="home-story-add"')],
@@ -40,7 +42,12 @@ const checks = [
   ['música enviada por artista entra publicada no catálogo', auth.includes("file_size:file.size,status:'published'") && account.includes('diretamente no catálogo público')],
   ['pacote Android/iOS inclui os dois compositores', prepare.includes("'home-story-composer.js'") && prepare.includes("'event-social-composer.js'") && prepare.includes("'conta.html'")],
   ['GPS tem permissões nativas configuradas no Android e iOS', androidConfig.includes('android.permission.ACCESS_FINE_LOCATION') && androidConfig.includes('android.permission.ACCESS_COARSE_LOCATION') && iosConfig.includes('NSLocationWhenInUseUsageDescription')],
-  ['Explorar reúne atalhos de humor, criadores, música, notícias e Funk Consciente', home.includes('id="radar-funk-consciente"') && home.includes('Explorar — vídeos e novidades') && home.includes('videos+engracados+brasil+shorts') && home.includes('criadores+influenciadores+brasil+shorts') && home.includes('funk+consciente+clipes+musica') && home.includes('news.google.com/search?q=funk') && home.includes('funk+consciente+entrevistas+projetos+sociais')]
+  ['Explorar reúne atalhos de humor, criadores, música, notícias e Funk Consciente', home.includes('id="radar-funk-consciente"') && home.includes('Explorar — vídeos e novidades') && home.includes('videos+engracados+brasil+shorts') && home.includes('criadores+influenciadores+brasil+shorts') && home.includes('funk+consciente+clipes+musica') && home.includes('news.google.com/search?q=funk') && home.includes('funk+consciente+entrevistas+projetos+sociais')],
+  ['atalho independente Estúdio/câmera removido da navegação principal', !home.includes('href="./estudio.html"') && !home.includes('📸 Estúdio')],
+  ['feed único inclui os 20 Shorts enviados e os reproduz dentro do app', (youtubeFeed.match(/'([A-Za-z0-9_-]{11})'/g)||[]).length >= 20 && youtubeFeed.includes('youtube-nocookie.com/embed/') && home.includes('<script type="module" src="./youtube-feed.js"></script>')],
+  ['feed de vídeos não cria categorias e mantém compartilhamento no Koe Fala Tu', youtubeFeed.includes('SHORTS.concat(CHANNEL_FALLBACK)') && youtubeFeed.includes('Koe Fala Tu') && youtubeFeed.includes('navigator.share')],
+  ['curtidas e comentários usam tabelas com RLS e propriedade por usuário', videoPolicy.includes('create table if not exists public.video_likes') && videoPolicy.includes('create table if not exists public.video_comments') && videoPolicy.includes('enable row level security') && videoPolicy.includes('auth.uid()')],
+  ['câmera frontal/traseira e efeitos permanecem dentro do modal de Stories', home.includes('id="home-story-flip-button"') && home.includes('data-story-effect="night"') && home.includes('id="home-story-composer"') && story.includes("facingMode = facingMode === 'environment' ? 'user' : 'environment'")]
 ];
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO') + ' ' + name);
 const failed = checks.filter(([, ok]) => !ok);
