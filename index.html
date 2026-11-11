@@ -1429,7 +1429,7 @@ updateConnectionStatus();
   const module=await import('./supabase/auth.js');const supabase=module.initSupabase();
   const profiles=await module.getPublicProfiles();const session=await module.getCurrentSession();
   const own=session?.user?await module.getMyBasicProfile():null;const ownCity=String(own?.city||'').trim().toLocaleLowerCase('pt-BR');
-  const candidates=profiles.filter(p=>p.user_id!==user?.id);
+  const candidates=profiles.filter(p=>p.user_id!==session?.user?.id);
   const render=()=>{
    const term=search.value.trim().toLocaleLowerCase('pt-BR'),mode=distance.value;
    const filtered=candidates.filter(p=>{const city=String(p.city||'').trim().toLocaleLowerCase('pt-BR');if(mode==='same'&&(!ownCity||city!==ownCity))return false;if(mode==='other'&&(!ownCity||!city||city===ownCity))return false;return [p.display_name,p.username,p.city,p.bio].some(v=>String(v||'').toLocaleLowerCase('pt-BR').includes(term));});
