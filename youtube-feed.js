@@ -20,42 +20,51 @@ function activateVideoButton(button) {
   }, { once: true });
 }
 
+const PINNED_HOME_TRACKS = [
+  { id: '-c2QERKILzg', title: 'Quarta música da seleção', order: '4º • Música' },
+  { id: 'HHKsZAS1eMk', title: 'Quinta música da seleção', order: '5º • Música' },
+];
+
+function createHomeVideoCard(video, orderText, linkText = 'Assistir no YouTube') {
+  const article = document.createElement('article');
+  article.className = 'home-youtube-video';
+  const order = document.createElement('span');
+  order.className = 'home-youtube-order';
+  order.textContent = orderText;
+  const frame = document.createElement('div');
+  frame.className = 'home-youtube-frame';
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'home-youtube-load';
+  button.dataset.youtubeId = video.id;
+  button.setAttribute('aria-label', 'Carregar e reproduzir: ' + video.title);
+  const image = document.createElement('img');
+  image.src = 'https://i.ytimg.com/vi/' + video.id + '/hqdefault.jpg';
+  image.alt = '';
+  image.loading = 'lazy';
+  image.decoding = 'async';
+  const label = document.createElement('span');
+  label.textContent = '▶ Reproduzir vídeo';
+  button.append(image, label);
+  activateVideoButton(button);
+  frame.append(button);
+  const link = document.createElement('a');
+  link.href = 'https://youtu.be/' + video.id;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  link.textContent = linkText;
+  article.append(order, frame, link);
+  return article;
+}
+
 function renderVideos(videos) {
   if (!grid || !Array.isArray(videos) || !videos.length) return;
   grid.replaceChildren();
-  videos.slice(0, 4).forEach((video, index) => {
-    const article = document.createElement('article');
-    article.className = 'home-youtube-video';
-    const order = document.createElement('span');
-    order.className = 'home-youtube-order';
-    order.textContent = index === 0 ? '1º • Mais recente' : (index === 3 ? '4º • Mais antigo' : (index + 1) + 'º');
-    const frame = document.createElement('div');
-    frame.className = 'home-youtube-frame';
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'home-youtube-load';
-    button.dataset.youtubeId = video.id;
-    button.setAttribute('aria-label', 'Carregar e reproduzir: ' + video.title);
-    const image = document.createElement('img');
-    image.src = 'https://i.ytimg.com/vi/' + video.id + '/hqdefault.jpg';
-    image.alt = '';
-    image.loading = 'lazy';
-    image.decoding = 'async';
-    const label = document.createElement('span');
-    label.textContent = '▶ Reproduzir vídeo';
-    button.append(image, label);
-    activateVideoButton(button);
-    frame.append(button);
-    const link = document.createElement('a');
-    link.href = 'https://www.youtube.com/watch?v=' + video.id;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    link.textContent = 'Assistir no YouTube';
-    article.append(order, frame, link);
-    grid.append(article);
+  videos.slice(0, 3).forEach((video, index) => {
+    grid.append(createHomeVideoCard(video, index === 0 ? '1º • Mais recente' : (index + 1) + 'º'));
   });
+  PINNED_HOME_TRACKS.forEach(track => grid.append(createHomeVideoCard(track, track.order, 'Ouvir no YouTube')));
 }
-
 async function refreshYouTubeFeed(force = false) {
   if (!grid || !navigator.onLine) return;
   if (!force && Date.now() - lastRefresh < 5 * 60 * 1000) return;
