@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [home, story, eventComposer, account, auth, prepare, eventPolicy, songPolicy, schema] = await Promise.all([
+const [home, story, eventComposer, account, auth, prepare, eventPolicy, songPolicy, schema, androidConfig, iosConfig] = await Promise.all([
   read('index.html'),
   read('home-story-composer.js'),
   read('event-social-composer.js'),
@@ -9,7 +9,9 @@ const [home, story, eventComposer, account, auth, prepare, eventPolicy, songPoli
   read('scripts/prepare-web.mjs'),
   read('supabase/migrations/20261111173858_allow_all_users_to_publish_events.sql'),
   read('supabase/migrations/20261111171633_artist_song_submissions_with_producer.sql'),
-  read('supabase/schema.sql')
+  read('supabase/schema.sql'),
+  read('scripts/configure-android-media.py'),
+  read('scripts/prepare-ios-info.py')
 ]);
 const checks = [
   ['atalho + de Stories fica na tela inicial', home.includes('id="home-story-add"')],
@@ -30,6 +32,7 @@ const checks = [
   ['envio de música exige ficha de artista no backend', auth.includes('export async function uploadMySong') && auth.includes("from('artists')") && auth.includes('if (!artistProfile) throw new Error')],
   ['RLS permite apenas artista ou administrador enviar áudio', songPolicy.includes('songs_insert_artist_pending_or_admin') && songPolicy.includes('audio_upload_artist_own_folder_or_admin')],
   ['pacote Android/iOS inclui os dois compositores', prepare.includes("'home-story-composer.js'") && prepare.includes("'event-social-composer.js'") && prepare.includes("'conta.html'")],
+  ['GPS tem permissões nativas configuradas no Android e iOS', androidConfig.includes('android.permission.ACCESS_FINE_LOCATION') && androidConfig.includes('android.permission.ACCESS_COARSE_LOCATION') && iosConfig.includes('NSLocationWhenInUseUsageDescription')],
   ['Radar inclui vídeos engraçados e informações do Funk Consciente', home.includes('videos+engracados+funk+brasil') && home.includes('news.google.com/search?q=funk')]
 ];
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO') + ' ' + name);
