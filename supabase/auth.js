@@ -419,13 +419,19 @@ export async function isCurrentUserArtistOrAdmin() {
   return await isCurrentUserAdmin();
 }
 
-export async function uploadMySong({ file, title, artistName, description = '' }) {
+export async function uploadMySong({ file, title, artistName, producerName = '', description = '' }) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para enviar uma música.');
-  // A autorização é confirmada pela função administrativa no banco; tipo de perfil artístico não concede publicação.
-  if (!(await isCurrentUserAdmin())) throw new Error('Somente a administração e a equipe autorizada podem publicar músicas.');
+  // Artistas com ficha própria enviam para análise; a equipe mantém a publicação no catálogo.
+  const isAdmin = await isCurrentUserAdmin();
+  if (!isAdmin) {
+    const { data: artistProfile, error: artistError } = await supabase.from('artists')
+      .select('id').eq('user_id', user.id).maybeSingle();
+    if (artistError) throw artistError;
+    if (!artistProfile) throw new Error('Salve primeiro sua ficha artística para liberar o envio de músicas.');
+  }
   if (!(file instanceof File)) throw new Error('Selecione um arquivo de áudio.');
   // Alguns seletores de arquivo do Android informam aliases ou MIME genérico.
   // Aceita MIME conhecido ou extensão de áudio permitida e grava sempre o MIME canônico.
@@ -443,18 +449,20 @@ export async function uploadMySong({ file, title, artistName, description = '' }
   if (file.size < 1 || file.size > 50 * 1024 * 1024) throw new Error('A música deve ter até 50 MB.');
   const cleanTitle = String(title || '').trim();
   const cleanArtist = String(artistName || '').trim();
+  const cleanProducer = String(producerName || '').trim();
   const cleanDescription = String(description || '').trim();
   if (cleanTitle.length < 1 || cleanTitle.length > 120) throw new Error('O título deve ter até 120 caracteres.');
   if (cleanArtist.length < 2 || cleanArtist.length > 100) throw new Error('Informe o nome artístico (até 100 caracteres).');
+  if (cleanProducer.length > 100) throw new Error('O nome do produtor deve ter até 100 caracteres.');
   if (cleanDescription.length > 1000) throw new Error('A descrição deve ter até 1.000 caracteres.');
   const canonicalMime = ({mp3:'audio/mpeg',m4a:'audio/mp4',aac:'audio/aac',wav:'audio/wav',ogg:'audio/ogg'})[extension];
   const path = user.id + '/songs/' + crypto.randomUUID() + '.' + extension;
   const { error: uploadError } = await supabase.storage.from('capital-do-trem-audio').upload(path,file,{contentType:canonicalMime,cacheControl:'3600',upsert:false});
   if (uploadError) throw uploadError;
   const { data, error } = await supabase.from('songs').insert({
-    user_id:user.id,title:cleanTitle,artist_name:cleanArtist,description:cleanDescription,
-    storage_path:path,mime_type:canonicalMime,file_size:file.size,status:'published'
-  }).select('id,title,artist_name,status,created_at').single();
+    user_id:user.id,title:cleanTitle,artist_name:cleanArtist,producer_name:cleanProducer,description:cleanDescription,
+    storage_path:path,mime_type:canonicalMime,file_size:file.size,status:isAdmin?'published':'pending'
+  }).select('id,title,artist_name,producer_name,status,created_at').single();
   if (error) {
     await supabase.storage.from('capital-do-trem-audio').remove([path]);
     throw error;
@@ -468,7 +476,7 @@ export async function getMySongs() {
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para consultar suas músicas.');
   const { data, error } = await supabase.from('songs')
-    .select('id,title,artist_name,description,status,created_at')
+    .select('id,title,artist_name,producer_name,description,status,created_at')
     .eq('user_id',user.id).order('created_at',{ascending:false});
   if (error) throw error;
   return data || [];
@@ -477,7 +485,7 @@ export async function getMySongs() {
 export async function getPublishedSongs() {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('songs')
-    .select('id,title,artist_name,description,storage_path')
+    .select('id,title,artist_name,producer_name,description,storage_path')
     .eq('status','published').order('created_at',{ascending:false}).limit(100);
   if (error) throw error;
   const songs = await Promise.all((data || []).map(async song => {
@@ -492,6 +500,7 @@ export async function getPublishedSongs() {
       id:song.id,
       title:song.title,
       artist_name:song.artist_name,
+      producer_name:song.producer_name || '',
       description:song.description,
       audio_url:signed.signedUrl,
       download_url:downloadable.signedUrl
