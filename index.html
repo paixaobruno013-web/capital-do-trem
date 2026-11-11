@@ -1654,6 +1654,7 @@ async function saveOfflineMusic(id,blob,title){
    else{intro.addEventListener('load',()=>{intro.style.visibility='visible';begin();},{once:true});intro.addEventListener('error',()=>{intro.style.visibility='visible';begin();},{once:true});}
   }
  }
+   if(!opening&&!openingVideo){const fallback=document.querySelector('.intro-smoke__brand img');if(fallback)fallback.style.visibility='visible';}
    const headerBgUrl=safeUrl(branding.headerBackgroundImageUrl);
   const appHeader=document.querySelector('body>header');
   if(appHeader&&headerBgUrl){
