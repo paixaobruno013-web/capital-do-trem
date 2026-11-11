@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [home, story, eventComposer, account, auth, prepare, eventPolicy, songPolicy] = await Promise.all([
+const [home, story, eventComposer, account, auth, prepare, eventPolicy, songPolicy, schema] = await Promise.all([
   read('index.html'),
   read('home-story-composer.js'),
   read('event-social-composer.js'),
@@ -21,7 +21,7 @@ const checks = [
   ['agenda consulta somente eventos publicados e com data de hoje em diante', /export async function getPublishedEvents\(\)[\s\S]*?\.eq\('status','published'\)[\s\S]*?\.gte\('event_date',today\)/.test(auth)],
   ['evento tem painel com foto, corte, efeitos, GPS e música', /event-social-photo/.test(home) && /event-social-zoom/.test(home) && /event-social-filter/.test(home) && /event-social-gps/.test(home) && /event-social-music/.test(home)],
   ['evento salva imagem cortada com efeito e envia publicação', /makeCroppedImage/.test(eventComposer) && /getCurrentPosition/.test(eventComposer) && /submitMyEvent\(/.test(eventComposer)],
-  ['publicação de eventos não exige perfil de artista', /create policy events_insert_authenticated[\s\S]*?created_by = \(select auth\.uid\(\)\)[\s\S]*?status = 'published'/.test(eventPolicy) && !/account_type\s*=\s*'artist'/.test(eventPolicy)],
+  ['schema base mantém eventos para qualquer conta autenticada', /create policy events_insert_authenticated[\\s\\S]*?created_by = \\(select auth\\.uid\\(\\)\\)/.test(schema) && !/create policy \\"events_publish_artist_or_admin\\"/.test(schema)],\n  ['publicação de eventos não exige perfil de artista', /create policy events_insert_authenticated[\s\S]*?created_by = \(select auth\.uid\(\)\)[\s\S]*?status = 'published'/.test(eventPolicy) && !/account_type\s*=\s*'artist'/.test(eventPolicy)],
   ['painel musical fica na área de perfil artístico', /id="artist-profile-area" hidden/.test(account) && /artistProfileArea\.hidden=\(profile\?\.account_type\|\|'user'\)!=='artist'/.test(account)],
   ['painel musical identifica título, artista e produtor', /artist-song-submit-title/.test(account) && /artist-song-submit-artist/.test(account) && /artist-song-submit-producer/.test(account) && /producer_name/.test(auth)],
   ['envio de áudio chama uploadMySong com nome do produtor', /uploadMySong\(\{[\s\S]*?producerName:document\.getElementById\('artist-song-submit-producer'\)/.test(account)],
