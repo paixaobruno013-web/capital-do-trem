@@ -140,13 +140,24 @@ function openComposer() {
     }
   }).catch(() => {});
 }
-function closeComposer() {
-  if (recorder?.state === 'recording') recorder.stop();
+function releaseCameraResources() {
   clearTimeout(recordLimit);
   if (renderFrame) cancelAnimationFrame(renderFrame);
+  renderFrame = 0;
   if (processedStream) processedStream.getTracks().forEach(track => track.stop());
   processedStream = null;
   stopCamera();
+}
+function closeComposer() {
+  const activeRecorder = recorder;
+  if (activeRecorder?.state === 'recording') {
+    // Let MediaRecorder finish writing its final chunk before stopping its tracks.
+    activeRecorder.addEventListener('stop', releaseCameraResources, { once: true });
+    activeRecorder.stop();
+    recordButton.textContent = '● Vídeo';
+  } else {
+    releaseCameraResources();
+  }
   clearPreview();
   modal?.classList.remove('is-open');
   modal?.setAttribute('aria-hidden', 'true');
@@ -189,7 +200,11 @@ function startFilteredRecording() {
   };
   draw();
   const videoStream = canvas.captureStream?.(30);
-  if (!videoStream) return stream;
+  if (!videoStream) {
+    if (renderFrame) cancelAnimationFrame(renderFrame);
+    renderFrame = 0;
+    throw new Error('Canvas captureStream indisponível');
+  }
   stream.getAudioTracks().forEach(track => videoStream.addTrack(track));
   processedStream = videoStream;
   return videoStream;
@@ -236,6 +251,11 @@ function toggleRecording() {
       if (recorder?.state === 'recording') recorder.stop();
     }, 30000);
   } catch (error) {
+    if (renderFrame) cancelAnimationFrame(renderFrame);
+    renderFrame = 0;
+    if (processedStream) processedStream.getTracks().forEach(track => track.stop());
+    processedStream = null;
+    recordButton.textContent = '● Vídeo';
     say('Não foi possível iniciar a gravação com efeitos neste aparelho. Escolha um vídeo do álbum.');
   }
 }
