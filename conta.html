@@ -84,6 +84,25 @@ audio{width:100%;}
 .story-compose-actions{display:flex;gap:9px;flex-wrap:wrap}
 .story-compose-actions button{flex:1;min-width:130px}
 </style>
+<style>
+.artist-song-studio{margin:18px 0;border:1px solid rgba(237,28,36,.42);background:radial-gradient(circle at 0 0,rgba(237,28,36,.15),transparent 48%),linear-gradient(145deg,#171719,#09090a);box-shadow:0 12px 34px #0005}
+.artist-song-studio-head{display:flex;align-items:center;gap:13px;margin-bottom:18px}
+.artist-song-studio-head h3{margin:0 0 4px;font-size:19px;color:#fff}
+.artist-song-studio-head p{margin:0;color:#bbb;font-size:13px}
+.artist-song-studio-icon{width:52px;height:52px;display:grid;place-items:center;border-radius:16px;background:linear-gradient(145deg,#ed1c24,#8e1016);color:white;font-size:29px;box-shadow:0 0 22px #ed1c2455}
+.artist-audio-drop{min-height:112px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:1px dashed #ed1c24;border-radius:15px;background:#ed1c2410;color:#fff;cursor:pointer;text-align:center;padding:15px}
+.artist-audio-drop span{font-size:27px;color:#ff4b53;font-weight:900}
+.artist-audio-drop small,.artist-audio-file-info{color:#aaa;font-size:12px}
+.artist-audio-file-info{padding:9px 2px}
+.artist-song-preview-wrap audio{width:100%;margin:6px 0 14px}
+.artist-song-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.artist-song-producer-field{grid-column:1/-1}
+.artist-song-submit-button{width:100%;margin-top:12px;min-height:48px;background:linear-gradient(110deg,#ed1c24,#9d1018);box-shadow:0 0 18px #ed1c243d;font-weight:900}
+.artist-song-history{margin-top:18px;border-top:1px solid #ffffff18;padding-top:13px}
+.artist-song-history h4{margin:0 0 8px;color:#fff}
+.artist-song-review-note{font-size:12px;margin-bottom:0}
+@media(max-width:520px){.artist-song-fields{grid-template-columns:1fr}.artist-song-producer-field{grid-column:auto}}
+</style>
 </head>
 <body>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
@@ -168,6 +187,26 @@ audio{width:100%;}
 <p id="artist-status" class="status" role="status" aria-live="polite"></p>
 </form>
 
+<section class="card artist-song-studio" id="artist-song-submit-panel" aria-labelledby="artist-song-submit-title">
+ <div class="artist-song-studio-head"><span class="artist-song-studio-icon">♫</span><div><h3 id="artist-song-submit-title">Seu som merece chegar longe</h3><p>Envie sua faixa para o catálogo do Capital do Trem</p></div></div>
+ <form id="artist-song-submit-form">
+  <label for="artist-song-submit-file">Arquivo da música</label>
+  <label class="artist-audio-drop" for="artist-song-submit-file"><span>＋</span><strong>Escolher arquivo de áudio</strong><small>MP3, M4A, AAC, WAV ou OGG • até 50 MB</small></label>
+  <input id="artist-song-submit-file" type="file" accept="audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/x-wav,audio/ogg,.mp3,.m4a,.aac,.wav,.ogg" required hidden>
+  <div id="artist-song-submit-file-info" class="artist-audio-file-info">Nenhum arquivo selecionado</div>
+  <div class="artist-song-preview-wrap"><audio id="artist-song-submit-preview" controls preload="metadata" hidden></audio></div>
+  <div class="artist-song-fields">
+   <div><label for="artist-song-submit-title">Nome da música *</label><input id="artist-song-submit-title" maxlength="120" placeholder="Título da sua faixa" required></div>
+   <div><label for="artist-song-submit-artist">Nome artístico *</label><input id="artist-song-submit-artist" maxlength="100" placeholder="Como seu público conhece você" required></div>
+   <div class="artist-song-producer-field"><label for="artist-song-submit-producer">Nome do produtor</label><input id="artist-song-submit-producer" maxlength="100" placeholder="Quem produziu essa faixa (opcional)"></div>
+  </div>
+  <button type="submit" id="artist-song-submit-button" class="artist-song-submit-button">🎵 Enviar minha música</button>
+  <p id="artist-song-submit-status" class="status" role="status" aria-live="polite"></p>
+ </form>
+ <div class="artist-song-history"><h4>Meus envios</h4><div id="artist-song-submit-history" aria-live="polite">Suas faixas enviadas aparecerão aqui.</div></div>
+ <p class="muted artist-song-review-note">Após o envio, a faixa fica privada e passa pela conferência da equipe antes de entrar no catálogo público.</p>
+</section>
+
 </div>
 <section class="card" id="admin-songs-panel" hidden aria-labelledby="admin-songs-title">
 <h3 id="admin-songs-title">🎵 Publicação de músicas — equipe</h3>
@@ -175,6 +214,7 @@ audio{width:100%;}
 <form id="artist-song-form">
 <label for="song-title">Nome da música</label><input id="song-title" maxlength="120" required>
 <label for="song-artist-name">Nome artístico</label><input id="song-artist-name" maxlength="100" required>
+<label for="song-producer-name">Nome do produtor</label><input id="song-producer-name" maxlength="100">
 <label for="song-audio-file">Arquivo de áudio</label><input id="song-audio-file" type="file" accept="audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/x-wav,audio/ogg,.mp3,.m4a,.aac,.wav,.ogg" required>
 <p class="muted" id="song-file-info">Tamanho máximo: 50 MB. Envie somente músicas das quais você tenha autorização de uso.</p>
 <button type="submit" id="submit-song">🎵 Postar música</button>
