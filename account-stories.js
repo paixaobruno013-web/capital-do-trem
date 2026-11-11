@@ -16,7 +16,7 @@ const cancelButton = el('my-story-cancel');
 let previewUrl = '';
 let loading = false;
 let storySongs = [];
-let musicSelect, musicStart, musicVolume, musicPreview;
+let musicSelect, musicStart, musicVolume, musicDuration, musicPreview;
 let observer;
 
 function say(message) { if (status) status.textContent = message; }
@@ -143,6 +143,8 @@ function mountStoryMusicPicker() {
   startLabel.textContent = 'Começar a música em (segundos)';
   musicStart = document.createElement('input');
   musicStart.type = 'number'; musicStart.min = '0'; musicStart.max = '3600'; musicStart.step = '1'; musicStart.value = '0';
+  const durationLabel = document.createElement('label'); durationLabel.textContent = 'Duração do trecho (5 a 60 segundos)';
+  musicDuration = document.createElement('input'); musicDuration.type = 'number'; musicDuration.min = '5'; musicDuration.max = '60'; musicDuration.step = '1'; musicDuration.value = '15';
   const volumeLabel = document.createElement('label');
   volumeLabel.textContent = 'Volume da música';
   musicVolume = document.createElement('input');
@@ -159,7 +161,7 @@ function mountStoryMusicPicker() {
   musicStart.addEventListener('change', () => { if (musicPreview.src) { try { musicPreview.currentTime = Number(musicStart.value) || 0; } catch {} } });
   musicVolume.addEventListener('input', () => { if (musicPreview) musicPreview.volume = Number(musicVolume.value); });
   if (!storySongs.length) { const empty = document.createElement('p'); empty.className = 'muted'; empty.textContent = 'O catálogo ainda não tem músicas publicadas disponíveis. Você pode publicar o Story normalmente sem trilha.'; wrap.append(heading, hint, empty); }
-  else wrap.append(heading, hint, label, musicSelect, startLabel, musicStart, volumeLabel, musicVolume, musicPreview);
+  else wrap.append(heading, hint, label, musicSelect, startLabel, musicStart, durationLabel, musicDuration, volumeLabel, musicVolume, musicPreview);
   const caption = document.getElementById('my-story-caption');
   composeFields.insertBefore(wrap, caption?.parentElement || composeFields.firstChild);
 }
@@ -201,7 +203,7 @@ form?.addEventListener('submit', async event => {
   publishButton.textContent = 'PUBLICANDO…';
   say('Enviando sua publicação…');
   try {
-    await auth.createMyStory({ file, caption: captionInput.value, musicSongId: musicSelect?.value || '', musicStartSeconds: musicStart?.value || 0, musicVolume: musicVolume?.value || 0.8 });
+    await auth.createMyStory({ file, caption: captionInput.value, musicSongId: musicSelect?.value || '', musicStartSeconds: musicStart?.value || 0, musicVolume: musicVolume?.value || 0.8, musicDurationSeconds: musicDuration?.value || 15 });
     clearStoryDraft();
     await loadStories();
     say('🟢 Seu Story foi publicado! Ele já aparece para a comunidade por 24 horas.');
