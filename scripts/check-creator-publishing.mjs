@@ -22,6 +22,7 @@ const checks = [
   ['Story é publicado pelo modal da tela inicial', story.includes('createMyStory(') && home.includes('home-story-publish')],
   ['feed de eventos aparece antes dos vídeos do YouTube', home.indexOf('id="home-event-feed"') >= 0 && home.indexOf('id="home-event-feed"') < home.indexOf('class="card home-youtube"')],
   ['feed some quando não há eventos dentro da data', home.includes('if(!active.length){feed.hidden=true;return;}')],
+  ['feed reavalia expiração a cada virada de data', home.includes('const scheduleHomeExpiryRefresh=()=>') && home.includes('scheduleHomeExpiryRefresh();')],
   ['agenda consulta eventos publicados de hoje em diante', auth.includes('export async function getPublishedEvents()') && auth.includes(".eq('status','published')") && auth.includes(".gte('event_date',today)")],
   ['evento oferece foto, corte, efeitos, GPS e música', ['event-social-photo','event-social-zoom','event-social-filter','event-social-gps','event-social-music'].every(id => home.includes('id="'+id+'"'))],
   ['evento salva imagem cortada com efeito e envia publicação', eventComposer.includes('makeCroppedImage') && eventComposer.includes('getCurrentPosition') && eventComposer.includes('submitMyEvent(')],
