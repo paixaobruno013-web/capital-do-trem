@@ -1420,7 +1420,7 @@ export async function createAdminStory({ file, caption = '', musicSongId = '', m
 export async function getActiveAdminStories() {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('admin_stories')
-    .select('id,media_url,media_type,caption,music_url,music_title,music_artist,music_start_seconds,music_volume,created_at,expires_at')
+    .select('id,media_url,media_type,caption,music_url,music_title,music_artist,music_start_seconds,music_volume,music_duration_seconds,created_at,expires_at')
     .eq('published', true)
     .gt('expires_at', new Date().toISOString())
     .order('created_at', { ascending: true });
@@ -1432,7 +1432,7 @@ export async function getAdminStories() {
   const supabase = initSupabase();
   if (!(await isCurrentUserAdmin())) throw new Error('Acesso administrativo não autorizado.');
   const { data, error } = await supabase.from('admin_stories')
-    .select('id,media_url,media_type,caption,music_url,music_title,music_artist,music_start_seconds,music_volume,created_at,expires_at,published')
+    .select('id,media_url,media_type,caption,music_url,music_title,music_artist,music_start_seconds,music_volume,music_duration_seconds,created_at,expires_at,published')
     .order('created_at', { ascending: false })
     .limit(30);
   if (error) throw error;
@@ -1509,7 +1509,7 @@ export async function createMyStory({ file, caption = '', musicSongId = '', musi
     caption: cleanCaption,
     ...music,
     expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-  }).select('id,author_id,display_name,username,avatar_url,media_url,media_type,caption,music_url,music_title,music_artist,music_start_seconds,music_volume,created_at,expires_at').single();
+  }).select('id,author_id,display_name,username,avatar_url,media_url,media_type,caption,music_url,music_title,music_artist,music_start_seconds,music_volume,music_duration_seconds,created_at,expires_at').single();
   if (error) {
     await supabase.storage.from('capital-do-trem-media').remove([path]);
     throw error;
@@ -1520,7 +1520,7 @@ export async function createMyStory({ file, caption = '', musicSongId = '', musi
 export async function getActiveUserStories() {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('user_stories')
-    .select('id,author_id,display_name,username,avatar_url,media_url,media_type,caption,music_url,music_title,music_artist,music_start_seconds,music_volume,created_at,expires_at')
+    .select('id,author_id,display_name,username,avatar_url,media_url,media_type,caption,music_url,music_title,music_artist,music_start_seconds,music_volume,music_duration_seconds,created_at,expires_at')
     .gt('expires_at', new Date().toISOString())
     .order('created_at', { ascending: true });
   if (error) throw error;
@@ -1533,7 +1533,7 @@ export async function getMyStories() {
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para ver seus Stories.');
   const { data, error } = await supabase.from('user_stories')
-    .select('id,media_path,media_url,media_type,caption,music_url,music_title,music_artist,music_start_seconds,music_volume,created_at,expires_at')
+    .select('id,media_path,media_url,media_type,caption,music_url,music_title,music_artist,music_start_seconds,music_volume,music_duration_seconds,created_at,expires_at')
     .eq('author_id', user.id)
     .order('created_at', { ascending: false })
     .limit(30);
