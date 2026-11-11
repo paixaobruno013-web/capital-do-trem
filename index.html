@@ -917,7 +917,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <section class="card home-friends" id="home-friends" aria-labelledby="home-friends-title"><div class="home-friends-row"><div><h2 id="home-friends-title">🤝 Friends — Fazer amizades</h2><p class="muted">Conheça a comunidade e encontre novas amizades no Capital do Trem.</p></div><a class="btn" href="./bate-papo.html#fazer-amigos">Entrar no Friends</a></div><div class="home-friends-actions"><a class="btn alt" href="./bate-papo.html#fazer-amigos">Ver pessoas da comunidade</a><a class="btn alt" href="#eventos" data-go="eventos">Eventos da galera</a></div></section>
 <section class="card home-youtube" aria-labelledby="home-youtube-title">
 <h2 id="home-youtube-title">▶ Vídeos da Capital do Trem</h2>
-<p class="muted">Todos os vídeos em um único fluxo, sem categorias. Toque para assistir aqui mesmo, curta, comente ou compartilhe.</p>
+<p class="muted">Os seis vídeos originais do projeto. Quando houver evento dentro da data, sua divulgação aparece aqui acima desta seleção.</p>
 <p id="youtube-feed-status" class="muted" role="status" aria-live="polite">Carregando vídeos…</p>
 <div class="home-youtube-grid" aria-live="polite"></div>
 </section>
@@ -1575,7 +1575,10 @@ function renderHomeEventFeed(events){
  const feed=document.getElementById('home-event-feed');
  const list=document.getElementById('home-event-feed-list');
  if(!feed||!list)return;
- const active=(events||[]).filter(item=>item.event_date>=(()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');})());
+ const now=new Date();
+ const today=[now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),String(now.getDate()).padStart(2,'0')].join('-');
+ const active=(events||[]).filter(item=>typeof item.event_date==='string'&&item.event_date.slice(0,10)>=today)
+  .sort((a,b)=>a.event_date.localeCompare(b.event_date)||String(a.event_time||'00:00').localeCompare(String(b.event_time||'00:00')));
  list.replaceChildren();
  if(!active.length){feed.hidden=true;return;}
  feed.hidden=false;
@@ -1898,7 +1901,7 @@ async function saveOfflineMusic(id,blob,title){
     video.style.zIndex='2';video.style.opacity='1';
     screen.insertBefore(video,screen.firstChild);screen.classList.add('custom-opening-screen');
     // A imagem é mostrada primeiro; o vídeo só aparece quando o navegador confirma reprodução real.
-    video.load();
+    // A carga é iniciada somente depois de registrar os eventos para não perder loadeddata.
     // O áudio fica habilitado por padrão. Se Android/iOS bloquear autoplay com som,
     // o botão de ativação aparece somente quando o navegador confirmar o bloqueio.
     const audioButton=document.createElement('button');audioButton.type='button';audioButton.textContent='🔊 TOQUE PARA LIBERAR O SOM';
@@ -1912,29 +1915,54 @@ async function saveOfflineMusic(id,blob,title){
     video.addEventListener('play',()=>{if(!video.muted)audioButton.remove();});
     // Mantém o próprio vídeo visível durante carregamento e retomadas, sem poster/logo sobreposto.
     video.addEventListener('playing',()=>{video.style.opacity='1';});
-    video.addEventListener('error',()=>{console.warn('Vídeo de abertura indisponível.');},{once:true});
-    const movingTrain=document.getElementById('opening-live-train');
+        const movingTrain=document.getElementById('opening-live-train');
     const startOpeningTrain=()=>{if(!movingTrain||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;movingTrain.style.setProperty('animation','none','important');void movingTrain.offsetWidth;movingTrain.style.setProperty('animation','opening-train-cross-sky 5s linear 1 both','important');};
     if(movingTrain)movingTrain.style.setProperty('animation','none','important');
     const bar=document.getElementById('opening-live-progress');
-    let progress=3,finished=false,clockStarted=false,finishTimer=null;
+    let progress=3,finished=false,clockStarted=false,finishTimer=null,fallbackTimer=null;
     const paint=()=>{if(bar)bar.style.width=progress+'%';};
-    const finish=()=>{if(finished)return;finished=true;progress=100;paint();screen.classList.add('is-finished');window.setTimeout(()=>screen.remove(),600);};
-    const beginOpeningClock=()=>{if(clockStarted)return;clockStarted=true;startOpeningTrain();finishTimer=window.setTimeout(finish,7000);};
+    const finish=()=>{
+     if(finished)return;
+     finished=true;clearTimeout(finishTimer);clearTimeout(fallbackTimer);clearInterval(loader);
+     progress=100;paint();video.pause();screen.classList.add('is-finished');
+     window.setTimeout(()=>screen.remove(),600);
+    };
+    const beginOpeningClock=()=>{if(clockStarted||finished)return;clockStarted=true;startOpeningTrain();finishTimer=window.setTimeout(finish,7000);};
     const loader=window.setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}else window.clearInterval(loader);},220);
+    const showOpeningFallback=()=>{
+     if(finished||video.dataset.fallbackShown==='yes')return;
+     video.dataset.fallbackShown='yes';clearTimeout(fallbackTimer);
+     try{video.pause();video.removeAttribute('src');video.load();}catch{}
+     video.remove();
+     const fallback=document.createElement('img');
+     fallback.className='opening-video-fallback';fallback.src=currentOpeningImage||'./marca.svg';fallback.alt='';
+     fallback.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:'+(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%;z-index:2';
+     screen.insertBefore(fallback,screen.firstChild);
+     audioButton.style.display='none';
+     beginOpeningClock();
+    };
     // Abertura e trem começam juntos; a rede não pode empurrar a duração para 20+ segundos.
     beginOpeningClock();
-    video.addEventListener('loadeddata',()=>{
+    video.addEventListener('playing',()=>{clearTimeout(fallbackTimer);if(savedOpeningSound&&!video.muted)audioButton.remove();});
+    video.addEventListener('loadeddata',async()=>{
      video.playbackRate=1;
-     video.play().then(()=>{if(savedOpeningSound&&!video.muted)audioButton.remove();}).catch(async error=>{
-      if(savedOpeningSound){audioButton.style.display='block';video.muted=true;video.defaultMuted=true;try{await video.play();}catch(playError){console.warn('Reprodução automática bloqueada pelo navegador.',playError);}}
-      else console.warn('Não foi possível iniciar o vídeo de abertura.',error);
-     });
+     try{
+      await video.play();
+      clearTimeout(fallbackTimer);
+      if(savedOpeningSound&&!video.muted)audioButton.remove();
+     }catch(error){
+      if(savedOpeningSound){
+       audioButton.style.display='block';video.muted=true;video.defaultMuted=true;
+      }
+      try{await video.play();clearTimeout(fallbackTimer);}
+      catch(playError){console.warn('Não foi possível reproduzir o vídeo de abertura; usando a imagem de segurança.',playError);showOpeningFallback();}
+     }
     },{once:true});
-    video.addEventListener('error',()=>{console.warn('Vídeo de abertura indisponível; mantendo o vídeo sem imagem extra.');beginOpeningClock();},{once:true});
-    // A duração da abertura é fixa em 7 segundos, independentemente da duração do arquivo.
+    video.addEventListener('error',()=>{console.warn('Falha ao carregar o vídeo de abertura; usando a imagem de segurança.');showOpeningFallback();},{once:true});
+    // Se a rede não entregar um quadro em cinco segundos, a abertura usa a imagem aprovada em vez de ficar preta.
     video.addEventListener('ended',finish,{once:true});
-    // O poster e a animação continuam mesmo se o vídeo não terminar de carregar; a abertura fecha no relógio fixo de 7 s.
+    video.load();
+    fallbackTimer=window.setTimeout(showOpeningFallback,5000);
    }
   }
  }catch(error){
