@@ -1427,8 +1427,8 @@ updateConnectionStatus();
  if(!list||!search||!distance||!count)return;
  try{
   const module=await import('./supabase/auth.js');const supabase=module.initSupabase();
-  const profiles=await module.getPublicProfiles();const {data:{user}}=await supabase.auth.getUser();
-  const own=profiles.find(p=>p.user_id===user?.id);const ownCity=String(own?.city||'').trim().toLocaleLowerCase('pt-BR');
+  const profiles=await module.getPublicProfiles();const session=await module.getCurrentSession();
+  const own=session?.user?await module.getMyBasicProfile():null;const ownCity=String(own?.city||'').trim().toLocaleLowerCase('pt-BR');
   const candidates=profiles.filter(p=>p.user_id!==user?.id);
   const render=()=>{
    const term=search.value.trim().toLocaleLowerCase('pt-BR'),mode=distance.value;
@@ -1439,7 +1439,7 @@ updateConnectionStatus();
     const card=document.createElement('article');card.className='item community-profile-card';const avatar=document.createElement('div');avatar.className='community-profile-avatar';
     if(p.avatar_type==='photo'&&typeof p.avatar_url==='string'&&p.avatar_url.startsWith('https://')){const img=document.createElement('img');img.src=p.avatar_url;img.alt='Foto de '+(p.display_name||'participante');img.loading='lazy';img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';avatar.append(img);}else avatar.textContent=p.avatar_type==='character'?'🎭':Array.from((p.display_name||'U').trim())[0]?.toLocaleUpperCase('pt-BR')||'U';
     const copy=document.createElement('div');copy.className='community-profile-copy';const name=document.createElement('strong');name.textContent=p.display_name||'Participante do Capital do Trem';const handle=document.createElement('p');handle.className='muted';handle.textContent='@'+(p.username||'usuario');const meta=document.createElement('div');meta.className='community-profile-meta';const role=document.createElement('span');role.className='community-profile-role';role.textContent=p.account_type==='artist'?'Artista / DJ':'Usuário Uai';meta.append(role);const city=document.createElement('p');city.className='muted community-profile-city';city.textContent=p.city||'Cidade não informada';copy.append(name,handle,meta,city);
-    if(p.bio){const bio=document.createElement('p');bio.className='community-profile-bio';bio.textContent=p.bio;copy.append(bio);}const chat=document.createElement('a');chat.className='btn alt';chat.href='./bate-papo.html';chat.textContent='Conhecer no Koe Fala Tu';chat.style.marginTop='8px';copy.append(chat);card.append(avatar,copy);list.append(card);
+    if(p.bio){const bio=document.createElement('p');bio.className='community-profile-bio';bio.textContent=p.bio;copy.append(bio);}const chat=document.createElement('a');chat.className='btn alt';chat.href='./bate-papo.html';chat.textContent='Abrir Koe Fala Tu';chat.style.marginTop='8px';copy.append(chat);card.append(avatar,copy);list.append(card);
    }
   };
   search.addEventListener('input',render);distance.addEventListener('change',render);render();
