@@ -81,7 +81,15 @@ function createHomeVideoCard(video, orderText, linkText = 'Assistir no YouTube')
   share.textContent = '↗ Compartilhar';
   share.setAttribute('aria-label', 'Compartilhar ' + String(video.title || 'vídeo'));
   share.addEventListener('click', () => shareHomeVideo(video));
-  actions.append(link, share);
+  const sendPrivate = document.createElement('a');
+  sendPrivate.className = 'btn alt home-youtube-private-share';
+  sendPrivate.textContent = '💬 Koe Fala Tu';
+  const privateUrl = new URL('./mensagens.html', window.location.href);
+  privateUrl.searchParams.set('share_title', String(video.title || 'Vídeo do Capital do Trem').slice(0, 160));
+  privateUrl.searchParams.set('share_url', 'https://youtu.be/' + video.id);
+  privateUrl.searchParams.set('share_source', 'YouTube');
+  sendPrivate.href = privateUrl.pathname + privateUrl.search;
+  actions.append(link, share, sendPrivate);
   article.append(order, frame, actions);
   return article;
 }
