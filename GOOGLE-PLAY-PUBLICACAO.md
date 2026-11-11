@@ -57,6 +57,7 @@ Fontes oficiais:
 - [ ] Instalar o pacote de lançamento em aparelhos reais e testar login, cadastro, navegação, áudio, reprodução com tela bloqueada (se suportada), upload autorizado, chat, eventos, localização, links externos, offline e atualização.
 - [ ] Conferir no Supabase as políticas RLS e as permissões de Storage. A restrição na interface não substitui a proteção no servidor.
 - [ ] Validar a política de privacidade contra o comportamento real do app nativo e os SDKs incluídos.
+- [x] Implementar fluxo autenticado de exclusão de conta dentro de Minha conta e página pública de instruções: https://paixaobruno013-web.github.io/capital-do-trem/account-deletion.html (a validação real com conta de teste ainda é necessária antes do envio).
 - [ ] Preencher a seção Segurança dos dados com informações verdadeiras sobre coleta, compartilhamento, retenção e exclusão. Não marcar respostas por suposição.
 - [ ] Declarar anúncios, público-alvo, classificação indicativa, permissões e instruções de acesso para os revisores.
 - [ ] Criar ícone de loja 512×512, imagem de destaque 1024×500 e capturas de tela reais do app em execução.
