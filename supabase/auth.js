@@ -1460,3 +1460,40 @@ export function subscribeUserStories(callback) {
     .subscribe();
   return () => { supabase.removeChannel(channel); };
 }
+
+
+async function accountDeletionFunctionError(error, fallback) {
+  let message = error?.message || fallback;
+  try {
+    const response = error?.context;
+    if (response && typeof response.clone === 'function') {
+      const payload = await response.clone().json();
+      if (payload?.error) message = payload.error;
+    }
+  } catch {}
+  return new Error(message);
+}
+
+export async function previewMyAccountDeletion() {
+  const supabase = initSupabase();
+  const { data, error } = await supabase.functions.invoke('delete-account', {
+    body: { action: 'preview' }
+  });
+  if (error) throw await accountDeletionFunctionError(error, 'Não foi possível revisar os dados da conta.');
+  if (!data?.ok || data?.canDelete !== true) throw new Error(data?.error || 'Não foi possível revisar os dados da conta.');
+  return data;
+}
+
+export async function deleteMyAccount(confirmation) {
+  const supabase = initSupabase();
+  if (String(confirmation || '') !== 'EXCLUIR MINHA CONTA') {
+    throw new Error('Digite exatamente EXCLUIR MINHA CONTA para confirmar.');
+  }
+  const { data, error } = await supabase.functions.invoke('delete-account', {
+    body: { action: 'delete', confirmation: String(confirmation) }
+  });
+  if (error) throw await accountDeletionFunctionError(error, 'Não foi possível excluir a conta.');
+  if (!data?.deleted) throw new Error(data?.error || 'O serviço não confirmou a exclusão da conta.');
+  await supabase.auth.signOut({ scope: 'local' });
+  return data;
+}
