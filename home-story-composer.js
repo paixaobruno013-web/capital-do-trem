@@ -13,6 +13,9 @@ const publish = el('home-story-publish');
 const saveButton = el('home-story-save');
 const recordButton = el('home-story-record-button');
 const flipButton = el('home-story-flip-button');
+const zoomControl = el('home-story-zoom');
+const zoomValue = el('home-story-zoom-value');
+let cameraZoom = 1;
 const effectButtons = [...document.querySelectorAll('[data-story-effect]')];
 const effects = {
   natural: { label: 'Natural', css: 'none' },
@@ -104,6 +107,8 @@ async function startCamera() {
       return false;
     }
     stream = cameraStream;
+    cameraZoom = Number(zoomControl?.value || 1);
+    if (zoomValue) zoomValue.textContent = cameraZoom.toFixed(1).replace('.0','') + '×';
     live.srcObject = stream;
     live.hidden = false;
     applyEffect();
@@ -185,7 +190,9 @@ function capturePhoto() {
   canvas.height = live.videoHeight;
   const context = canvas.getContext('2d');
   context.filter = 'none';
-  context.drawImage(live, 0, 0, canvas.width, canvas.height);
+  const cropWidth = canvas.width / cameraZoom;
+  const cropHeight = canvas.height / cameraZoom;
+  context.drawImage(live, (canvas.width-cropWidth)/2, (canvas.height-cropHeight)/2, cropWidth, cropHeight, 0, 0, canvas.width, canvas.height);
   canvas.toBlob(blob => {
     if (!blob) { say('Não foi possível capturar a foto. Tente novamente.'); return; }
     setSelected(new File([blob], 'capital-do-trem-story.jpg', { type: 'image/jpeg' }));
@@ -206,7 +213,9 @@ function startFilteredRecording() {
       return;
     }
     context.filter = effectCss();
-    context.drawImage(live, 0, 0, width, height);
+    const cropWidth = width / cameraZoom;
+    const cropHeight = height / cameraZoom;
+    context.drawImage(live, (width-cropWidth)/2, (height-cropHeight)/2, cropWidth, cropHeight, 0, 0, width, height);
     renderFrame = requestAnimationFrame(draw);
   };
   draw();
@@ -359,7 +368,35 @@ album?.addEventListener('change', () => {
   setSelected(file);
 });
 el('home-story-photo-button')?.addEventListener('click', capturePhoto);
-recordButton?.addEventListener('click', toggleRecording);
+// Toque longo grava; soltar encerra. Clique de teclado continua acessível.
+recordButton?.addEventListener('pointerdown', event => {
+  if (event.pointerType === 'mouse' && event.button !== 0) return;
+  event.preventDefault();
+  recordButton.setPointerCapture?.(event.pointerId);
+  if (recorder?.state !== 'recording') toggleRecording();
+});
+const stopHeldRecording = () => {
+  if (recorder?.state === 'recording') toggleRecording();
+};
+recordButton?.addEventListener('pointerup', stopHeldRecording);
+recordButton?.addEventListener('pointercancel', stopHeldRecording);
+recordButton?.addEventListener('lostpointercapture', stopHeldRecording);
+recordButton?.addEventListener('click', event => {
+  if (event.detail === 0) toggleRecording();
+});
+zoomControl?.addEventListener('input', async () => {
+  cameraZoom = Number(zoomControl.value || 1);
+  if (zoomValue) zoomValue.textContent = cameraZoom.toFixed(1).replace('.0','') + '×';
+  const track = stream?.getVideoTracks?.()[0];
+  const capabilities = track?.getCapabilities?.();
+  if (capabilities && 'zoom' in capabilities) {
+    const min = capabilities.zoom.min ?? 1;
+    const max = capabilities.zoom.max ?? 1;
+    const value = min + ((cameraZoom - 1) / 2) * (max - min);
+    try { await track.applyConstraints({ advanced: [{ zoom: Math.min(max, Math.max(min, value)) }] }); }
+    catch (error) { say('O zoom físico não está disponível neste modo de câmera.'); }
+  }
+});
 saveButton?.addEventListener('click', saveToGallery);
 flipButton?.addEventListener('click', async () => {
   facingMode = facingMode === 'environment' ? 'user' : 'environment';
