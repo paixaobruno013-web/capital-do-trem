@@ -738,19 +738,29 @@ async function signChatAttachment(path) {
 }
 async function hydrateChatMessage(message) {
   if (!message?.attachment_path) return message;
-  return { ...message, attachment_url: await signChatAttachment(message.attachment_path) };
+  try { return { ...message, attachment_url: await signChatAttachment(message.attachment_path) }; }
+  catch (error) {
+    console.warn('Anexo temporariamente indisponível; a mensagem continuará visível.', error);
+    return { ...message, attachment_url: null };
+  }
 }
 async function hydrateChatMessages(messages) {
+  const rows = messages || [];
   const supabase = initSupabase();
-  const paths = [...new Set((messages || []).map(m => m.attachment_path).filter(Boolean))];
-  if (!paths.length) return messages || [];
-  const { data, error } = await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).createSignedUrls(paths, 900);
-  if (error) throw error;
-  const signed = new Map((data || []).filter(item => item?.path && item?.signedUrl).map(item => [item.path, item.signedUrl]));
-  return (messages || []).map(message => ({
-    ...message,
-    attachment_url: message.attachment_path ? (signed.get(message.attachment_path) || null) : message.attachment_url
-  }));
+  const paths = [...new Set(rows.map(m => m.attachment_path).filter(Boolean))];
+  if (!paths.length) return rows;
+  try {
+    const { data, error } = await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).createSignedUrls(paths, 900);
+    if (error) throw error;
+    const signed = new Map((data || []).filter(item => item?.path && item?.signedUrl).map(item => [item.path, item.signedUrl]));
+    return rows.map(message => ({
+      ...message,
+      attachment_url: message.attachment_path ? (signed.get(message.attachment_path) || null) : message.attachment_url
+    }));
+  } catch (error) {
+    console.warn('Não foi possível assinar alguns anexos; as mensagens continuam disponíveis.', error);
+    return rows.map(message => ({ ...message, attachment_url: message.attachment_url || null }));
+  }
 }
 
 // Bate-papo geral em tempo real para todos os usuários autenticados.
