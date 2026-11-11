@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 const index = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const auth = await readFile(new URL('../supabase/auth.js', import.meta.url), 'utf8');
-const sql = await readFile(new URL('../supabase/migrations/20261111024500_music_library.sql', import.meta.url), 'utf8');
+const sql = await readFile(new URL('../supabase/migrations/20261111024251_add_personal_music_library.sql', import.meta.url), 'utf8');
 const checks = [
   [index.includes('id="music-library"'), 'Painel da biblioteca musical ausente.'],
   [index.includes('id="saved-songs-list"') && index.includes('id="recent-songs-list"'), 'Listas de salvas e recentes ausentes.'],
