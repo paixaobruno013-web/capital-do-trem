@@ -54,7 +54,7 @@ create table if not exists public.admin_users (
   created_at timestamptz not null default now()
 );
 
--- Eventos, shows e ações sociais enviados para análise.
+-- Eventos comunitários: qualquer conta autenticada pode publicar; o feed respeita a data do evento.
 create table if not exists public.events (
   id uuid primary key default gen_random_uuid(),
   title text not null check (char_length(title) between 2 and 120),
@@ -433,21 +433,21 @@ alter table public.events
   drop constraint if exists events_longitude_range,
   add constraint events_longitude_range check (longitude is null or longitude between -180 and 180);
 create index if not exists events_published_date_idx on public.events(status,event_date,event_time);
-create policy "events_publish_artist_or_admin" on public.events
+drop policy if exists events_publish_artist_or_admin on public.events;
+drop policy if exists events_publish_immediately on public.events;
+drop policy if exists events_submit_pending on public.events;
+drop policy if exists events_insert_authenticated on public.events;
+create policy events_insert_authenticated on public.events
   for insert to authenticated
   with check (
-    created_by=(select auth.uid())
-    and status='published'
-    and (
-      (select private.is_admin())
-      or exists (
-        select 1 from public.profiles p
-        where p.user_id=(select auth.uid()) and p.account_type='artist'
-      )
-    )
+    created_by = (select auth.uid())
+    and status = 'published'
     and (
       music_song_id is null
-      or exists (select 1 from public.songs s where s.id=music_song_id and s.status='published')
+      or exists (
+        select 1 from public.songs s
+        where s.id = music_song_id and s.status = 'published'
+      )
     )
   );
 alter table public.songs enable row level security;
