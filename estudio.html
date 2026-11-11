@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050505"><title>Estúdio • Capital do Trem</title>
+<style>
+:root{color-scheme:dark;--red:#ed1c24;--panel:#151515;--line:#343434;--muted:#aaa}*{box-sizing:border-box}body{margin:0;background:#050505;color:#fff;font:16px system-ui,sans-serif}main{width:min(760px,100%);margin:auto;padding:18px 14px 40px}.top{display:flex;align-items:center;gap:12px;margin-bottom:18px}.top a{color:#fff;text-decoration:none;border:1px solid var(--line);border-radius:10px;padding:9px}.top h1{font-size:21px;margin:0}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;margin:12px 0}.muted{color:var(--muted);font-size:14px}.preview{width:100%;aspect-ratio:9/16;max-height:65vh;background:#000;border-radius:12px;object-fit:contain}.controls{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.btn,button,select{border:1px solid var(--line);border-radius:10px;background:#222;color:#fff;padding:11px 13px;font:inherit}.primary{background:var(--red);border-color:var(--red);font-weight:800}button:disabled{opacity:.45}.filters{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.filters button[aria-pressed=true]{border-color:var(--red);box-shadow:0 0 0 1px var(--red)}label{display:block;margin:10px 0 5px}.status{min-height:22px;color:#ffd1d1;font-size:14px}input[type=file]{max-width:100%}@media(min-width:600px){.layout{display:grid;grid-template-columns:1fr 240px;gap:14px;align-items:start}}
+</style>
+</head>
+<body><main>
+<header class="top"><a href="./index.html">← Voltar</a><h1>📸 Estúdio Capital do Trem</h1></header>
+<p class="muted">Crie fotos e vídeos com filtros antes de compartilhar. A câmera funciona quando o navegador autorizar o acesso.</p>
+<section class="card layout">
+<div>
+<video id="camera" class="preview" playsinline autoplay muted hidden></video>
+<img id="photo" class="preview" alt="Prévia da foto ou vídeo" hidden>
+<video id="recorded" class="preview" controls playsinline hidden></video>
+<canvas id="canvas" hidden></canvas>
+<p id="status" class="status" role="status" aria-live="polite">Escolha uma foto ou abra a câmera.</p>
+<div class="controls"><button id="cameraStart" class="primary">Abrir câmera</button><button id="capture" disabled>📷 Tirar foto</button><button id="record" disabled>🔴 Gravar vídeo</button><button id="stop" disabled>Parar gravação</button></div>
+<div class="controls"><label for="file">Escolher foto ou vídeo</label><input id="file" type="file" accept="image/*,video/*" capture="environment"></div>
+<div class="controls"><button id="download" disabled>Salvar criação no aparelho</button></div>
+</div>
+<div>
+<strong>Filtros e efeitos</strong>
+<p class="muted">Toque para experimentar na prévia.</p>
+<div class="filters" id="filters">
+<button data-filter="none" aria-pressed="true">Original</button><button data-filter="grayscale(1)" aria-pressed="false">P&B</button><button data-filter="sepia(.75)" aria-pressed="false">Retrô</button><button data-filter="contrast(1.35) saturate(1.35)" aria-pressed="false">Vibrante</button><button data-filter="brightness(1.18) saturate(1.2)" aria-pressed="false">Luz</button><button data-filter="saturate(.55)" aria-pressed="false">Suave</button><button data-filter="hue-rotate(25deg) saturate(1.3)" aria-pressed="false">Neon</button><button data-filter="blur(1px) brightness(1.08)" aria-pressed="false">Sonho</button><button data-filter="invert(.12) contrast(1.2)" aria-pressed="false">Urbano</button>
+</div>
+<p class="muted">Os filtros são aplicados à prévia e à foto salva. A gravação de vídeo usa a câmera; efeitos durante a gravação variam conforme o suporte do aparelho.</p>
+</div>
+</section>
+<section class="card"><strong>Como funciona</strong><p class="muted">Nesta primeira implantação, suas criações são processadas no próprio aparelho e salvas localmente. A publicação direta no perfil/Stories e o envio ao mural serão conectados ao armazenamento seguro do aplicativo numa etapa de integração, para não expor arquivos nem publicar sem sua confirmação.</p></section>
+</main>
+<script>
+(()=> {
+const $=id=>document.getElementById(id), camera=$('camera'), photo=$('photo'), recorded=$('recorded'), canvas=$('canvas'), status=$('status');
+let stream=null, recorder=null, chunks=[], currentBlob=null, currentName='capital-do-trem', filter='none', sourceType='';
+const setStatus=t=>status.textContent=t;
+function setFilter(value){filter=value;for(const b of $('filters').querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.filter===value));camera.style.filter=value;photo.style.filter=value;}
+$('filters').addEventListener('click',e=>{const b=e.target.closest('button[data-filter]');if(!b)return;setFilter(b.dataset.filter);});
+$('cameraStart').addEventListener('click',async()=>{try{if(!navigator.mediaDevices?.getUserMedia)throw new Error('Este navegador não oferece acesso à câmera.');stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:true});camera.srcObject=stream;camera.hidden=false;photo.hidden=true;recorded.hidden=true;$('capture').disabled=false;$('record').disabled=false;setStatus('Câmera pronta. Você pode tirar uma foto ou gravar.');}catch(e){setStatus(e.message||'Não foi possível abrir a câmera. Confira as permissões do aparelho.');}});
+$('capture').addEventListener('click',()=>{if(!camera.videoWidth)return;canvas.width=camera.videoWidth;canvas.height=camera.videoHeight;const ctx=canvas.getContext('2d');ctx.filter=filter;ctx.drawImage(camera,0,0);canvas.toBlob(blob=>{if(!blob)return;currentBlob=blob;currentName='capital-do-trem-foto.jpg';photo.src=URL.createObjectURL(blob);photo.hidden=false;recorded.hidden=true;photo.style.filter='none';$('download').disabled=false;setStatus('Foto criada com filtro. Salve no aparelho quando quiser.');},'image/jpeg',.92);});
+$('record').addEventListener('click',()=>{try{if(!stream||!window.MediaRecorder)throw new Error('Gravação de vídeo não é compatível neste aparelho/navegador.');chunks=[];recorder=new MediaRecorder(stream);recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};recorder.onstop=()=>{currentBlob=new Blob(chunks,{type:recorder.mimeType||'video/webm'});currentName='capital-do-trem-video.'+(currentBlob.type.includes('mp4')?'mp4':'webm');recorded.src=URL.createObjectURL(currentBlob);recorded.hidden=false;photo.hidden=true;$('download').disabled=false;setStatus('Vídeo gravado. Salve no aparelho para guardar.');};recorder.start();$('record').disabled=true;$('stop').disabled=false;setStatus('Gravando vídeo…');}catch(e){setStatus(e.message);}});
+$('stop').addEventListener('click',()=>{if(recorder?.state==='recording')recorder.stop();$('record').disabled=false;$('stop').disabled=true;});
+$('file').addEventListener('change',e=>{const f=e.target.files?.[0];if(!f)return;if(f.size>80*1024*1024){setStatus('Escolha um arquivo de até 80 MB.');return;}currentBlob=f;currentName=f.name||'capital-do-trem-midia';sourceType=f.type;const url=URL.createObjectURL(f);if(f.type.startsWith('image/')){photo.src=url;photo.hidden=false;recorded.hidden=true;photo.style.filter=filter;}else if(f.type.startsWith('video/')){recorded.src=url;recorded.hidden=false;photo.hidden=true;}else{setStatus('Formato não suportado.');return;}$('download').disabled=false;setStatus('Mídia carregada. Escolha um filtro e salve sua criação.');});
+$('download').addEventListener('click',()=>{if(!currentBlob)return;let blob=currentBlob;if(sourceType.startsWith('image/')||currentName.endsWith('.jpg')){if(photo.src&& !photo.hidden){const w=photo.naturalWidth,h=photo.naturalHeight;canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d');ctx.filter=filter;ctx.drawImage(photo,0,0,w,h);canvas.toBlob(b=>save(b,'capital-do-trem-foto.jpg'),'image/jpeg',.92);return;}}save(blob,currentName);});
+function save(blob,name){if(!blob)return;const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);setStatus('Arquivo salvo/baixado pelo navegador.');}
+window.addEventListener('pagehide',()=>{if(stream)stream.getTracks().forEach(t=>t.stop());});
+})();
+</script></body></html>
