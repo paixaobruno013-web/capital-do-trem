@@ -58,3 +58,4 @@ $$;
 drop trigger if exists post_comments_set_author_name on public.post_comments;
 create trigger post_comments_set_author_name before insert on public.post_comments
 for each row execute procedure public.set_post_comment_author_name();
+revoke all on function public.set_post_comment_author_name() from public, anon, authenticated;
