@@ -1,0 +1,111 @@
+name: Validar pacotes para Google Play e App Store
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'conta.html'
+      - 'mensagens.html'
+      - 'privacidade.html'
+      - 'supabase/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'capacitor.config.ts'
+      - '.github/workflows/store-package-validation.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: store-package-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android-aab:
+    name: Validar Android App Bundle (sem assinatura de loja)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+      - name: Instalar Android 16 / API 36
+        run: sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+      - name: Preparar web e projeto nativo
+        run: |
+          npm install
+          npm run build:web
+          npx cap add android
+          npx cap sync android
+          python scripts/configure-android-media.py android
+      - name: Conferir nível de API exigido pela Play Store
+        run: |
+          echo "Versões SDK configuradas pelo Capacitor:"
+          grep -nE 'compileSdkVersion|targetSdkVersion|minSdkVersion' android/variables.gradle
+          grep -Eq 'targetSdkVersion[[:space:]]*=[[:space:]]*3[6-9]' android/variables.gradle
+      - name: Gerar AAB de validação
+        working-directory: android
+        run: ./gradlew --no-daemon bundleRelease
+      - name: Conferir AAB gerado
+        run: |
+          test -s android/app/build/outputs/bundle/release/app-release.aab
+          ls -lh android/app/build/outputs/bundle/release/app-release.aab
+      - name: Guardar AAB não assinado para validação técnica
+        uses: actions/upload-artifact@v4
+        with:
+          name: capital-do-trem-android-aab-unsigned
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 14
+
+  ios-archive:
+    name: Validar arquivo iOS (sem assinatura Apple)
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Preparar web e projeto nativo
+        run: |
+          npm install
+          npm run build:web
+          npx cap add ios
+          python3 scripts/prepare-ios-info.py ios/App/App/Info.plist
+          npx cap sync ios
+      - name: Validar identificador e permissões iOS
+        run: |
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -showBuildSettings > /tmp/cdt-ios-settings.txt
+          grep -q 'PRODUCT_BUNDLE_IDENTIFIER = com.capitaldotrem.app' /tmp/cdt-ios-settings.txt
+          /usr/libexec/PlistBuddy -c 'Print :NSCameraUsageDescription' ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c 'Print :NSMicrophoneUsageDescription' ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c 'Print :NSPhotoLibraryUsageDescription' ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c 'Print :NSLocationWhenInUseUsageDescription' ios/App/App/Info.plist
+      - name: Criar archive técnico sem assinatura
+        run: |
+          xcodebuild archive \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/Capital-do-Trem-Unsigned.xcarchive \
+            CODE_SIGNING_ALLOWED=NO
+          test -d build/Capital-do-Trem-Unsigned.xcarchive/Products/Applications/App.app
+      - name: Guardar archive técnico não assinado
+        uses: actions/upload-artifact@v4
+        with:
+          name: capital-do-trem-ios-archive-unsigned
+          path: build/Capital-do-Trem-Unsigned.xcarchive
+          if-no-files-found: error
+          retention-days: 14
