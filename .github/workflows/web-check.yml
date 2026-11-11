@@ -66,7 +66,7 @@ jobs:
           node scripts/check-intro-opening.mjs
       - name: Conferir proteção e segurança do banco
         run: |
-          grep -q 'create policy "songs_insert_artist_pending_or_admin"' supabase/schema.sql
+          grep -q 'create policy "songs_insert_artist_published_or_admin"' supabase/schema.sql
           grep -q 'create policy "audio_upload_artist_own_folder_or_admin"' supabase/schema.sql
           grep -q 'producer_name text not null default' supabase/schema.sql
           grep -q 'video/quicktime' supabase/schema.sql
@@ -188,5 +188,6 @@ jobs:
           test -s supabase/migrations/2026-11-06-music-catalog.sql
           test -s supabase/migrations/20261111171633_artist_song_submissions_with_producer.sql
           test -s supabase/migrations/20261111172006_retire_legacy_artist_song_upload_policies.sql
+          test -s supabase/migrations/20261111174525_artist_song_direct_publication.sql
           test -s www/manifest.webmanifest
           echo "Preparação web concluída: arquivos essenciais encontrados."
