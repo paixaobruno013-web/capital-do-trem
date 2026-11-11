@@ -35,6 +35,7 @@ function createPlayer(id,title){
 }
 async function requireSession(){
   const session=await getCurrentSession();
+  if(session?.user)initialSessionPromise=Promise.resolve(session);
   if(!session?.user){setStatus('Entre na sua conta para curtir ou comentar.');return null;}
   return session;
 }
@@ -53,7 +54,7 @@ async function loadInteractions(card,video){
 
   }catch(error){
     console.warn('Interações dos vídeos ainda não estão disponíveis:',error);
-    setStatus('As curtidas e os comentários serão ativados após a atualização do banco de dados.');
+    setStatus('Não foi possível carregar as curtidas agora. Tente novamente em instantes.');
   }
 }
 async function loadComments(card,video){
