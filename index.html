@@ -193,8 +193,8 @@ nav#nav .nav-profile:before{content:"♙";display:inline-block;width:22px;font-s
  .home-shortcuts button,.home-shortcuts a{min-height:58px;padding:6px 3px;border-radius:10px;font-size:11px}
  .home-shortcuts span{font-size:19px}
  nav#nav{justify-content:space-around;overflow:hidden;gap:2px}
- nav#nav button[data-page="artistas"],nav#nav button[data-page="comunidade"],nav#nav button[data-page="social"],nav#nav button[data-page="parcerias"],nav#nav button[data-page="divulgue"],nav#nav button[data-page="duvidas"]{display:none}
- nav#nav button,nav#nav .nav-chat,nav#nav .nav-profile{flex:1 1 20%;width:20%;min-width:0;max-width:20%;min-height:58px;padding:5px 1px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:10px;font-size:10px;line-height:1.1;white-space:normal;text-align:center}
+ nav#nav button[data-page="artistas"],nav#nav button[data-page="amigos"],nav#nav button[data-page="comunidade"],nav#nav button[data-page="social"],nav#nav button[data-page="parcerias"],nav#nav button[data-page="divulgue"],nav#nav button[data-page="duvidas"]{display:none}
+ nav#nav button,nav#nav .nav-chat,nav#nav .nav-profile{flex:1 1 16.66%;width:16.66%;min-width:0;max-width:16.66%;min-height:58px;padding:5px 1px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:10px;font-size:10px;line-height:1.1;white-space:normal;text-align:center}
  nav#nav .nav-chat:before,nav#nav .nav-profile:before{display:block;width:auto;height:20px;font-size:19px;line-height:20px}
  nav#nav .nav-profile:before{content:"♙"}
 }
@@ -875,7 +875,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <main id="main-content" tabindex="-1">
 <p id="connection-status" class="connection-status" role="status" aria-live="polite" hidden></p>
 <section class="hero reference-banner"><h2>AQUI A MÚSICA<br><strong>NÃO PARA!</strong></h2><p>Conectando a quebrada!</p><div class="social"><button class="btn" data-go="musicas">▶ Ouvir músicas</button><button class="btn alt" data-go="comunidade">Comunidade</button></div></section>
-<nav id="nav" aria-label="Navegação principal"><button class="active" data-page="inicio" aria-controls="inicio" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11h2v10h6v-6h4v6h6V11h2L12 3z"/></svg>Início</button><a class="nav-chat" href="./bate-papo.html" aria-label="Abrir chat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.7 2 11.3c0 2.2 1 4.2 2.7 5.7L4 21l4.4-2.1c1.1.4 2.3.6 3.6.6 5.5 0 10-3.7 10-8.2S17.5 3 12 3zm-4 9a1.3 1.3 0 1 1 0-2.6A1.3 1.3 0 0 1 8 12zm4 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6zm4 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6z"/></svg>Chat</a><button data-page="musicas" aria-controls="musicas"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="music-note-stem" d="M10 17V5.2L21 3v12"/><circle cx="7" cy="18" r="3.2"/><circle cx="18" cy="16" r="3.2"/></svg>Músicas</button><button data-page="artistas" aria-controls="artistas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v3h4v3a5 5 0 0 1-5 5 5 5 0 0 1-3 2.8V20h5v2H6v-2h5v-3.2A5 5 0 0 1 8 14a5 5 0 0 1-5-5V6h4V3zm10 5v4a3 3 0 0 0 2-3V8h-2zM5 8v1a3 3 0 0 0 2 3V8H5z"/></svg>Ranking</button><a class="nav-profile" href="./conta.html" aria-label="Abrir meu perfil"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0 2c-4.4 0-8 2.2-8 5v2h16v-2c0-2.8-3.6-5-8-5z"/></svg>Perfil</a></nav>
+<nav id="nav" aria-label="Navegação principal"><button class="active" data-page="inicio" aria-controls="inicio" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11h2v10h6v-6h4v6h6V11h2L12 3z"/></svg>Início</button><button data-page="amigos" aria-controls="amigos">🤝 Amigos</button><a class="nav-chat" href="./bate-papo.html" aria-label="Abrir chat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.7 2 11.3c0 2.2 1 4.2 2.7 5.7L4 21l4.4-2.1c1.1.4 2.3.6 3.6.6 5.5 0 10-3.7 10-8.2S17.5 3 12 3zm-4 9a1.3 1.3 0 1 1 0-2.6A1.3 1.3 0 0 1 8 12zm4 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6zm4 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6z"/></svg>Chat</a><button data-page="musicas" aria-controls="musicas"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="music-note-stem" d="M10 17V5.2L21 3v12"/><circle cx="7" cy="18" r="3.2"/><circle cx="18" cy="16" r="3.2"/></svg>Músicas</button><button data-page="artistas" aria-controls="artistas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v3h4v3a5 5 0 0 1-5 5 5 5 0 0 1-3 2.8V20h5v2H6v-2h5v-3.2A5 5 0 0 1 8 14a5 5 0 0 1-5-5V6h4V3zm10 5v4a3 3 0 0 0 2-3V8h-2zM5 8v1a3 3 0 0 0 2 3V8H5z"/></svg>Ranking</button><a class="nav-profile" href="./conta.html" aria-label="Abrir meu perfil"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0 2c-4.4 0-8 2.2-8 5v2h16v-2c0-2.8-3.6-5-8-5z"/></svg>Perfil</a></nav>
 <section class="page active" id="inicio"><section class="home-stories card" aria-labelledby="home-stories-title"><div class="home-stories-heading"><h2 id="home-stories-title">Stories da quebrada</h2><a href="./conta.html#stories">＋ Seu Story</a></div><div id="home-stories-list" class="home-stories-list" aria-label="Stories recentes"><p class="muted">Carregando Stories…</p></div></section><section class="card home-youtube" aria-labelledby="home-youtube-title">
 <h2 id="home-youtube-title">▶ Vídeos da Capital do Trem</h2>
 <p class="muted">Os vídeos mais recentes do canal oficial, atualizados automaticamente.</p><p id="youtube-feed-status" class="muted" role="status" aria-live="polite">Conferindo as novidades do canal…</p>
@@ -920,6 +920,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <p class="muted">Lembre-se de anexar o cartaz ou a imagem do evento diretamente na conversa. Divulgue somente endereços públicos de eventos, nunca endereço residencial.</p>
 </div>
 </section>
+<section class="page" id="amigos"><div class="card"><h2>🤝 Fazer amigos</h2><p class="muted">Conheça pessoas que também fazem parte do Capital do Trem. Descubra participantes da sua cidade ou amplie a roda conhecendo gente de outros lugares.</p><p class="notice">Só aparecem pessoas que escolheram deixar o perfil público. A cidade é informada pela própria pessoa; não usamos GPS nem mostramos endereço ou distância exata.</p><label for="friends-search">Buscar pessoas</label><input id="friends-search" type="search" maxlength="80" placeholder="Nome, @usuário, cidade ou interesse"><label for="friends-distance">Onde procurar</label><select id="friends-distance"><option value="all">Perto e longe — todas as cidades</option><option value="same">Na minha cidade</option><option value="other">Em outras cidades</option></select><p id="friends-count" class="muted" aria-live="polite">Carregando participantes públicos…</p><div id="friends-directory" class="list" aria-live="polite"><p class="muted">Carregando…</p></div><p class="muted">Para conversar, abra o Koe Fala Tu. Respeite a privacidade e as escolhas de cada pessoa.</p><a class="btn alt" href="./bate-papo.html">Abrir Koe Fala Tu</a></div></section>
 <section class="page" id="comunidade">
 <div class="card"><h2>👥 Nossa comunidade</h2><p class="muted">Um espaço para usuários Uai, artistas e todos que fazem parte do Capital do Trem. Cada pessoa escolhe se quer deixar seu perfil visível.</p><a class="btn" href="./conta.html">Criar minha conta / Meu perfil</a></div>
 <div class="card"><h3>Perfis públicos</h3><div id="community-profiles" class="list" aria-live="polite"><p class="muted">Os perfis públicos aparecerão aqui quando o banco estiver conectado.</p></div></div>
@@ -1089,7 +1090,7 @@ updateIntroControl();
 const pages=[...document.querySelectorAll('.page')],tabs=[...document.querySelectorAll('[data-page]')];
 function go(id){const target=pages.find(p=>p.id===id);if(!target)return;pages.forEach(p=>p.classList.toggle('active',p===target));tabs.forEach(t=>{const active=t.dataset.page===id;t.classList.toggle('active',active);if(active){t.setAttribute('aria-current','page');t.scrollIntoView({block:'nearest',inline:'nearest',behavior:window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}else t.removeAttribute('aria-current');});window.scrollTo({top:0,behavior:window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}
 tabs.forEach(t=>t.addEventListener('click',()=>go(t.dataset.page)));document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
-function openPageFromHash(){const id=decodeURIComponent(location.hash.slice(1));if(['inicio','musicas','eventos','artistas','comunidade','social','parcerias','divulgue','duvidas'].includes(id))go(id);}
+function openPageFromHash(){const id=decodeURIComponent(location.hash.slice(1));if(['inicio','musicas','eventos','artistas','amigos','comunidade','social','parcerias','divulgue','duvidas'].includes(id))go(id);}
 if(location.hash)openPageFromHash();window.addEventListener('hashchange',openPageFromHash);
 const themeButton=document.getElementById('theme');
 const THEME_KEY='capitaldotrem_theme_v1';
@@ -1419,6 +1420,30 @@ updateConnectionStatus();
    }catch(error){/* Mantém o último status válido quando a rede oscilar. */}
   },45000);
  }catch(error){const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar o diretório agora. Confira sua conexão e tente novamente.';container.replaceChildren(message);}
+})();
+// Descoberta de amigos: somente perfis que optaram por visibilidade pública.
+(async()=>{
+ const list=document.getElementById('friends-directory'),search=document.getElementById('friends-search'),distance=document.getElementById('friends-distance'),count=document.getElementById('friends-count');
+ if(!list||!search||!distance||!count)return;
+ try{
+  const module=await import('./supabase/auth.js');const supabase=module.initSupabase();
+  const profiles=await module.getPublicProfiles();const {data:{user}}=await supabase.auth.getUser();
+  const own=profiles.find(p=>p.user_id===user?.id);const ownCity=String(own?.city||'').trim().toLocaleLowerCase('pt-BR');
+  const candidates=profiles.filter(p=>p.user_id!==user?.id);
+  const render=()=>{
+   const term=search.value.trim().toLocaleLowerCase('pt-BR'),mode=distance.value;
+   const filtered=candidates.filter(p=>{const city=String(p.city||'').trim().toLocaleLowerCase('pt-BR');if(mode==='same'&&(!ownCity||city!==ownCity))return false;if(mode==='other'&&(!ownCity||!city||city===ownCity))return false;return [p.display_name,p.username,p.city,p.bio].some(v=>String(v||'').toLocaleLowerCase('pt-BR').includes(term));});
+   list.replaceChildren();count.textContent=filtered.length+' pessoa(s) encontrada(s) • '+candidates.length+' perfil(is) público(s)';
+   if(!filtered.length){const empty=document.createElement('p');empty.className='muted';empty.textContent=mode==='same'&&!ownCity?'Informe sua cidade em Meu perfil para encontrar pessoas da mesma cidade.':'Nenhuma pessoa encontrada com esse filtro. Tente buscar em todas as cidades.';list.append(empty);return;}
+   for(const p of filtered){
+    const card=document.createElement('article');card.className='item community-profile-card';const avatar=document.createElement('div');avatar.className='community-profile-avatar';
+    if(p.avatar_type==='photo'&&typeof p.avatar_url==='string'&&p.avatar_url.startsWith('https://')){const img=document.createElement('img');img.src=p.avatar_url;img.alt='Foto de '+(p.display_name||'participante');img.loading='lazy';img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';avatar.append(img);}else avatar.textContent=p.avatar_type==='character'?'🎭':Array.from((p.display_name||'U').trim())[0]?.toLocaleUpperCase('pt-BR')||'U';
+    const copy=document.createElement('div');copy.className='community-profile-copy';const name=document.createElement('strong');name.textContent=p.display_name||'Participante do Capital do Trem';const handle=document.createElement('p');handle.className='muted';handle.textContent='@'+(p.username||'usuario');const meta=document.createElement('div');meta.className='community-profile-meta';const role=document.createElement('span');role.className='community-profile-role';role.textContent=p.account_type==='artist'?'Artista / DJ':'Usuário Uai';meta.append(role);const city=document.createElement('p');city.className='muted community-profile-city';city.textContent=p.city||'Cidade não informada';copy.append(name,handle,meta,city);
+    if(p.bio){const bio=document.createElement('p');bio.className='community-profile-bio';bio.textContent=p.bio;copy.append(bio);}const chat=document.createElement('a');chat.className='btn alt';chat.href='./bate-papo.html';chat.textContent='Conhecer no Koe Fala Tu';chat.style.marginTop='8px';copy.append(chat);card.append(avatar,copy);list.append(card);
+   }
+  };
+  search.addEventListener('input',render);distance.addEventListener('change',render);render();
+ }catch(error){list.replaceChildren();const msg=document.createElement('p');msg.className='muted';msg.textContent='Não foi possível carregar pessoas agora. Tente novamente quando a conexão voltar.';list.append(msg);count.textContent='Diretório temporariamente indisponível.';}
 })();
 // Vitrine pública: mostra apenas artistas aprovados pela equipe.
 (async()=>{
