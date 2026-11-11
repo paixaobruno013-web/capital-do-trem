@@ -25,7 +25,7 @@ const checks = [
   ['painel musical fica na área de perfil artístico', /id="artist-profile-area" hidden/.test(account) && /artistProfileArea\.hidden=\(profile\?\.account_type\|\|'user'\)!=='artist'/.test(account)],
   ['painel musical identifica título, artista e produtor', /artist-song-submit-title/.test(account) && /artist-song-submit-artist/.test(account) && /artist-song-submit-producer/.test(account) && /producer_name/.test(auth)],
   ['envio de áudio chama uploadMySong com nome do produtor', /uploadMySong\(\{[\s\S]*?producerName:document\.getElementById\('artist-song-submit-producer'\)/.test(account)],
-  ['envio de música exige ficha de artista no backend', /export async function uploadMySong[\s\S]*?from\('artists'\)[\s\S]*?if\(!artistProfile\)/.test(auth)],
+  ['envio de música exige ficha de artista no backend', /export async function uploadMySong[\s\S]*?from\('artists'\)[\s\S]*?if\s*\(!artistProfile\)/.test(auth)],
   ['RLS permite apenas artista ou administrador enviar áudio', /songs_insert_artist_pending_or_admin/.test(songPolicy) && /audio_upload_artist_own_folder_or_admin/.test(songPolicy)],
   ['pacote Android/iOS inclui os dois compositores', /'home-story-composer\.js'/.test(prepare) && /'event-social-composer\.js'/.test(prepare) && /'conta\.html'/.test(prepare)],
   ['Radar inclui vídeos engraçados e informações do Funk Consciente', /videos\+engracados\+funk\+brasil/.test(home) && /news\.google\.com\/search\?q=funk/.test(home)]
