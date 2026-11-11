@@ -117,12 +117,15 @@ jobs:
           grep -q 'subscribePrivateMessages' mensagens.html
           grep -q 'author_avatar_type' bate-papo.html
           echo "Políticas de perfil, configurações e avatar sincronizado verificadas."
+      - name: Verificar fluxo de exclusão de conta
+        run: node scripts/check-account-deletion.mjs
       - name: Conferir arquivos essenciais
         run: |
           test -s www/index.html
           test -s www/conta.html
           test -s www/admin.html
           test -s www/privacidade.html
+          test -s www/account-deletion.html
           grep -q 'Supabase Auth' privacidade.html
           if grep -q 'Esta versão ainda não oferece cadastro' privacidade.html; then
             echo "ERRO: política de privacidade contém informação desatualizada sobre cadastro."
