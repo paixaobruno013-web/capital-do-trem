@@ -21,13 +21,18 @@ const INSTAGRAM_REELS = [
 ];
 const EXPLORE_VIDEOS = [...SHORTS,...INSTAGRAM_REELS];
 
+// Os nove vídeos da tela inicial usam proporção 16:9 (1280 × 720).
+// Os vídeos verticais da área Explorar mantêm seu formato original.
 const HOME_VIDEOS = [
-  {id:'LmI04iuudmQ',title:'Vídeo do canal Capital do Trem'},
-  {id:'DDHrNCagaD0',title:'Vídeo do canal Capital do Trem'},
-  {id:'eQHIsU_mamM',title:'Vídeo do canal Capital do Trem'},
-  {id:'W4wnKF5AHQA',title:'Vídeo do canal Capital do Trem'},
-  {id:'-c2QERKILzg',title:'Música da seleção Capital do Trem'},
-  {id:'HHKsZAS1eMk',title:'Música da seleção Capital do Trem'}
+  {id:'LmI04iuudmQ',title:'Vídeo 1 — Capital do Trem'},
+  {id:'DDHrNCagaD0',title:'Vídeo 2 — Capital do Trem'},
+  {id:'eQHIsU_mamM',title:'Vídeo 3 — Capital do Trem'},
+  {id:'W4wnKF5AHQA',title:'Vídeo 4 — Capital do Trem'},
+  {id:'-c2QERKILzg',title:'Vídeo 5 — Capital do Trem'},
+  {id:'HHKsZAS1eMk',title:'Vídeo 6 — Capital do Trem'},
+  {id:'AT-kZl6j-z8',title:'Vídeo 7 — Capital do Trem'},
+  {id:'tDINGPA7Wcs',title:'Vídeo 8 — Capital do Trem'},
+  {id:'6iovhzLNabU',title:'Vídeo 9 — Capital do Trem'}
 ];
 
 function setStatus(message){if(status)status.textContent=message;}
@@ -83,7 +88,7 @@ async function loadComments(card,video){
 }
 function makeCard(video,index){
   const article=document.createElement('article');
-  article.className='home-youtube-video home-youtube-short';
+  article.className='home-youtube-video home-youtube-featured';
   const title=document.createElement('h3');title.textContent=video.title||'Vídeo da Capital do Trem';
   const frame=document.createElement('div');frame.className='home-youtube-frame';
   const cover=document.createElement('button');cover.type='button';cover.className='home-youtube-load';
