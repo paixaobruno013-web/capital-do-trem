@@ -83,6 +83,11 @@ jobs:
       - name: Sincronizar projeto iOS
         run: npx cap sync ios
 
+      - name: Validar versão mínima do iOS suportada pelo Capacitor 8
+        run: |
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -showBuildSettings > /tmp/cdt-ios-settings.txt
+          grep -q 'IPHONEOS_DEPLOYMENT_TARGET = 15.0' /tmp/cdt-ios-settings.txt
+
       - name: Conferir versão do Xcode e simuladores
         run: |
           xcodebuild -version
