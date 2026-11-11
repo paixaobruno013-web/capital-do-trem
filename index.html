@@ -118,7 +118,7 @@ body.light .brand,body.light .hero h2,body.light .card h3{text-shadow:0 0 10px r
 .card{box-shadow:0 8px 24px rgba(0,0,0,.18);transition:transform .18s ease,border-color .18s ease}
 .card:hover{border-color:rgba(237,28,36,.45)}
 #inicio .grid .card{min-height:132px;background:linear-gradient(145deg,var(--panel2),var(--panel))}
-#published-song-catalog .card,#public-events .card,#community-profiles .card{border-color:rgba(237,28,36,.28)}
+.music-library-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.music-library-columns section{min-width:0}.music-library-columns h4{margin:8px 0}.music-library-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}.music-library-row button{min-height:38px;padding:7px 10px;white-space:nowrap}.music-library-row strong{overflow-wrap:anywhere;font-size:13px}@media(max-width:560px){.music-library-columns{grid-template-columns:1fr}}#published-song-catalog .card,#public-events .card,#community-profiles .card{border-color:rgba(237,28,36,.28)}
 body.light nav#nav{background:#fff;border-color:#ddd}
 body.light nav#nav:before{color:#111;border-color:#ddd}
 body.light nav#nav button,body.light nav#nav .nav-chat{color:#222}
@@ -858,7 +858,19 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <article class="home-youtube-video"><span class="home-youtube-order">4º • Mais antigo</span><div class="home-youtube-frame"><button class="home-youtube-load" type="button" data-youtube-id="W4wnKF5AHQA" aria-label="Carregar e reproduzir: Vídeo mais antigo da seleção"><img src="https://i.ytimg.com/vi/W4wnKF5AHQA/hqdefault.jpg" alt="" loading="lazy" decoding="async"><span>▶ Reproduzir vídeo</span></button></div><a href="https://youtu.be/W4wnKF5AHQA" target="_blank" rel="noopener noreferrer">Assistir no YouTube</a></article>
 </div></section>
 <div class="home-shortcuts reference-shortcuts" aria-label="Atalhos principais"><button type="button" data-go="musicas"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="music-note-stem" d="M10 17V5.2L21 3v12"/><circle cx="7" cy="18" r="3.2"/><circle cx="18" cy="16" r="3.2"/></svg>Músicas</button><button type="button" data-go="comunidade"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zm8 0a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM8 13c-3.5 0-6 1.8-6 4v3h11v-3c0-2.2-2.5-4-5-4zm8 0c-.6 0-1.2.1-1.8.2 1.7 1 2.8 2.3 2.8 3.8v3h5v-3c0-2.2-2.5-4-6-4z"/></svg>Comunidade</button><button type="button" data-go="eventos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h2v3h6V2h2v3h3v17H4V5h3V2zm-1 8v10h12V10H6zm2 2h3v3H8v-3z"/></svg>Eventos</button><button type="button" data-go="artistas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v3h4v3a5 5 0 0 1-5 5 5 5 0 0 1-3 2.8V20h5v2H6v-2h5v-3.2A5 5 0 0 1 8 14a5 5 0 0 1-5-5V6h4V3zm10 5v4a3 3 0 0 0 2-3V8h-2zM5 8v1a3 3 0 0 0 2 3V8H5z"/></svg>Ranking</button><a href="./conta.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 13a7.8 7.8 0 0 0 0-2l2-1.5-2-3.5-2.4 1a7.8 7.8 0 0 0-1.7-1L15 3H9l-.4 3a7.8 7.8 0 0 0-1.7 1l-2.4-1-2 3.5 2 1.5a7.8 7.8 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a7.8 7.8 0 0 0 1.7 1L9 21h6l.4-3a7.8 7.8 0 0 0 1.7-1l2.4 1 2-3.5-2.1-1.5zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>Configurações</a></div><div class="grid"><article class="card"><h3>🎧 Música independente</h3><p class="muted">Espaço para lançamentos, artistas e sons da cena.</p></article><article class="card"><h3>📅 Cultura e eventos</h3><p class="muted">Divulgação de encontros, bailes e atividades culturais.</p></article><article class="card"><h3>🤝 Comunidade</h3><p class="muted">Ações sociais, parcerias e informação para fortalecer a comunidade.</p></article></div><div class="card reference-trending"><h3>🔥 Em Alta na Comunidade</h3><p class="muted">Novidades, lançamentos e recados da comunidade em um mural visual para compartilhar.</p><div id="public-posts" class="list" aria-live="polite"><p class="muted">Carregando publicações da comunidade…</p></div></div><div class="card reference-extra-links"><h3>Mais do Capital do Trem</h3><p><a href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">YouTube</a> · <a href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Instagram</a> · <a href="./conta.html">Minha conta</a> · <a href="./mensagens.html">Minhas conversas</a></p></div><div class="card"><h3>📣 Mural da comunidade</h3><p class="muted">Publicações aprovadas pela equipe do Capital do Trem.</p><p class="muted">As publicações da comunidade aparecem na área “Em Alta na Comunidade” acima.</p></div><div class="notice">O mural mostra somente divulgações aprovadas pela equipe. Para enviar uma publicação, entre na sua conta e use a área de divulgação. <a href="./conta.html">Acessar minha conta</a>.</div></section>
-<section class="page" id="musicas"><div class="card"><h2>🎵 Central de músicas</h2><p class="muted">Um espaço para ouvir os sons dentro do Capital do Trem, sem precisar abrir o YouTube.</p><p class="muted">Músicas publicadas pela comunidade, com reprodução, download, curtidas e comentários.</p><div class="music-discovery-head"><a class="btn alt" href="https://www.youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ Videoclipes e canal</a><span class="muted">Novos sons da cena independente</span></div><label for="song-catalog-search" class="muted" style="display:block;margin:14px 0 5px;font-weight:700">🔎 Buscar por música ou artista</label><input id="song-catalog-search" type="search" inputmode="search" autocomplete="off" placeholder="Digite o nome da música ou do artista…" aria-controls="published-song-catalog" style="margin:0 0 8px"><p id="song-catalog-count" class="muted" role="status" aria-live="polite" style="margin:0 0 10px">Carregando músicas…</p><div id="published-song-catalog" class="list" aria-live="polite"><p class="muted">Carregando catálogo compartilhado…</p></div></div><div class="card"><h3>🎧 Player do Capital do Trem</h3><label for="audio">Escolha uma música autorizada que esteja no seu aparelho</label><input id="audio" type="file" accept="audio/*"><audio id="player" controls preload="metadata" style="width:100%;margin:12px 0"></audio><div class="social" style="align-items:center"><button class="btn" id="download-audio" type="button" disabled>⬇ Baixar música</button><span id="audio-status" class="muted" role="status" aria-live="polite">Selecione um áudio para ouvir e baixar nesta demonstração.</span></div><p class="muted">O player oferece controles de reprodução e pode continuar tocando com a tela bloqueada, conforme o suporte do navegador e as configurações de economia de bateria do celular. O download salva o arquivo selecionado neste aparelho.</p><p class="muted">Só compartilhe ou baixe músicas que você tenha autorização para distribuir.</p></div></section>
+<section class="page" id="musicas"><div class="card"><h2>🎵 Central de músicas</h2><p class="muted">Um espaço para ouvir os sons dentro do Capital do Trem, sem precisar abrir o YouTube.</p><p class="muted">Músicas publicadas pela comunidade, com reprodução, download, curtidas e comentários.</p><div class="music-discovery-head"><a class="btn alt" href="https://www.youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ Videoclipes e canal</a><span class="muted">Novos sons da cena independente</span></div><section class="card music-library" id="music-library" aria-labelledby="music-library-title">
+<h3 id="music-library-title">🎼 Minha biblioteca</h3>
+<p class="muted">Suas músicas salvas e as últimas que você ouviu. A biblioteca acompanha sua conta nos seus aparelhos.</p>
+<div id="music-library-login" class="notice" hidden><p>Entre na sua conta para salvar músicas e sincronizar seu histórico entre Android, iPhone e web.</p><a class="btn alt" href="./conta.html">Entrar ou criar conta</a></div>
+<div id="music-library-content" hidden>
+<div class="music-library-columns">
+<section><h4>❤️ Minhas músicas salvas</h4><div id="saved-songs-list" class="list"><p class="muted">Carregando sua coleção…</p></div></section>
+<section><h4>▶ Ouvidas recentemente</h4><div id="recent-songs-list" class="list"><p class="muted">Carregando seu histórico…</p></div></section>
+</div>
+</div>
+<p id="music-library-status" class="muted" role="status" aria-live="polite"></p>
+</section>
+<label for="song-catalog-search" class="muted" style="display:block;margin:14px 0 5px;font-weight:700">🔎 Buscar por música ou artista</label><input id="song-catalog-search" type="search" inputmode="search" autocomplete="off" placeholder="Digite o nome da música ou do artista…" aria-controls="published-song-catalog" style="margin:0 0 8px"><p id="song-catalog-count" class="muted" role="status" aria-live="polite" style="margin:0 0 10px">Carregando músicas…</p><div id="published-song-catalog" class="list" aria-live="polite"><p class="muted">Carregando catálogo compartilhado…</p></div></div><div class="card"><h3>🎧 Player do Capital do Trem</h3><label for="audio">Escolha uma música autorizada que esteja no seu aparelho</label><input id="audio" type="file" accept="audio/*"><audio id="player" controls preload="metadata" style="width:100%;margin:12px 0"></audio><div class="social" style="align-items:center"><button class="btn" id="download-audio" type="button" disabled>⬇ Baixar música</button><span id="audio-status" class="muted" role="status" aria-live="polite">Selecione um áudio para ouvir e baixar nesta demonstração.</span></div><p class="muted">O player oferece controles de reprodução e pode continuar tocando com a tela bloqueada, conforme o suporte do navegador e as configurações de economia de bateria do celular. O download salva o arquivo selecionado neste aparelho.</p><p class="muted">Só compartilhe ou baixe músicas que você tenha autorização para distribuir.</p></div></section>
 <section class="page" id="eventos">
 <div class="card"><h2>📍 Logo ali</h2><p class="muted">Encontre shows, bailes, encontros e ações sociais próximos de onde você está.</p><button class="btn" id="find-nearby">Usar localização do meu celular</button><p id="location-status" class="muted" aria-live="polite">Sua localização só será acessada se você tocar no botão e autorizar o GPS. As coordenadas serão usadas para abrir o Google Maps e não serão salvas pelo Capital do Trem.</p><a id="nearby-map" class="btn alt" href="#" target="_blank" rel="noopener" hidden>Abrir mapa com opções próximas</a></div>
 <div class="card"><h2>📅 Agenda do Capital do Trem</h2><p class="muted">Shows, bailes, encontros e atividades culturais divulgadas pela comunidade.</p><p class="muted">📸 Cartazes, data, local e compartilhamento em um formato de divulgação visual.</p><div id="public-events" aria-live="polite"><p class="muted">A agenda compartilhada será carregada quando o banco estiver conectado.</p></div><p class="muted">A agenda é compartilhada. Para publicar um evento, entre na sua conta e use a área “Enviar evento”. O formulário de prévia abaixo serve para preparar uma mensagem e compartilhar os detalhes.</p><a class="btn" href="./conta.html">Entrar e publicar evento</a>
@@ -1524,18 +1536,57 @@ async function saveOfflineMusic(id,blob,title){
   const api=await import('./supabase/auth.js');api.initSupabase();
   const session=await api.getCurrentSession();
   const songs=await api.getPublishedSongs();container.replaceChildren();
+  const libraryPanel=document.getElementById('music-library');
+  const libraryLogin=document.getElementById('music-library-login');
+  const libraryContent=document.getElementById('music-library-content');
+  const libraryStatus=document.getElementById('music-library-status');
+  const savedList=document.getElementById('saved-songs-list');
+  const recentList=document.getElementById('recent-songs-list');
+  let savedSongIds=new Set();
+  let recentSongIds=[];
+  const songCards=new Map();
+  if(session){
+   libraryContent.hidden=false;
+   try{const library=await api.getMyMusicLibrary();savedSongIds=new Set(library.savedSongIds);recentSongIds=library.recentSongIds;}
+   catch(error){libraryStatus.textContent='Não foi possível sincronizar sua biblioteca agora. As músicas continuam disponíveis para ouvir.';}
+  }else{libraryLogin.hidden=false;}
+  const renderLibraryList=(target,ids,emptyText)=>{
+   if(!target)return;target.replaceChildren();
+   const unique=[...new Set(ids)].filter(id=>songs.some(song=>song.id===id)).slice(0,12);
+   if(!unique.length){const empty=document.createElement('p');empty.className='muted';empty.textContent=emptyText;target.append(empty);return;}
+   for(const id of unique){
+    const song=songs.find(item=>item.id===id);if(!song)continue;
+    const row=document.createElement('div');row.className='music-library-row';
+    const label=document.createElement('strong');label.textContent=song.title+' • '+(song.artist_name||'Capital do Trem');
+    const open=document.createElement('button');open.type='button';open.className='btn alt';open.textContent='Tocar';
+    open.addEventListener('click',()=>{
+     const card=songCards.get(id);const audio=card?.querySelector('audio');
+     if(card){card.scrollIntoView({behavior:'smooth',block:'center'});if(audio)window.setTimeout(()=>audio.play().catch(()=>{}),220);}
+    });
+    row.append(label,open);target.append(row);
+   }
+  };
+  const renderMusicLibrary=()=>{
+   renderLibraryList(savedList,[...savedSongIds],'Você ainda não salvou músicas. Use “♡ Salvar” no catálogo.');
+   renderLibraryList(recentList,recentSongIds,'As músicas que você tocar aparecerão aqui.');
+  };
+  if(session)renderMusicLibrary();
   const searchInput=document.getElementById('song-catalog-search');
   const countLabel=document.getElementById('song-catalog-count');
+  if(session)renderMusicLibrary();
   if(!songs.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='As músicas publicadas pela comunidade aparecerão aqui.';container.append(empty);return;}
   for(const song of songs){
-   const card=document.createElement('article');card.className='item';card.style.margin='10px 0';card.dataset.searchText=[song.title,song.artist_name,song.description].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
+   const card=document.createElement('article');card.className='item';card.style.margin='10px 0';card.dataset.songId=song.id;songCards.set(song.id,card);card.dataset.searchText=[song.title,song.artist_name,song.description].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
    const title=document.createElement('h3');title.textContent=song.title;
    const artist=document.createElement('p');artist.className='muted';artist.textContent=song.artist_name;
    card.append(title,artist);
    if(song.description){const desc=document.createElement('p');desc.textContent=song.description;card.append(desc);}
    const audioUrl=safeHttpsUrl(song.audio_url);const downloadUrl=safeHttpsUrl(song.download_url)||audioUrl;
    if(audioUrl){
-    const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=audioUrl;audio.addEventListener('play',()=>{container.querySelectorAll('audio').forEach(other=>{if(other!==audio&&!other.paused)other.pause();});});audio.style.cssText='width:100%;margin:8px 0';audio.setAttribute('aria-label','Ouvir '+song.title);
+    const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=audioUrl;audio.addEventListener('play',()=>{
+      container.querySelectorAll('audio').forEach(other=>{if(other!==audio&&!other.paused)other.pause();});
+      if(session){recentSongIds=[song.id,...recentSongIds.filter(id=>id!==song.id)].slice(0,30);renderMusicLibrary();api.recordSongPlay(song.id).catch(error=>console.warn('Histórico musical não sincronizado.',error));}
+     });audio.style.cssText='width:100%;margin:8px 0';audio.setAttribute('aria-label','Ouvir '+song.title);
     let offlineTrack=null;
     try{offlineTrack=await getOfflineMusic(song.id);if(offlineTrack?.blob){audio.src=URL.createObjectURL(offlineTrack.blob);audio.dataset.offlineReady='true';}}catch(error){/* A reprodução online continua disponível se o armazenamento local falhar. */}
     if('mediaSession' in navigator){
@@ -1594,6 +1645,18 @@ async function saveOfflineMusic(id,blob,title){
     finally{shareButton.disabled=false;}
    });
    shareRow.append(shareButton,shareStatus);card.append(shareRow);
+   if(session){
+    const saveButton=document.createElement('button');saveButton.type='button';saveButton.className='btn alt';saveButton.style.marginTop='7px';
+    const paintSaved=()=>{saveButton.textContent=savedSongIds.has(song.id)?'♥ Salva na minha biblioteca':'♡ Salvar na minha biblioteca';};
+    paintSaved();
+    saveButton.addEventListener('click',async()=>{
+     saveButton.disabled=true;
+     try{const saved=await api.toggleSavedSong(song.id);if(saved)savedSongIds.add(song.id);else savedSongIds.delete(song.id);paintSaved();renderMusicLibrary();if(libraryStatus)libraryStatus.textContent=saved?'Música salva na sua biblioteca.':'Música removida da sua biblioteca.';}
+     catch(error){if(libraryStatus)libraryStatus.textContent=error?.message||'Não foi possível atualizar sua biblioteca.';}
+     finally{saveButton.disabled=false;}
+    });
+    card.append(saveButton);
+   }
    if(!session){
     const access=document.createElement('div');access.className='notice';access.style.marginTop='12px';
     const message=document.createElement('p');message.textContent='Entre na sua conta para curtir, comentar e acompanhar a conversa desta música.';
