@@ -1601,9 +1601,15 @@ function renderHomeEventFeed(events){
   const refreshHomeFeed=async()=>{try{renderHomeEventFeed(await module.getPublishedEvents());}catch(error){console.warn('Não foi possível atualizar o feed de eventos:',error);}};
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshHomeFeed();});
   window.addEventListener('capital:events-updated',refreshHomeFeed);
-  const nowForExpiry=new Date();
-  const nextLocalMidnight=new Date(nowForExpiry.getFullYear(),nowForExpiry.getMonth(),nowForExpiry.getDate()+1,0,0,5);
-  window.setTimeout(refreshHomeFeed,Math.max(1000,nextLocalMidnight-nowForExpiry));
+  const scheduleHomeExpiryRefresh=()=>{
+   const now=new Date();
+   const nextMidnight=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,5);
+   window.setTimeout(async()=>{
+    await refreshHomeFeed();
+    scheduleHomeExpiryRefresh();
+   },Math.max(1000,nextMidnight-now));
+  };
+  scheduleHomeExpiryRefresh();
   container.replaceChildren();
   if(!events.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Ainda não há eventos aprovados na agenda. Volte em breve!';container.append(empty);return;}
   for(const item of events){
