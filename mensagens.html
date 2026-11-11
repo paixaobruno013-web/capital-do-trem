@@ -144,6 +144,8 @@ body.light .messages{background:linear-gradient(180deg,#fff8f8,#f4f4f4)}
 #compose #private-attach{flex:0 0 40px;width:40px;min-width:40px;height:40px;min-height:40px;padding:0;border:0;border-radius:50%;background:#252529;color:#fff;font-size:20px}
 #compose .private-attachment-preview{display:flex;align-items:center;gap:10px;flex:0 0 100%;min-width:0;padding:10px 12px;border:1px solid #ed1c2455;border-radius:13px;background:#242427}
 .private-attachment-preview[hidden]{display:none}
+#compose.has-attachment{flex-wrap:wrap!important}
+#compose.emoji-open #private-attach{display:none}
 .private-attachment-preview .file-copy{min-width:0;flex:1}
 .private-attachment-preview strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
 .private-attachment-preview small{display:block;color:#aaa;font-size:11px}
@@ -205,8 +207,8 @@ privateAttachOption('📷','Câmera','image/*,video/*','camera');
 privateAttachMenu.append(privateAttachTitle,privateAttachOptions);document.body.append(privateAttachMenu);
 privateAttachButton.addEventListener('click',()=>{privateAttachMenu.hidden=!privateAttachMenu.hidden;privateAttachButton.setAttribute('aria-expanded',String(!privateAttachMenu.hidden));});
 document.addEventListener('pointerdown',event=>{if(!privateAttachMenu.hidden&&!privateAttachMenu.contains(event.target)&&!privateAttachButton.contains(event.target)){privateAttachMenu.hidden=true;privateAttachButton.setAttribute('aria-expanded','false');}});
-function clearPrivateFile(){selectedPrivateFile=null;privateFileInput.value='';privatePreview.hidden=true;privateFileName.textContent='';privateFileSize.textContent='';}
-privateFileInput.addEventListener('change',()=>{selectedPrivateFile=privateFileInput.files?.[0]||null;if(!selectedPrivateFile){clearPrivateFile();return;}privateFileName.textContent=selectedPrivateFile.name;privateFileSize.textContent=(selectedPrivateFile.size/1024/1024).toFixed(2)+' MB';privatePreview.hidden=false;});
+function clearPrivateFile(){selectedPrivateFile=null;privateFileInput.value='';privatePreview.hidden=true;privateFileName.textContent='';privateFileSize.textContent='';$('compose').classList.remove('has-attachment');}
+privateFileInput.addEventListener('change',()=>{selectedPrivateFile=privateFileInput.files?.[0]||null;if(!selectedPrivateFile){clearPrivateFile();return;}privateFileName.textContent=selectedPrivateFile.name;privateFileSize.textContent=(selectedPrivateFile.size/1024/1024).toFixed(2)+' MB';privatePreview.hidden=false;$('compose').classList.add('has-attachment');});
 privateRemove.addEventListener('click',clearPrivateFile);
 
 function personName(id){const p=state?.people.find(p=>p.user_id===id);return p?`${p.display_name||'Usuário Uai'} (@${p.username||'sem_usuario'})`:'Usuário Uai';}
@@ -302,7 +304,9 @@ function drawGroupMessage(m){
  head.append(avatar,who);box.prepend(head);
  if(m.attachment_url&&typeof m.attachment_url==='string'&&m.attachment_url.startsWith('https://')){
   if(m.attachment_type==='image'){const img=node('img');img.src=m.attachment_url;img.alt='Imagem compartilhada no grupo';img.loading='lazy';img.style.cssText='display:block;max-width:100%;max-height:260px;border-radius:10px;margin-top:7px';box.append(img);}
+  else if(m.attachment_type==='video'){const video=node('video');video.controls=true;video.playsInline=true;video.preload='metadata';video.src=m.attachment_url;video.style.cssText='display:block;max-width:100%;max-height:280px;border-radius:10px;margin-top:7px';box.append(video);}
   else if(m.attachment_type==='audio'){const audio=node('audio');audio.controls=true;audio.src=m.attachment_url;audio.preload='metadata';box.append(audio);}
+  else if(m.attachment_type==='document'){const link=node('a','document-attachment','📄 '+(m.attachment_name||'Documento')+' • '+(Number(m.attachment_size||0)/1024/1024).toFixed(2)+' MB');link.href=m.attachment_url;link.target='_blank';link.rel='noopener noreferrer';link.download=m.attachment_name||'';box.append(link);}
  }
  const t=node('time',null,fmt(m.created_at));box.append(t);$('messages').append(box);$('messages').scrollTop=$('messages').scrollHeight;
 }
