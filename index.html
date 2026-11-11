@@ -1725,7 +1725,7 @@ async function saveOfflineMusic(id,blob,title){
    if(movingTrain)movingTrain.style.setProperty('animation','none','important');
    const bar=document.getElementById('opening-live-progress');let progress=3,started=false,finished=false;
    const paint=()=>{if(bar)bar.style.width=progress+'%';};
-   const finish=()=>{if(finished)return;finished=true;progress=100;paint();screen.classList.add('is-finished');window.setTimeout(()=>screen.remove(),600);};
+   const finish=()=>{if(finished)return;finished=true;progress=100;paint();video.pause();screen.classList.add('is-finished');window.setTimeout(()=>screen.remove(),600);};
    const begin=()=>{if(started)return;started=true;startOpeningTrain();window.setTimeout(finish,10000);};
    const loader=window.setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}else window.clearInterval(loader);},220);
    if(intro.complete&&intro.naturalWidth>0){intro.style.visibility='visible';document.documentElement.classList.remove('intro-brand-pending');begin();}
