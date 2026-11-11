@@ -70,6 +70,19 @@ img,video,audio{max-width:100%;}
 audio{width:100%;}
 :focus-visible{outline:2px solid var(--red);outline-offset:3px;}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}}
+
+/* Composer de Stories no padrão das redes sociais: foto do perfil + botão ao lado. */
+.story-profile-actions{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin:14px 0 10px}
+.story-profile-person{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:84px;font-size:12px;font-weight:700;color:var(--muted)}
+#my-story-avatar{width:76px;height:76px;border-radius:50%;border:3px solid #777;box-shadow:0 0 0 2px rgba(130,130,130,.12);display:grid;place-items:center;overflow:hidden;background:#111;color:#fff;font-size:26px;font-weight:900}
+#my-story-avatar img{width:100%;height:100%;object-fit:cover}
+.story-add-button{display:inline-flex;align-items:center;gap:10px;min-height:54px;padding:8px 15px;border-radius:999px;font-size:14px}
+.story-add-plus{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#22c55e;color:#061009;font-size:27px;font-weight:500;line-height:1}
+.story-media-preview{display:grid;place-items:center;min-height:90px;max-height:380px;margin:12px 0;padding:8px;border:1px dashed var(--line);border-radius:12px;background:#050505;overflow:hidden}
+.story-media-preview:empty{display:none}
+.story-media-preview img,.story-media-preview video{display:block;max-width:100%;max-height:360px;object-fit:contain;border-radius:8px}
+.story-compose-actions{display:flex;gap:9px;flex-wrap:wrap}
+.story-compose-actions button{flex:1;min-width:130px}
 </style>
 </head>
 <body>
@@ -113,14 +126,27 @@ audio{width:100%;}
 <p class="muted">Sua sessão está ativa. Aqui você administra sua participação no Capital do Trem.</p>
 <section class="card" id="my-stories-panel" aria-labelledby="my-stories-title">
 <h3 id="my-stories-title">🟢 Meus Stories</h3>
-<div id="my-story-avatar" aria-label="Sua foto de perfil com Stories ativos">U</div>
-<p class="muted">Publique fotos, vídeos e mensagens na sua conta. Seus Stories ficam visíveis para a comunidade por 24 horas. Você pode excluir qualquer publicação sua.</p>
+<div class="story-profile-actions">
+ <div class="story-profile-person">
+  <div id="my-story-avatar" aria-label="Sua foto de perfil com Stories ativos">U</div>
+  <span>Seu perfil</span>
+ </div>
+ <button id="my-story-add" class="secondary story-add-button" type="button" aria-controls="my-story-file">
+  <span class="story-add-plus" aria-hidden="true">+</span><span>Adicionar Story</span>
+ </button>
+</div>
+<p class="muted">Toque no + ao lado da sua foto, escolha uma imagem ou vídeo e publique. O Story fica visível por 24 horas, como nas redes sociais.</p>
 <form id="my-story-form">
-<label for="my-story-file">Foto ou vídeo (JPG, PNG, WebP ou MP4/WebM)</label>
-<input id="my-story-file" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" required>
-<label for="my-story-caption">Escreva uma mensagem (opcional)</label>
-<textarea id="my-story-caption" maxlength="280" rows="2" placeholder="Compartilhe uma novidade com a comunidade..."></textarea>
-<button id="my-story-publish" type="submit">🟢 Publicar no meu Story</button>
+<input id="my-story-file" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" hidden>
+<div id="my-story-compose-fields" hidden>
+ <div id="my-story-preview" class="story-media-preview" aria-live="polite"></div>
+ <label for="my-story-caption">Escreva uma mensagem (opcional)</label>
+ <textarea id="my-story-caption" maxlength="280" rows="2" placeholder="Compartilhe uma novidade com a comunidade..."></textarea>
+ <div class="story-compose-actions">
+  <button id="my-story-publish" type="submit">🟢 Publicar Story</button>
+  <button id="my-story-cancel" class="secondary" type="button">Cancelar</button>
+ </div>
+</div>
 <p id="my-story-status" class="status" role="status" aria-live="polite"></p>
 </form>
 <h4>Minhas publicações</h4><div id="my-story-list" class="muted" aria-live="polite">Seus Stories aparecerão aqui.</div>
