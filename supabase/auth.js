@@ -700,7 +700,7 @@ export async function leaveChatGroup() {
 const CHAT_ATTACHMENT_BUCKET = 'capital-do-trem-chat';
 const CHAT_ATTACHMENT_TYPES = {
   jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp',
-  mp4:'video/mp4',webm:'video/webm',
+  mp4:'video/mp4',webm:'video/webm',mov:'video/quicktime',
   mp3:'audio/mpeg',m4a:'audio/mp4',aac:'audio/aac',ogg:'audio/ogg',oga:'audio/ogg',wav:'audio/wav',
   pdf:'application/pdf',txt:'text/plain',csv:'text/csv',
   doc:'application/msword',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
