@@ -239,7 +239,7 @@ try{
  const sharedUrl=new URL(shareParams.get('share_url')||'');
  const sharedSource=(shareParams.get('share_source')||'Capital do Trem').slice(0,40);
  if(sharedUrl.protocol==='https:'&&['youtu.be','www.youtube.com','youtube.com'].includes(sharedUrl.hostname)){
-  sharedDraft=sharedTitle+'\\n'+sharedSource+': '+sharedUrl.href;
+  sharedDraft=sharedTitle+'\n'+sharedSource+': '+sharedUrl.href;
   const hint=document.getElementById('shared-content-hint');if(hint)hint.hidden=false;
  }
 }catch(error){/* Ignora links de compartilhamento inválidos. */}
