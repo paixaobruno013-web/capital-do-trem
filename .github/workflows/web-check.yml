@@ -130,6 +130,8 @@ jobs:
           grep -q 'subscribePrivateMessages' mensagens.html
           grep -q 'author_avatar_type' bate-papo.html
           echo "Políticas de perfil, configurações e avatar sincronizado verificadas."
+      - name: Verificar monitoramento local de falhas
+        run: node scripts/check-health-monitor.mjs
       - name: Verificar fluxo de exclusão de conta
         run: node scripts/check-account-deletion.mjs
       - name: Verificar biblioteca musical sincronizada
