@@ -838,7 +838,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 </script>
 <div class="intro-smoke" id="intro-smoke" aria-hidden="true">
  <div class="intro-smoke__cloud"></div>
- <div class="intro-smoke__brand"><img src="marca.svg" alt=""><strong>CAPITAL DO TREM</strong><span>A MÚSICA DA NOSSA QUEBRADA!</span></div>
+ <div class="intro-smoke__brand"><img src="marca.svg" alt="" style="visibility:hidden"><strong>CAPITAL DO TREM</strong><span>A MÚSICA DA NOSSA QUEBRADA!</span></div>
  <div class="opening-clean-zone" aria-hidden="true"></div>
  <div class="opening-live-loader" id="opening-live-loader" role="status" aria-live="polite"><div class="opening-live-spinner" aria-hidden="true"></div><strong>Carregando...</strong><div class="opening-live-track"><span id="opening-live-progress"></span><span class="opening-live-train" id="opening-live-train" aria-hidden="true"><span class="opening-wagon opening-wagon-speakers opening-wagon-rear" aria-label="Primeiro vagão: alto-falante"><span class="opening-wagon-load opening-speaker-backward">🔊</span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-dancers" aria-label="Segundo vagão: rapaz e moça dançando"><span class="opening-wagon-load"><span class="opening-dancer female" aria-label="moça dançando">💃<i class="arm arm-left"></i><i class="arm arm-right"></i></span><span class="opening-dancer male" aria-label="rapaz dançando">🕺<i class="arm arm-left"></i><i class="arm arm-right"></i></span></span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-speakers opening-wagon-front" aria-label="Terceiro vagão: alto-falante"><span class="opening-wagon-load opening-speaker-forward">🔊</span><span class="opening-wagon-deck"></span></span><span class="opening-locomotive" aria-label="Locomotiva à frente puxando os três vagões">🚂</span></span></div></div>
 </div>
@@ -1638,40 +1638,22 @@ async function saveOfflineMusic(id,blob,title){
   // Manter a URL estável permite reutilizar o arquivo já baixado e reduz espera/rede móvel.
   const currentOpeningImage=opening,currentOpeningVideo=openingVideo;
   if(profile){const logo=document.getElementById('site-logo');if(logo)logo.src=profile;}
-  if(opening){
- const intro=document.querySelector('.intro-smoke__brand img');
- const screen=document.getElementById('intro-smoke');
- if(intro&&screen){
-  intro.src=currentOpeningImage;
-  intro.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';
-  intro.style.objectFit=branding.openingFit==='contain'?'contain':'cover';
-  intro.closest('.intro-smoke__brand')?.classList.add('custom-opening-image');
-  screen.classList.add('custom-opening-screen');
-  const bar=document.getElementById('opening-live-progress');
-  const train=document.getElementById('opening-live-train');
-  const openingStartedAt=performance.now();let progress=3,ready=document.readyState==='complete',imageReady=false,finished=false,finishQueued=false;
-  const paint=()=>{if(bar)bar.style.width=progress+'%';};
-  const finish=()=>{
-   if(finished||finishQueued||!ready||!imageReady)return;
-   const remaining=Math.max(0,7000-(performance.now()-openingStartedAt));
-   finishQueued=true;
-   setTimeout(()=>{
-    if(finished)return;
-    finished=true;progress=100;paint();
-    screen.classList.add('is-finished');
-    setTimeout(()=>screen.remove(),600);
-   },remaining);
-  };
-  const loader=setInterval(()=>{
-   if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}
-   finish();
-   if(finished)clearInterval(loader);
-  },220);
-  if(intro.complete&&intro.naturalWidth>0)imageReady=true;
-  else {intro.addEventListener('load',()=>{imageReady=true;finish();},{once:true});intro.addEventListener('error',()=>{imageReady=true;finish();},{once:true});}
-  if(ready)finish();else window.addEventListener('load',()=>{ready=true;finish();},{once:true});
+  if(opening&&!openingVideo){
+  const intro=document.querySelector('.intro-smoke__brand img'),screen=document.getElementById('intro-smoke');
+  if(intro&&screen){
+   intro.style.visibility='hidden';intro.src=currentOpeningImage;
+   intro.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';
+   intro.style.objectFit=branding.openingFit==='contain'?'contain':'cover';
+   intro.closest('.intro-smoke__brand')?.classList.add('custom-opening-image');screen.classList.add('custom-opening-screen');
+   const bar=document.getElementById('opening-live-progress');let progress=3,started=false,finished=false;
+   const paint=()=>{if(bar)bar.style.width=progress+'%';};
+   const finish=()=>{if(finished)return;finished=true;progress=100;paint();screen.classList.add('is-finished');window.setTimeout(()=>screen.remove(),600);};
+   const begin=()=>{if(started)return;started=true;window.setTimeout(finish,7000);};
+   const loader=window.setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}else window.clearInterval(loader);},220);
+   if(intro.complete&&intro.naturalWidth>0){intro.style.visibility='visible';begin();}
+   else{intro.addEventListener('load',()=>{intro.style.visibility='visible';begin();},{once:true});intro.addEventListener('error',()=>{intro.style.visibility='visible';begin();},{once:true});}
+  }
  }
-}
    const headerBgUrl=safeUrl(branding.headerBackgroundImageUrl);
   const appHeader=document.querySelector('body>header');
   if(appHeader&&headerBgUrl){
@@ -1696,8 +1678,8 @@ async function saveOfflineMusic(id,blob,title){
     const brand=document.querySelector('.intro-smoke__brand');
     if(brand)brand.style.display='none';
     const video=document.createElement('video');
-    video.className='opening-video-background';video.src=currentOpeningVideo;video.poster=currentOpeningImage||profile||'./marca.svg';video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';video.style.opacity='0';video.style.transition='opacity .25s ease';const savedOpeningSound=(()=>{try{return localStorage.getItem('capitaldotrem_intro_sound_v1')!=='off'&&branding.openingVideoMuted!==true;}catch{return branding.openingVideoMuted!==true;}})();
-    video.autoplay=true;video.muted=!savedOpeningSound;video.defaultMuted=!savedOpeningSound;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));video.playsInline=true;video.loop=true;video.preload='metadata';video.setAttribute('aria-hidden','true');
+    video.className='opening-video-background';video.src=currentOpeningVideo;video.poster=currentOpeningImage||profile||'./marca.svg';video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';video.style.opacity='1';video.style.transition='opacity .25s ease';const savedOpeningSound=(()=>{try{return localStorage.getItem('capitaldotrem_intro_sound_v1')!=='off'&&branding.openingVideoMuted!==true;}catch{return branding.openingVideoMuted!==true;}})();
+    video.autoplay=true;video.muted=!savedOpeningSound;video.defaultMuted=!savedOpeningSound;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));video.playsInline=true;video.loop=true;video.playbackRate=1;video.preload='auto';video.setAttribute('aria-hidden','true');
     screen.insertBefore(video,screen.firstChild);screen.classList.add('custom-opening-screen');
     // A imagem de poster aparece imediatamente; o vídeo baixa dados em segundo plano.
     video.load();
@@ -1720,23 +1702,23 @@ async function saveOfflineMusic(id,blob,title){
      movingTrain.style.setProperty('animation','opening-train-cross-sky 5s linear 1 both','important');
     }
     const bar=document.getElementById('opening-live-progress');
-    const startedAt=performance.now();let progress=3,finished=false;
+    let progress=3,finished=false,clockStarted=false,finishTimer=null;
     const paint=()=>{if(bar)bar.style.width=progress+'%';};
-    // A abertura nunca fica presa esperando rede, vídeo ou window.load: limite real de 7 segundos.
-    const finish=()=>{
-     if(finished)return;
-     const remaining=Math.max(0,7000-(performance.now()-startedAt));
-     window.setTimeout(()=>{if(finished)return;finished=true;progress=100;paint();screen.classList.add('is-finished');window.setTimeout(()=>screen.remove(),600);},remaining);
-    };
-    const loader=setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}if(finished)clearInterval(loader);},220);
+    const finish=()=>{if(finished)return;finished=true;progress=100;paint();screen.classList.add('is-finished');window.setTimeout(()=>screen.remove(),600);};
+    const beginOpeningClock=()=>{if(clockStarted)return;clockStarted=true;const ms=Number.isFinite(video.duration)&&video.duration>0?Math.max(7000,video.duration*1000):7000;finishTimer=window.setTimeout(finish,ms);};
+    const loader=window.setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}else window.clearInterval(loader);},220);
+    video.addEventListener('playing',beginOpeningClock,{once:true});
     video.addEventListener('loadeddata',()=>{
-     video.style.opacity='1';
-     video.play().then(()=>{if(savedOpeningSound&&!video.muted)audioButton.remove();}).catch(error=>{
-      if(savedOpeningSound){audioButton.style.display='block';console.warn('O navegador exige toque para liberar o áudio da abertura.',error);}
+     video.playbackRate=1;
+     video.play().then(()=>{if(savedOpeningSound&&!video.muted)audioButton.remove();}).catch(async error=>{
+      if(savedOpeningSound){audioButton.style.display='block';video.muted=true;video.defaultMuted=true;try{await video.play();}catch(playError){console.warn('Reprodução automática bloqueada pelo navegador.',playError);}}
+      else console.warn('Não foi possível iniciar o vídeo de abertura.',error);
      });
     },{once:true});
-    video.addEventListener('error',()=>{console.warn('Vídeo de abertura indisponível; mantendo a imagem de poster.');},{once:true});
-    finish();
+    video.addEventListener('error',()=>{console.warn('Vídeo de abertura indisponível; mantendo a imagem de poster.');beginOpeningClock();},{once:true});
+    video.addEventListener('durationchange',()=>{if(clockStarted&&finishTimer){window.clearTimeout(finishTimer);const ms=Number.isFinite(video.duration)&&video.duration>0?Math.max(7000,video.duration*1000):7000;finishTimer=window.setTimeout(finish,ms);}});
+    video.addEventListener('ended',finish,{once:true});
+    window.setTimeout(()=>{if(!clockStarted&&video.error)beginOpeningClock();},12000);
    }
   }
  }catch(error){console.warn('Identidade visual padrão mantida.',error);}
