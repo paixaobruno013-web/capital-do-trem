@@ -324,28 +324,55 @@ export async function saveMyArtistProfile(profile) {
   return data;
 }
  
-// Eventos enviados pelo usuário autenticado. O RLS limita os registros ao autor.
+// Eventos publicados por artistas cadastrados e pela administração.
 export async function submitMyEvent(eventData) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para enviar um evento.');
+  const title = String(eventData.title || '').trim();
+  const address = String(eventData.address || '').trim();
+  if (title.length < 2) throw new Error('Informe o nome do evento.');
+  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(String(eventData.event_date || ''))) throw new Error('Informe uma data válida.');
+  const today = new Date();
+  const localToday = [today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
+  if (eventData.event_date < localToday) throw new Error('A data do evento já passou.');
+  if (address.length < 3) throw new Error('Informe o endereço ou use o GPS.');
+  const latitude = eventData.latitude == null || eventData.latitude === '' ? null : Number(eventData.latitude);
+  const longitude = eventData.longitude == null || eventData.longitude === '' ? null : Number(eventData.longitude);
+  if ((latitude == null) !== (longitude == null) || (latitude != null && (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 || !Number.isFinite(longitude) || longitude < -180 || longitude > 180))) {
+    throw new Error('A localização GPS não é válida. Tente capturá-la novamente.');
+  }
   const payload = {
-    title: String(eventData.title || '').trim(),
+    title,
     event_date: eventData.event_date,
     event_time: eventData.event_time || null,
-    address: String(eventData.address || '').trim(),
+    address,
     category: eventData.category || 'show',
-    description: String(eventData.description || '').trim(),
-    contact: String(eventData.contact || '').trim(),
+    description: String(eventData.description || '').trim().slice(0,2000),
+    contact: String(eventData.contact || '').trim().slice(0,120),
     poster_url: eventData.poster_url || null,
+    latitude,
+    longitude,
+    music_song_id: eventData.music_song_id || null,
     created_by: user.id,
     status: 'published'
   };
   const { data, error } = await supabase.from('events').insert(payload)
-    .select('id, title, event_date, address, status').single();
+    .select('id, title, event_date, address, status, latitude, longitude, music_song_id').single();
   if (error) throw error;
   return data;
+}
+
+export async function getEventMusicOptions() {
+  const supabase = initSupabase();
+  const { data, error } = await supabase.from('songs')
+    .select('id,title,artist_name')
+    .eq('status','published')
+    .order('created_at',{ascending:false})
+    .limit(100);
+  if (error) throw error;
+  return data || [];
 }
 
 export async function getMyEvents() {
@@ -520,17 +547,30 @@ export async function getPublishedSongs() {
 // Agenda pública: visitantes podem consultar eventos publicados diretamente.
 export async function getPublishedEvents() {
   const supabase = initSupabase();
-  const { data, error } = await supabase
-    .from('events')
-    .select('id, title, event_date, event_time, address, description, contact, poster_url')
-    .eq('status', 'published')
-    // Usa a data local do aparelho para não antecipar/atrasar a agenda por causa do UTC.
-    .gte('event_date', (() => { const now = new Date(); return [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-'); })())
-    .order('event_date', { ascending: true })
-    .order('event_time', { ascending: true })
+  const today = (() => { const now = new Date(); return [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-'); })();
+  const { data, error } = await supabase.from('events')
+    .select('id,title,event_date,event_time,address,description,contact,poster_url,latitude,longitude,music_song_id')
+    .eq('status','published')
+    .gte('event_date',today)
+    .order('event_date',{ascending:true})
+    .order('event_time',{ascending:true})
     .limit(50);
   if (error) throw error;
-  return data || [];
+  const events = data || [];
+  const songIds = [...new Set(events.map(item=>item.music_song_id).filter(Boolean))];
+  if (songIds.length) {
+    const { data: songs, error: songsError } = await supabase.from('songs')
+      .select('id,title,artist_name,storage_path')
+      .in('id',songIds).eq('status','published');
+    if (songsError) throw songsError;
+    const songsById = new Map();
+    for (const song of songs || []) {
+      const { data: signed } = await supabase.storage.from('capital-do-trem-audio').createSignedUrl(song.storage_path,60*60);
+      songsById.set(song.id,{title:song.title,artist_name:song.artist_name,audio_url:signed?.signedUrl||null});
+    }
+    return events.map(item=>({...item,music:songsById.get(item.music_song_id)||null}));
+  }
+  return events.map(item=>({...item,music:null}));
 }
 
 // Publica uma divulgação imediatamente no mural da comunidade.
