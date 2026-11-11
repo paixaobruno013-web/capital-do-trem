@@ -34,7 +34,7 @@ const checks = [
   ['conversa privada envia arquivo junto da legenda', /sendPrivateMessage\(active\.id,value,selectedPrivateFile\)/.test(privateChat)],
   ['conversa privada renderiza foto, vídeo, áudio e documento', /m\.attachment_type==='image'/.test(privateChat) && /m\.attachment_type==='video'/.test(privateChat) && /m\.attachment_type==='audio'/.test(privateChat) && /m\.attachment_type==='document'/.test(privateChat)],
   ['build Android/iOS inclui páginas e módulo Supabase atualizado', /'mensagens\.html'/.test(prepare) && /'bate-papo\.html'/.test(prepare) && /'supabase\/auth\.js'/.test(prepare)],
-  ['service worker recebeu versão de cache nova e inclui as conversas', /capital-do-trem-v258/.test(worker) && /mensagens\.html/.test(worker) && /bate-papo\.html/.test(worker)]
+  ['service worker recebeu versão de cache nova e inclui as conversas', /capital-do-trem-v259/.test(worker) && /mensagens\.html/.test(worker) && /bate-papo\.html/.test(worker)]
 ];
 const failed = checks.filter(([, ok]) => !ok);
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO') + ' ' + name);
