@@ -158,6 +158,19 @@ audio{width:100%;}
 </section>
 <div style="display:flex;gap:9px;flex-wrap:wrap"><button type="button" class="secondary" id="lock-account">🔒 Bloquear agora</button><button type="button" class="secondary" id="sign-out">Sair da conta</button></div>
 <p id="session-status" class="status" role="status" aria-live="polite"></p>
+
+<section class="card" id="delete-account-panel" aria-labelledby="delete-account-title">
+<h3 id="delete-account-title">🗑️ Excluir minha conta</h3>
+<p class="muted">Você pode excluir permanentemente sua conta e os dados vinculados. O processo remove seu perfil, publicações, eventos, Stories, mensagens e arquivos enviados. Esta ação não pode ser desfeita.</p>
+<button type="button" class="secondary" id="review-account-deletion">Revisar dados para exclusão</button>
+<p id="account-deletion-status" class="status" role="status" aria-live="polite"></p>
+<form id="account-deletion-confirm-form" hidden>
+<label for="account-deletion-confirmation">Para confirmar, digite exatamente: EXCLUIR MINHA CONTA</label>
+<input id="account-deletion-confirmation" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="24" required>
+<button type="submit" id="confirm-account-deletion" style="background:#a40000">Excluir permanentemente minha conta</button>
+</form>
+</section>
+
 <form id="set-password-form" class="card" style="margin-top:16px">
 <h3>🔐 Definir senha do aplicativo</h3>
 <p class="muted">Crie uma senha exclusiva para entrar no Capital do Trem. Ela será diferente da senha do banco de dados. Use pelo menos 8 caracteres.</p>
@@ -408,6 +421,7 @@ function showSession(session){
       }).catch(error=>console.warn('Não foi possível confirmar o selo administrativo:',error));
     }
     profilePanel.hidden=false;accessPanel.hidden=true;eventPanel.hidden=false;postPanel.hidden=false;basicProfilePanel.hidden=false;
+    if(window.location.hash==='#delete-account-panel')window.setTimeout(()=>document.getElementById('delete-account-panel')?.scrollIntoView({behavior:'smooth',block:'start'}),180);
     loadProfileInstallCount();
     scheduleAccountLock();
     if(auth){loadBasicProfile();loadArtistProfile();loadMyEvents();loadAdminSongAccess();}
@@ -726,6 +740,47 @@ eventForm.addEventListener('submit',async event=>{
  catch(error){eventStatus.textContent=error?.message||'Não foi possível enviar. Verifique a conexão e tente novamente.';}
  finally{button.disabled=false;}
 });
+
+const deletionReviewButton=document.getElementById('review-account-deletion');
+const deletionStatus=document.getElementById('account-deletion-status');
+const deletionForm=document.getElementById('account-deletion-confirm-form');
+const deletionPhrase=document.getElementById('account-deletion-confirmation');
+deletionReviewButton.addEventListener('click',async()=>{
+ deletionReviewButton.disabled=true;
+ deletionForm.hidden=true;
+ deletionStatus.textContent='Verificando os dados vinculados à sua conta...';
+ try{
+  const result=await auth.previewMyAccountDeletion();
+  deletionStatus.textContent=result.filesToRemove+' arquivo(s) enviado(s) por você serão removidos. Perfil, publicações, eventos, Stories, mensagens e outros dados vinculados também serão excluídos. Leia o aviso com atenção antes de continuar.';
+  deletionForm.hidden=false;
+  deletionPhrase.value='';
+ }catch(error){
+  deletionStatus.textContent=error?.message||'Não foi possível revisar a conta. Tente novamente.';
+ }finally{deletionReviewButton.disabled=false;}
+});
+deletionForm.addEventListener('submit',async event=>{
+ event.preventDefault();
+ const button=document.getElementById('confirm-account-deletion');
+ if(deletionPhrase.value!=='EXCLUIR MINHA CONTA'){
+  deletionStatus.textContent='Digite exatamente EXCLUIR MINHA CONTA para confirmar.';
+  deletionPhrase.focus();return;
+ }
+ const accepted=window.confirm('Esta ação é permanente. Deseja realmente excluir sua conta e os dados vinculados?');
+ if(!accepted)return;
+ button.disabled=true;deletionReviewButton.disabled=true;
+ deletionStatus.textContent='Excluindo sua conta e os arquivos vinculados com segurança...';
+ try{
+  await auth.deleteMyAccount(deletionPhrase.value);
+  deletionForm.hidden=true;
+  profilePanel.hidden=true;
+  accessPanel.hidden=false;
+  status.textContent='Sua conta e os dados vinculados foram excluídos. Você saiu do Capital do Trem.';
+ }catch(error){
+  deletionStatus.textContent=error?.message||'Não foi possível concluir a exclusão. Tente novamente ou fale com a equipe.';
+  button.disabled=false;deletionReviewButton.disabled=false;
+ }
+});
+
 signOutButton.addEventListener('click',async()=>{
  signOutButton.disabled=true;sessionStatus.textContent='Saindo da conta...';
  try{await auth.signOutAccount();showSession(null);sessionStatus.textContent='Você saiu da sua conta com segurança.';}
