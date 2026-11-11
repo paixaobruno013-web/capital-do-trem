@@ -1570,7 +1570,6 @@ async function saveOfflineMusic(id,blob,title){
    renderLibraryList(savedList,[...savedSongIds],'Você ainda não salvou músicas. Use “♡ Salvar” no catálogo.');
    renderLibraryList(recentList,recentSongIds,'As músicas que você tocar aparecerão aqui.');
   };
-  if(session)renderMusicLibrary();
   const searchInput=document.getElementById('song-catalog-search');
   const countLabel=document.getElementById('song-catalog-count');
   if(session)renderMusicLibrary();
