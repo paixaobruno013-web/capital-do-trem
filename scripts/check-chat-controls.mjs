@@ -28,7 +28,7 @@ const checks = [
   ['seletor oferece categorias e recentes', /Mais usados/.test(emoji) && /emoji-category-tabs/.test(emoji) && /renderRecent\(\)/.test(emoji)],
   ['seletor usa imagens Twemoji com fallback para ampliar compatibilidade de emojis', emoji.includes('cdn.jsdelivr.net/gh/jdecked/twemoji') && /emoji-fallback/.test(emoji)],
   ['Fazer Amigos aparece abaixo do bate-papo e lista somente perfis públicos', /id=\"fazer-amigos\"/.test(room) && /chat-friends-directory/.test(room) && /getPublicProfiles\(\)/.test(room) && /is_public/.test(auth)],
-  ['atalho Fazer Amigos da página inicial direciona para a área abaixo do chat', home.includes('bate-papo.html#fazer-amigos')],
+  ['Fazer Amigos não cria ícone extra na navegação inicial e permanece abaixo do chat', !/data-page=\"amigos\"/.test(home) && /id=\"fazer-amigos\"/.test(room) && /chat-friends-directory/.test(room)],
   ['mensagens privadas possuem botão de emojis e seletor', /id="private-emoji-toggle"/.test(privateChat) && /id="emoji-tray"[^>]*data-emoji-picker/.test(privateChat)],
   ['mensagens do bate-papo geral usam imagens emoji com fallback', /function appendEmojiText\(/.test(room) && /appendEmojiText\(body,part\)/.test(room)],
   ['conversas privadas e grupo renderizam emojis com suporte visual ampliado', /function appendEmojiText\(/.test(privateChat) && /appendEmojiText\(b,m\.content\|\|''\)/.test(privateChat) && /appendEmojiText\(box,m\.content\|\|''\)/.test(privateChat)],
