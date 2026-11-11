@@ -132,6 +132,8 @@ jobs:
           echo "Políticas de perfil, configurações e avatar sincronizado verificadas."
       - name: Verificar monitoramento local de falhas
         run: node scripts/check-health-monitor.mjs
+      - name: Verificar área de apoiadores
+        run: node scripts/check-supporters.mjs
       - name: Verificar fluxo de exclusão de conta
         run: node scripts/check-account-deletion.mjs
       - name: Verificar biblioteca musical sincronizada
