@@ -442,14 +442,75 @@ songForm.addEventListener('submit',async event=>{
  if(!file){songStatus.textContent='Selecione o arquivo de áudio.';return;}
  button.disabled=true;songStatus.textContent='Enviando música para publicação pela equipe…';
  try{
-  await auth.uploadMySong({file,title:document.getElementById('song-title').value.trim(),artistName:document.getElementById('song-artist-name').value.trim()});
-  songForm.reset();songStatus.textContent='Música enviada e publicada no catálogo.';
+  await auth.uploadMySong({file,title:document.getElementById('song-title').value.trim(),artistName:document.getElementById('song-artist-name').value.trim(),producerName:document.getElementById('song-producer-name').value.trim()});
+  songForm.reset();songStatus.textContent='Música publicada no catálogo.';
   await loadMySongs();
  }catch(error){songStatus.textContent=error?.message||'Não foi possível enviar a música. Confira o formato, tamanho e conexão.';}
  finally{button.disabled=false;}
 });
+const artistSongForm=document.getElementById('artist-song-submit-form');
+const artistSongStatus=document.getElementById('artist-song-submit-status');
+const artistSongHistory=document.getElementById('artist-song-submit-history');
+const artistSongFile=document.getElementById('artist-song-submit-file');
+const artistSongPreview=document.getElementById('artist-song-submit-preview');
+let artistSongPreviewUrl='';
+async function loadArtistSongArea(profile){
+ const submit=document.getElementById('artist-song-submit-button');
+ if(!profile){
+  submit.disabled=true;
+  artistSongStatus.textContent='Salve sua ficha artística primeiro para liberar o envio de músicas.';
+  artistSongHistory.textContent='Depois de salvar sua ficha, seus envios aparecerão aqui.';
+  return;
+ }
+ submit.disabled=false;
+ artistSongStatus.textContent='Sua ficha artística está pronta. Escolha a faixa que deseja enviar.';
+ try{
+  const songs=await auth.getMySongs();
+  artistSongHistory.replaceChildren();
+  if(!songs.length){artistSongHistory.textContent='Você ainda não enviou músicas.';return;}
+  for(const song of songs){
+   const card=document.createElement('article');card.className='notice';card.style.margin='9px 0';
+   const title=document.createElement('strong');title.textContent=song.title;
+   const artist=document.createElement('p');artist.className='muted';artist.textContent='🎤 '+song.artist_name+(song.producer_name?' • Produção: '+song.producer_name:'');
+   const state=document.createElement('p');state.textContent=song.status==='published'?'✓ Publicada no catálogo':song.status==='rejected'?'Não aprovada — procure a equipe':'⏳ Enviada — aguardando conferência da equipe';
+   const date=document.createElement('small');date.className='muted';date.textContent=new Date(song.created_at).toLocaleString('pt-BR');
+   card.append(title,artist,state,date);artistSongHistory.append(card);
+  }
+ }catch(error){artistSongHistory.textContent='Não foi possível carregar seu histórico agora.';}
+}
+artistSongFile?.addEventListener('change',()=>{
+ if(artistSongPreviewUrl)URL.revokeObjectURL(artistSongPreviewUrl);
+ artistSongPreviewUrl='';
+ const file=artistSongFile.files?.[0];
+ const info=document.getElementById('artist-song-submit-file-info');
+ if(!file){info.textContent='Nenhum arquivo selecionado';artistSongPreview.hidden=true;artistSongPreview.removeAttribute('src');return;}
+ info.textContent=file.name+' • '+(file.size/1024/1024).toFixed(1)+' MB';
+ if(file.size>50*1024*1024){artistSongStatus.textContent='O arquivo ultrapassa o limite de 50 MB.';artistSongFile.value='';info.textContent='Escolha um arquivo de até 50 MB.';return;}
+ artistSongPreviewUrl=URL.createObjectURL(file);artistSongPreview.src=artistSongPreviewUrl;artistSongPreview.hidden=false;
+});
+artistSongForm?.addEventListener('submit',async event=>{
+ event.preventDefault();
+ const button=document.getElementById('artist-song-submit-button');
+ const file=artistSongFile.files?.[0];
+ if(!file){artistSongStatus.textContent='Escolha o arquivo da sua música.';return;}
+ button.disabled=true;artistSongStatus.textContent='Enviando sua faixa com segurança…';
+ try{
+  const saved=await auth.uploadMySong({
+   file,
+   title:document.getElementById('artist-song-submit-title').value.trim(),
+   artistName:document.getElementById('artist-song-submit-artist').value.trim(),
+   producerName:document.getElementById('artist-song-submit-producer').value.trim()
+  });
+  artistSongForm.reset();artistSongPreview.hidden=true;artistSongPreview.removeAttribute('src');
+  if(artistSongPreviewUrl)URL.revokeObjectURL(artistSongPreviewUrl);artistSongPreviewUrl='';
+  document.getElementById('artist-song-submit-file-info').textContent='Nenhum arquivo selecionado';
+  artistSongStatus.textContent=saved.status==='published'?'Sua música já está no catálogo!':'Sua música foi enviada. A equipe fará a conferência antes de publicar.';
+  await loadArtistSongArea(await auth.getMyArtistProfile());
+ }catch(error){artistSongStatus.textContent=error?.message||'Não foi possível enviar sua música. Confira o arquivo e tente novamente.';}
+ finally{button.disabled=false;}
+});
 async function loadArtistProfile(){
- try{const profile=await auth.getMyArtistProfile();fillArtistForm(profile);}
+ try{const profile=await auth.getMyArtistProfile();fillArtistForm(profile);await loadArtistSongArea(profile);}
  catch(error){artistStatus.textContent='Não foi possível carregar sua ficha artística agora. Atualize a página e tente novamente.';}
 }
 function showSession(session){
@@ -729,6 +790,7 @@ artistForm.addEventListener('submit',async event=>{
   const saved=await auth.saveMyArtistProfile(profile);
   document.getElementById('artist-photo-upload').value='';
   fillArtistForm(saved);
+  await loadArtistSongArea(saved);
   artistStatus.textContent='Ficha artística enviada e salva para avaliação da equipe.';}
  catch(error){artistStatus.textContent=error?.message||'Não foi possível salvar. Verifique os dados e tente novamente.';}
  finally{if(!document.getElementById('artist-name').disabled)saveButton.disabled=false;}
