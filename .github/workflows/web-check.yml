@@ -44,6 +44,10 @@ jobs:
           test -s www/youtube-feed.js
       - name: Verificar controles e regressões do chat
         run: node scripts/check-chat-controls.mjs
+      - name: Verificar anexos seguros e envio moderno do chat
+        run: |
+          node --check scripts/check-chat-attachments.mjs
+          node scripts/check-chat-attachments.mjs
       - name: Conferir proteção e segurança do banco
         run: |
           grep -q 'create policy "songs_insert_artist_or_admin"' supabase/schema.sql
