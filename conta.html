@@ -97,7 +97,7 @@ audio{width:100%;}
 <section class="card">
 <h2>Bem-vindo ao Capital do Trem</h2>
 <p class="muted">Um espaço para artistas e Usuários Uai criarem seus perfis, descobrirem músicas e participarem da comunidade.</p>
-<div id="setup-message" class="notice" role="status">O cadastro ainda não está ativado. A conexão segura com o serviço de contas precisa ser configurada antes de receber usuários.</div>
+<div id="setup-message" class="notice" role="status">Escolha seu tipo de conta e use somente e-mail e senha. Tudo em uma única área, simples e direta.</div>
 </section>
 <section class="card" id="basic-profile-panel" hidden aria-labelledby="basic-profile-title">
 <h2 id="basic-profile-title">👤 Meu perfil na comunidade</h2>
@@ -210,19 +210,16 @@ audio{width:100%;}
 </section>
 <section class="card" id="access-panel" aria-labelledby="access-title">
 <h2 id="access-title">Acesso à conta</h2>
-<div class="tabs" role="group" aria-label="Tipo de acesso">
+<div class="tabs account-actions" role="group" aria-label="Ação da conta">
 <button type="button" class="secondary" id="tab-login" aria-pressed="true" disabled>Entrar</button>
 <button type="button" class="secondary" id="tab-register" aria-pressed="false" disabled>Criar conta</button>
-<button type="button" class="secondary" id="tab-reset" aria-pressed="false" disabled>Recuperar senha</button>
+<button type="button" class="secondary" id="tab-reset" aria-pressed="false" disabled>Esqueci a senha</button>
 </div>
 <form id="account-form">
-<div id="name-wrap" hidden>
-<label for="display-name">Nome artístico ou nome de exibição</label>
-<input id="display-name" name="display-name" maxlength="80" autocomplete="name" disabled>
-<label for="register-username">Escolha seu nome de usuário (@)</label><input id="register-username" name="register-username" maxlength="32" minlength="3" pattern="[a-zA-Z0-9][a-zA-Z0-9_]{2,31}" autocomplete="username" placeholder="ex.: brunochock" disabled><p class="muted">Use letras, números ou _. Esse @ será sua identificação no Capital do Trem.</p>
-<label for="register-type">Tipo de conta</label>
-<select id="register-type" name="register-type" disabled style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="user">Usuário Uai</option><option value="artist">Artista / DJ</option></select><p class="muted">É DJ? Escolha Artista / DJ. DJs recebem o mesmo selo azul de artista.</p>
-</div>
+<label for="register-type">Como você quer participar?</label>
+<select id="register-type" name="register-type" disabled style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit">
+<option value="user">Usuário comum Uai</option><option value="artist">Artista MC/DJ</option>
+</select>
 <label for="email">E-mail</label>
 <input id="email" name="email" type="email" maxlength="254" autocomplete="email" required disabled>
 <div id="password-wrap">
@@ -230,10 +227,7 @@ audio{width:100%;}
 <div class="password-row"><input id="password" name="password" type="password" minlength="8" autocomplete="current-password" required disabled><button type="button" class="secondary" id="toggle-password" aria-controls="password" aria-pressed="false" disabled>Mostrar</button></div>
 <p class="muted">Use uma senha com pelo menos 8 caracteres.</p>
 </div>
-<button id="submit-account" type="submit" disabled>Cadastro em preparação</button>
-<div style="display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--muted);font-size:.9rem" aria-hidden="true"><span style="height:1px;background:var(--line);flex:1"></span><span>ou</span><span style="height:1px;background:var(--line);flex:1"></span></div>
-<button id="google-signin" class="secondary" type="button" disabled>🌐 Continuar com Google</button>
-<p class="muted" style="margin-top:8px">Acesso com Google temporariamente indisponível porque o provedor ainda não foi configurado. Use e-mail e senha para entrar. O acesso de administrador continua restrito ao e-mail proprietário autorizado.</p>
+<button id="submit-account" type="submit" disabled>Entrar</button>
 <p id="account-status" class="status" role="status" aria-live="polite"></p>
 </form>
 </section>
@@ -300,7 +294,7 @@ const passwordToggle=document.getElementById('toggle-password');
 passwordToggle.addEventListener('click',()=>{const visible=passwordInput.type==='password';passwordInput.type=visible?'text':'password';passwordToggle.textContent=visible?'Ocultar':'Mostrar';passwordToggle.setAttribute('aria-pressed',String(visible));});
 const form=document.getElementById('account-form');
 const status=document.getElementById('account-status');
-const controls=[...form.querySelectorAll('input,button,select,textarea'),...document.querySelectorAll('.tabs button')];
+const controls=[...form.querySelectorAll('input,button,select,textarea'),...document.querySelectorAll('.account-actions button')];
 const accessPanel=document.getElementById('access-panel');
 const profilePanel=document.getElementById('profile-panel');
 const basicProfilePanel=document.getElementById('basic-profile-panel');
@@ -622,45 +616,24 @@ try{
   setupMessage.textContent='Não foi possível conectar agora. Você ainda pode abrir as opções de acesso; tente novamente ao enviar o formulário.';
 }
 let mode='login';
-const tabs={
- login:document.getElementById('tab-login'),
- register:document.getElementById('tab-register'),
- reset:document.getElementById('tab-reset')
-};
+const tabs={login:document.getElementById('tab-login'),register:document.getElementById('tab-register'),reset:document.getElementById('tab-reset')};
 function setMode(next){
  mode=next;
  Object.entries(tabs).forEach(([key,button])=>button.setAttribute('aria-pressed',String(key===mode)));
- document.getElementById('name-wrap').hidden=mode!=='register';
+ const hideRole=mode==='reset'||mode==='recovery';
+ document.getElementById('register-type').hidden=hideRole;
+ document.querySelector('label[for="register-type"]').hidden=hideRole;
  document.getElementById('password-wrap').hidden=mode==='reset';
  document.getElementById('email').readOnly=mode==='recovery';
  document.querySelector('label[for="password"]').textContent=mode==='recovery'?'Nova senha':'Senha';
- document.getElementById('display-name').required=mode==='register';
- document.getElementById('register-username').required=mode==='register';
- document.getElementById('register-username').hidden=mode!=='register';
- document.getElementById('register-type').required=mode==='register';
- document.getElementById('register-type').hidden=mode!=='register';
  document.getElementById('password').required=mode!=='reset';
  document.getElementById('password').autocomplete=mode==='register'||mode==='recovery'?'new-password':'current-password';
- passwordInput.type='password';passwordToggle.textContent='Mostrar';passwordToggle.setAttribute('aria-pressed','false');document.getElementById('password').autocomplete=mode==='register'?'new-password':'current-password';
+ passwordInput.type='password';passwordToggle.textContent='Mostrar';passwordToggle.setAttribute('aria-pressed','false');
  document.getElementById('submit-account').textContent=mode==='register'?'Criar minha conta':mode==='reset'?'Enviar link de recuperação':mode==='recovery'?'Salvar nova senha':'Entrar';
  status.textContent='';
 }
 setMode('login');
 Object.entries(tabs).forEach(([key,button])=>button.addEventListener('click',()=>setMode(key)));
-document.getElementById('google-signin').addEventListener('click',async()=>{
- const button=document.getElementById('google-signin');
- button.disabled=true;status.textContent='Conectando ao Google...';
- try{
-  if(!auth){
-   const module=await import('./supabase/auth.js');
-   module.initSupabase();auth=module;
-  }
-  await auth.signInWithGoogleAccount({redirectTo:window.location.origin+window.location.pathname});
- }catch(error){
-  status.textContent=error?.message||'Não foi possível iniciar o acesso com Google. Verifique se o provedor Google foi ativado no serviço de contas.';
-  button.disabled=false;
- }
-});
 form.addEventListener('submit',async event=>{
  event.preventDefault();
  if(!auth){
@@ -669,14 +642,13 @@ form.addEventListener('submit',async event=>{
  }
  const email=document.getElementById('email').value.trim();
  const password=document.getElementById('password').value;
- const displayName=document.getElementById('display-name').value.trim();
- const username=document.getElementById('register-username').value.trim().toLowerCase();
+
  const accountType=document.getElementById('register-type').value;
  const submit=document.getElementById('submit-account');
  submit.disabled=true;status.textContent='Aguarde...';
  try{
   if(mode==='register'){
-   const result=await auth.registerAccount({email,password,displayName,username,accountType});
+   const result=await auth.registerAccount({email,password,displayName:email.split('@')[0],accountType});
    if(result.user?.identities?.length===0){
     status.textContent='Este e-mail já possui cadastro. Entre na sua conta ou use Recuperar senha.';
    }else if(result.session?.user){
