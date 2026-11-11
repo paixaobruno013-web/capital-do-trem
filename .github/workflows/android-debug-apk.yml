@@ -2,6 +2,19 @@ name: Android test APK
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'youtube-feed.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'package.json'
+      - 'capacitor.config.ts'
+      - 'scripts/**'
+      - 'assets/**'
+      - 'home-story-composer.js'
+      - 'event-social-composer.js'
+      - '.github/workflows/android-debug-apk.yml'
 
 permissions:
   contents: read
