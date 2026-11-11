@@ -19,6 +19,7 @@ const files = [
   'admin-stories.js',
   'avatar.html',
   'mensagens.html',
+  'youtube-feed.js',
   'diagnostico.html',
   'marca.svg',
   'manifest.webmanifest',
