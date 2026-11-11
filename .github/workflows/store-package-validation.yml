@@ -5,16 +5,25 @@ on:
   push:
     branches: [main]
     paths:
-      - 'index.html'
-      - 'conta.html'
-      - 'mensagens.html'
-      - 'privacidade.html'
+      - '**.html'
+      - '**.js'
+      - '**.css'
+      - '**.json'
+      - '**.svg'
+      - '**.png'
+      - '**.webp'
+      - '**.jpg'
+      - '**.jpeg'
+      - '**.mp4'
+      - 'assets/**'
       - 'supabase/**'
       - 'scripts/**'
       - 'package.json'
       - 'package-lock.json'
       - 'capacitor.config.ts'
-      - '.github/workflows/store-package-validation.yml'
+      - 'manifest.webmanifest'
+      - 'sw.js'
+      - '.github/workflows/**'
 
 permissions:
   contents: read
