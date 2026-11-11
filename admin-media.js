@@ -44,7 +44,7 @@ el('opening-video-save-direct')?.addEventListener('click',()=>upload(
    if(!type.toLowerCase().includes('video/'))throw new Error('O endereço publicado não está retornando um arquivo de vídeo.');
    return url;
   },
- 'VÍDEO PUBLICADO E CONFERIDO. A abertura já está apontando para o arquivo novo.','PUBLICAR VÍDEO NA ABERTURA',50*1024*1024
+ 'VÍDEO PUBLICADO E CONFERIDO. A abertura já está apontando para o arquivo novo.','PUBLICAR VÍDEO NA ABERTURA',20*1024*1024
 ));
 el('opening-image-save-direct')?.addEventListener('click',()=>upload(
  'opening-image-file-direct','opening-image-save-direct','opening-media-direct-status',
