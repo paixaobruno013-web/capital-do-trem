@@ -2119,6 +2119,9 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
 .home-story-effect-list button[aria-pressed=true]{border-color:#ed1c24;background:#681018;box-shadow:0 0 10px #ed1c2466}
 .home-story-effects p{display:none}
 .home-story-save,#home-story-caption,.home-story-publish,#home-story-status{position:absolute;z-index:8;left:12px;right:12px;width:calc(100% - 24px)}
+.home-story-save,#home-story-caption,.home-story-publish{display:none}
+#home-story-composer.has-selection .home-story-save,#home-story-composer.has-selection #home-story-caption,#home-story-composer.has-selection .home-story-publish{display:block}
+#home-story-composer.has-selection .home-story-zoom{display:none}
 .home-story-save{bottom:calc(env(safe-area-inset-bottom,0px) + 250px);min-height:38px;border:1px solid #ffffff66;border-radius:20px;background:#000a;color:#fff;font-weight:800}
 #home-story-caption{bottom:calc(env(safe-area-inset-bottom,0px) + 292px);min-height:42px;max-height:58px;resize:none;border:1px solid #ffffff55;border-radius:12px;background:#0009;color:#fff;padding:9px;font:inherit}
 .home-story-publish{bottom:calc(env(safe-area-inset-bottom,0px) + 70px);min-height:38px;border:0;border-radius:22px;background:linear-gradient(110deg,#ed1c24,#9d1018);color:#fff;font-weight:900}
