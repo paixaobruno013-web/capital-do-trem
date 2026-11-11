@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [home, story, eventComposer, account, auth, prepare, eventPolicy, songPolicy, schema, androidConfig, iosConfig] = await Promise.all([
+const [home, story, eventComposer, account, auth, prepare, eventPolicy, songPolicy, directSongPolicy, schema, androidConfig, iosConfig] = await Promise.all([
   read('index.html'),
   read('home-story-composer.js'),
   read('event-social-composer.js'),
@@ -9,6 +9,7 @@ const [home, story, eventComposer, account, auth, prepare, eventPolicy, songPoli
   read('scripts/prepare-web.mjs'),
   read('supabase/migrations/20261111173858_allow_all_users_to_publish_events.sql'),
   read('supabase/migrations/20261111171633_artist_song_submissions_with_producer.sql'),
+  read('supabase/migrations/20261111174525_artist_song_direct_publication.sql'),
   read('supabase/schema.sql'),
   read('scripts/configure-android-media.py'),
   read('scripts/prepare-ios-info.py')
@@ -30,7 +31,8 @@ const checks = [
   ['painel musical identifica título, artista e produtor', ['artist-song-submit-title','artist-song-submit-artist','artist-song-submit-producer'].every(id => account.includes('id="'+id+'"')) && auth.includes('producer_name')],
   ['envio de áudio chama uploadMySong com nome do produtor', account.includes('uploadMySong({') && account.includes("producerName:document.getElementById('artist-song-submit-producer')")],
   ['envio de música exige ficha de artista no backend', auth.includes('export async function uploadMySong') && auth.includes("from('artists')") && auth.includes('if (!artistProfile) throw new Error')],
-  ['RLS permite apenas artista ou administrador enviar áudio', songPolicy.includes('songs_insert_artist_pending_or_admin') && songPolicy.includes('audio_upload_artist_own_folder_or_admin')],
+  ['RLS permite artista publicar diretamente e restringe upload ao artista ou administrador', directSongPolicy.includes('songs_insert_artist_published_or_admin') && directSongPolicy.includes("status = 'published'") && songPolicy.includes('audio_upload_artist_own_folder_or_admin')],
+  ['música enviada por artista entra publicada no catálogo', auth.includes("file_size:file.size,status:'published'") && account.includes('diretamente no catálogo público')],
   ['pacote Android/iOS inclui os dois compositores', prepare.includes("'home-story-composer.js'") && prepare.includes("'event-social-composer.js'") && prepare.includes("'conta.html'")],
   ['GPS tem permissões nativas configuradas no Android e iOS', androidConfig.includes('android.permission.ACCESS_FINE_LOCATION') && androidConfig.includes('android.permission.ACCESS_COARSE_LOCATION') && iosConfig.includes('NSLocationWhenInUseUsageDescription')],
   ['Radar inclui vídeos engraçados e informações do Funk Consciente', home.includes('videos+engracados+funk+brasil') && home.includes('news.google.com/search?q=funk')]
