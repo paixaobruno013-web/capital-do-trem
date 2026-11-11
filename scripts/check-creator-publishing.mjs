@@ -40,7 +40,7 @@ const checks = [
   ['música enviada por artista entra publicada no catálogo', auth.includes("file_size:file.size,status:'published'") && account.includes('diretamente no catálogo público')],
   ['pacote Android/iOS inclui os dois compositores', prepare.includes("'home-story-composer.js'") && prepare.includes("'event-social-composer.js'") && prepare.includes("'conta.html'")],
   ['GPS tem permissões nativas configuradas no Android e iOS', androidConfig.includes('android.permission.ACCESS_FINE_LOCATION') && androidConfig.includes('android.permission.ACCESS_COARSE_LOCATION') && iosConfig.includes('NSLocationWhenInUseUsageDescription')],
-  ['Radar inclui vídeos engraçados e informações do Funk Consciente', home.includes('videos+engracados+funk+brasil') && home.includes('news.google.com/search?q=funk')]
+  ['Explorar reúne atalhos de humor, criadores, música, notícias e Funk Consciente', home.includes('id="radar-funk-consciente"') && home.includes('Explorar — vídeos e novidades') && home.includes('videos+engracados+brasil+shorts') && home.includes('criadores+influenciadores+brasil+shorts') && home.includes('funk+consciente+clipes+musica') && home.includes('news.google.com/search?q=funk') && home.includes('funk+consciente+entrevistas+projetos+sociais')]
 ];
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO') + ' ' + name);
 const failed = checks.filter(([, ok]) => !ok);
