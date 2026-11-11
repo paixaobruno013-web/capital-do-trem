@@ -245,6 +245,18 @@ function updateCounter(){counter.textContent=`${input.value.length}/1000 caracte
 input.addEventListener('input',updateCounter);
 let unsubscribe=null,seen=new Set(),currentUserId=null;
 const MAX_VISIBLE_MESSAGES=100;
+function emojiAssetUrl(value){const code=Array.from(value).map(ch=>ch.codePointAt(0).toString(16)).filter(code=>code!=='fe0f').join('-');return 'https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/'+code+'.svg'}
+function appendEmojiText(target,value){
+ const source=String(value||'');
+ if(typeof Intl.Segmenter!=='function'){target.append(document.createTextNode(source));return;}
+ const segments=new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(source);
+ for(const part of segments){
+  const chunk=part.segment;
+  if(/[\p{Extended_Pictographic}\p{Regional_Indicator}]/u.test(chunk)||chunk.includes('\u20e3')){
+   const img=document.createElement('img');img.className='cdt-emoji-image';img.src=emojiAssetUrl(chunk);img.alt=chunk;img.setAttribute('role','img');img.loading='lazy';img.addEventListener('error',()=>img.replaceWith(document.createTextNode(chunk)),{once:true});target.append(img);
+  }else target.append(document.createTextNode(chunk));
+ }
+}
 function addMessage(m){
  if(!m||!m.id||seen.has(m.id))return;
  const wasNearBottom=list.scrollHeight-list.scrollTop-list.clientHeight<90;
@@ -266,7 +278,7 @@ function addMessage(m){
  for(const part of parts){
   if(part==='[CDT_MASCULINO]'||part==='[CDT_FEMININA]'){const sticker=document.createElement('img');sticker.className='cdt-chat-sticker';sticker.src=part==='[CDT_MASCULINO]'?'./assets/sticker-cdt-masculino.svg':'./assets/sticker-cdt-feminina.svg';sticker.alt=part==='[CDT_MASCULINO]'?'Figurinha Capital do Trem: cantor de boné, Juliet prata e microfone':'Figurinha Capital do Trem: cantora com mechas coloridas, Juliet branco e microfone';sticker.loading='lazy';body.append(sticker);}
   else if(animatedTokens[part]){const emoji=document.createElement('span');emoji.className=animatedTokens[part];emoji.textContent=part;body.append(emoji);}
-  else body.append(document.createTextNode(part));
+  else appendEmojiText(body,part);
  }
  box.append(head,body);
  if(m.attachment_url&&typeof m.attachment_url==='string'&&m.attachment_url.startsWith('https://')){
