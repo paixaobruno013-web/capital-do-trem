@@ -957,15 +957,17 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 </section>
 <section class="page" id="social"><div class="card"><h2>❤️ Ação social</h2><p>Um espaço para divulgar campanhas solidárias, arrecadações e iniciativas comunitárias.</p><p class="muted">As campanhas oficiais serão publicadas após implantação de moderação e canal administrativo. Para sugerir uma ação, envie uma apresentação com objetivo, responsável, data e local.</p><a class="btn instagram-button" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Apresentar uma ação social</a></div></section>
 <section class="page" id="artistas"><section class="card" id="radar-funk-consciente" aria-labelledby="radar-funk-title">
-<h2 id="radar-funk-title">🔥 Radar Funk Consciente</h2>
-<p class="muted">Uma vitrine para descobrir música, vídeos divertidos, cultura e notícias sobre funk. As buscas abrem resultados atualizados nas fontes originais.</p>
-<div class="home-youtube-grid">
-<article class="home-youtube-video"><strong>🎵 Música e lançamentos</strong><p class="muted">Descubra sons e lançamentos do funk consciente.</p><a href="https://www.youtube.com/results?search_query=funk+consciente+lan%C3%A7amentos" target="_blank" rel="noopener noreferrer">Pesquisar músicas</a></article>
-<article class="home-youtube-video"><strong>😂 Vídeos engraçados</strong><p class="muted">Humor, dança e vídeos relacionados ao movimento funk.</p><a href="https://www.youtube.com/results?search_query=videos+engracados+funk+brasil" target="_blank" rel="noopener noreferrer">Ver vídeos</a></article>
-<article class="home-youtube-video"><strong>📰 Notícias sobre funk</strong><p class="muted">Consulte matérias recentes em veículos e sites de notícias.</p><a href="https://news.google.com/search?q=funk%20consciente&hl=pt-BR&gl=BR&ceid=BR%3Apt-419" target="_blank" rel="noopener noreferrer">Buscar notícias</a></article>
-<article class="home-youtube-video"><strong>🎤 Funk Consciente</strong><p class="muted">Pesquise entrevistas, projetos, cultura e iniciativas sociais.</p><a href="https://www.google.com/search?q=%22funk+consciente%22+not%C3%ADcias" target="_blank" rel="noopener noreferrer">Pesquisar informações</a></article>
+<h2 id="radar-funk-title">🔎 Explorar — vídeos e novidades</h2>
+<p class="muted">Um só lugar para descobrir humor, criadores, música e notícias do Funk Consciente.</p>
+<div class="radar-explore-grid">
+<a class="radar-explore-tile" href="https://www.youtube.com/results?search_query=videos+engracados+brasil+shorts" target="_blank" rel="noopener noreferrer"><span>😂 Humor</span><small>Vídeos engraçados e curtos</small></a>
+<a class="radar-explore-tile" href="https://www.youtube.com/results?search_query=criadores+influenciadores+brasil+shorts" target="_blank" rel="noopener noreferrer"><span>🎭 Criadores</span><small>Influenciadores e tendências</small></a>
+<a class="radar-explore-tile" href="https://www.youtube.com/results?search_query=funk+consciente+clipes+musica" target="_blank" rel="noopener noreferrer"><span>🎵 Música</span><small>Funk, clipes e lançamentos</small></a>
+<a class="radar-explore-tile" href="https://news.google.com/search?q=funk%20consciente&hl=pt-BR&gl=BR&ceid=BR%3Apt-419" target="_blank" rel="noopener noreferrer"><span>📰 Notícias</span><small>Informações e atualidades</small></a>
+<a class="radar-explore-tile" href="https://www.youtube.com/results?search_query=funk+consciente+entrevistas+projetos+sociais" target="_blank" rel="noopener noreferrer"><span>🎤 Funk Consciente</span><small>Entrevistas, cultura e projetos</small></a>
+<a class="radar-explore-tile" href="https://www.youtube.com/results?search_query=videos+curtos+funk+brasil" target="_blank" rel="noopener noreferrer"><span>🔥 Em alta</span><small>Vídeos curtos e tendências</small></a>
 </div>
-<p class="muted">A atualização automática dentro do aplicativo depende de uma integração segura com fontes RSS/APIs e serviço de servidor. Por enquanto, os links levam às buscas atuais; nenhuma notícia é copiada ou publicada automaticamente sem validação.</p>
+<p class="muted">Esta etapa organiza os assuntos em uma grade única. Para exibir um fluxo automático de vídeos e notícias reproduzindo dentro do aplicativo, sem abrir buscas externas, falta integrar e validar fontes de conteúdo e um serviço de curadoria. Não vamos inventar vídeos nem copiar publicações sem autorização.</p>
 </section>
 
 <div class="card"><h2>🎤 Artistas do Capital</h2><p class="muted">Um espaço para apresentar talentos da nossa cena, conhecer novos sons e fortalecer quem faz música na comunidade.</p><p class="muted">Os perfis enviados pela área Minha conta aparecem aqui depois da aprovação da equipe. Para enviar sua ficha e foto com segurança, use o formulário oficial da sua conta.</p><a class="btn" href="./conta.html">Acessar minha conta e enviar ficha artística</a><h3>Artistas em destaque</h3><div id="public-artists" class="list" aria-live="polite"><p class="muted">A vitrine de artistas será carregada quando o banco estiver conectado.</p></div></div>
@@ -2097,10 +2099,24 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
 .home-story-compose-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:11px 0}
 .home-story-compose-controls button,.home-story-publish{min-height:44px;border:1px solid #39393c;border-radius:11px;background:#242427;color:#fff;font-weight:800}
 .home-story-compose-controls button:disabled{opacity:.45}
+.home-story-effects{margin:10px 0;padding:10px;border:1px solid #333;border-radius:12px;background:#171719}
+.home-story-effects>strong{display:block;font-size:13px;margin-bottom:8px}
+.home-story-effect-list{display:flex;gap:7px;overflow-x:auto;padding:2px 1px 7px;scrollbar-width:thin}
+.home-story-effect-list button{flex:0 0 auto;min-height:36px;padding:7px 11px;border:1px solid #414145;border-radius:22px;background:#252529;color:#fff;font-size:12px;font-weight:700}
+.home-story-effect-list button[aria-pressed=true]{border-color:#ed1c24;background:#4a1115;box-shadow:0 0 10px #ed1c2444}
+.home-story-effects p{margin:3px 0 0;color:#aaa;font-size:11px;line-height:1.35}
+.home-story-save{width:100%;min-height:42px;margin:0 0 8px;border:1px solid #555;border-radius:11px;background:#242427;color:#fff;font-weight:800}
+.home-story-save:disabled{opacity:.4}
 #home-story-caption{width:100%;min-height:68px;resize:vertical;border:1px solid #38383b;border-radius:11px;background:#1a1a1d;color:#fff;padding:11px;font:inherit}
 .home-story-publish{width:100%;margin-top:10px;border:0;background:linear-gradient(110deg,#ed1c24,#9d1018);box-shadow:0 0 16px #ed1c243d}
 #home-story-status{min-height:20px;margin:8px 0 0;color:#ddd;font-size:13px}
 @media(max-width:420px){#home-story-composer{padding:7px}#home-story-composer-card{padding:10px}#home-story-camera-stage{max-height:52dvh}}
+.radar-explore-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:14px 0}
+.radar-explore-tile{min-height:118px;aspect-ratio:16/9;display:flex;flex-direction:column;justify-content:flex-end;gap:5px;padding:12px;border:1px solid #393939;border-radius:13px;background:linear-gradient(145deg,#242424,#090909);color:#fff;text-decoration:none;box-shadow:inset 0 -30px 40px #0008}
+.radar-explore-tile span{font-weight:900;font-size:15px}
+.radar-explore-tile small{color:#ccc;font-size:11px}
+.radar-explore-tile:focus-visible,.radar-explore-tile:hover{border-color:#ed1c24;box-shadow:0 0 14px #ed1c2438}
+@media(min-width:600px){.radar-explore-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 #capital-story-toast{position:fixed;z-index:10020;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(92vw,420px);padding:13px 16px;border:1px solid #22c55e;border-radius:13px;background:#07130b;color:#fff;font-weight:800;text-align:center;box-shadow:0 8px 30px #0009;display:none}
 #capital-story-viewer{position:fixed;z-index:10030;inset:0;background:rgba(0,0,0,.96);display:none;align-items:center;justify-content:center;padding:16px}
 #capital-story-viewer.is-open{display:flex}
@@ -2129,7 +2145,22 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
    <button id="home-story-album-button" type="button">▣ Álbum</button>
    <button id="home-story-photo-button" type="button">◎ Foto</button>
    <button id="home-story-record-button" type="button">● Vídeo</button>
+   <button id="home-story-flip-button" type="button">↻ Câmera</button>
   </div>
+  <div class="home-story-effects" aria-label="Efeitos da câmera">
+   <strong>✨ Efeitos</strong>
+   <div class="home-story-effect-list">
+    <button type="button" data-story-effect="natural" aria-pressed="true">Natural</button>
+    <button type="button" data-story-effect="day" aria-pressed="false">☀️ Dia</button>
+    <button type="button" data-story-effect="night" aria-pressed="false">🌙 Noturno</button>
+    <button type="button" data-story-effect="warm" aria-pressed="false">Quente</button>
+    <button type="button" data-story-effect="bw" aria-pressed="false">P&amp;B</button>
+    <button type="button" data-story-effect="neon" aria-pressed="false">Neon</button>
+    <button type="button" data-story-effect="beauty" aria-pressed="false">Beleza suave</button>
+   </div>
+   <p>Os efeitos são aplicados à captura de fotos e à gravação feita pela câmera. “Beleza suave” é um ajuste visual, ainda não é IA generativa.</p>
+  </div>
+  <button id="home-story-save" class="home-story-save" type="button" disabled>↓ Salvar na galeria</button>
   <label for="home-story-caption">Mensagem (opcional)</label>
   <textarea id="home-story-caption" maxlength="280" placeholder="O que você quer compartilhar?"></textarea>
   <button id="home-story-publish" class="home-story-publish" type="button" disabled>Publicar Story</button>
