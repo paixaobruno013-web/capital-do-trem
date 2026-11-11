@@ -17,7 +17,12 @@ const checks = [
   ['API de comentários com limite de 1.000 caracteres', /export async function addPostComment[\s\S]*?clean\.length>1000/.test(auth)],
   ['mural mostra botão de curtir e contagem', /getPostSocial\(item\.id\)[\s\S]*?Curtido[\s\S]*?likeCount/.test(home)],
   ['mural mostra lista e formulário de comentários', /Comentários[\s\S]*?post-comment-form[\s\S]*?addPostComment\(item\.id/.test(home)],
-  ['compartilhamento privado continua disponível', /Koe Fala Tu[\s\S]*?share_text/.test(home)]
+  ['compartilhamento privado continua disponível', /Koe Fala Tu[\s\S]*?share_text/.test(home)],
+  ['área Fazer amigos permanece no menu e na navegação', /data-page="amigos"/.test(home) && /id="amigos"/.test(home)],
+  ['busca e filtro por cidade continuam disponíveis', /id="friends-search"/.test(home) && /id="friends-distance"/.test(home)],
+  ['diretório consulta somente perfis públicos', /getPublicProfiles\(\)/.test(home) && /\.eq\('is_public', true\)/.test(auth)],
+  ['filtro do próprio perfil usa a sessão autenticada sem variável global inexistente', /profiles\.filter\(p=>p\.user_id!==session\?\.user\?\.id\)/.test(home) && !/profiles\.filter\(p=>p\.user_id!==user\?\.id\)/.test(home)],
+  ['atalho para Koe Fala Tu permanece na área de amizades', /id="amigos"[\s\S]*?Abrir Koe Fala Tu/.test(home)]
 ];
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO') + ' ' + name);
 const failed = checks.filter(([, ok]) => !ok);
