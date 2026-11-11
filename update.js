@@ -173,7 +173,7 @@
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)verifyRealConnection();});
  window.setTimeout(verifyRealConnection,500);
  // Mantém a detecção de quedas silenciosas sem consultar a rede a cada 5 segundos.
- window.setInterval(verifyRealConnection,4000);
+ window.setInterval(verifyRealConnection,30*1000);
  if(!supportsServiceWorkerUpdates||!('serviceWorker' in navigator))return;
  let registration=null,reloading=false;
  const banner=document.createElement('aside');
