@@ -225,6 +225,8 @@ function addMessage(m){
   else if(m.attachment_type==='audio'){const audio=document.createElement('audio');audio.controls=true;audio.preload='metadata';audio.src=m.attachment_url;media.append(audio);}
   else if(m.attachment_type==='document'){const link=document.createElement('a');link.href=m.attachment_url;link.target='_blank';link.rel='noopener noreferrer';link.download=m.attachment_name||'';link.className='document-attachment';link.textContent='📄 '+(m.attachment_name||'Abrir documento')+' • '+(Number(m.attachment_size||0)/1024/1024).toFixed(2)+' MB';media.append(link);}
   box.append(media);
+ }else if(m.attachment_path){
+  const note=document.createElement('small');note.className='muted';note.textContent='📎 Anexo protegido. Se não abrir agora, atualize a conversa para gerar um novo link.';box.append(note);
  }
  const stamp=Number.isNaN(d.getTime())?0:d.getTime();
  const next=[...list.children].find(node=>{const value=new Date(node.dataset.createdAt).getTime();return (Number.isNaN(value)?0:value)>stamp;});
