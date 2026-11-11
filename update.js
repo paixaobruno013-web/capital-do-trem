@@ -260,37 +260,51 @@
 })();
 
 
-// Monitoramento local de saúde: detecta travamentos longos e erros sem coletar dados pessoais.
+// Monitoramento local de saúde: registra erros técnicos sem enviar dados pessoais.
 (()=>{
+ const STORAGE_KEY='capitaldotrem_health_incidents_v1';
+ const MAX_ITEMS=30;
  const incidents=[];
  let recoveryShown=false;
- function safeToRecover(){
-  const active=document.activeElement;
-  if(active&&/^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName))return false;
-  return ![...document.querySelectorAll('input,textarea,select')].some(field=>{
-   if(field.type==='file')return !!field.files?.length;
-   if(field.type==='checkbox'||field.type==='radio')return field.checked!==field.defaultChecked;
-   return field.value!==field.defaultValue&&field.value.trim()!=='';
-  });
+ function readStored(){
+  try{
+   const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
+   return Array.isArray(saved)?saved.filter(item=>item&&typeof item.kind==='string').slice(-MAX_ITEMS):[];
+  }catch{return [];}
  }
- function reportIncident(kind){
+ function persist(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(incidents.slice(-MAX_ITEMS)));}catch{}
+ }
+ incidents.push(...readStored());
+ function safeFileName(value){
+  if(!value)return '';
+  try{return String(value).split(/[?#]/)[0].split('/').pop().slice(0,100);}catch{return '';}
+ }
+ function reportIncident(kind,details={}){
   const now=Date.now();
-  incidents.push({kind,time:now});
-  while(incidents.length&&now-incidents[0].time>90000)incidents.shift();
-  if(incidents.length<3||recoveryShown)return;
+  incidents.push({
+   kind:String(kind).slice(0,32),
+   time:now,
+   page:location.pathname.split('/').pop().slice(0,80),
+   file:safeFileName(details.file),
+   line:Number.isFinite(details.line)?Math.max(0,details.line):0
+  });
+  while(incidents.length>MAX_ITEMS)incidents.shift();
+  persist();
+  const recent=incidents.filter(item=>now-item.time<90000);
+  if(recent.length<3||recoveryShown)return;
   recoveryShown=true;
   const notice=document.createElement('aside');
   notice.setAttribute('role','status');
   notice.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(90px + env(safe-area-inset-bottom,0px));z-index:10003;max-width:520px;margin:auto;padding:13px 15px;border:1px solid #ed1c24;border-radius:12px;background:#111;color:#fff;font:600 14px/1.45 system-ui,sans-serif;box-shadow:0 8px 28px #0009';
-  notice.textContent='O Capital do Trem identificou uma instabilidade. Ele não será reiniciado automaticamente; tente atualizar manualmente quando terminar sua atividade.';
+  notice.textContent='O Capital do Trem identificou uma instabilidade. Seus dados não serão apagados nem a tela será reiniciada automaticamente. Consulte Verificar sistema quando terminar sua atividade.';
   document.body.append(notice);
-  // Não recarrega automaticamente: o usuário decide quando atualizar.
  }
  window.addEventListener('error',event=>{
   if(event.target&&event.target!==window){
    const tag=event.target.tagName;
-   if(tag==='SCRIPT'||tag==='LINK')reportIncident('asset-load');
-  }else reportIncident('javascript');
+   if(tag==='SCRIPT'||tag==='LINK')reportIncident('asset-load',{file:event.target.src||event.target.href});
+  }else reportIncident('javascript',{file:event.filename,line:event.lineno});
  },true);
  window.addEventListener('unhandledrejection',()=>reportIncident('promise'));
  if('PerformanceObserver'in window){
@@ -301,4 +315,9 @@
    observer.observe({entryTypes:['longtask']});
   }catch(error){}
  }
+ window.CapitalDoTremHealth={
+  getIncidents:()=>incidents.slice().reverse(),
+  clearIncidents:()=>{incidents.length=0;try{localStorage.removeItem(STORAGE_KEY);}catch{}return true;},
+  exportReport:()=>JSON.stringify({createdAt:new Date().toISOString(),page:location.pathname,incidents:incidents.slice().reverse()},null,2)
+ };
 })();
