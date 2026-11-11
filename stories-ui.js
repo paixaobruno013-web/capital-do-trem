@@ -164,7 +164,7 @@ function renderStory(index) {
   captionBox.replaceChildren();
   const media = document.createElement(story.media_type === 'video' ? 'video' : 'img');
   media.src = story.media_url;
-  if (story.media_type === 'video') {
+  let storySeconds = 7;\n  if (story.media_type === 'video') {
     media.controls = true;
     media.autoplay = true;
     media.playsInline = true;
@@ -172,7 +172,7 @@ function renderStory(index) {
     media.addEventListener('ended', () => renderStory(currentIndex + 1));
   } else {
     media.alt = 'Story de ' + (story.display_name || 'Capital do Trem');
-    const storySeconds = story.music_url ? Math.max(5, Math.min(60, Number(story.music_duration_seconds) || 15)) : 7;
+    storySeconds = story.music_url ? Math.max(5, Math.min(60, Number(story.music_duration_seconds) || 15)) : 7;
     advanceTimer = setTimeout(() => renderStory(currentIndex + 1), storySeconds * 1000);
   }
   mediaBox.append(media);
@@ -197,7 +197,7 @@ function renderStory(index) {
     progress.style.transition = 'none';
     progress.style.transform = 'scaleX(1)';
     if (story.media_type !== 'video') requestAnimationFrame(() => {
-      progress.style.transition = 'transform 7s linear';
+      progress.style.transition = 'transform ' + storySeconds + 's linear';
       progress.style.transform = 'scaleX(0)';
     });
   }
