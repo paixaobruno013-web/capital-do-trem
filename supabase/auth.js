@@ -730,7 +730,7 @@ async function uploadChatFile(file, path) {
 async function signChatAttachment(path) {
   if (!path) return null;
   const supabase = initSupabase();
-  const { data, error } = await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).createSignedUrl(path, 3600);
+  const { data, error } = await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).createSignedUrl(path, 900);
   if (error) throw error;
   return data?.signedUrl || null;
 }
@@ -742,7 +742,7 @@ async function hydrateChatMessages(messages) {
   const supabase = initSupabase();
   const paths = [...new Set((messages || []).map(m => m.attachment_path).filter(Boolean))];
   if (!paths.length) return messages || [];
-  const { data, error } = await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).createSignedUrls(paths, 3600);
+  const { data, error } = await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).createSignedUrls(paths, 900);
   if (error) throw error;
   const signed = new Map((data || []).filter(item => item?.path && item?.signedUrl).map(item => [item.path, item.signedUrl]));
   return (messages || []).map(message => ({
