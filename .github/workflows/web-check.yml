@@ -72,6 +72,8 @@ jobs:
           grep -q 'video/quicktime' supabase/schema.sql
           grep -q "video/quicktime':'mov'" supabase/auth.js
           grep -q 'android.permission.CAMERA' scripts/configure-android-media.py
+          grep -q 'android.permission.ACCESS_FINE_LOCATION' scripts/configure-android-media.py
+          grep -q 'android.permission.ACCESS_COARSE_LOCATION' scripts/configure-android-media.py
           grep -q 'NSCameraUsageDescription' scripts/prepare-ios-info.py
           test -s supabase/migrations/20261111172220_allow_quicktime_story_media.sql
           if grep -q 'create policy "songs_insert_artist_or_admin"' supabase/schema.sql; then echo 'ERRO: política antiga de músicas continua ativa no schema.'; exit 1; fi
