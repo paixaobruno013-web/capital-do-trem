@@ -118,6 +118,14 @@ audio{width:100%;}
 .chat-attachment-options button{min-height:68px;display:flex;align-items:center;gap:10px;justify-content:flex-start;background:#242427;border:1px solid #ffffff12;border-radius:14px;padding:12px;text-align:left}
 .chat-attachment-options button span:first-child{font-size:23px}
 .chat-upload-progress{grid-column:1/-1;height:4px;overflow:hidden;border-radius:99px;background:#3b3b40}
+.chat-attachment-preview{grid-column:1/-1;display:flex;align-items:center;gap:10px;min-width:0;padding:9px;border:1px solid #ed1c2455;border-radius:13px;background:#202024}
+.chat-attachment-preview[hidden]{display:none}
+.chat-attachment-preview .preview-thumb{width:62px;height:62px;flex:0 0 62px;display:grid;place-items:center;overflow:hidden;border-radius:10px;background:#090909;font-size:25px}
+.chat-attachment-preview .preview-thumb img,.chat-attachment-preview .preview-thumb video{width:100%;height:100%;object-fit:cover}
+.chat-attachment-preview .preview-thumb audio{width:210px;max-width:100%;height:38px}
+.chat-attachment-preview .preview-copy{min-width:0;flex:1;overflow-wrap:anywhere;font-size:12px}
+.chat-attachment-preview .preview-copy small{display:block;color:var(--muted);font-size:11px}
+.chat-attachment-preview button{min-height:32px;padding:4px 10px;border-radius:99px;font-size:11px}
 .chat-upload-progress[hidden]{display:none}
 .chat-upload-progress span{display:block;width:35%;height:100%;border-radius:99px;background:var(--red);animation:cdt-upload-slide 1.1s ease-in-out infinite alternate}
 @keyframes cdt-upload-slide{from{transform:translateX(-10%)}to{transform:translateX(210%)}}
@@ -157,7 +165,9 @@ window.addEventListener('pagehide',saveChatState);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)saveChatState();else clearCameraReturnFlag();});
 window.addEventListener('pageshow',()=>{if(!input.value)restoreChatState();clearCameraReturnFlag();});
 
-function chooseAttachment(file){selectedAttachment=file||null;attachmentName.textContent=selectedAttachment?`📎 ${selectedAttachment.name} • ${(selectedAttachment.size/1024/1024).toFixed(1)} MB`:'';removeAttachmentButton.hidden=!selectedAttachment;}
+const attachmentPreview=document.createElement('div');attachmentPreview.className='chat-attachment-preview';attachmentPreview.hidden=true;attachmentPreview.innerHTML='<div class="preview-thumb">📎</div><div class="preview-copy"></div>';attachmentName.after(attachmentPreview);let attachmentPreviewUrl=null;
+function clearPreviewUrl(){if(attachmentPreviewUrl){URL.revokeObjectURL(attachmentPreviewUrl);attachmentPreviewUrl=null;}}
+function chooseAttachment(file){clearPreviewUrl();selectedAttachment=file||null;attachmentPreview.hidden=!selectedAttachment;removeAttachmentButton.hidden=!selectedAttachment;if(!selectedAttachment){attachmentName.textContent='';attachmentPreview.querySelector('.preview-thumb').textContent='📎';attachmentPreview.querySelector('.preview-copy').replaceChildren();return;}if(selectedAttachment.size>20*1024*1024){selectedAttachment=null;attachmentInput.value='';cameraInput.value='';attachmentPreview.hidden=true;removeAttachmentButton.hidden=true;status.textContent='O arquivo deve ter até 20 MB. Escolha um arquivo menor.';return;}attachmentName.textContent='';const type=selectedAttachment.type||'',thumb=attachmentPreview.querySelector('.preview-thumb'),copy=attachmentPreview.querySelector('.preview-copy');copy.replaceChildren();const name=document.createElement('strong');name.textContent=selectedAttachment.name;const meta=document.createElement('small');meta.textContent=(selectedAttachment.size/1024/1024).toFixed(2)+' MB • '+(type.startsWith('image/')?'Imagem':type.startsWith('video/')?'Vídeo':type.startsWith('audio/')?'Áudio / música':'Documento');copy.append(name,meta);attachmentPreviewUrl=URL.createObjectURL(selectedAttachment);if(type.startsWith('image/')){const img=document.createElement('img');img.src=attachmentPreviewUrl;img.alt='Prévia da imagem';thumb.replaceChildren(img);}else if(type.startsWith('video/')){const video=document.createElement('video');video.src=attachmentPreviewUrl;video.muted=true;video.playsInline=true;video.preload='metadata';thumb.replaceChildren(video);}else if(type.startsWith('audio/')){const audio=document.createElement('audio');audio.src=attachmentPreviewUrl;audio.controls=true;audio.preload='metadata';audio.setAttribute('aria-label','Ouvir música ou áudio selecionado');thumb.replaceChildren(audio);}else thumb.textContent='📄';status.textContent='Anexo pronto. Adicione uma legenda ou envie.';}
 attachmentInput.addEventListener('change',()=>chooseAttachment(attachmentInput.files?.[0]));
 cameraInput.addEventListener('change',()=>{clearCameraReturnFlag();if(cameraInput.files?.[0]){attachmentInput.value='';chooseAttachment(cameraInput.files[0]);}}); 
 const attachButton=document.getElementById('camera-open');
@@ -178,16 +188,16 @@ function addAttachOption(icon,label,accept,mode='file'){
   saveChatState();attachmentInput.click();
  });attachOptions.append(button);
 }
-addAttachOption('🖼️','Fotos e vídeos','image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime,.mov');
-addAttachOption('📄','Documento','application/pdf,text/plain,text/csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx');
-addAttachOption('🎵','Áudio','audio/*');
+addAttachOption('🖼️','Galeria • fotos e vídeos','image/*,video/*');
+addAttachOption('📄','Arquivos e documentos','application/pdf,text/plain,text/csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx');
+addAttachOption('🎵','Áudios e músicas','audio/*');
 addAttachOption('📷','Câmera','image/*,video/*','camera');
 attachMenu.append(attachTitle,attachOptions);document.body.append(attachMenu);
 attachButton.addEventListener('click',()=>{attachMenu.hidden=!attachMenu.hidden;attachButton.setAttribute('aria-expanded',String(!attachMenu.hidden));});
 document.addEventListener('pointerdown',event=>{if(!attachMenu.hidden&&!attachMenu.contains(event.target)&&!attachButton.contains(event.target)){attachMenu.hidden=true;attachButton.setAttribute('aria-expanded','false');}});
 const removeAttachmentButton=document.createElement('button');removeAttachmentButton.type='button';removeAttachmentButton.id='remove-chat-attachment';removeAttachmentButton.textContent='Remover';removeAttachmentButton.hidden=true;
 attachmentName.after(removeAttachmentButton);
-function clearSelectedAttachment(){selectedAttachment=null;attachmentInput.value='';cameraInput.value='';attachmentName.textContent='';removeAttachmentButton.hidden=true;}
+function clearSelectedAttachment(){selectedAttachment=null;attachmentInput.value='';cameraInput.value='';attachmentName.textContent='';removeAttachmentButton.hidden=true;attachmentPreview.hidden=true;attachmentPreview.querySelector('.preview-thumb').textContent='📎';attachmentPreview.querySelector('.preview-copy').replaceChildren();clearPreviewUrl();}
 removeAttachmentButton.addEventListener('click',clearSelectedAttachment);
 
 function updateCounter(){counter.textContent=`${input.value.length}/1000 caracteres`;}
