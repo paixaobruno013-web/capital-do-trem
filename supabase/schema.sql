@@ -416,6 +416,7 @@ create table if not exists public.songs (
   user_id uuid not null references auth.users(id) on delete cascade,
   title text not null check (char_length(title) between 1 and 120),
   artist_name text not null check (char_length(artist_name) between 1 and 100),
+  producer_name text not null default '' check (char_length(producer_name) <= 100),
   description text not null default '' check (char_length(description) <= 1000),
   storage_path text not null unique,
   mime_type text not null check (mime_type in ('audio/mpeg','audio/mp4','audio/aac','audio/wav','audio/ogg','audio/x-wav')),
@@ -433,9 +434,17 @@ create policy "songs_read_published_owner_admin" on public.songs
   using (status='published' or user_id=(select auth.uid()) or (select private.is_admin()));
 drop policy if exists "songs_insert_own_pending" on public.songs;
 drop policy if exists "songs_insert_admin_only" on public.songs;
-create policy "songs_insert_admin_only" on public.songs
+create policy "songs_insert_artist_pending_or_admin" on public.songs
   for insert to authenticated
-  with check (user_id=(select auth.uid()) and (select private.is_admin()));
+  with check (
+    user_id=(select auth.uid())
+    and (
+      (status='pending' and exists (
+        select 1 from public.artists a where a.user_id=(select auth.uid())
+      ))
+      or (select private.is_admin())
+    )
+  );
 drop policy if exists "songs_update_own_pending_admin" on public.songs;
 create policy "songs_update_own_pending_admin" on public.songs
   for update to authenticated
@@ -453,12 +462,15 @@ on conflict (id) do update set public=false,file_size_limit=excluded.file_size_l
   allowed_mime_types=excluded.allowed_mime_types;
 drop policy if exists "audio_upload_own_folder" on storage.objects;
 drop policy if exists "audio_upload_admin_only" on storage.objects;
-create policy "audio_upload_admin_only" on storage.objects
+create policy "audio_upload_artist_own_folder_or_admin" on storage.objects
   for insert to authenticated
   with check (
     bucket_id='capital-do-trem-audio'
     and (storage.foldername(name))[1]=(select auth.uid())::text
-    and (select private.is_admin())
+    and (
+      (select private.is_admin())
+      or exists (select 1 from public.artists a where a.user_id=(select auth.uid()))
+    )
   );
 drop policy if exists "audio_read_published_owner_admin" on storage.objects;
 create policy "audio_read_published_owner_admin" on storage.objects
