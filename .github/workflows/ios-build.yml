@@ -6,6 +6,8 @@ on:
     branches: [main]
     paths:
       - 'index.html'
+      - 'youtube-feed.js'
+      - 'youtube-feed.js'
       - 'event-social-composer.js'
       - 'home-story-composer.js'
       - 'home-story-composer.js'
