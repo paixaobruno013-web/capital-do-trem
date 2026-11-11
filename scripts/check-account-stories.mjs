@@ -4,6 +4,9 @@ import assert from 'node:assert/strict';
 const page = fs.readFileSync('conta.html', 'utf8');
 const script = fs.readFileSync('account-stories.js', 'utf8');
 const auth = fs.readFileSync('supabase/auth.js', 'utf8');
+const storyViewer = fs.readFileSync('stories-ui.js', 'utf8');
+const adminStories = fs.readFileSync('admin-stories.js', 'utf8');
+
 
 assert.match(page, /class="story-profile-actions"/);
 assert.match(page, /id="my-story-avatar"/);
@@ -31,8 +34,6 @@ assert.match(storyViewer, /story\.music_duration_seconds/);
 assert.match(script, /Colocar música no Story/);
 assert.match(script, /musicPreview\.controls = true/);
 assert.match(auth, /export async function createMyStory\(\{ file, caption = '', musicSongId = ''/);
-const storyViewer = fs.readFileSync('stories-ui.js', 'utf8');
-const adminStories = fs.readFileSync('admin-stories.js', 'utf8');
 assert.match(storyViewer, /story\.music_url/);
 assert.match(storyViewer, /Música do Story/);
 assert.match(storyViewer, /activeStoryAudio\.pause\(\)/);
