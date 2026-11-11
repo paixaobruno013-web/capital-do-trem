@@ -61,6 +61,7 @@ jobs:
         run: |
           echo "Versões SDK configuradas pelo Capacitor:"
           grep -nE 'compileSdkVersion|targetSdkVersion|minSdkVersion' android/variables.gradle
+          grep -Eq 'minSdkVersion[[:space:]]*=[[:space:]]*24' android/variables.gradle
           grep -Eq 'targetSdkVersion[[:space:]]*=[[:space:]]*3[6-9]' android/variables.gradle
       - name: Gerar AAB de validação
         working-directory: android
