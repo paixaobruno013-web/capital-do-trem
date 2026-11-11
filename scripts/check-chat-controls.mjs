@@ -30,6 +30,8 @@ const checks = [
   ['Fazer Amigos aparece abaixo do bate-papo e lista somente perfis públicos', /id=\"fazer-amigos\"/.test(room) && /chat-friends-directory/.test(room) && /getPublicProfiles\(\)/.test(room) && /is_public/.test(auth)],
   ['atalho Fazer Amigos da página inicial direciona para a área abaixo do chat', /bate-papo\\.html#fazer-amigos/.test(home)],
   ['mensagens privadas possuem botão de emojis e seletor', /id="private-emoji-toggle"/.test(privateChat) && /id="emoji-tray"[^>]*data-emoji-picker/.test(privateChat)],
+  ['mensagens do bate-papo geral usam imagens emoji com fallback', /function appendEmojiText\(/.test(room) && /appendEmojiText\(body,part\)/.test(room)],
+  ['conversas privadas e grupo renderizam emojis com suporte visual ampliado', /function appendEmojiText\(/.test(privateChat) && /appendEmojiText\(b,m\.content\|\|''\)/.test(privateChat) && /appendEmojiText\(box,m\.content\|\|''\)/.test(privateChat)],
   ['service worker inclui os módulos de chat e mensagens privadas', /chat-enhancements\.js/.test(worker) && /emoji-picker\.js/.test(worker) && /mensagens\.html/.test(worker)],
 
   ['seletor mantém campo de mensagem e envio visíveis enquanto aberto', !privateChat.includes('#compose.emoji-open #message,#compose.emoji-open #send,#compose.emoji-open #private-emoji-toggle{display:none}') && !room.includes('.composer.emoji-open #message,.composer.emoji-open #camera-open,.composer.emoji-open #record-audio,.composer.emoji-open #send,.composer.emoji-open .chat-tools{display:none!important}')],
