@@ -470,6 +470,10 @@ create policy "songs_insert_artist_published_or_admin" on public.songs
       (
         status = 'published'
         and exists (
+          select 1 from public.profiles p
+          where p.user_id = (select auth.uid()) and p.account_type = 'artist'
+        )
+        and exists (
           select 1 from public.artists a where a.user_id = (select auth.uid())
         )
       )
