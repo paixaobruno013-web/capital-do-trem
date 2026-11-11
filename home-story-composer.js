@@ -162,14 +162,13 @@ function capturePhoto() {
   canvas.width = live.videoWidth;
   canvas.height = live.videoHeight;
   const context = canvas.getContext('2d');
-  context.filter = effectCss();
+  context.filter = 'none';
   context.drawImage(live, 0, 0, canvas.width, canvas.height);
   canvas.toBlob(blob => {
     if (!blob) { say('Não foi possível capturar a foto. Tente novamente.'); return; }
     setSelected(new File([blob], 'capital-do-trem-story.jpg', { type: 'image/jpeg' }));
-    // A foto capturada já recebeu o efeito na imagem; evita aplicar duas vezes na prévia.
-    photoPreview.style.filter = 'none';
-    say('Foto pronta com efeito aplicado. Você pode salvar na galeria ou publicar.');
+    applyEffect();
+    say('Foto pronta com o efeito selecionado. Você pode salvar na galeria ou publicar.');
   }, 'image/jpeg', 0.94);
 }
 function startFilteredRecording() {
