@@ -12,7 +12,7 @@ A decisão do projeto é manter o Capital do Trem gratuito para baixar e usar, s
 
 ---
 
-Atualizado em 10/11/2026. Este documento separa o que já existe no repositório do que ainda precisa ser comprovado antes do lançamento.
+Atualizado em 11/11/2026. Este documento separa o que já existe no repositório do que ainda precisa ser comprovado antes do lançamento.
 
 ## Atualização técnica — 11/11/2026
 
@@ -25,7 +25,7 @@ As compilações de CI no commit `0e884e3c` foram concluídas com sucesso:
 
 **Ainda não há publicação nas lojas.** O APK atual é debug; o build iOS de dispositivo é unsigned. Nenhum deles deve ser enviado à Play Console ou ao App Store Connect.
 
-Foi adicionado o workflow `.github/workflows/store-package-validation.yml`, que prepara uma validação específica do Android App Bundle e do archive iOS, ambos sem assinatura. Esses artefatos servem para confirmar empacotamento e metadados; não substituem a assinatura de distribuição, credenciais de desenvolvedor, testes em aparelhos reais ou revisão das lojas.
+Foi adicionado o workflow `.github/workflows/store-package-validation.yml`. Na execução `42955993898`, em 11/11/2026, os dois jobs terminaram com sucesso: o Android gerou e conferiu `capital-do-trem-android-aab-unsigned` (AAB de validação, 3,05 MB), e o iOS gerou `capital-do-trem-ios-archive-unsigned` (archive técnico, 3,99 MB). Os artefatos ficam disponíveis no GitHub Actions por 14 dias. Ambos continuam sem assinatura de distribuição; não substituem credenciais de desenvolvedor, testes em aparelhos reais ou revisão das lojas. O workflow também foi ampliado para disparar automaticamente quando arquivos HTML, JavaScript, CSS, JSON, imagens e demais recursos do app mudarem.
 
 ## Situação técnica verificada no repositório
 
@@ -64,7 +64,7 @@ Fontes oficiais:
 ## Bloqueios antes de enviar à Play Store
 
 - [x] Gerar o projeto Android nativo e confirmar compilação limpa em CI (a validação em aparelho real ainda está pendente).
-- [ ] Confirmar no AAB de validação que `targetSdk` é 36 ou superior e registrar o resultado.
+- [x] Confirmar no workflow que `targetSdk` é 36 ou superior; a etapa de conferência passou na execução `42955993898`.
 - [ ] Definir `versionCode` e `versionName` de lançamento.
 - [ ] Criar e guardar com segurança a chave de assinatura de produção; gerar um Android App Bundle (.aab) assinado. Não publicar APK debug.
 - [ ] Instalar o pacote de lançamento assinado em aparelhos reais e testar login, cadastro, navegação, áudio, reprodução com tela bloqueada (se suportada), upload autorizado, chat, eventos, localização, links externos, offline e atualização.
@@ -123,4 +123,4 @@ Entretenimento ou Música e áudio. Confirmar a categoria que melhor representa 
 - Preparação para revisão, política de privacidade, anúncios, acesso dos revisores e classificação: https://support.google.com/googleplay/android-developer/answer/9859455
 - Segurança dos dados: https://support.google.com/googleplay/android-developer/answer/10787469
 
-**Importante:** este checklist e o texto de loja são preparação. Eles não significam que o AAB foi gerado, que a conta Play Console foi configurada ou que o app foi aprovado/publicado.
+**Importante:** o AAB e o archive técnico de validação foram gerados, mas estão sem assinatura de distribuição. Este checklist não significa que as contas de desenvolvedor foram configuradas, que os pacotes assinados foram enviados ou que os apps foram aprovados/publicados.
