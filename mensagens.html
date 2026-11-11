@@ -235,14 +235,18 @@ const esc=s=>String(s||'');const fmt=v=>new Date(v).toLocaleString('pt-BR',{date
 const shareParams=new URLSearchParams(window.location.search);
 let sharedDraft='';
 try{
- const sharedTitle=(shareParams.get('share_title')||'Vídeo compartilhado').slice(0,160);
- const sharedUrl=new URL(shareParams.get('share_url')||'');
- const sharedSource=(shareParams.get('share_source')||'Capital do Trem').slice(0,40);
- if(sharedUrl.protocol==='https:'&&['youtu.be','www.youtube.com','youtube.com'].includes(sharedUrl.hostname)){
-  sharedDraft=sharedTitle+'\n'+sharedSource+': '+sharedUrl.href;
-  const hint=document.getElementById('shared-content-hint');if(hint)hint.hidden=false;
+ const sharedText=shareParams.get('share_text');
+ if(sharedText){sharedDraft=sharedText.slice(0,1400);}
+ else{
+  const sharedTitle=(shareParams.get('share_title')||'Vídeo compartilhado').slice(0,160);
+  const sharedUrl=new URL(shareParams.get('share_url')||'');
+  const sharedSource=(shareParams.get('share_source')||'Capital do Trem').slice(0,40);
+  if(sharedUrl.protocol==='https:'&&['youtu.be','www.youtube.com','youtube.com'].includes(sharedUrl.hostname)){
+   sharedDraft=sharedTitle+'\n'+sharedSource+': '+sharedUrl.href;
+  }
  }
-}catch(error){/* Ignora links de compartilhamento inválidos. */}
+ if(sharedDraft){const hint=document.getElementById('shared-content-hint');if(hint)hint.hidden=false;}
+}catch(error){/* Ignora conteúdo de compartilhamento inválido. */}
 
 const privateAttachButton=$('private-attach'),privateFileInput=$('private-attachment-input'),privatePreview=$('private-attachment-preview'),privateFileName=$('private-attachment-name'),privateFileSize=$('private-attachment-size'),privateFileKind=$('private-attachment-kind'),privateThumb=$('private-attachment-thumb'),privateRemove=$('private-attachment-remove'),privateProgress=$('private-upload-progress');
 let selectedPrivateFile=null,privatePreviewUrl=null;
