@@ -39,6 +39,16 @@ let previewUrl = '';
 let recordLimit = null;
 let busy = false;
 let cameraRequestId = 0;
+let recordingAudioStream = null;
+function stopRecordingAudio() {
+  if (!recordingAudioStream) return;
+  const tracks = recordingAudioStream.getAudioTracks();
+  tracks.forEach(track => {
+    try { stream?.removeTrack(track); } catch {}
+    track.stop();
+  });
+  recordingAudioStream = null;
+}
 
 function say(text) { if (status) status.textContent = text; }
 function effectCss() { return effects[activeEffect]?.css || 'none'; }
@@ -98,10 +108,24 @@ async function startCamera() {
     return false;
   }
   try {
-    const cameraStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: facingMode }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-      audio: true
-    });
+    let cameraStream;
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: facingMode },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          frameRate: { ideal: 24, max: 30 }
+        },
+        audio: false
+      });
+    } catch (firstError) {
+      if (firstError?.name === 'NotAllowedError' || firstError?.name === 'SecurityError') throw firstError;
+      cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: facingMode } },
+        audio: false
+      });
+    }
     // The user may close the composer or switch cameras while permission is pending.
     if (requestId !== cameraRequestId || !modal?.classList.contains('is-open')) {
       cameraStream.getTracks().forEach(track => track.stop());
@@ -111,10 +135,20 @@ async function startCamera() {
     cameraZoom = Number(zoomControl?.value || 1);
     if (zoomValue) zoomValue.textContent = cameraZoom.toFixed(1).replace('.0','') + '×';
     live.style.transform = 'scale(' + cameraZoom + ')';
+    live.muted = true;
+    live.autoplay = true;
+    live.playsInline = true;
     live.srcObject = stream;
     live.hidden = false;
     applyEffect();
-    await live.play().catch(() => {});
+    await live.play();
+    if (!live.videoWidth || !live.videoHeight) {
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('A câmera demorou para iniciar')), 4500);
+        live.addEventListener('loadedmetadata', () => { clearTimeout(timeout); resolve(); }, { once: true });
+        live.addEventListener('error', () => { clearTimeout(timeout); reject(new Error('Falha na prévia da câmera')); }, { once: true });
+      });
+    }
     message.textContent = 'Câmera aberta • escolha Foto, Vídeo ou Álbum';
     say('Câmera pronta. Escolha um efeito ou capture sua mídia.');
     return true;
@@ -159,6 +193,7 @@ function openComposer() {
 }
 function releaseCameraResources() {
   clearTimeout(recordLimit);
+  stopRecordingAudio();
   if (renderFrame) cancelAnimationFrame(renderFrame);
   renderFrame = 0;
   if (processedStream) processedStream.getTracks().forEach(track => track.stop());
@@ -233,7 +268,7 @@ function startFilteredRecording() {
   processedStream = videoStream;
   return videoStream;
 }
-function toggleRecording() {
+async function toggleRecording() {
   if (recorder?.state === 'recording') {
     recorder.stop();
     recordButton.textContent = '● Vídeo';
@@ -243,7 +278,28 @@ function toggleRecording() {
     say('A gravação pela câmera não está disponível neste navegador. Escolha um vídeo do álbum.');
     return;
   }
+  const activeCameraStream = stream;
   try {
+    // O microfone só é solicitado quando a pessoa escolhe gravar vídeo;
+    // abrir a câmera para tirar foto não depende da permissão de áudio.
+    try {
+      recordingAudioStream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true },
+        video: false
+      });
+      if (stream !== activeCameraStream || !modal?.classList.contains('is-open')) {
+        stopRecordingAudio();
+        return;
+      }
+      recordingAudioStream.getAudioTracks().forEach(track => activeCameraStream.addTrack(track));
+    } catch (audioError) {
+      recordingAudioStream = null;
+      say('Microfone indisponível. O vídeo será gravado sem áudio.');
+    }
+    if (stream !== activeCameraStream || !modal?.classList.contains('is-open')) {
+      stopRecordingAudio();
+      return;
+    }
     const recordingStream = startFilteredRecording();
     const mimeType = ['video/mp4;codecs=h264','video/mp4','video/webm;codecs=vp8','video/webm']
       .find(type => MediaRecorder.isTypeSupported?.(type));
@@ -251,12 +307,14 @@ function toggleRecording() {
     chunks = [];
     recorder.ondataavailable = event => { if (event.data?.size) chunks.push(event.data); };
     recorder.onerror = () => {
+      stopRecordingAudio();
       clearTimeout(recordLimit);
       if (renderFrame) cancelAnimationFrame(renderFrame);
       recordButton.textContent = '● Vídeo';
       say('A gravação foi interrompida. Tente novamente ou escolha um vídeo do álbum.');
     };
     recorder.onstop = () => {
+      stopRecordingAudio();
       clearTimeout(recordLimit);
       if (renderFrame) cancelAnimationFrame(renderFrame);
       if (processedStream) processedStream.getTracks().forEach(track => track.stop());
@@ -275,6 +333,7 @@ function toggleRecording() {
       if (recorder?.state === 'recording') recorder.stop();
     }, 30000);
   } catch (error) {
+    stopRecordingAudio();
     if (renderFrame) cancelAnimationFrame(renderFrame);
     renderFrame = 0;
     if (processedStream) processedStream.getTracks().forEach(track => track.stop());
