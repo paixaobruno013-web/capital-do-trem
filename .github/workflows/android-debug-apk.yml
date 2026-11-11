@@ -13,6 +13,9 @@ on:
       - 'scripts/**'
       - 'assets/**'
       - 'home-story-composer.js'
+      - 'stories-ui.js'
+      - 'account-stories.js'
+      - 'admin-stories.js'
       - 'event-social-composer.js'
       - '.github/workflows/android-debug-apk.yml'
 
