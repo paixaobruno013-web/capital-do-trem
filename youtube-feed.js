@@ -41,7 +41,7 @@ function createPlayer(id,title){
   const frame=document.createElement('iframe');
   frame.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?playsinline=1&rel=0&autoplay=1';
   frame.title=title;
-  frame.loading='lazy';
+  frame.loading='eager';
   frame.referrerPolicy='strict-origin-when-cross-origin';
   frame.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
   frame.allowFullscreen=true;
@@ -141,7 +141,7 @@ function makeExploreCard(video,index){
   const article=document.createElement('article');article.className='explore-video-card';
   const heading=document.createElement('h3');heading.textContent=video.title;
   const stage=document.createElement('div');stage.className='explore-video-stage';
-  const play=document.createElement('button');play.type='button';play.className='explore-video-play';play.textContent='▶ Assistir';
+  const play=document.createElement('button');play.type='button';play.className='explore-video-play';play.textContent='▶ Assistir no aplicativo';play.setAttribute('aria-label','Assistir '+video.title+' dentro do aplicativo');
   if(video.platform==='youtube'){
     const image=document.createElement('img');image.src='https://i.ytimg.com/vi/'+video.id+'/hqdefault.jpg';image.alt='Prévia do Short';image.loading='lazy';image.decoding='async';
     play.prepend(image);
