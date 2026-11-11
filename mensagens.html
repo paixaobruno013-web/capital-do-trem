@@ -170,6 +170,45 @@ body.light .messages{background:linear-gradient(180deg,#fff8f8,#f4f4f4)}
 .message-attachment audio{width:100%;min-width:220px}
 .document-attachment{display:flex;align-items:center;gap:8px;min-height:46px;padding:10px 12px;border-radius:12px;background:#333;color:#fff;text-decoration:none;overflow-wrap:anywhere}
 @media(max-width:480px){#compose #private-attach{flex-basis:36px;width:36px;min-width:36px;height:36px;min-height:36px}.private-attachment-menu{bottom:calc(76px + env(safe-area-inset-bottom,0px))}}
+
+/* Teclado visual do Capital do Trem: teclas pretas com luz vermelha suave ao fundo. */
+.emoji-picker,.emoji-full-panel,.emoji-category-grid{
+  background:radial-gradient(ellipse at 50% 0%,rgba(237,28,36,.18),rgba(12,0,2,.96) 72%)!important;
+  border-color:rgba(237,28,36,.34)!important;
+  box-shadow:inset 0 0 22px rgba(237,28,36,.10),0 0 13px rgba(237,28,36,.10);
+}
+.emoji-recent-strip .emoji-choice,.emoji-category-grid .emoji-choice,
+.emoji-category-tabs button,.emoji-all-toggle,.emoji-close{
+  background:#050505!important;color:#fff!important;
+  border:1px solid rgba(237,28,36,.38)!important;
+  box-shadow:0 0 5px rgba(237,28,36,.16),inset 0 0 7px rgba(237,28,36,.08);
+}
+.emoji-recent-strip .emoji-choice:active,.emoji-category-grid .emoji-choice:active,
+.emoji-category-tabs button[aria-pressed="true"]{
+  background:#180507!important;border-color:#ed1c24!important;
+  box-shadow:0 0 9px rgba(237,28,36,.38),inset 0 0 8px rgba(237,28,36,.18);
+}
+.composer,.compose{
+  background:radial-gradient(ellipse at 50% 0%,rgba(237,28,36,.13),#050505 75%)!important;
+  border-color:rgba(237,28,36,.38)!important;
+  box-shadow:0 0 12px rgba(237,28,36,.13),inset 0 0 12px rgba(237,28,36,.07)!important;
+}
+.composer button,.compose button,.chat-tools button{
+  background:#050505!important;color:#fff!important;
+  border:1px solid rgba(237,28,36,.48)!important;
+  box-shadow:0 0 7px rgba(237,28,36,.18),inset 0 0 7px rgba(237,28,36,.08)!important;
+}
+.composer button#send,.compose button.primary{
+  background:#090909!important;border-color:#ed1c24!important;
+  box-shadow:0 0 9px rgba(237,28,36,.32),inset 0 0 8px rgba(237,28,36,.12)!important;
+}
+.composer input#message,.compose input{
+  color:#fff!important;
+}
+body.light .emoji-picker,body.light .emoji-full-panel,body.light .emoji-category-grid{
+  background:radial-gradient(ellipse at 50% 0%,rgba(237,28,36,.14),#13090a 78%)!important;
+}
+
 </style></head>
 <body><a class="skip" href="#main">Pular para o conteúdo</a>
 <header><img src="./marca.svg" alt="Capital do Trem"><h1>Minhas conversas</h1><p class="muted">Conversas individuais com convite e aceite antes de começar.</p><div class="actions"><a class="btn" href="./index.html">Início</a><a class="btn" href="./bate-papo.html">Fala Trem • Geral</a><a class="btn" href="./conta.html">Minha conta</a><button id="theme" type="button">☀️ Claro</button></div></header>
