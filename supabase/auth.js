@@ -1701,6 +1701,30 @@ export async function deleteAdminPrivateGalleryItem(id) {
 
 
 
+// Interações sociais das divulgações públicas.
+export async function getPostSocial(postId) {
+ const supabase=initSupabase();
+ const [likes,comments]=await Promise.all([
+  supabase.from('post_likes').select('user_id',{count:'exact',head:true}).eq('post_id',postId),
+  supabase.from('post_comments').select('id,post_id,author_id,author_name,content,created_at').eq('post_id',postId).order('created_at',{ascending:true}).limit(100)
+ ]);
+ if(likes.error)throw likes.error;if(comments.error)throw comments.error;
+ const {data:{user}}=await supabase.auth.getUser();let liked=false;
+ if(user){const {data,error}=await supabase.from('post_likes').select('post_id').eq('post_id',postId).eq('user_id',user.id).maybeSingle();if(error)throw error;liked=!!data;}
+ return {likeCount:likes.count||0,liked,comments:comments.data||[]};
+}
+export async function togglePostLike(postId) {
+ const supabase=initSupabase();const {data:{user},error:userError}=await supabase.auth.getUser();if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para curtir uma publicação.');
+ const {data:existing,error:lookupError}=await supabase.from('post_likes').select('post_id').eq('post_id',postId).eq('user_id',user.id).maybeSingle();if(lookupError)throw lookupError;
+ if(existing){const {error}=await supabase.from('post_likes').delete().eq('post_id',postId).eq('user_id',user.id);if(error)throw error;return false;}
+ const {error}=await supabase.from('post_likes').insert({post_id:postId,user_id:user.id});if(error)throw error;return true;
+}
+export async function addPostComment(postId,content) {
+ const supabase=initSupabase();const {data:{user},error:userError}=await supabase.auth.getUser();if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para comentar.');
+ const clean=String(content||'').trim();if(!clean||clean.length>1000)throw new Error('O comentário deve ter entre 1 e 1.000 caracteres.');
+ const {data,error}=await supabase.from('post_comments').insert({post_id:postId,author_id:user.id,content:clean}).select('id,post_id,author_id,author_name,content,created_at').single();if(error)throw error;return data;
+}
+
 // Publicações salvas: coleção particular sincronizada pela conta.
 export async function getMySavedPosts() {
  const supabase=initSupabase();const {data:{user},error:userError}=await supabase.auth.getUser();if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para ver seus itens salvos.');
