@@ -2151,6 +2151,20 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
 #capital-story-controls button,#capital-story-close{pointer-events:auto;border:0;background:rgba(0,0,0,.38);color:#fff;font-size:25px;width:48px;min-height:54px}
 #capital-story-close{position:absolute;right:8px;top:8px;width:42px;height:42px;min-height:42px;border-radius:50%;z-index:2;background:rgba(0,0,0,.65)}
 @media(min-width:760px){#capital-story-viewer{padding:24px}}
+
+/* Stories: zoom discreto e ferramentas compactas, sem cobrir a imagem. */
+.home-story-zoom{left:50%;right:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 202px);transform:translateX(-50%);width:min(54vw,250px);gap:7px;padding:2px 8px;border:0;border-radius:0;background:transparent;box-shadow:none;backdrop-filter:none}
+.home-story-zoom input{appearance:none;-webkit-appearance:none;height:2px;min-height:2px;margin:0;padding:0;border:0;border-radius:2px;background:#111;outline:1px solid rgba(255,255,255,.65);box-shadow:0 0 2px #000}
+.home-story-zoom input::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;border-radius:50%;background:#ed1c24;border:1px solid #fff;box-shadow:0 0 4px #000}
+.home-story-zoom input::-moz-range-thumb{width:9px;height:9px;border-radius:50%;background:#ed1c24;border:1px solid #fff}
+.home-story-zoom output{min-width:30px;font-size:10px;font-weight:700;text-shadow:0 1px 3px #000}
+.home-story-effects{bottom:calc(env(safe-area-inset-bottom,0px) + 56px);padding:3px 8px 4px;background:linear-gradient(transparent,#0009 35%)}
+.home-story-effects>strong{font-size:9px;margin:0 0 2px;opacity:.8}
+.home-story-effect-list{gap:4px;padding:1px 0 2px}
+.home-story-effect-list button{min-height:26px;padding:3px 8px;font-size:9px;border-radius:16px;background:#1119}
+#home-story-album-button,#home-story-flip-button{min-width:54px;min-height:32px;height:32px;padding:4px 8px;font-size:10px;border-radius:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
+#home-story-album-button{left:12px}#home-story-flip-button{right:12px}
+@media(max-height:680px){.home-story-zoom{bottom:calc(env(safe-area-inset-bottom,0px) + 160px);width:min(48vw,210px)}.home-story-effects{bottom:calc(env(safe-area-inset-bottom,0px) + 44px)}.home-story-effect-list button{min-height:24px;padding:2px 7px}}
 </style>
 <div id="home-story-composer" aria-hidden="true">
  <section id="home-story-composer-card" role="dialog" aria-modal="true" aria-labelledby="home-story-compose-title">
