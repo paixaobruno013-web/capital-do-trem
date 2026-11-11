@@ -47,7 +47,9 @@ const checks = [
   ['feed único inclui os 20 Shorts enviados e os reproduz dentro do app', (youtubeFeed.match(/'([A-Za-z0-9_-]{11})'/g)||[]).length >= 20 && youtubeFeed.includes('youtube-nocookie.com/embed/') && home.includes('<script type="module" src="./youtube-feed.js"></script>')],
   ['feed de vídeos não cria categorias e mantém compartilhamento no Koe Fala Tu', youtubeFeed.includes('SHORTS.concat(CHANNEL_FALLBACK)') && youtubeFeed.includes('Koe Fala Tu') && youtubeFeed.includes('navigator.share')],
   ['curtidas e comentários usam tabelas com RLS e propriedade por usuário', videoPolicy.includes('create table if not exists public.video_likes') && videoPolicy.includes('create table if not exists public.video_comments') && videoPolicy.includes('enable row level security') && videoPolicy.includes('auth.uid()')],
-  ['câmera frontal/traseira e efeitos permanecem dentro do modal de Stories', home.includes('id="home-story-flip-button"') && home.includes('data-story-effect="night"') && home.includes('id="home-story-composer"') && story.includes("facingMode = facingMode === 'environment' ? 'user' : 'environment'")]
+  ['câmera frontal/traseira e efeitos permanecem dentro do modal de Stories', home.includes('id="home-story-flip-button"') && home.includes('data-story-effect="night"') && home.includes('id="home-story-composer"') && story.includes("facingMode = facingMode === 'environment' ? 'user' : 'environment'")],
+  ['encerramento da câmera aguarda o MediaRecorder finalizar o último trecho', story.includes("activeRecorder.addEventListener('stop', releaseCameraResources, { once: true })") && story.includes('activeRecorder.stop();')],
+  ['gravação não finge aplicar efeitos se captureStream não estiver disponível', story.includes("throw new Error('Canvas captureStream indisponível')") && story.includes('if (!videoStream)')]
 ];
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO') + ' ' + name);
 const failed = checks.filter(([, ok]) => !ok);
