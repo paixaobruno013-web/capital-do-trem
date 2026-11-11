@@ -233,6 +233,8 @@ async function refreshStories({ notify = false, previousAdmin = new Set(), previ
     console.info('Stories aguardando conexão:', error?.message || error);
   }
 }
+document.addEventListener('capital:stories-updated', () => refreshStories());
+
 if (viewer) {
   const openOfficial = () => openViewer(officialStories, 'Stories oficiais da Capital do Trem', logo);
   logo?.addEventListener('click', openOfficial);
