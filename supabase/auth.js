@@ -468,6 +468,10 @@ export async function uploadMySong({ file, title, artistName, producerName = '',
   // Artistas com ficha própria publicam diretamente no catálogo; a equipe não precisa aprovar cada envio.
   const isAdmin = await isCurrentUserAdmin();
   if (!isAdmin) {
+    const { data: accountProfile, error: accountError } = await supabase.from('profiles')
+      .select('account_type').eq('user_id', user.id).maybeSingle();
+    if (accountError) throw accountError;
+    if (accountProfile?.account_type !== 'artist') throw new Error('Somente contas Artista / DJ podem publicar músicas.');
     const { data: artistProfile, error: artistError } = await supabase.from('artists')
       .select('id').eq('user_id', user.id).maybeSingle();
     if (artistError) throw artistError;
