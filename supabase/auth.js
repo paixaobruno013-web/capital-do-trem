@@ -711,12 +711,14 @@ function describeChatFile(file) {
   if (!(file instanceof File)) throw new Error('Escolha um arquivo do celular.');
   const extension = String(file.name || '').split('.').pop().toLowerCase();
   const rawMime = String(file.type || '').toLowerCase().split(';')[0].trim();
-  const mime = Object.values(CHAT_ATTACHMENT_TYPES).includes(rawMime) ? rawMime : CHAT_ATTACHMENT_TYPES[extension];
+  const allowedMimes = [...Object.values(CHAT_ATTACHMENT_TYPES), 'audio/webm'];
+  const mime = allowedMimes.includes(rawMime) ? rawMime : CHAT_ATTACHMENT_TYPES[extension];
   if (!mime) throw new Error('Formato não permitido. Envie foto, vídeo, áudio, PDF, texto ou documento Office.');
   const type = mime.startsWith('image/') ? 'image' : mime.startsWith('video/') ? 'video' : mime.startsWith('audio/') ? 'audio' : 'document';
+  const canonicalExtension = mime === 'audio/webm' ? 'webm' : (Object.entries(CHAT_ATTACHMENT_TYPES).find(([, value]) => value === mime)?.[0] || extension);
   if (file.size < 1 || file.size > 20 * 1024 * 1024) throw new Error('O arquivo precisa ter até 20 MB.');
   if (type === 'image' && file.size > 12 * 1024 * 1024) throw new Error('Fotos precisam ter até 12 MB.');
-  return { type, mime, extension, name: String(file.name || 'arquivo').slice(0,180), size: file.size };
+  return { type, mime, extension:canonicalExtension, name: String(file.name || 'arquivo').slice(0,180), size: file.size };
 }
 async function uploadChatFile(file, path) {
   const supabase = initSupabase();
