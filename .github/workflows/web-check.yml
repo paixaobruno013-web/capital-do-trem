@@ -42,6 +42,10 @@ jobs:
           node --check youtube-feed.js
           node scripts/check-social-saved-youtube.mjs
           test -s www/youtube-feed.js
+      - name: Verificar curtidas e comentários do mural
+        run: |
+          node --check scripts/check-post-social.mjs
+          node scripts/check-post-social.mjs
       - name: Verificar controles e regressões do chat
         run: node scripts/check-chat-controls.mjs
       - name: Verificar anexos seguros e envio moderno do chat
