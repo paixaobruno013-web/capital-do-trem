@@ -27,6 +27,18 @@ As compilações de CI no commit `0e884e3c` foram concluídas com sucesso:
 
 Foi adicionado o workflow `.github/workflows/store-package-validation.yml`. Na execução `42955993898`, em 11/11/2026, os dois jobs terminaram com sucesso: o Android gerou e conferiu `capital-do-trem-android-aab-unsigned` (AAB de validação, 3,05 MB), e o iOS gerou `capital-do-trem-ios-archive-unsigned` (archive técnico, 3,99 MB). Os artefatos ficam disponíveis no GitHub Actions por 14 dias. Ambos continuam sem assinatura de distribuição; não substituem credenciais de desenvolvedor, testes em aparelhos reais ou revisão das lojas. O workflow também foi ampliado para disparar automaticamente quando arquivos HTML, JavaScript, CSS, JSON, imagens e demais recursos do app mudarem.
 
+## Revisão de mensagens e anexos — 11/11/2026
+
+- [x] Anexos novos do grupo e das conversas privadas migrados para bucket privado `capital-do-trem-chat`.
+- [x] Regras de Storage verificam membro ativo do grupo ou participante de conversa aceita; bloqueios impedem a leitura de anexos privados.
+- [x] Links de acesso são temporários (15 minutos); o aplicativo continua exibindo a mensagem mesmo se a assinatura do anexo falhar.
+- [x] Interface de anexos no estilo mensageiro: galeria, câmera, áudio, documentos, prévia, remoção e estado de envio.
+- [x] Formatos compatíveis incluem imagens, MP4/WebM/MOV, áudio e documentos PDF/Office; limite de 20 MB por arquivo e 12 MB para imagens.
+- [x] Fluxo de exclusão de conta atualizado para localizar e remover arquivos de grupo e de conversas privadas; Edge Function `delete-account` implantada na versão 2, com JWT obrigatório.
+- [x] Cinco índices de chaves estrangeiras adicionados após revisão do Performance Advisor.
+- [ ] Testar envio e leitura com duas contas reais, incluindo bloqueio, saída do grupo e exclusão de uma conta de teste.
+- [ ] Testar seleção de arquivos em Android real e iPhone real; a compilação nativa em CI não substitui esses testes.
+
 ## Situação técnica verificada no repositório
 
 - Identificador configurado no Capacitor: `com.capitaldotrem.app`.
