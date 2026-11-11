@@ -133,7 +133,7 @@
   if(probeRunning||document.hidden)return;
   probeRunning=true;
   const controller=new AbortController();
-  const timeout=window.setTimeout(()=>controller.abort(),4200);
+  const timeout=window.setTimeout(()=>controller.abort(),2500);
   try{
    if(!navigator.onLine)throw new Error('Dispositivo sem rede');
    const response=await fetch('https://zmjxkfjzrbbxyvgkwirv.supabase.co/auth/v1/health?cdt_probe='+Date.now(),{
@@ -173,7 +173,7 @@
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)verifyRealConnection();});
  window.setTimeout(verifyRealConnection,500);
  // Mantém a detecção de quedas silenciosas sem consultar a rede a cada 5 segundos.
- window.setInterval(verifyRealConnection,30*1000);
+ window.setInterval(verifyRealConnection,5*1000);
  if(!supportsServiceWorkerUpdates||!('serviceWorker' in navigator))return;
  let registration=null,reloading=false;
  const banner=document.createElement('aside');
