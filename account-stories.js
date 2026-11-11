@@ -15,6 +15,8 @@ const preview = el('my-story-preview');
 const cancelButton = el('my-story-cancel');
 let previewUrl = '';
 let loading = false;
+let storySongs = [];
+let musicSelect, musicStart, musicVolume, musicPreview;
 let observer;
 
 function say(message) { if (status) status.textContent = message; }
@@ -112,11 +114,54 @@ async function activate() {
     const profile = await auth.getMyBasicProfile();
     const profileAvatar = await auth.getMyAvatar().catch(() => null);
     renderAvatar(profileAvatar, profile);
+    storySongs = await auth.getPublishedSongs().catch(error => { console.info('Catálogo musical indisponível:', error?.message || error); return []; });
+    mountStoryMusicPicker();
     await loadStories();
   } catch (error) {
     panel.dataset.storiesReady = '';
     say(error?.message || 'Entre na sua conta para publicar Stories.');
   }
+}
+function mountStoryMusicPicker() {
+  if (!composeFields || document.getElementById('my-story-music-picker')) return;
+  const wrap = document.createElement('section');
+  wrap.id = 'my-story-music-picker';
+  wrap.className = 'notice';
+  wrap.style.margin = '12px 0';
+  const heading = document.createElement('strong');
+  heading.textContent = '🎵 Colocar música no Story';
+  const hint = document.createElement('p');
+  hint.className = 'muted';
+  hint.textContent = 'Escolha uma faixa publicada no catálogo do Capital do Trem. Use apenas músicas próprias ou autorizadas.';
+  const label = document.createElement('label');
+  label.textContent = 'Música do catálogo';
+  musicSelect = document.createElement('select');
+  musicSelect.id = 'my-story-music-song';
+  musicSelect.append(new Option('Publicar sem música', ''));
+  for (const song of storySongs) musicSelect.append(new Option(song.artist_name + ' — ' + song.title, song.id));
+  const startLabel = document.createElement('label');
+  startLabel.textContent = 'Começar a música em (segundos)';
+  musicStart = document.createElement('input');
+  musicStart.type = 'number'; musicStart.min = '0'; musicStart.max = '3600'; musicStart.step = '1'; musicStart.value = '0';
+  const volumeLabel = document.createElement('label');
+  volumeLabel.textContent = 'Volume da música';
+  musicVolume = document.createElement('input');
+  musicVolume.type = 'range'; musicVolume.min = '0'; musicVolume.max = '1'; musicVolume.step = '0.05'; musicVolume.value = '0.8';
+  musicPreview = document.createElement('audio');
+  musicPreview.controls = true; musicPreview.preload = 'none'; musicPreview.hidden = true;
+  musicSelect.addEventListener('change', () => {
+    const song = storySongs.find(item => item.id === musicSelect.value);
+    musicPreview.pause();
+    musicPreview.removeAttribute('src');
+    if (song) { musicPreview.src = song.audio_url; musicPreview.currentTime = Number(musicStart.value) || 0; musicPreview.volume = Number(musicVolume.value); musicPreview.hidden = false; }
+    else musicPreview.hidden = true;
+  });
+  musicStart.addEventListener('change', () => { if (musicPreview.src) { try { musicPreview.currentTime = Number(musicStart.value) || 0; } catch {} } });
+  musicVolume.addEventListener('input', () => { if (musicPreview) musicPreview.volume = Number(musicVolume.value); });
+  if (!storySongs.length) { const empty = document.createElement('p'); empty.className = 'muted'; empty.textContent = 'O catálogo ainda não tem músicas publicadas disponíveis. Você pode publicar o Story normalmente sem trilha.'; wrap.append(heading, hint, empty); }
+  else wrap.append(heading, hint, label, musicSelect, startLabel, musicStart, volumeLabel, musicVolume, musicPreview);
+  const caption = document.getElementById('my-story-caption');
+  composeFields.insertBefore(wrap, caption?.parentElement || composeFields.firstChild);
 }
 function clearStoryDraft() {
   if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = ''; }
@@ -156,7 +201,7 @@ form?.addEventListener('submit', async event => {
   publishButton.textContent = 'PUBLICANDO…';
   say('Enviando sua publicação…');
   try {
-    await auth.createMyStory({ file, caption: captionInput.value });
+    await auth.createMyStory({ file, caption: captionInput.value, musicSongId: musicSelect?.value || '', musicStartSeconds: musicStart?.value || 0, musicVolume: musicVolume?.value || 0.8 });
     clearStoryDraft();
     await loadStories();
     say('🟢 Seu Story foi publicado! Ele já aparece para a comunidade por 24 horas.');
