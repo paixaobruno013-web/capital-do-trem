@@ -65,7 +65,7 @@ async function startCamera() {
   try {
     stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: 'environment' } },
-      audio: false
+      audio: true
     });
     live.srcObject = stream;
     live.hidden = false;
