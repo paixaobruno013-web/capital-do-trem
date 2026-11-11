@@ -6,6 +6,8 @@ on:
     branches: [main]
     paths:
       - 'index.html'
+      - 'conta.html'
+      - 'home-story-composer.js'
       - 'estudio.html'
       - 'admin.html'
       - 'bate-papo.html'
