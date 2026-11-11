@@ -1,10 +1,11 @@
 import { readFile } from 'node:fs/promises';
-const [index, auth, messages, worker, edge] = await Promise.all([
+const [index, auth, messages, worker, edge, feed] = await Promise.all([
   readFile(new URL('../index.html', import.meta.url), 'utf8'),
   readFile(new URL('../supabase/auth.js', import.meta.url), 'utf8'),
   readFile(new URL('../mensagens.html', import.meta.url), 'utf8'),
   readFile(new URL('../sw.js', import.meta.url), 'utf8'),
-  readFile(new URL('../supabase/functions/youtube-channel-feed/index.ts', import.meta.url), 'utf8')
+  readFile(new URL('../supabase/functions/youtube-channel-feed/index.ts', import.meta.url), 'utf8'),
+  readFile(new URL('../youtube-feed.js', import.meta.url), 'utf8')
 ]);
 const checks = [
   [auth.includes('export async function getMySavedPosts') && auth.includes('export async function toggleSavedPost'), 'API de publicações salvas ausente'],
@@ -15,9 +16,9 @@ const checks = [
   [edge.includes('feeds/videos.xml?channel_id=') && edge.includes('capitaldotrem'), 'Função não consulta o feed público do canal correto'],
   [edge.includes('slice(0, 4)') && edge.includes('Access-Control-Allow-Origin'), 'Feed não limita os quatro vídeos nem libera CORS'],
   [worker.includes('youtube-feed.js') && /capital-do-trem-v[0-9]+/.test(worker), 'Service worker não atualiza o módulo do YouTube'],
-  [index.includes('data-youtube-id="-c2QERKILzg"') && index.includes('data-youtube-id="HHKsZAS1eMk"'), 'Painel inicial exibe as músicas 4 e 5'],
-  [index.includes('5º • Música') && index.includes('6º • Música') && feed.includes("id: '-c2QERKILzg'") && feed.includes("id: 'HHKsZAS1eMk'"), 'Músicas 4 e 5 permanecem após a atualização automática do feed'],
-  [/videos\\.slice\\(0, 3\\)/.test(feed), 'Feed automático mantém três vídeos recentes antes das duas músicas fixas']
+  [index.includes('data-youtube-id="W4wnKF5AHQA"') && index.includes('data-youtube-id="-c2QERKILzg"') && index.includes('data-youtube-id="HHKsZAS1eMk"'), 'Painel inicial mantém o quarto vídeo e as músicas 5 e 6'],
+  [index.includes('5º • Música') && index.includes('6º • Música') && feed.includes("id: '-c2QERKILzg'") && feed.includes("id: 'HHKsZAS1eMk'"), 'Músicas 5 e 6 permanecem após a atualização automática do feed'],
+  [feed.includes('videos.slice(0, 4)') && feed.includes('PINNED_HOME_TRACKS.forEach'), 'Feed automático mantém quatro vídeos recentes antes das músicas 5 e 6']
 ];
 for (const [ok, message] of checks) { console.log((ok ? 'OK  ' : 'ERRO ') + message); if (!ok) process.exitCode = 1; }
 if (!process.exitCode) console.log('Coleção de publicações, Direct e feed automático do YouTube: verificações aprovadas.');
