@@ -60,7 +60,7 @@ function createHomeVideoCard(video, orderText, linkText = 'Assistir no YouTube')
 function renderVideos(videos) {
   if (!grid || !Array.isArray(videos) || !videos.length) return;
   grid.replaceChildren();
-  videos.slice(0, 3).forEach((video, index) => {
+  videos.slice(0, 4).forEach((video, index) => {
     grid.append(createHomeVideoCard(video, index === 0 ? '1º • Mais recente' : (index + 1) + 'º'));
   });
   PINNED_HOME_TRACKS.forEach(track => grid.append(createHomeVideoCard(track, track.order, 'Ouvir no YouTube')));
