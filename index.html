@@ -1719,7 +1719,7 @@ async function saveOfflineMusic(id,blob,title){
     video.addEventListener('error',()=>{console.warn('Vídeo de abertura indisponível; mantendo a imagem de poster.');beginOpeningClock();},{once:true});
     video.addEventListener('durationchange',()=>{if(clockStarted&&finishTimer){window.clearTimeout(finishTimer);const ms=Number.isFinite(video.duration)&&video.duration>0?Math.max(7000,video.duration*1000):7000;finishTimer=window.setTimeout(finish,ms);}});
     video.addEventListener('ended',finish,{once:true});
-    window.setTimeout(()=>{if(!clockStarted&&video.error)beginOpeningClock();},12000);
+    window.setTimeout(()=>{if(!clockStarted){video.pause();video.style.opacity='0';beginOpeningClock();}},12000);
    }
   }
  }catch(error){console.warn('Identidade visual padrão mantida.',error);}
