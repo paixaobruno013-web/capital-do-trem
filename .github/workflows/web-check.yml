@@ -48,6 +48,10 @@ jobs:
         run: |
           node --check scripts/check-chat-attachments.mjs
           node scripts/check-chat-attachments.mjs
+      - name: Verificar abertura e fallback do vídeo
+        run: |
+          node --check scripts/check-intro-opening.mjs
+          node scripts/check-intro-opening.mjs
       - name: Conferir proteção e segurança do banco
         run: |
           grep -q 'create policy "songs_insert_artist_or_admin"' supabase/schema.sql
