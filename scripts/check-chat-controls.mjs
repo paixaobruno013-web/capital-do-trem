@@ -32,9 +32,13 @@ const checks = [
 
   ['configurações públicas da abertura ignoram cache HTTP antigo', auth.includes('/rest/v1/site_settings') && auth.includes("cache: 'no-store'") && auth.includes('Cache-Control')],
   ['vídeo de abertura usa URL estável para reaproveitar cache do arquivo enviado', home.includes('const currentOpeningImage=opening,currentOpeningVideo=openingVideo') && !home.includes('cdt_opening') && !home.includes('randomUUID')],
-  ['imagem de poster aparece enquanto o vídeo carrega', home.includes("video.poster=currentOpeningImage||profile||'./marca.svg'") && home.includes("video.preload='metadata'")],
-  ['vídeo só aparece depois do primeiro quadro estar pronto', home.includes("video.addEventListener('loadeddata'") && home.includes("video.style.opacity='1'")],
-  ['abertura termina em 7 segundos sem depender do carregamento do vídeo ou da página', home.includes('const remaining=Math.max(0,7000-(performance.now()-startedAt))') && !home.includes('!ready||!videoReady')],
+  ['arte padrão antiga fica oculta até confirmar a mídia atual', home.includes('<img src="marca.svg" alt="" style="visibility:hidden">') && home.includes("if(opening&&!openingVideo)")],
+  ['poster atual aparece imediatamente durante o carregamento do vídeo', home.includes("video.poster=currentOpeningImage||profile||'./marca.svg'") && home.includes("video.style.opacity='1'")],
+  ['vídeo usa pré-carregamento e velocidade normal', home.includes("video.preload='auto'") && home.includes('video.playbackRate=1')],
+  ['cronômetro só começa quando o vídeo realmente reproduz', home.includes("video.addEventListener('playing',beginOpeningClock") && !home.includes('const startedAt=performance.now();let progress=3,finished=false')],
+  ['vídeo fica pelo menos 7 segundos e não corta vídeos mais longos', home.includes('Math.max(7000,video.duration*1000)') && home.includes("video.addEventListener('ended',finish")],
+  ['autoplay com som bloqueado tenta iniciar mudo e oferece ativação', home.includes('video.muted=true;video.defaultMuted=true') && home.includes("audioButton.style.display='block'")],
+  ['vídeo lento possui fallback para não travar a abertura', home.includes("if(!clockStarted){video.pause();video.style.opacity='0';beginOpeningClock();}")],
   ['publicação do vídeo confirma URL gravada e resposta de vídeo', adminMedia.includes('saved.openingVideoUrl!==url') && adminMedia.includes("method:'HEAD',cache:'no-store'") && adminMedia.includes('content-type') ]
 
 
