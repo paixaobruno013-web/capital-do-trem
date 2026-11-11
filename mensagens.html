@@ -147,6 +147,11 @@ body.light .messages{background:linear-gradient(180deg,#fff8f8,#f4f4f4)}
 #compose.has-attachment{flex-wrap:wrap!important}
 #compose.emoji-open #private-attach{display:none}
 .private-attachment-preview .file-copy{min-width:0;flex:1}
+.private-attachment-thumb{width:58px;height:58px;flex:0 0 58px;display:grid;place-items:center;overflow:hidden;border-radius:11px;background:#111;font-size:25px;color:#fff}
+.private-attachment-thumb img,.private-attachment-thumb video{width:100%;height:100%;max-width:none;object-fit:cover}
+.private-attachment-thumb audio{width:190px;height:38px;max-width:100%}
+.private-attachment-preview{flex-wrap:wrap}
+.private-attachment-preview .file-copy small+small{color:#ed8790}
 .private-attachment-preview strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
 .private-attachment-preview small{display:block;color:#aaa;font-size:11px}
 .private-attachment-preview button{min-height:32px;padding:4px 10px;border-radius:99px;font-size:11px}
@@ -178,17 +183,17 @@ body.light .messages{background:linear-gradient(180deg,#fff8f8,#f4f4f4)}
 <div class="security-seal" role="note">
   <div class="security-seal-title"><span aria-hidden="true">🔒</span><span>Conexão criptografada</span><small>HTTPS</small></div>
   <p>Seus dados são protegidos durante a transmissão por HTTPS. Esta versão ainda não oferece criptografia ponta a ponta.</p>
-</div><div id="messages" class="messages" aria-live="polite"><p class="empty">Suas mensagens aparecerão aqui.</p></div><form id="compose" class="compose" hidden><div id="emoji-tray" data-emoji-picker data-input="#message"></div><button id="private-attach" type="button" aria-label="Anexar arquivo" aria-haspopup="true" aria-expanded="false">📎</button><button id="private-emoji-toggle" type="button" aria-label="Abrir emojis" aria-expanded="false">😊</button><input id="message" maxlength="2000" autocomplete="off" placeholder="Escreva sua mensagem…" aria-label="Mensagem privada"><input id="private-attachment-input" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime,.mov,audio/mpeg,audio/mp4,audio/aac,audio/ogg,audio/wav,audio/webm,application/pdf,text/plain,text/csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx" hidden><div id="private-attachment-preview" class="private-attachment-preview" hidden><span aria-hidden="true">📎</span><span class="file-copy"><strong id="private-attachment-name"></strong><small id="private-attachment-size"></small></span><button id="private-attachment-remove" type="button">Remover</button></div><div id="private-upload-progress" class="private-upload-progress" hidden><span></span></div><button class="primary" id="send" type="submit">➤</button></form><p class="status" id="status" role="status" aria-live="polite"></p></section>
+</div><div id="messages" class="messages" aria-live="polite"><p class="empty">Suas mensagens aparecerão aqui.</p></div><form id="compose" class="compose" hidden><div id="emoji-tray" data-emoji-picker data-input="#message"></div><button id="private-attach" type="button" aria-label="Anexar arquivo" aria-haspopup="true" aria-expanded="false">📎</button><button id="private-emoji-toggle" type="button" aria-label="Abrir emojis" aria-expanded="false">😊</button><input id="message" maxlength="2000" autocomplete="off" placeholder="Escreva sua mensagem…" aria-label="Mensagem privada"><input id="private-attachment-input" type="file" accept="image/*,video/*,audio/*,application/pdf,text/plain,text/csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx" hidden><div id="private-attachment-preview" class="private-attachment-preview" hidden><div id="private-attachment-thumb" class="private-attachment-thumb" aria-hidden="true">📎</div><span class="file-copy"><strong id="private-attachment-name"></strong><small id="private-attachment-size"></small><small id="private-attachment-kind"></small></span><button id="private-attachment-remove" type="button">Remover</button></div><div id="private-upload-progress" class="private-upload-progress" hidden><span></span></div><button class="primary" id="send" type="submit">➤</button></form><p class="status" id="status" role="status" aria-live="polite"></p></section>
 </div>
 <section class="panel"><h2>Privacidade e respeito</h2><p class="muted">Só participantes de uma conversa aceita conseguem ler as mensagens privadas. O grupo geral é voluntário: entre para ver as mensagens e saia quando quiser. Novos convites privados só são liberados entre pessoas ativas que já conversaram no grupo. Você pode bloquear alguém. Não compartilhe senhas, códigos ou dados bancários.</p></section>
 </div>
 </main>
 <script type="module">
-import {getCurrentSession,getPrivateConversationData,getOnlineUserIds,requestPrivateConversation,decidePrivateConversation,getPrivateMessages,sendPrivateMessage,subscribePrivateMessages,blockPrivateUser,getChatMessages,sendChatMessage,subscribeChatMessages,getPublicBranding,joinChatGroup,leaveChatGroup} from './supabase/auth.js';
+import {getCurrentSession,getPrivateConversationData,getOnlineUserIds,requestPrivateConversation,decidePrivateConversation,getPrivateMessages,sendPrivateMessage,subscribePrivateMessages,blockPrivateUser,getChatMessages,sendChatMessage,uploadChatAttachment,subscribeChatMessages,getPublicBranding,joinChatGroup,leaveChatGroup} from './supabase/auth.js';
 const $=id=>document.getElementById(id);let state=null,active=null,activeGroup=false,unsubscribe=null,onlineIds=new Set(),groupLogo="./marca.svg";
 const esc=s=>String(s||'');const fmt=v=>new Date(v).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
-const privateAttachButton=$('private-attach'),privateFileInput=$('private-attachment-input'),privatePreview=$('private-attachment-preview'),privateFileName=$('private-attachment-name'),privateFileSize=$('private-attachment-size'),privateRemove=$('private-attachment-remove'),privateProgress=$('private-upload-progress');
-let selectedPrivateFile=null;
+const privateAttachButton=$('private-attach'),privateFileInput=$('private-attachment-input'),privatePreview=$('private-attachment-preview'),privateFileName=$('private-attachment-name'),privateFileSize=$('private-attachment-size'),privateFileKind=$('private-attachment-kind'),privateThumb=$('private-attachment-thumb'),privateRemove=$('private-attachment-remove'),privateProgress=$('private-upload-progress');
+let selectedPrivateFile=null,privatePreviewUrl=null;
 const PRIVATE_FILE_ACCEPT={
  gallery:'image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime,.mov',document:'application/pdf,text/plain,text/csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx',audio:'audio/*'
 };
@@ -200,15 +205,15 @@ function privateAttachOption(icon,label,accept,mode='file'){
  button.addEventListener('click',()=>{privateAttachMenu.hidden=true;privateAttachButton.setAttribute('aria-expanded','false');if(mode==='camera'){privateFileInput.accept='image/*,video/*';privateFileInput.setAttribute('capture','environment');}else{privateFileInput.accept=accept;privateFileInput.removeAttribute('capture');}privateFileInput.click();});
  privateAttachOptions.append(button);
 }
-privateAttachOption('🖼️','Fotos e vídeos',PRIVATE_FILE_ACCEPT.gallery);
-privateAttachOption('📄','Documento',PRIVATE_FILE_ACCEPT.document);
-privateAttachOption('🎵','Áudio',PRIVATE_FILE_ACCEPT.audio);
-privateAttachOption('📷','Câmera','image/*,video/*','camera');
+privateAttachOption('🖼️','Galeria • fotos e vídeos','image/*,video/*');
+privateAttachOption('📄','Arquivos e documentos',PRIVATE_FILE_ACCEPT.document);
+privateAttachOption('🎵','Áudios e músicas',PRIVATE_FILE_ACCEPT.audio);
+privateAttachOption('📷','Abrir câmera','image/*,video/*','camera');
 privateAttachMenu.append(privateAttachTitle,privateAttachOptions);document.body.append(privateAttachMenu);
 privateAttachButton.addEventListener('click',()=>{privateAttachMenu.hidden=!privateAttachMenu.hidden;privateAttachButton.setAttribute('aria-expanded',String(!privateAttachMenu.hidden));});
 document.addEventListener('pointerdown',event=>{if(!privateAttachMenu.hidden&&!privateAttachMenu.contains(event.target)&&!privateAttachButton.contains(event.target)){privateAttachMenu.hidden=true;privateAttachButton.setAttribute('aria-expanded','false');}});
-function clearPrivateFile(){selectedPrivateFile=null;privateFileInput.value='';privatePreview.hidden=true;privateFileName.textContent='';privateFileSize.textContent='';$('compose').classList.remove('has-attachment');}
-privateFileInput.addEventListener('change',()=>{selectedPrivateFile=privateFileInput.files?.[0]||null;if(!selectedPrivateFile){clearPrivateFile();return;}privateFileName.textContent=selectedPrivateFile.name;privateFileSize.textContent=(selectedPrivateFile.size/1024/1024).toFixed(2)+' MB';privatePreview.hidden=false;$('compose').classList.add('has-attachment');});
+function clearPrivateFile(){selectedPrivateFile=null;privateFileInput.value='';privatePreview.hidden=true;privateFileName.textContent='';privateFileSize.textContent='';privateFileKind.textContent='';privateThumb.replaceChildren(document.createTextNode('📎'));if(privatePreviewUrl){URL.revokeObjectURL(privatePreviewUrl);privatePreviewUrl=null;}$('compose').classList.remove('has-attachment');}
+privateFileInput.addEventListener('change',()=>{const file=privateFileInput.files?.[0]||null;if(!file){clearPrivateFile();return;}if(file.size>20*1024*1024){clearPrivateFile();$('status').textContent='O arquivo deve ter até 20 MB. Escolha um arquivo menor.';return;}clearPrivateFile();selectedPrivateFile=file;privateFileName.textContent=file.name;privateFileSize.textContent=(file.size/1024/1024).toFixed(2)+' MB';const type=file.type||'';privateFileKind.textContent=type.startsWith('image/')?'Prévia da imagem':type.startsWith('video/')?'Prévia do vídeo':type.startsWith('audio/')?'Áudio ou música pronta para enviar':'Documento • arquivo anexado';privatePreviewUrl=URL.createObjectURL(file);if(type.startsWith('image/')){const img=node('img');img.src=privatePreviewUrl;img.alt='Prévia da imagem selecionada';privateThumb.replaceChildren(img);}else if(type.startsWith('video/')){const video=node('video');video.src=privatePreviewUrl;video.muted=true;video.playsInline=true;video.preload='metadata';privateThumb.replaceChildren(video);}else if(type.startsWith('audio/')){const audio=node('audio');audio.src=privatePreviewUrl;audio.controls=true;audio.preload='metadata';audio.setAttribute('aria-label','Ouvir áudio selecionado');privateThumb.replaceChildren(audio);}else privateThumb.replaceChildren(document.createTextNode('📄'));privatePreview.hidden=false;$('compose').classList.add('has-attachment');$('status').textContent='Arquivo selecionado. Você pode adicionar uma legenda e enviar.';});
 privateRemove.addEventListener('click',clearPrivateFile);
 
 function personName(id){const p=state?.people.find(p=>p.user_id===id);return p?`${p.display_name||'Usuário Uai'} (@${p.username||'sem_usuario'})`:'Usuário Uai';}
@@ -348,9 +353,9 @@ $('compose').addEventListener('submit',async e=>{
  const value=$('message').value.trim();if(!value&&!selectedPrivateFile)return;
  $('send').disabled=true;$('private-attach').disabled=true;$('private-emoji-toggle').disabled=true;
  $('message').disabled=true;privateFileInput.disabled=true;privateProgress.hidden=!selectedPrivateFile;
- $('status').textContent=selectedPrivateFile?'Enviando arquivo com acesso protegido…':'Enviando mensagem…';
+ $('status').textContent=selectedPrivateFile?(activeGroup?'Enviando anexo para o grupo…':'Enviando arquivo com acesso protegido…'):'Enviando mensagem…';
  try{
-  if(activeGroup){const sent=await sendChatMessage(value);drawGroupMessage(sent);}
+  if(activeGroup){let uploaded=null;if(selectedPrivateFile)uploaded=await uploadChatAttachment(selectedPrivateFile);const sent=await sendChatMessage(value,uploaded);drawGroupMessage(sent);}
   else{const sent=await sendPrivateMessage(active.id,value,selectedPrivateFile);drawMessage(sent);}
   $('message').value='';clearPrivateFile();$('status').textContent='Mensagem enviada.';
  }catch(err){$('status').textContent=err.message||'Não foi possível enviar.';}
