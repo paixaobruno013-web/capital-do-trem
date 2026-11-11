@@ -66,21 +66,30 @@ export function initSupabase() {
 }
 
 export async function registerAccount({ email, password, displayName, username, accountType = 'user' }) {
-  const cleanUsername = String(username || '').trim().toLowerCase();
-  if (!/^[a-z0-9][a-z0-9_]{2,31}$/.test(cleanUsername)) throw new Error('O nome de usuário deve ter de 3 a 32 caracteres: letras minúsculas, números e _.');
+  const cleanEmail = String(email || '').trim().toLowerCase();
+  if (!cleanEmail || !cleanEmail.includes('@')) throw new Error('Informe um e-mail válido.');
+  let cleanUsername = String(username || '').trim().toLowerCase();
+  if (!cleanUsername) {
+    const base = (cleanEmail.split('@')[0] || 'usuario').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9_]/g, '_').replace(/^[^a-z0-9]+/, '').slice(0, 20) || 'usuario';
+    const bytes = new Uint8Array(4);
+    if (globalThis.crypto?.getRandomValues) globalThis.crypto.getRandomValues(bytes);
+    else for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+    const suffix = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+    cleanUsername = (base + '_' + suffix).slice(0, 32);
+  }
+  if (!/^[a-z0-9][a-z0-9_]{2,31}$/.test(cleanUsername)) throw new Error('Não foi possível preparar seu identificador. Tente novamente.');
   const supabase = initSupabase();
   const { data, error } = await supabase.auth.signUp({
-    email: email.trim(),
+    email: cleanEmail,
     password,
     options: {
-      data: { name: String(displayName || '').trim().slice(0, 80), username: cleanUsername, account_type: accountType === 'artist' ? 'artist' : 'user' },
+      data: { name: String(displayName || cleanEmail.split('@')[0]).trim().slice(0, 80), username: cleanUsername, account_type: accountType === 'artist' ? 'artist' : 'user' },
       emailRedirectTo: window.location.href
     }
   });
   if (error) throw error;
   return data;
 }
-
 export async function signInAccount({ email, password }) {
   const supabase = initSupabase();
   const { data, error } = await supabase.auth.signInWithPassword({
