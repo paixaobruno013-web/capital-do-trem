@@ -26,7 +26,5 @@ for (const file of ['admin-apoiadores.html','apoiadores.html','supporters-admin.
   assert.ok(serviceWorker.includes(file), 'Arquivo de apoiadores ausente do pré-cache: '+file);
   assert.ok(prepare.includes(file), 'Arquivo de apoiadores ausente da preparação web: '+file);
 }
-for (const file of ['supporters-admin.js','supporters-public.js']) {
-  assert.ok(!/50\s*\*\s*1024\s*\*\s*1024/.test(file), 'Não usar limite de 50 MB no módulo de apoiadores.');
-}
+assert.ok(!/50\s*\*\s*1024\s*\*\s*1024/.test(adminJs+publicJs), 'Não usar limite de 50 MB no módulo de apoiadores.');
 console.log('Área de apoiadores: acesso, publicação, prévia, atualização e cache verificados.');
