@@ -131,6 +131,7 @@ function openComposer() {
   if (!modal || busy) return;
   modal.classList.add('is-open');
   modal.setAttribute('aria-hidden', 'false');
+  window.CapitalVolumeBridge?.setStoryCameraOpen?.(true);
   selectedFile = null;
   album.value = '';
   publish.disabled = true;
@@ -179,6 +180,7 @@ function closeComposer() {
   clearPreview();
   modal?.classList.remove('is-open');
   modal?.setAttribute('aria-hidden', 'true');
+  window.CapitalVolumeBridge?.setStoryCameraOpen?.(false);
   el('home-story-account-link')?.remove();
   addButton?.focus();
 }
@@ -389,19 +391,28 @@ recordButton?.addEventListener('lostpointercapture', stopHeldRecording);
 recordButton?.addEventListener('click', event => {
   if (event.detail === 0) toggleRecording();
 });
-zoomControl?.addEventListener('input', async () => {
-  cameraZoom = Number(zoomControl.value || 1);
-  if (zoomValue) zoomValue.textContent = cameraZoom.toFixed(1).replace('.0','') + '×';
-  if (live) live.style.transform = 'scale(' + cameraZoom + ')';
+async function applyZoomToTrack() {
   const track = stream?.getVideoTracks?.()[0];
   const capabilities = track?.getCapabilities?.();
-  if (capabilities && 'zoom' in capabilities) {
-    const min = capabilities.zoom.min ?? 1;
-    const max = capabilities.zoom.max ?? 1;
-    const value = min + ((cameraZoom - 1) / 2) * (max - min);
-    try { await track.applyConstraints({ advanced: [{ zoom: Math.min(max, Math.max(min, value)) }] }); }
-    catch (error) { say('O zoom físico não está disponível neste modo de câmera.'); }
-  }
+  if (!capabilities || !('zoom' in capabilities)) return;
+  const min = capabilities.zoom.min ?? 1;
+  const max = capabilities.zoom.max ?? 1;
+  const value = min + ((cameraZoom - 1) / 2) * (max - min);
+  try { await track.applyConstraints({ advanced: [{ zoom: Math.min(max, Math.max(min, value)) }] }); }
+  catch (error) { /* O zoom digital continua funcionando como alternativa. */ }
+}
+function setCameraZoom(value) {
+  cameraZoom = Math.max(1, Math.min(3, Number(value) || 1));
+  if (zoomControl) zoomControl.value = String(cameraZoom);
+  if (zoomValue) zoomValue.textContent = cameraZoom.toFixed(1).replace('.0','') + '×';
+  if (live) live.style.transform = 'scale(' + cameraZoom + ')';
+  applyZoomToTrack();
+}
+zoomControl?.addEventListener('input', () => setCameraZoom(zoomControl.value));
+window.addEventListener('capital:volume-key', event => {
+  if (!modal?.classList.contains('is-open') || selectedFile) return;
+  const step = event.detail?.direction === 'in' ? 0.1 : -0.1;
+  setCameraZoom(cameraZoom + step);
 });
 saveButton?.addEventListener('click', saveToGallery);
 flipButton?.addEventListener('click', async () => {
@@ -419,4 +430,7 @@ modal?.addEventListener('click', event => { if (event.target === modal) closeCom
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && modal?.classList.contains('is-open')) closeComposer();
 });
-window.addEventListener('pagehide', stopCamera);
+window.addEventListener('pagehide', () => {
+  window.CapitalVolumeBridge?.setStoryCameraOpen?.(false);
+  stopCamera();
+});
