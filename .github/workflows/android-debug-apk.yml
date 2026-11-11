@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - 'index.html'
+      - 'estudio.html'
       - 'admin.html'
       - 'bate-papo.html'
       - 'chat-enhancements.js'
