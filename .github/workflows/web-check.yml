@@ -26,6 +26,7 @@ jobs:
       - name: Verificar sintaxe dos módulos de Stories
         run: |
           node --check stories-ui.js
+          node --check home-story-composer.js
           node --check admin-stories.js
           node --check account-stories.js
       - name: Verificar sintaxe do módulo Supabase
@@ -58,8 +59,11 @@ jobs:
           node scripts/check-intro-opening.mjs
       - name: Conferir proteção e segurança do banco
         run: |
-          grep -q 'create policy "songs_insert_artist_or_admin"' supabase/schema.sql
-          grep -q 'create policy "audio_upload_artist_or_admin"' supabase/schema.sql
+          grep -q 'create policy "songs_insert_artist_pending_or_admin"' supabase/schema.sql
+          grep -q 'create policy "audio_upload_artist_own_folder_or_admin"' supabase/schema.sql
+          grep -q 'producer_name text not null default' supabase/schema.sql
+          if grep -q 'create policy "songs_insert_artist_or_admin"' supabase/schema.sql; then echo 'ERRO: política antiga de músicas continua ativa no schema.'; exit 1; fi
+          if grep -q 'create policy "audio_upload_artist_or_admin"' supabase/schema.sql; then echo 'ERRO: política antiga de Storage continua ativa no schema.'; exit 1; fi
           if grep -q 'create policy "songs_insert_registered_users"' supabase/schema.sql; then
             echo "ERRO: usuários comuns ainda podem inserir músicas."
             exit 1
@@ -149,6 +153,10 @@ jobs:
       - name: Conferir arquivos essenciais
         run: |
           test -s www/index.html
+          test -s www/home-story-composer.js
+          grep -q 'id="home-story-add"' www/index.html
+          grep -q 'id="home-story-album-button"' www/index.html
+          grep -q 'id="artist-song-submit-form"' www/conta.html
           test -s www/conta.html
           test -s www/admin.html
           test -s www/privacidade.html
@@ -164,5 +172,7 @@ jobs:
           test -s www/supabase/auth.js
           test -s supabase/schema.sql
           test -s supabase/migrations/2026-11-06-music-catalog.sql
+          test -s supabase/migrations/20261111173000_artist_song_submissions_with_producer.sql
+          test -s supabase/migrations/20261111173500_retire_legacy_artist_song_upload_policies.sql
           test -s www/manifest.webmanifest
           echo "Preparação web concluída: arquivos essenciais encontrados."
