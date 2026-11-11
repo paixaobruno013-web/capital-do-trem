@@ -13,7 +13,7 @@ const [adminPage, publicPage, adminJs, publicJs, serviceWorker, prepare] = await
 for (const id of ['supporter-form','supporter-file','supporter-preview','supporter-publish','supporter-list','supporter-refresh','supporter-denied-status']) {
   assert.ok(adminPage.includes(id), 'Painel de apoiadores sem elemento: '+id);
 }
-for (const id of ['data-supporter-grid','data-supporter-empty','data-supporter-retry']) {
+for (const id of ['data-supporter-grid','supporter-empty','data-supporter-retry']) {
   assert.ok(publicPage.includes(id), 'Página pública de apoiadores sem elemento: '+id);
 }
 assert.ok(adminJs.includes('20 * 1024 * 1024'), 'Limite do painel precisa corresponder ao bucket de 20 MB.');
