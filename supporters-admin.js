@@ -155,6 +155,7 @@ $('supporter-form')?.addEventListener('submit', async event => {
   button.disabled = true;
   let path = '';
   let uploaded = false;
+  let recordCreated = false;
   status('Etapa 1/2: enviando o arquivo com segurança…');
   try {
     const ext = ({'image/jpeg':'jpg','image/png':'png','image/webp':'webp','video/mp4':'mp4','video/webm':'webm'})[file.type];
@@ -176,12 +177,15 @@ $('supporter-form')?.addEventListener('submit', async event => {
     }).select('id').single();
     if (insertError) throw new Error('Arquivo enviado, mas o cadastro da publicação falhou: ' + describeError(insertError));
     if (!inserted?.id) throw new Error('O banco não confirmou a publicação.');
+    recordCreated = true;
     $('supporter-form').reset();
     clearPreview();
     await loadItems();
     status('Publicado e confirmado! O conteúdo já está disponível na Área de Apoiadores.');
   } catch (error) {
-    if (uploaded && path) {
+    if (recordCreated) {
+      status('A publicação foi gravada, mas a lista não atualizou: ' + describeError(error) + '. Toque em ATUALIZAR LISTA.');
+    } else if (uploaded && path) {
       const { error: cleanupError } = await supabase.storage.from('capital-do-trem-media').remove([path]);
       if (cleanupError) status('Falha na publicação: ' + describeError(error) + ' • O arquivo temporário não pôde ser removido: ' + describeError(cleanupError));
       else status('Falha na publicação: ' + describeError(error));
