@@ -16,9 +16,9 @@ const checks = [
   [edge.includes('feeds/videos.xml?channel_id=') && edge.includes('capitaldotrem'), 'Função não consulta o feed público do canal correto'],
   [edge.includes('slice(0, 4)') && edge.includes('Access-Control-Allow-Origin'), 'Feed não limita os quatro vídeos nem libera CORS'],
   [worker.includes('youtube-feed.js') && /capital-do-trem-v[0-9]+/.test(worker), 'Service worker não atualiza o módulo do YouTube'],
-  [index.includes('data-youtube-id="W4wnKF5AHQA"') && index.includes('data-youtube-id="-c2QERKILzg"') && index.includes('data-youtube-id="HHKsZAS1eMk"'), 'Painel inicial mantém o quarto vídeo e as músicas 5 e 6'],
-  [index.includes('5º • Música') && index.includes('6º • Música') && feed.includes("id: '-c2QERKILzg'") && feed.includes("id: 'HHKsZAS1eMk'"), 'Músicas 5 e 6 permanecem após a atualização automática do feed'],
-  [feed.includes('videos.slice(0, 4)') && feed.includes('PINNED_HOME_TRACKS.forEach'), 'Feed automático mantém quatro vídeos recentes antes das músicas 5 e 6']
+  [feed.includes("id:'W4wnKF5AHQA'") && feed.includes("id:'-c2QERKILzg'") && feed.includes("id:'HHKsZAS1eMk'"), 'Vídeo 4 e músicas 5 e 6 continuam no feed unificado'],
+  [feed.includes('SHORTS.concat(CHANNEL_FALLBACK)') && feed.includes("title:'Música da seleção Capital do Trem'"), 'Músicas selecionadas permanecem misturadas sem categorias'],
+  [feed.includes('grid.replaceChildren(...videos.map(makeCard))') && feed.includes('Mistura determinística'), 'Feed único renderiza vídeos e músicas na mesma sequência']
 ];
 for (const [ok, message] of checks) { console.log((ok ? 'OK  ' : 'ERRO ') + message); if (!ok) process.exitCode = 1; }
 if (!process.exitCode) console.log('Coleção de publicações, Direct e feed automático do YouTube: verificações aprovadas.');
