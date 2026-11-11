@@ -16,7 +16,7 @@ const checks = [
   [edge.includes('slice(0, 4)') && edge.includes('Access-Control-Allow-Origin'), 'Feed não limita os quatro vídeos nem libera CORS'],
   [worker.includes('youtube-feed.js') && /capital-do-trem-v[0-9]+/.test(worker), 'Service worker não atualiza o módulo do YouTube'],
   [index.includes('data-youtube-id="-c2QERKILzg"') && index.includes('data-youtube-id="HHKsZAS1eMk"'), 'Painel inicial exibe as músicas 4 e 5'],
-  [index.includes('4º • Música') && index.includes('5º • Música') && feed.includes("id: '-c2QERKILzg'") && feed.includes("id: 'HHKsZAS1eMk'"), 'Músicas 4 e 5 permanecem após a atualização automática do feed'],
+  [index.includes('5º • Música') && index.includes('6º • Música') && feed.includes("id: '-c2QERKILzg'") && feed.includes("id: 'HHKsZAS1eMk'"), 'Músicas 4 e 5 permanecem após a atualização automática do feed'],
   [/videos\\.slice\\(0, 3\\)/.test(feed), 'Feed automático mantém três vídeos recentes antes das duas músicas fixas']
 ];
 for (const [ok, message] of checks) { console.log((ok ? 'OK  ' : 'ERRO ') + message); if (!ok) process.exitCode = 1; }
