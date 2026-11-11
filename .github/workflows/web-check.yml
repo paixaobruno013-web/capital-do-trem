@@ -37,6 +37,11 @@ jobs:
           grep -q 'audio/x-m4a' supabase/auth.js
       - name: Verificar sintaxe dos scripts das páginas
         run: node scripts/check-inline-scripts.mjs
+      - name: Verificar coleção de publicações salvas e atualização do YouTube
+        run: |
+          node --check youtube-feed.js
+          node scripts/check-social-saved-youtube.mjs
+          test -s www/youtube-feed.js
       - name: Verificar controles e regressões do chat
         run: node scripts/check-chat-controls.mjs
       - name: Conferir proteção e segurança do banco
