@@ -178,7 +178,7 @@ function addAttachOption(icon,label,accept,mode='file'){
   saveChatState();attachmentInput.click();
  });attachOptions.append(button);
 }
-addAttachOption('🖼️','Fotos e vídeos','image/*,video/*');
+addAttachOption('🖼️','Fotos e vídeos','image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime,.mov');
 addAttachOption('📄','Documento','application/pdf,text/plain,text/csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx');
 addAttachOption('🎵','Áudio','audio/*');
 addAttachOption('📷','Câmera','image/*,video/*','camera');
