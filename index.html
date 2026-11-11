@@ -920,7 +920,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <p class="muted">Lembre-se de anexar o cartaz ou a imagem do evento diretamente na conversa. Divulgue somente endereços públicos de eventos, nunca endereço residencial.</p>
 </div>
 </section>
-<section class="page" id="amigos"><div class="card"><h2>🤝 Fazer amigos</h2><p class="muted">Conheça pessoas que também fazem parte do Capital do Trem. Descubra participantes da sua cidade ou amplie a roda conhecendo gente de outros lugares.</p><p class="notice">Só aparecem pessoas que escolheram deixar o perfil público. A cidade é informada pela própria pessoa; não usamos GPS nem mostramos endereço ou distância exata.</p><label for="friends-search">Buscar pessoas</label><input id="friends-search" type="search" maxlength="80" placeholder="Nome, @usuário, cidade ou interesse"><label for="friends-distance">Onde procurar</label><select id="friends-distance"><option value="all">Perto e longe — todas as cidades</option><option value="same">Na minha cidade</option><option value="other">Em outras cidades</option></select><p id="friends-count" class="muted" aria-live="polite">Carregando participantes públicos…</p><div id="friends-directory" class="list" aria-live="polite"><p class="muted">Carregando…</p></div><p class="muted">Para conversar, abra o Koe Fala Tu. Respeite a privacidade e as escolhas de cada pessoa.</p><a class="btn alt" href="./bate-papo.html">Abrir Koe Fala Tu</a></div></section>
+<section class="page" id="amigos"><div class="card"><h2>🤝 Fazer amigos</h2><p class="muted">A área Fazer Amigos agora fica logo abaixo do bate-papo Fala Trem, para facilitar o acesso à comunidade.</p><a class="btn" href="./bate-papo.html#fazer-amigos">Abrir Fazer Amigos no Koe Fala Tu</a></div></section>
 <section class="page" id="comunidade">
 <div class="card"><h2>👥 Nossa comunidade</h2><p class="muted">Um espaço para usuários Uai, artistas e todos que fazem parte do Capital do Trem. Cada pessoa escolhe se quer deixar seu perfil visível.</p><a class="btn" href="./conta.html">Criar minha conta / Meu perfil</a></div>
 <div class="card"><h3>Perfis públicos</h3><div id="community-profiles" class="list" aria-live="polite"><p class="muted">Os perfis públicos aparecerão aqui quando o banco estiver conectado.</p></div></div>
@@ -1421,30 +1421,7 @@ updateConnectionStatus();
   },45000);
  }catch(error){const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar o diretório agora. Confira sua conexão e tente novamente.';container.replaceChildren(message);}
 })();
-// Descoberta de amigos: somente perfis que optaram por visibilidade pública.
-(async()=>{
- const list=document.getElementById('friends-directory'),search=document.getElementById('friends-search'),distance=document.getElementById('friends-distance'),count=document.getElementById('friends-count');
- if(!list||!search||!distance||!count)return;
- try{
-  const module=await import('./supabase/auth.js');const supabase=module.initSupabase();
-  const profiles=await module.getPublicProfiles();const session=await module.getCurrentSession();
-  const own=session?.user?await module.getMyBasicProfile():null;const ownCity=String(own?.city||'').trim().toLocaleLowerCase('pt-BR');
-  const candidates=profiles.filter(p=>p.user_id!==session?.user?.id);
-  const render=()=>{
-   const term=search.value.trim().toLocaleLowerCase('pt-BR'),mode=distance.value;
-   const filtered=candidates.filter(p=>{const city=String(p.city||'').trim().toLocaleLowerCase('pt-BR');if(mode==='same'&&(!ownCity||city!==ownCity))return false;if(mode==='other'&&(!ownCity||!city||city===ownCity))return false;return [p.display_name,p.username,p.city,p.bio].some(v=>String(v||'').toLocaleLowerCase('pt-BR').includes(term));});
-   list.replaceChildren();count.textContent=filtered.length+' pessoa(s) encontrada(s) • '+candidates.length+' perfil(is) público(s)';
-   if(!filtered.length){const empty=document.createElement('p');empty.className='muted';empty.textContent=mode==='same'&&!ownCity?'Informe sua cidade em Meu perfil para encontrar pessoas da mesma cidade.':'Nenhuma pessoa encontrada com esse filtro. Tente buscar em todas as cidades.';list.append(empty);return;}
-   for(const p of filtered){
-    const card=document.createElement('article');card.className='item community-profile-card';const avatar=document.createElement('div');avatar.className='community-profile-avatar';
-    if(p.avatar_type==='photo'&&typeof p.avatar_url==='string'&&p.avatar_url.startsWith('https://')){const img=document.createElement('img');img.src=p.avatar_url;img.alt='Foto de '+(p.display_name||'participante');img.loading='lazy';img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';avatar.append(img);}else avatar.textContent=p.avatar_type==='character'?'🎭':Array.from((p.display_name||'U').trim())[0]?.toLocaleUpperCase('pt-BR')||'U';
-    const copy=document.createElement('div');copy.className='community-profile-copy';const name=document.createElement('strong');name.textContent=p.display_name||'Participante do Capital do Trem';const handle=document.createElement('p');handle.className='muted';handle.textContent='@'+(p.username||'usuario');const meta=document.createElement('div');meta.className='community-profile-meta';const role=document.createElement('span');role.className='community-profile-role';role.textContent=p.account_type==='artist'?'Artista / DJ':'Usuário Uai';meta.append(role);const city=document.createElement('p');city.className='muted community-profile-city';city.textContent=p.city||'Cidade não informada';copy.append(name,handle,meta,city);
-    if(p.bio){const bio=document.createElement('p');bio.className='community-profile-bio';bio.textContent=p.bio;copy.append(bio);}const chat=document.createElement('a');chat.className='btn alt';chat.href='./bate-papo.html';chat.textContent='Abrir Koe Fala Tu';chat.style.marginTop='8px';copy.append(chat);card.append(avatar,copy);list.append(card);
-   }
-  };
-  search.addEventListener('input',render);distance.addEventListener('change',render);render();
- }catch(error){list.replaceChildren();const msg=document.createElement('p');msg.className='muted';msg.textContent='Não foi possível carregar pessoas agora. Tente novamente quando a conexão voltar.';list.append(msg);count.textContent='Diretório temporariamente indisponível.';}
-})();
+// Diretório Fazer Amigos migrado para a parte inferior do bate-papo Fala Trem.
 // Vitrine pública: mostra apenas artistas aprovados pela equipe.
 (async()=>{
  const container=document.getElementById('public-artists');
