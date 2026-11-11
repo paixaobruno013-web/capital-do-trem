@@ -25,6 +25,25 @@ const PINNED_HOME_TRACKS = [
   { id: 'HHKsZAS1eMk', title: 'Sexta música da seleção', order: '6º • Música' },
 ];
 
+function shareHomeVideo(video) {
+  const url = 'https://youtu.be/' + encodeURIComponent(video.id);
+  const title = String(video.title || 'Vídeo do Capital do Trem').slice(0, 180);
+  const shareData = { title: 'Capital do Trem — ' + title, text: 'Olha esse vídeo no Capital do Trem!', url };
+  if (navigator.share) {
+    navigator.share(shareData).catch(error => {
+      if (error?.name !== 'AbortError') console.warn('Não foi possível abrir o compartilhamento:', error);
+    });
+    return;
+  }
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(url).then(() => {
+      if (feedStatus) feedStatus.textContent = 'Link copiado! Agora é só colar no WhatsApp, Instagram ou Facebook.';
+    }).catch(() => window.prompt('Copie o link do vídeo:', url));
+    return;
+  }
+  window.prompt('Copie o link do vídeo:', url);
+}
+
 function createHomeVideoCard(video, orderText, linkText = 'Assistir no YouTube') {
   const article = document.createElement('article');
   article.className = 'home-youtube-video';
@@ -48,12 +67,22 @@ function createHomeVideoCard(video, orderText, linkText = 'Assistir no YouTube')
   button.append(image, label);
   activateVideoButton(button);
   frame.append(button);
+  const actions = document.createElement('div');
+  actions.className = 'home-youtube-actions';
+  actions.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:9px';
   const link = document.createElement('a');
   link.href = 'https://youtu.be/' + video.id;
   link.target = '_blank';
   link.rel = 'noopener noreferrer';
   link.textContent = linkText;
-  article.append(order, frame, link);
+  const share = document.createElement('button');
+  share.type = 'button';
+  share.className = 'btn alt home-youtube-share';
+  share.textContent = '↗ Compartilhar';
+  share.setAttribute('aria-label', 'Compartilhar ' + String(video.title || 'vídeo'));
+  share.addEventListener('click', () => shareHomeVideo(video));
+  actions.append(link, share);
+  article.append(order, frame, actions);
   return article;
 }
 
