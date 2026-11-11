@@ -23,7 +23,10 @@ const checks = [
   ['busca e filtro por cidade ficam abaixo do bate-papo', /id="chat-friends-search"/.test(chat) && /id="chat-friends-distance"/.test(chat) && /id="fazer-amigos"/.test(chat)],
   ['diretório consulta somente perfis públicos', /getPublicProfiles\(\)/.test(chat) && /\.eq\('is_public', true\)/.test(auth)],
   ['filtro do próprio perfil usa a sessão autenticada sem variável global inexistente', /profile\.user_id!==session\?\.user\?\.id/.test(chat) && !/profile\.user_id!==user\?\.id/.test(chat)],
-  ['atalho para Koe Fala Tu permanece na área de amizades', /id="fazer-amigos"[\s\S]*?mensagens\.html/.test(chat) && /bate-papo\.html#fazer-amigos/.test(home)]
+  ['atalho para Koe Fala Tu permanece na área de amizades', /id="fazer-amigos"[\s\S]*?mensagens\.html/.test(chat) && /bate-papo\.html#fazer-amigos/.test(home)],
+  ['vídeo de abertura não recebe poster com logo ou imagem extra', /video\.removeAttribute\('poster'\)/.test(home) && !/const posterLayer\s*=/.test(home)],
+  ['marca sobreposta fica oculta quando há vídeo de abertura', /if\(brand\)brand\.style\.display='none'/.test(home)],
+  ['locomotiva e três vagões permanecem na abertura', /opening-wagon-rear/.test(home) && /opening-wagon-dancers/.test(home) && /opening-wagon-front/.test(home) && /opening-locomotive/.test(home)]
 ];
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO') + ' ' + name);
 const failed = checks.filter(([, ok]) => !ok);
