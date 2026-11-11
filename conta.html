@@ -926,7 +926,10 @@ async function loadMyEvents(){
    const title=document.createElement('strong');title.textContent=item.title;
    const detail=document.createElement('p');detail.textContent=new Date(item.event_date+'T00:00:00').toLocaleDateString('pt-BR')+' • '+item.address;
    const state=document.createElement('p');state.textContent='Situação: '+(item.status==='published'?'Publicado na agenda':item.status==='rejected'?'Indisponível — entre em contato com a equipe':'Processando publicação');
-   card.append(title,detail,state);myEvents.append(card);
+   card.append(title,detail);
+   if(item.music){const music=document.createElement('p');music.textContent='🎵 Música: '+item.music.title+' — '+item.music.artist_name;card.append(music);}
+   if(item.latitude!=null&&item.longitude!=null){const gps=document.createElement('p');gps.textContent='📍 GPS salvo';card.append(gps);}
+   card.append(state);myEvents.append(card);
   }
  }catch(error){myEvents.textContent='Não foi possível consultar seus eventos enviados agora. Atualize a página e tente novamente.';}
 }
