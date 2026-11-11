@@ -49,6 +49,17 @@ body.light .card,body.light .panel,body.light .conversation,body.light .message-
 </div>
 <p id="overall" class="muted" role="status" aria-live="polite">Aguardando verificação.</p>
 <div id="results"></div>
+<section class="card" aria-labelledby="health-title">
+ <strong id="health-title">Histórico de falhas deste aparelho</strong>
+ <p class="muted">O registro é local neste dispositivo. Não envia mensagens, e-mails, senhas ou conteúdo das conversas.</p>
+ <div class="actions">
+  <button id="refresh-health" type="button">Atualizar histórico</button>
+  <button id="export-health" type="button">Exportar relatório</button>
+  <button id="clear-health" type="button">Limpar histórico</button>
+ </div>
+ <p id="health-summary" class="muted" role="status" aria-live="polite">Carregando histórico...</p>
+ <div id="health-results"></div>
+</section>
 </section>
 <section class="card">
 <strong>Privacidade e segurança</strong>
@@ -136,6 +147,38 @@ button.addEventListener('click',async()=>{
  overall.className=passed===total?'good':'wait';
  button.disabled=false;
 });
+
+
+const healthSummary=document.getElementById('health-summary'),healthResults=document.getElementById('health-results');
+function renderHealth(){
+ const monitor=window.CapitalDoTremHealth;
+ if(!monitor){healthSummary.textContent='Monitoramento ainda não carregado nesta versão.';return;}
+ const items=monitor.getIncidents();
+ healthSummary.textContent=items.length+' registro(s) local(is) neste aparelho.';
+ healthResults.replaceChildren();
+ if(!items.length){const p=document.createElement('p');p.className='muted';p.textContent='Nenhuma falha registrada por este monitor até agora.';healthResults.append(p);return;}
+ items.slice(0,15).forEach(item=>{
+  const row=document.createElement('div');row.className='result wait';
+  const title=document.createElement('strong');title.textContent=item.kind;
+  const detail=document.createElement('p');detail.className='muted';
+  detail.textContent=new Date(item.time).toLocaleString()+' • '+(item.page||'página não identificada')+(item.file?' • '+item.file:'')+(item.line?' • linha '+item.line:'');
+  row.append(title,detail);healthResults.append(row);
+ });
+}
+document.getElementById('refresh-health').addEventListener('click',renderHealth);
+document.getElementById('export-health').addEventListener('click',()=>{
+ const report=window.CapitalDoTremHealth?.exportReport?.();
+ if(!report){healthSummary.textContent='Monitoramento ainda não carregado.';return;}
+ const blob=new Blob([report],{type:'application/json'});
+ const url=URL.createObjectURL(blob);const link=document.createElement('a');
+ link.href=url;link.download='capital-do-trem-relatorio-de-falhas.json';link.click();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+document.getElementById('clear-health').addEventListener('click',()=>{
+ if(!window.confirm('Deseja apagar o histórico local de falhas deste aparelho?'))return;
+ window.CapitalDoTremHealth?.clearIncidents?.();renderHealth();
+});
+renderHealth();
 
 const themeButton=document.getElementById('theme-toggle');const themeKey='capitaldotrem_theme_v1';function setTheme(value){const light=value==='light';document.body.classList.toggle('light',light);themeButton.textContent=light?'🌙 Escuro':'☀️ Claro';themeButton.setAttribute('aria-pressed',String(light));document.querySelector('meta[name="theme-color"]').content=light?'#f5f5f5':'#000000';}let initial='dark';try{initial=localStorage.getItem(themeKey)==='light'?'light':'dark';}catch{}setTheme(initial);themeButton.addEventListener('click',()=>{const next=document.body.classList.contains('light')?'dark':'light';setTheme(next);try{localStorage.setItem(themeKey,next);}catch{}});window.addEventListener('storage',event=>{if(event.key===themeKey)setTheme(event.newValue==='light'?'light':'dark');});
 </script>
