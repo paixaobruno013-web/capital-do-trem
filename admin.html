@@ -112,7 +112,6 @@ audio{width:100%;}
 <a class="command-link" href="./conta.html"><span class="glyph">♙</span>Minha conta</a>
 <a class="command-link" href="./#musicas"><span class="glyph">♫</span>Músicas</a>
 <a class="command-link" href="./admin-apoiadores.html"><span class="glyph">🤝</span>Apoiadores</a>
-<a class="command-link" href="./admin-apoiadores.html"><span class="glyph">🤝</span>Apoiadores</a>
 <a class="command-link" href="./#musicas"><span class="glyph">✦</span>Lançamentos</a>
 <a class="command-link" href="./#eventos"><span class="glyph">▦</span>Eventos</a>
 <a class="command-link" href="./#comunidade"><span class="glyph">☻</span>Comunidade</a>
@@ -122,8 +121,14 @@ audio{width:100%;}
 <a class="command-link" href="#queue"><span class="glyph">⚙</span>Moderação</a>
 <a class="command-link" href="#private-gallery-section"><span class="glyph">🔒</span>Álbum privado</a>
 </nav>
-
-<section class="command-section" id="header-background-section">
+<section class="command-section" id="casa-control-panel">
+<h2>🏠 Painel da casa • identidade e abertura</h2>
+<p class="muted">Um lugar só para atualizar as imagens principais e o vídeo de abertura. As alterações publicadas aparecem para todos.</p>
+<div class="item"><h3>1. Cabeceira do perfil</h3><p class="muted">Imagem atrás da foto e do nome Capital do Trem.</p><img id="casa-header-preview" alt="Prévia da cabeceira" style="display:block;width:100%;max-width:420px;aspect-ratio:16/6;object-fit:cover;border-radius:12px;background:#080808"><label for="casa-header-file">Escolher imagem da cabeceira</label><input id="casa-header-file" type="file" accept="image/jpeg,image/png,image/webp"><button id="casa-header-save" type="button">Salvar cabeceira</button><p id="casa-header-status" class="status" role="status" aria-live="polite">Selecione uma imagem para atualizar.</p></div>
+<div class="item"><h3>2. Capa do painel</h3><p class="muted">Envie a arte completa com a frase “AQUI A MÚSICA NÃO PARA!”.</p><img id="casa-cover-preview" alt="Prévia da capa" style="display:block;width:100%;max-width:420px;aspect-ratio:16/9;object-fit:cover;border-radius:12px;background:#080808"><label for="casa-cover-file">Escolher capa do painel</label><input id="casa-cover-file" type="file" accept="image/jpeg,image/png,image/webp"><button id="casa-cover-save" type="button">Salvar capa</button><p id="casa-cover-status" class="status" role="status" aria-live="polite">A frase deve estar na própria imagem enviada.</p></div>
+<div class="item"><h3>3. Vídeo de abertura e áudio</h3><p class="muted">Atualize o vídeo e escolha se o som começa ativo. Android e iPhone podem exigir um toque para liberar o áudio automático.</p><video id="casa-opening-preview" controls playsinline muted style="display:none;width:100%;max-width:280px;max-height:420px;background:#000;border-radius:12px"></video><label for="casa-opening-file">Escolher vídeo MP4 ou WebM (até 50 MB)</label><input id="casa-opening-file" type="file" accept="video/mp4,video/webm,.mp4,.webm"><label for="casa-opening-sound">Áudio do vídeo</label><select id="casa-opening-sound"><option value="on">Som ativo ao abrir</option><option value="off">Abrir sem som</option></select><label for="casa-opening-volume">Volume padrão</label><div class="range-row"><span class="muted">0% — 100%</span><output id="casa-opening-volume-value">70%</output><input id="casa-opening-volume" type="range" min="0" max="100" step="1" value="70"></div><button id="casa-opening-save" type="button">Salvar vídeo e opções de áudio</button><p id="casa-opening-status" class="status" role="status" aria-live="polite">O volume e a preferência de áudio ficam salvos para a abertura.</p></div>
+</section>
+<section class="command-section" id="header-background-section" hidden>
  <h2>Fundo do cabeçalho inicial • atrás da foto e do nome verificado</h2>
  <div class="item" id="header-background-direct-panel">
   <h3>Envio direto do fundo do cabeçalho</h3>
@@ -152,7 +157,7 @@ audio{width:100%;}
  </div>
 </section>
 
-<section class="command-section" id="profile-image-section">
+<section class="command-section" id="profile-image-section" hidden>
  <h2>Imagem superior do aplicativo • perfil inicial</h2>
  <p class="muted">Altere somente a imagem circular que aparece no topo da tela inicial. Esta opção não muda a abertura nem o painel inferior “AQUI A MÚSICA NÃO PARA!”. Para melhor nitidez, escolha o arquivo original em alta resolução (JPG, PNG ou WebP, até 5 MB).</p>
  <div class="item">
@@ -164,7 +169,7 @@ audio{width:100%;}
  </div>
 </section>
 
-<section class="command-section" id="branding-section">
+<section class="command-section" id="branding-section" hidden>
  <h2>Identidade visual oficial • logo circular</h2>
  <p class="muted">Escolha a arte original uma única vez. O sistema salvará o mesmo arquivo para a foto de perfil e para a abertura. JPG, PNG ou WebP até 5 MB.</p>
  <div class="item">
@@ -179,7 +184,7 @@ audio{width:100%;}
 </section>
 
 
-<section class="command-section" id="opening-media-choice">
+<section class="command-section" id="opening-media-choice" hidden>
  <h2>Escolher tipo de abertura</h2>
  <p class="muted">Selecione se a abertura será uma imagem parada por 10 segundos ou um vídeo. A locomotiva e os vagões do carregamento permanecem.</p>
  <label for="opening-media-mode">Tipo de mídia da abertura</label>
@@ -224,7 +229,7 @@ audio{width:100%;}
  </div>
 </section>
 
-<section class="command-section" id="opening-image-section">
+<section class="command-section" id="opening-image-section" hidden>
  <h2>Usar IMAGEM no lugar do vídeo de abertura</h2>
  <p class="muted">Escolha esta opção quando quiser uma imagem fixa em vez do vídeo. Ao salvar, o vídeo de abertura é desativado automaticamente e a imagem permanece por 10 segundos. A animação da locomotiva e dos vagões continua preservada. Esta opção não altera a imagem superior do perfil. JPG, PNG ou WebP até 5 MB.</p>
  <div class="item">
@@ -237,7 +242,7 @@ audio{width:100%;}
 </section>
 
 
-<section class="command-section" id="opening-video-section">
+<section class="command-section" id="opening-video-section" hidden>
  <h2>Substituir vídeo de abertura</h2>
  <p class="muted">Envie um vídeo MP4 ou WebM de até 50 MB. O vídeo será exibido em tela cheia na abertura do aplicativo; para permitir reprodução automática no Android e iPhone, ele começa sem áudio. A vinheta sonora do aplicativo continua independente.</p>
  <div class="item">
@@ -249,7 +254,7 @@ audio{width:100%;}
   <p id="opening-video-status" class="status" role="status" aria-live="polite">Nenhum vídeo novo selecionado.</p>
  </div>
 </section>
-<section class="command-section" id="home-background-section">
+<section class="command-section" id="home-background-section" hidden>
  <h2>Plano de fundo do painel central</h2>
  <p class="muted">Substitua a imagem da favela com o helicóptero e a frase “AQUI A MÚSICA NÃO PARA!”. A imagem aparece atrás do texto e dos botões, sem removê-los. JPG, PNG ou WebP até 8 MB.</p>
  <div class="item">
@@ -321,6 +326,18 @@ const queue=document.getElementById('queue'),loginForm=document.getElementById('
 let auth=null,currentUser=null;
 function node(tag,cls,text){const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;}
 function showLoggedOut(){currentUser=null;loginPanel.hidden=false;dashboard.hidden=true;const gallery=document.getElementById('private-gallery-list');if(gallery)gallery.replaceChildren(node('p','muted','Conteúdo protegido por acesso administrativo.'));}
+function setupCasaPanel(){
+ const hf=document.getElementById('casa-header-file'),hp=document.getElementById('casa-header-preview'),hs=document.getElementById('casa-header-status');
+ const cf=document.getElementById('casa-cover-file'),cp=document.getElementById('casa-cover-preview'),cs=document.getElementById('casa-cover-status');
+ const vf=document.getElementById('casa-opening-file'),vp=document.getElementById('casa-opening-preview'),vs=document.getElementById('casa-opening-status'),sound=document.getElementById('casa-opening-sound'),vol=document.getElementById('casa-opening-volume'),volOut=document.getElementById('casa-opening-volume-value');
+ const preview=(input,img,status,isVideo)=>input.addEventListener('change',()=>{const file=input.files?.[0];if(!file)return;const max=isVideo?50:8;if(file.size<1||file.size>max*1024*1024){status.textContent='Arquivo acima do limite de '+max+' MB.';input.value='';return;}const url=URL.createObjectURL(file);img.src=url;if(isVideo)img.style.display='block';status.textContent='Prévia carregada. Toque em salvar para publicar.';});
+ preview(hf,hp,hs,false);preview(cf,cp,cs,false);preview(vf,vp,vs,true);
+ vol.addEventListener('input',()=>volOut.textContent=vol.value+'%');
+ document.getElementById('casa-header-save').addEventListener('click',async()=>{const f=hf.files?.[0],b=document.getElementById('casa-header-save');if(!f){hs.textContent='Escolha primeiro a imagem da cabeceira.';return;}b.disabled=true;hs.textContent='Publicando cabeceira…';try{hp.src=await auth.saveAdminHeaderBackground(f,{x:50,y:50,blur:0,fit:'cover'});hf.value='';hs.textContent='Cabeceira atualizada para todos!';}catch(e){hs.textContent=e?.message||'Falha ao salvar.';}finally{b.disabled=false;}});
+ document.getElementById('casa-cover-save').addEventListener('click',async()=>{const f=cf.files?.[0],b=document.getElementById('casa-cover-save');if(!f){cs.textContent='Escolha a capa com a frase AQUI A MÚSICA NÃO PARA!';return;}b.disabled=true;cs.textContent='Publicando capa…';try{cp.src=await auth.saveAdminHomeBackground(f,{x:50,y:50,blur:0,fit:'cover'});cf.value='';cs.textContent='Capa atualizada para todos!';}catch(e){cs.textContent=e?.message||'Falha ao salvar.';}finally{b.disabled=false;}});
+ document.getElementById('casa-opening-save').addEventListener('click',async()=>{const f=vf.files?.[0],b=document.getElementById('casa-opening-save');b.disabled=true;vs.textContent='Salvando vídeo e áudio…';try{if(f){await auth.saveAdminOpeningVideo(f,{x:50,y:50,fit:'cover'});vp.src=URL.createObjectURL(f);vp.style.display='block';vf.value='';}const saved=await auth.saveAdminOpeningVideoSettings({muted:sound.value==='on',volume:Number(vol.value)/100});vs.textContent='Configuração salva! Som '+(saved.muted?'desativado':'ativo')+' • volume '+Math.round(saved.volume*100)+'%. O autoplay com som depende das permissões do aparelho.';}catch(e){vs.textContent=e?.message||'Falha ao salvar vídeo ou áudio.';}finally{b.disabled=false;}});
+}
+async function loadCasaPanelBranding(){try{const b=await auth.getPublicBranding();if(b.headerBackgroundImageUrl)document.getElementById('casa-header-preview').src=b.headerBackgroundImageUrl;if(b.homeBackgroundImageUrl)document.getElementById('casa-cover-preview').src=b.homeBackgroundImageUrl;if(b.openingVideoUrl){const v=document.getElementById('casa-opening-preview');v.src=b.openingVideoUrl;v.style.display='block';}document.getElementById('casa-opening-sound').value=b.openingVideoMuted?'off':'on';const n=Math.round(Math.max(0,Math.min(1,Number(b.openingVideoVolume??.7)))*100);document.getElementById('casa-opening-volume').value=String(n);document.getElementById('casa-opening-volume-value').textContent=n+'%';}catch(e){document.getElementById('casa-opening-status').textContent='Não foi possível carregar as configurações atuais.';}}
 async function enterDashboard(user){
  currentUser=user;
  // A conta proprietária pode inicializar o primeiro administrador com validação no banco.
@@ -330,6 +347,7 @@ async function enterDashboard(user){
  loginPanel.hidden=true;dashboard.hidden=false;
  document.getElementById('admin-welcome').textContent='Acesso autorizado: '+user.email;
  await loadBranding();
+ await loadCasaPanelBranding();
  await loadQueue();
  await loadChatModeration();
  await loadPrivateGallery();
@@ -734,7 +752,7 @@ document.getElementById('refresh-queue').addEventListener('click',async()=>{awai
 document.getElementById('refresh-chat').addEventListener('click',loadChatModeration);
 document.getElementById('logout').addEventListener('click',async()=>{await auth.signOutAccount();showLoggedOut();loginStatus.textContent='Você saiu do painel.';});
 try{
- auth=await import('./supabase/auth.js');auth.initSupabase();
+ auth=await import('./supabase/auth.js');auth.initSupabase();setupCasaPanel();
  const session=await auth.getCurrentSession();if(session?.user)await enterDashboard(session.user);
 }catch(error){loginStatus.textContent='Painel ainda indisponível: configure as credenciais do Supabase e aplique o banco de dados.';}
 
