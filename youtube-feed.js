@@ -1,131 +1,133 @@
-// Atualiza automaticamente a vitrine com os quatro vídeos públicos mais recentes do canal.
-const YOUTUBE_FEED_ENDPOINT = 'https://zmjxkfjzrbbxyvgkwirv.supabase.co/functions/v1/youtube-channel-feed';
-const YOUTUBE_PUBLIC_KEY = 'sb_publishable_FLbDg6UCePQHb7s0wkywng_J9pNKlsP';
+import { initSupabase, getCurrentSession } from './supabase/auth.js';
+
+const FEED_ENDPOINT = 'https://zmjxkfjzrbbxyvgkwirv.supabase.co/functions/v1/youtube-channel-feed';
+const PUBLIC_KEY = 'sb_publishable_FLbDg6UCePQHb7s0wkywng_J9pNKlsP';
 const grid = document.querySelector('.home-youtube-grid');
-const feedStatus = document.getElementById('youtube-feed-status');
-let lastRefresh = 0;
+const status = document.getElementById('youtube-feed-status');
 
-function activateVideoButton(button) {
-  button.addEventListener('click', () => {
-    const id = button.dataset.youtubeId;
-    if (!/^[a-zA-Z0-9_-]{11}$/.test(id || '')) return;
-    const frame = document.createElement('iframe');
-    frame.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1';
-    frame.title = button.getAttribute('aria-label') || 'Vídeo da Capital do Trem';
-    frame.loading = 'eager';
-    frame.referrerPolicy = 'strict-origin-when-cross-origin';
-    frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-    frame.allowFullscreen = true;
-    button.replaceWith(frame);
-  }, { once: true });
-}
+const SHORTS = [
+  'XG6J1-wxmqY','2pi4Chy_T7k','AYaC4UX3LQM','Ln7uxqY68u4','MBXrQa52x7I',
+  '6g-LDLVRXmM','l0LLjmqqGPg','6oqpTDwEz_k','x4Wbv87Pl9k','Hhe4uvhFh5M',
+  '5xUC-8Zu--s','8YI6twT5FIQ','uDmGRWA_hMU','78IJ7SVpvI4','v2fvGO7GaHs',
+  'VLDQtWADNA0','Kjsypc0JzB0','dFVVsD0Nsfg','NcMLXKNkGzg','Pu_QnJPSntA'
+].map((id,index)=>({id,title:'Vídeo da Capital do Trem '+(index+1)}));
 
-const PINNED_HOME_TRACKS = [
-  { id: '-c2QERKILzg', title: 'Quinta música da seleção', order: '5º • Música' },
-  { id: 'HHKsZAS1eMk', title: 'Sexta música da seleção', order: '6º • Música' },
+const CHANNEL_FALLBACK = [
+  {id:'LmI04iuudmQ',title:'Vídeo do canal Capital do Trem'},
+  {id:'DDHrNCagaD0',title:'Vídeo do canal Capital do Trem'},
+  {id:'eQHIsU_mamM',title:'Vídeo do canal Capital do Trem'},
+  {id:'W4wnKF5AHQA',title:'Vídeo do canal Capital do Trem'}
 ];
 
-function shareHomeVideo(video) {
-  const url = 'https://youtu.be/' + encodeURIComponent(video.id);
-  const title = String(video.title || 'Vídeo do Capital do Trem').slice(0, 180);
-  const shareData = { title: 'Capital do Trem — ' + title, text: 'Olha esse vídeo no Capital do Trem!', url };
-  if (navigator.share) {
-    navigator.share(shareData).catch(error => {
-      if (error?.name !== 'AbortError') console.warn('Não foi possível abrir o compartilhamento:', error);
-    });
-    return;
-  }
-  if (navigator.clipboard?.writeText) {
-    navigator.clipboard.writeText(url).then(() => {
-      if (feedStatus) feedStatus.textContent = 'Link copiado! Agora é só colar no WhatsApp, Instagram ou Facebook.';
-    }).catch(() => window.prompt('Copie o link do vídeo:', url));
-    return;
-  }
-  window.prompt('Copie o link do vídeo:', url);
+function setStatus(message){if(status)status.textContent=message;}
+function videoUrl(id){return 'https://youtu.be/'+encodeURIComponent(id);}
+function createPlayer(id,title){
+  const frame=document.createElement('iframe');
+  frame.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?playsinline=1&rel=0';
+  frame.title=title;
+  frame.loading='lazy';
+  frame.referrerPolicy='strict-origin-when-cross-origin';
+  frame.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+  frame.allowFullscreen=true;
+  return frame;
 }
-
-function createHomeVideoCard(video, orderText, linkText = 'Assistir no YouTube') {
-  const article = document.createElement('article');
-  article.className = 'home-youtube-video';
-  const order = document.createElement('span');
-  order.className = 'home-youtube-order';
-  order.textContent = orderText;
-  const frame = document.createElement('div');
-  frame.className = 'home-youtube-frame';
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'home-youtube-load';
-  button.dataset.youtubeId = video.id;
-  button.setAttribute('aria-label', 'Carregar e reproduzir: ' + video.title);
-  const image = document.createElement('img');
-  image.src = 'https://i.ytimg.com/vi/' + video.id + '/hqdefault.jpg';
-  image.alt = '';
-  image.loading = 'lazy';
-  image.decoding = 'async';
-  const label = document.createElement('span');
-  label.textContent = '▶ Reproduzir vídeo';
-  button.append(image, label);
-  activateVideoButton(button);
-  frame.append(button);
-  const actions = document.createElement('div');
-  actions.className = 'home-youtube-actions';
-  actions.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:9px';
-  const link = document.createElement('a');
-  link.href = 'https://youtu.be/' + video.id;
-  link.target = '_blank';
-  link.rel = 'noopener noreferrer';
-  link.textContent = linkText;
-  const share = document.createElement('button');
-  share.type = 'button';
-  share.className = 'btn alt home-youtube-share';
-  share.textContent = '↗ Compartilhar';
-  share.setAttribute('aria-label', 'Compartilhar ' + String(video.title || 'vídeo'));
-  share.addEventListener('click', () => shareHomeVideo(video));
-  const sendPrivate = document.createElement('a');
-  sendPrivate.className = 'btn alt home-youtube-private-share';
-  sendPrivate.textContent = '💬 Koe Fala Tu';
-  const privateUrl = new URL('./mensagens.html', window.location.href);
-  privateUrl.searchParams.set('share_title', String(video.title || 'Vídeo do Capital do Trem').slice(0, 160));
-  privateUrl.searchParams.set('share_url', 'https://youtu.be/' + video.id);
-  privateUrl.searchParams.set('share_source', 'YouTube');
-  sendPrivate.href = privateUrl.pathname + privateUrl.search;
-  actions.append(link, share, sendPrivate);
-  article.append(order, frame, actions);
+async function requireSession(){
+  const session=await getCurrentSession();
+  if(!session?.user){setStatus('Entre na sua conta para curtir ou comentar.');return null;}
+  return session;
+}
+async function loadInteractions(card,video){
+  try{
+    const client=initSupabase();
+    const [{count,error:likeError},{data:ownLike,error:ownError}]=await Promise.all([
+      client.from('video_likes').select('id',{count:'exact',head:true}).eq('youtube_video_id',video.id),
+      getCurrentSession().then(session=>session?.user?client.from('video_likes').select('id').eq('youtube_video_id',video.id).eq('user_id',session.user.id).maybeSingle():{data:null,error:null})
+    ]);
+    if(likeError)throw likeError;
+    if(ownError)throw ownError;
+    const like=card.querySelector('[data-action="like"]');
+    like.textContent='♥ Curtir ('+(count||0)+')';
+    like.setAttribute('aria-pressed',String(Boolean(ownLike)));
+    const comments=await client.from('video_comments').select('body,created_at').eq('youtube_video_id',video.id).order('created_at',{ascending:false}).limit(20);
+    if(comments.error)throw comments.error;
+    const list=card.querySelector('.home-youtube-comment-list');
+    list.replaceChildren();
+    (comments.data||[]).reverse().forEach(item=>{
+      const p=document.createElement('p');p.className='home-youtube-comment';
+      p.textContent=item.body;
+      const time=document.createElement('time');
+      time.dateTime=item.created_at;
+      time.textContent=new Date(item.created_at).toLocaleString('pt-BR');
+      p.append(time);list.append(p);
+    });
+  }catch(error){
+    console.warn('Interações dos vídeos ainda não estão disponíveis:',error);
+    setStatus('As curtidas e os comentários serão ativados após a atualização do banco de dados.');
+  }
+}
+function makeCard(video,index){
+  const article=document.createElement('article');
+  article.className='home-youtube-video home-youtube-short';
+  const title=document.createElement('h3');title.textContent=video.title||'Vídeo da Capital do Trem';
+  const frame=document.createElement('div');frame.className='home-youtube-frame';
+  const cover=document.createElement('button');cover.type='button';cover.className='home-youtube-load';
+  cover.setAttribute('aria-label','Reproduzir '+title.textContent);
+  const image=document.createElement('img');image.src='https://i.ytimg.com/vi/'+video.id+'/hqdefault.jpg';image.alt='';image.loading='lazy';image.decoding='async';
+  const play=document.createElement('span');play.textContent='▶ Reproduzir aqui';
+  cover.append(image,play);
+  cover.addEventListener('click',()=>cover.replaceWith(createPlayer(video.id,title.textContent)),{once:true});
+  frame.append(cover);
+  const actions=document.createElement('div');actions.className='home-youtube-actions';
+  const like=document.createElement('button');like.type='button';like.dataset.action='like';like.textContent='♥ Curtir';like.addEventListener('click',async()=>{
+    try{
+      const session=await requireSession();if(!session)return;
+      const client=initSupabase();
+      const {data:own,error}=await client.from('video_likes').select('id').eq('youtube_video_id',video.id).eq('user_id',session.user.id).maybeSingle();
+      if(error)throw error;
+      if(own){const removed=await client.from('video_likes').delete().eq('id',own.id);if(removed.error)throw removed.error;}
+      else{const added=await client.from('video_likes').insert({youtube_video_id:video.id,user_id:session.user.id});if(added.error)throw added.error;}
+      await loadInteractions(article,video);
+    }catch(error){setStatus(error?.message||'Não foi possível registrar sua curtida.');}
+  });
+  const commentToggle=document.createElement('button');commentToggle.type='button';commentToggle.textContent='💬 Comentar';
+  const share=document.createElement('button');share.type='button';share.textContent='↗ Compartilhar';
+  share.addEventListener('click',async()=>{
+    const url=videoUrl(video.id);
+    try{if(navigator.share)await navigator.share({title:video.title,text:'Olha esse vídeo no Capital do Trem!',url});else if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(url);setStatus('Link copiado para compartilhar.');}else window.prompt('Copie o link do vídeo:',url);}catch(error){if(error?.name!=='AbortError')setStatus('Não foi possível compartilhar agora.');}
+  });
+  const send=document.createElement('a');send.className='btn alt';send.textContent='💬 Koe Fala Tu';
+  const messageUrl=new URL('./mensagens.html',window.location.href);messageUrl.searchParams.set('share_title',video.title);messageUrl.searchParams.set('share_url',videoUrl(video.id));messageUrl.searchParams.set('share_source','YouTube');send.href=messageUrl.pathname+messageUrl.search;
+  actions.append(like,commentToggle,share,send);
+  const panel=document.createElement('div');panel.className='home-youtube-comments';panel.hidden=true;
+  const form=document.createElement('form');const textarea=document.createElement('textarea');textarea.maxLength=1000;textarea.required=true;textarea.placeholder='Escreva um comentário…';
+  const submit=document.createElement('button');submit.type='submit';submit.textContent='Publicar comentário';
+  form.append(textarea,submit);
+  form.addEventListener('submit',async event=>{
+    event.preventDefault();
+    const body=textarea.value.trim();if(!body)return;
+    try{const session=await requireSession();if(!session)return;const client=initSupabase();const {error}=await client.from('video_comments').insert({youtube_video_id:video.id,user_id:session.user.id,body});if(error)throw error;textarea.value='';await loadInteractions(article,video);setStatus('Comentário publicado.');}
+    catch(error){setStatus(error?.message||'Não foi possível publicar o comentário.');}
+  });
+  const list=document.createElement('div');list.className='home-youtube-comment-list';
+  panel.append(form,list);
+  commentToggle.addEventListener('click',()=>{panel.hidden=!panel.hidden;if(!panel.hidden)loadInteractions(article,video);});
+  article.append(title,frame,actions,panel);
+  loadInteractions(article,video);
   return article;
 }
-
-function renderVideos(videos) {
-  if (!grid || !Array.isArray(videos) || !videos.length) return;
-  grid.replaceChildren();
-  videos.slice(0, 4).forEach((video, index) => {
-    grid.append(createHomeVideoCard(video, index === 0 ? '1º • Mais recente' : (index + 1) + 'º'));
-  });
-  PINNED_HOME_TRACKS.forEach(track => grid.append(createHomeVideoCard(track, track.order, 'Ouvir no YouTube')));
+async function render(){
+  if(!grid)return;
+  const seen=new Set();
+  let videos=SHORTS.concat(CHANNEL_FALLBACK);
+  try{
+    const response=await fetch(FEED_ENDPOINT,{headers:{apikey:PUBLIC_KEY,Accept:'application/json'},cache:'no-store',signal:AbortSignal.timeout(10000)});
+    if(response.ok){const data=await response.json();if(Array.isArray(data.videos))videos=videos.concat(data.videos);}
+  }catch(error){console.warn('Feed automático do canal indisponível:',error);}
+  videos=videos.filter(video=>video&&/^[A-Za-z0-9_-]{11}$/.test(video.id||'')&&!seen.has(video.id)&&seen.add(video.id));
+  // Mistura determinística: intercala a lista enviada com os vídeos do canal, sem criar categorias.
+  videos=videos.map((video,index)=>({video,key:(index*7)%videos.length})).sort((a,b)=>a.key-b.key).map(item=>item.video);
+  grid.replaceChildren(...videos.map(makeCard));
+  setStatus(videos.length+' vídeos disponíveis no mesmo feed. A reprodução acontece dentro do aplicativo.');
 }
-async function refreshYouTubeFeed(force = false) {
-  if (!grid || !navigator.onLine) return;
-  if (!force && Date.now() - lastRefresh < 5 * 60 * 1000) return;
-  try {
-    const response = await fetch(YOUTUBE_FEED_ENDPOINT, {
-      method: 'GET',
-      headers: { apikey: YOUTUBE_PUBLIC_KEY, Accept: 'application/json' },
-      cache: 'no-store',
-      signal: AbortSignal.timeout(12000),
-    });
-    if (!response.ok) throw new Error('Feed indisponível (' + response.status + ').');
-    const data = await response.json();
-    if (!Array.isArray(data.videos) || !data.videos.length) throw new Error('Nenhum vídeo público foi retornado.');
-    renderVideos(data.videos);
-    lastRefresh = Date.now();
-    if (feedStatus) feedStatus.textContent = '✓ Vídeos atualizados automaticamente pelo canal oficial.';
-  } catch (error) {
-    if (feedStatus) feedStatus.textContent = 'Não foi possível atualizar agora. Mantivemos os vídeos já exibidos; tentaremos novamente quando houver conexão.';
-    console.warn('Atualização automática do YouTube:', error);
-  }
-}
-
-refreshYouTubeFeed(true);
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) refreshYouTubeFeed();
-});
-window.addEventListener('online', () => refreshYouTubeFeed(true));
+render();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&navigator.onLine)render();});
