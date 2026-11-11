@@ -202,8 +202,10 @@ album?.addEventListener('change', () => {
     album.value = '';
     return;
   }
-  if (file.size > 20 * 1024 * 1024) {
-    say(file.type.startsWith('video/') ? 'O vídeo deve ter até 20 MB.' : 'A foto deve ter até 8 MB.');
+  const isVideo = file.type.startsWith('video/');
+  const maxSize = isVideo ? 20 * 1024 * 1024 : 8 * 1024 * 1024;
+  if (file.size > maxSize) {
+    say(isVideo ? 'O vídeo deve ter até 20 MB.' : 'A foto deve ter até 8 MB.');
     album.value = '';
     return;
   }
