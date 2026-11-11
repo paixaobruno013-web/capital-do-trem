@@ -381,11 +381,17 @@ export async function getMyEvents() {
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para consultar seus eventos.');
   const { data, error } = await supabase.from('events')
-    .select('id, title, event_date, address, status')
-    .eq('created_by', user.id)
-    .order('created_at', { ascending: false });
+    .select('id,title,event_date,event_time,address,status,latitude,longitude,music_song_id')
+    .eq('created_by',user.id)
+    .order('created_at',{ascending:false});
   if (error) throw error;
-  return data || [];
+  const items=data||[];
+  const songIds=[...new Set(items.map(item=>item.music_song_id).filter(Boolean))];
+  if(!songIds.length)return items;
+  const {data:songs,error:songError}=await supabase.from('songs').select('id,title,artist_name').in('id',songIds);
+  if(songError)throw songError;
+  const lookup=new Map((songs||[]).map(song=>[song.id,{title:song.title,artist_name:song.artist_name}]));
+  return items.map(item=>({...item,music:lookup.get(item.music_song_id)||null}));
 }
 
 // Verificação e moderação administrativa. O banco confirma a função do usuário;
