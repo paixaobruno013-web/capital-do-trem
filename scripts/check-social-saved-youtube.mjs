@@ -20,7 +20,7 @@ const checks = [
   [worker.includes('youtube-feed.js') && /capital-do-trem-v[0-9]+/.test(worker), 'Service worker não atualiza o módulo do YouTube'],
   [feed.includes("id:'W4wnKF5AHQA'") && feed.includes("id:'-c2QERKILzg'") && feed.includes("id:'HHKsZAS1eMk'"), 'Vídeo 4 e músicas 5 e 6 continuam no feed unificado'],
   [homeVideosBlock && (homeVideosBlock[1].match(/\{id:/g)||[]).length === 9 && shortsBlock && (shortsBlock[1].match(/'([A-Za-z0-9_-]{11})'/g)||[]).length === 25 && feed.includes("title:'Música da seleção Capital do Trem'") && !feed.includes('SHORTS.concat('), 'Nove vídeos da home separados da biblioteca de 25 Shorts'],
-  [feed.includes('grid.replaceChildren(...videos.map(makeCard))') && feed.includes('const videos=HOME_VIDEOS;') && feed.includes('seis vídeos originais'), 'Home renderiza somente os seis vídeos originais']
+  [feed.includes('grid.replaceChildren(...videos.map(makeCard))') && feed.includes('const videos=HOME_VIDEOS;') && homeVideosBlock && (homeVideosBlock[1].match(/\{id:/g)||[]).length === 9, 'Home renderiza exatamente os nove vídeos originais']
 ];
 for (const [ok, message] of checks) { console.log((ok ? 'OK  ' : 'ERRO ') + message); if (!ok) process.exitCode = 1; }
 if (!process.exitCode) console.log('Coleção de publicações, Direct e feed automático do YouTube: verificações aprovadas.');
