@@ -352,7 +352,7 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
 /* Ajuste fino: assinatura Bruno Chock menor na abertura. */
 .intro-smoke__signature{width:auto !important;min-width:0 !important;max-width:calc(100vw - 32px) !important;min-height:0 !important;padding:4px 10px !important;font-size:12px !important;letter-spacing:1.1px !important;line-height:1.1 !important;border-width:1px !important;border-radius:7px !important;box-shadow:0 0 7px rgba(237,28,36,.7),0 0 14px rgba(237,28,36,.35) !important}
 /* Vitrine dos quatro vídeos da Capital do Trem */
-.home-youtube{border-color:rgba(237,28,36,.55);box-shadow:0 0 18px rgba(237,28,36,.12)}
+.home-event-feed{margin-bottom:14px;border:1px solid rgba(237,28,36,.5)!important;background:linear-gradient(150deg,#1a1012,#080808 78%)!important;box-shadow:0 0 20px #ed1c2416}.home-event-feed[hidden]{display:none!important}.home-event-feed-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}.home-event-feed-heading span{font-size:10px;font-weight:900;letter-spacing:1.5px;color:#ff7078}.home-event-feed-heading h2{margin:4px 0;font-size:21px}.home-event-feed-heading>a{color:#fff;text-decoration:none;border:1px solid #ed1c24;border-radius:999px;padding:7px 11px;font-size:12px;font-weight:800}.home-event-feed-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}.home-event-feed-card{min-width:0;overflow:hidden;border:1px solid #3a292c;border-radius:14px;background:#100d0e}.home-event-feed-card img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;background:#050505}.home-event-feed-card-body{padding:11px}.home-event-feed-card h3{margin:0 0 7px;font-size:16px;overflow-wrap:anywhere}.home-event-feed-meta{font-size:12px;color:#c7babc;margin:5px 0}.home-event-feed-card audio{width:100%;height:38px;margin-top:8px}.home-event-feed-card .home-event-map{display:inline-block;margin-top:8px;color:#ff777e;font-size:12px;font-weight:800}.home-event-feed-card .home-event-description{font-size:13px;line-height:1.45;color:#ddd;white-space:pre-wrap}.home-event-feed-share{width:100%;margin-top:9px;min-height:38px;border:1px solid #ed1c24;border-radius:10px;background:#211416;color:#fff;font-weight:800}@media(max-width:520px){.home-event-feed-list{grid-template-columns:1fr}.home-event-feed-card img{max-height:440px;object-fit:cover}}.home-youtube{border-color:rgba(237,28,36,.55);box-shadow:0 0 18px rgba(237,28,36,.12)}
 .home-youtube h2{margin:0 0 5px;font-size:clamp(21px,4vw,28px)}
 .home-youtube-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
 .home-stories{margin-bottom:14px;padding:13px!important}.home-stories-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}.home-stories-heading h2{font-size:17px;margin:0}.home-stories-heading>a{color:var(--fg);font-size:12px;font-weight:800;text-decoration:none;border:1px solid #ed1c24;border-radius:999px;padding:7px 10px}.home-stories-list{display:flex;gap:13px;overflow-x:auto;padding:12px 2px 5px;scroll-snap-type:x proximity;overscroll-behavior-x:contain}.home-story-item{flex:0 0 72px;width:72px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:var(--fg);font:inherit;cursor:pointer;scroll-snap-align:start}.home-story-ring{width:66px;height:66px;border-radius:50%;padding:3px;display:grid;place-items:center;background:linear-gradient(135deg,#ffcc33,#ed1c24,#a855f7);box-shadow:0 0 12px #ed1c2440}.home-story-ring.seen{background:#777;box-shadow:none}.home-story-avatar{width:100%;height:100%;border-radius:50%;border:2px solid #080808;background:#171717;color:#fff;display:grid;place-items:center;overflow:hidden;font-size:20px;font-weight:900}.home-story-avatar img{width:100%;height:100%;object-fit:cover}.home-story-name{width:100%;font-size:11px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.home-story-item:focus-visible{outline:2px solid #ed1c24;outline-offset:3px;border-radius:12px}.home-stories-empty{font-size:12px;padding:4px 0}@media(prefers-reduced-motion:no-preference){.home-story-ring{transition:transform .18s ease}.home-story-item:active .home-story-ring{transform:scale(.94)}}
@@ -876,7 +876,11 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <p id="connection-status" class="connection-status" role="status" aria-live="polite" hidden></p>
 <section class="hero reference-banner"><h2>AQUI A MÚSICA<br><strong>NÃO PARA!</strong></h2><p>Conectando a quebrada!</p><div class="social"><button class="btn" data-go="musicas">▶ Ouvir músicas</button><button class="btn alt" data-go="comunidade">Comunidade</button></div></section>
 <nav id="nav" aria-label="Navegação principal"><button class="active" data-page="inicio" aria-controls="inicio" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11h2v10h6v-6h4v6h6V11h2L12 3z"/></svg>Início</button><a class="nav-chat" href="./bate-papo.html" aria-label="Abrir chat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.7 2 11.3c0 2.2 1 4.2 2.7 5.7L4 21l4.4-2.1c1.1.4 2.3.6 3.6.6 5.5 0 10-3.7 10-8.2S17.5 3 12 3zm-4 9a1.3 1.3 0 1 1 0-2.6A1.3 1.3 0 0 1 8 12zm4 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6zm4 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6z"/></svg>Chat</a><button data-page="musicas" aria-controls="musicas"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="music-note-stem" d="M10 17V5.2L21 3v12"/><circle cx="7" cy="18" r="3.2"/><circle cx="18" cy="16" r="3.2"/></svg>Músicas</button><button data-page="artistas" aria-controls="artistas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v3h4v3a5 5 0 0 1-5 5 5 5 0 0 1-3 2.8V20h5v2H6v-2h5v-3.2A5 5 0 0 1 8 14a5 5 0 0 1-5-5V6h4V3zm10 5v4a3 3 0 0 0 2-3V8h-2zM5 8v1a3 3 0 0 0 2 3V8H5z"/></svg>Ranking</button><a class="nav-chat" href="./estudio.html" aria-label="Abrir Estúdio de fotos e vídeos">📸 Estúdio</a><a class="nav-profile" href="./conta.html" aria-label="Abrir meu perfil"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0 2c-4.4 0-8 2.2-8 5v2h16v-2c0-2.8-3.6-5-8-5z"/></svg>Perfil</a></nav>
-<section class="page active" id="inicio"><section class="home-stories card" aria-labelledby="home-stories-title"><div class="home-stories-heading"><h2 id="home-stories-title">Stories da quebrada</h2><button id="home-story-add" type="button" aria-label="Criar Story" title="Criar Story">＋</button></div><div id="home-stories-list" class="home-stories-list" aria-label="Stories recentes"><p class="muted">Carregando Stories…</p></div></section><section class="card home-youtube" aria-labelledby="home-youtube-title">
+<section class="page active" id="inicio"><section class="home-stories card" aria-labelledby="home-stories-title"><div class="home-stories-heading"><h2 id="home-stories-title">Stories da quebrada</h2><button id="home-story-add" type="button" aria-label="Criar Story" title="Criar Story">＋</button></div><div id="home-stories-list" class="home-stories-list" aria-label="Stories recentes"><p class="muted">Carregando Stories…</p></div></section><section class="card home-event-feed" id="home-event-feed" aria-labelledby="home-event-feed-title" hidden>
+<div class="home-event-feed-heading"><div><span>AGENDA DA COMUNIDADE</span><h2 id="home-event-feed-title">📅 Eventos próximos</h2></div><a href="#eventos" data-go="eventos">Ver agenda</a></div>
+<div id="home-event-feed-list" class="home-event-feed-list" aria-live="polite"></div>
+</section>
+<section class="card home-youtube" aria-labelledby="home-youtube-title">
 <h2 id="home-youtube-title">▶ Vídeos da Capital do Trem</h2>
 <p class="muted">Os vídeos mais recentes do canal oficial, atualizados automaticamente.</p><p id="youtube-feed-status" class="muted" role="status" aria-live="polite">Conferindo as novidades do canal…</p>
 <div class="home-youtube-grid">
@@ -1531,6 +1535,34 @@ updateConnectionStatus();
   const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar o mural compartilhado agora. Tente novamente em instantes.';container.replaceChildren(message);
  }
 })();
+function renderHomeEventFeed(events){
+ const feed=document.getElementById('home-event-feed');
+ const list=document.getElementById('home-event-feed-list');
+ if(!feed||!list)return;
+ const active=(events||[]).filter(item=>item.event_date>=(()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');})());
+ list.replaceChildren();
+ if(!active.length){feed.hidden=true;return;}
+ feed.hidden=false;
+ for(const item of active){
+  const card=document.createElement('article');card.className='home-event-feed-card';
+  const poster=safeHttpsUrl(item.poster_url);
+  if(poster){const img=document.createElement('img');img.src=poster;img.alt='Imagem do evento '+item.title;img.loading='lazy';img.decoding='async';card.append(img);}
+  const body=document.createElement('div');body.className='home-event-feed-card-body';
+  const title=document.createElement('h3');title.textContent=item.title;
+  const date=document.createElement('p');date.className='home-event-feed-meta';
+  date.textContent=new Date(item.event_date+'T00:00:00').toLocaleDateString('pt-BR')+(item.event_time?' • '+String(item.event_time).slice(0,5):'');
+  const place=document.createElement('p');place.className='home-event-feed-meta';place.textContent='📍 '+item.address;
+  body.append(title,date,place);
+  if(item.description){const desc=document.createElement('p');desc.className='home-event-description';desc.textContent=item.description;body.append(desc);}
+  const query=item.latitude!=null&&item.longitude!=null?item.latitude+','+item.longitude:item.address;
+  const map=document.createElement('a');map.className='home-event-map';map.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query);map.target='_blank';map.rel='noopener noreferrer';map.textContent='Abrir endereço e GPS';body.append(map);
+  if(item.music?.audio_url){const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=item.music.audio_url;audio.setAttribute('aria-label','Música do evento: '+item.music.title);body.append(audio);}
+  else if(item.music?.title){const track=document.createElement('p');track.className='home-event-feed-meta';track.textContent='🎵 '+item.music.title+' — '+(item.music.artist_name||'');body.append(track);}
+  const share=document.createElement('button');share.type='button';share.className='home-event-feed-share';share.textContent='↗ Compartilhar evento';
+  share.addEventListener('click',async()=>{const data={title:item.title,text:item.title+' • '+date.textContent+' • '+item.address,url:map.href};try{if(navigator.share)await navigator.share(data);else{await navigator.clipboard.writeText(data.text+' • '+data.url);share.textContent='✓ Copiado';}}catch(error){if(error.name!=='AbortError')share.textContent='Não foi possível compartilhar';}});
+  body.append(share);card.append(body);list.append(card);
+ }
+}
 // Agenda pública: exibe somente eventos aprovados no banco compartilhado.
 // Sem configuração Supabase, mantém a demonstração informativa sem quebrar o site.
 (async()=>{
@@ -1539,6 +1571,12 @@ updateConnectionStatus();
   const module=await import('./supabase/auth.js');
   module.initSupabase();
   const events=await module.getPublishedEvents();
+  renderHomeEventFeed(events);
+  const refreshHomeFeed=async()=>{try{renderHomeEventFeed(await module.getPublishedEvents());}catch(error){console.warn('Não foi possível atualizar o feed de eventos:',error);}};
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshHomeFeed();});
+  const nowForExpiry=new Date();
+  const nextLocalMidnight=new Date(nowForExpiry.getFullYear(),nowForExpiry.getMonth(),nowForExpiry.getDate()+1,0,0,5);
+  window.setTimeout(refreshHomeFeed,Math.max(1000,nextLocalMidnight-nowForExpiry));
   container.replaceChildren();
   if(!events.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Ainda não há eventos aprovados na agenda. Volte em breve!';container.append(empty);return;}
   for(const item of events){
