@@ -21,6 +21,7 @@ let unsubscribers = [];
 let profileObserver;
 let lastTrigger = null;
 let activeStoryAudio = null;
+let activeStoryMusicTimer = null;
 
 function seenIds() {
   try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]')); }
@@ -141,6 +142,7 @@ function showToast(message) {
 function clearAdvance() { clearTimeout(advanceTimer); advanceTimer = null; }
 function closeViewer() {
   clearAdvance();
+  clearTimeout(activeStoryMusicTimer); activeStoryMusicTimer = null;
   if (activeStoryAudio) { activeStoryAudio.pause(); activeStoryAudio.removeAttribute('src'); activeStoryAudio = null; }
   viewer?.classList.remove('is-open');
   viewer?.setAttribute('aria-hidden', 'true');
@@ -157,6 +159,7 @@ function renderStory(index) {
   updateOfficialRing();
   updateUserProfileRings();
   mediaBox.replaceChildren();
+  clearTimeout(activeStoryMusicTimer); activeStoryMusicTimer = null;
   if (activeStoryAudio) { activeStoryAudio.pause(); activeStoryAudio.removeAttribute('src'); activeStoryAudio = null; }
   captionBox.replaceChildren();
   const media = document.createElement(story.media_type === 'video' ? 'video' : 'img');
@@ -169,7 +172,8 @@ function renderStory(index) {
     media.addEventListener('ended', () => renderStory(currentIndex + 1));
   } else {
     media.alt = 'Story de ' + (story.display_name || 'Capital do Trem');
-    advanceTimer = setTimeout(() => renderStory(currentIndex + 1), 7000);
+    const storySeconds = story.music_url ? Math.max(5, Math.min(60, Number(story.music_duration_seconds) || 15)) : 7;
+    advanceTimer = setTimeout(() => renderStory(currentIndex + 1), storySeconds * 1000);
   }
   mediaBox.append(media);
   const author = story.author_id ? (story.display_name || 'Usuário Uai') + (story.username ? ' • @' + story.username : '') : 'Capital do Trem • Oficial';
@@ -187,6 +191,7 @@ function renderStory(index) {
     activeStoryAudio = music;
     music.addEventListener('loadedmetadata', () => { try { music.currentTime = Math.max(0, Number(story.music_start_seconds) || 0); } catch {} }, { once: true });
     music.play().catch(() => { musicLabel.textContent += ' • Toque em reproduzir para ouvir'; });
+    activeStoryMusicTimer = setTimeout(() => { music.pause(); }, Math.max(5, Math.min(60, Number(story.music_duration_seconds) || 15)) * 1000);
   }
   if (progress) {
     progress.style.transition = 'none';
