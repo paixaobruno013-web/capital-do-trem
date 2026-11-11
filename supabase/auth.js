@@ -1466,7 +1466,7 @@ export function subscribeAdminStories(callback) {
 // Stories pessoais da comunidade — cada conta gerencia os próprios.
 // Stories públicos para a comunidade e expiração automática em 24h.
 // ============================================================
-export async function createMyStory({ file, caption = '', musicSongId = '', musicStartSeconds = 0, musicVolume = 0.8 }) {
+export async function createMyStory({ file, caption = '', musicSongId = '', musicStartSeconds = 0, musicVolume = 0.8, musicDurationSeconds = 15 }) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
@@ -1479,13 +1479,13 @@ export async function createMyStory({ file, caption = '', musicSongId = '', musi
   const profile = await getMyBasicProfile();
   const avatar = await getMyAvatar().catch(() => null);
   const cleanCaption = String(caption || '').trim().slice(0, 280);
-  let music = { music_song_id: null, music_url: null, music_title: '', music_artist: '', music_start_seconds: 0, music_volume: 0.8 };
+  let music = { music_song_id: null, music_url: null, music_title: '', music_artist: '', music_start_seconds: 0, music_volume: 0.8, music_duration_seconds: 15 };
   if (musicSongId) {
     const { data: song, error: songError } = await supabase.from('songs').select('id,title,artist_name,storage_path').eq('id', musicSongId).eq('status', 'published').single();
     if (songError || !song) throw new Error('Essa música não está disponível para uso nos Stories.');
     const { data: signed, error: signedError } = await supabase.storage.from('capital-do-trem-audio').createSignedUrl(song.storage_path, 25 * 60 * 60);
     if (signedError || !signed?.signedUrl) throw new Error('Não foi possível preparar a música para o Story.');
-    music = { music_song_id: song.id, music_url: signed.signedUrl, music_title: String(song.title || '').slice(0,120), music_artist: String(song.artist_name || '').slice(0,100), music_start_seconds: Math.max(0, Math.min(3600, Number(musicStartSeconds) || 0)), music_volume: Math.max(0, Math.min(1, Number(musicVolume) || 0)) };
+    music = { music_song_id: song.id, music_url: signed.signedUrl, music_title: String(song.title || '').slice(0,120), music_artist: String(song.artist_name || '').slice(0,100), music_start_seconds: Math.max(0, Math.min(3600, Number(musicStartSeconds) || 0)), music_volume: Math.max(0, Math.min(1, Number(musicVolume) || 0)), music_duration_seconds: Math.max(5, Math.min(60, Math.round(Number(musicDurationSeconds) || 15))) };
   }
   const path = user.id + '/stories/' + crypto.randomUUID() + '.' + format.extension;
   const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, {
