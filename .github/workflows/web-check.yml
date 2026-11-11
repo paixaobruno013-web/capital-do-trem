@@ -25,6 +25,7 @@ jobs:
         run: node scripts/check-pwa.mjs
       - name: Verificar sintaxe dos módulos de Stories
         run: |
+          python3 -m py_compile scripts/configure-android-media.py scripts/prepare-ios-info.py
           node --check stories-ui.js
           node --check home-story-composer.js
           node --check admin-stories.js
