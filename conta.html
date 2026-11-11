@@ -83,6 +83,7 @@ audio{width:100%;}
 .story-media-preview img,.story-media-preview video{display:block;max-width:100%;max-height:360px;object-fit:contain;border-radius:8px}
 .story-compose-actions{display:flex;gap:9px;flex-wrap:wrap}
 .story-compose-actions button{flex:1;min-width:130px}
+.event-composer{overflow:hidden;border:1px solid #5a171b!important;background:linear-gradient(155deg,#171113,#090909 65%)!important;box-shadow:0 12px 40px #0008,0 0 24px #ed1c2410}.event-composer-heading{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:18px}.event-composer-kicker{font-size:10px;letter-spacing:1.8px;color:#ff6269;font-weight:900}.event-composer-heading h2{margin:5px 0;font-size:clamp(21px,5vw,28px)}.event-composer-badge{border:1px solid #ed1c24;border-radius:999px;padding:6px 10px;color:#ff747a;font-size:10px;font-weight:900;letter-spacing:1px}.event-form-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}.event-form-main input,.event-form-main textarea,.event-form-main select,.event-extra-card input,.event-extra-card select{width:100%;box-sizing:border-box}.event-form-two,.event-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.event-composer input:not([type=range]):not([type=file]),.event-composer textarea,.event-select{padding:12px;margin:6px 0 12px;border:1px solid #393235;border-radius:11px;background:#171416;color:#fff;font:inherit}.event-composer label{display:block;font-size:13px;font-weight:800;color:#f4e9ea}.event-photo-stage{position:relative;aspect-ratio:4/5;max-height:460px;overflow:hidden;border:1px solid #453337;border-radius:15px;background:radial-gradient(circle at 50% 45%,#2c171a,#080808 72%);display:grid;place-items:center}.event-photo-stage img{width:100%;height:100%;object-fit:cover;display:block;transition:filter .12s}.event-photo-stage #event-photo-placeholder{display:flex;flex-direction:column;align-items:center;gap:8px;color:#ddd;text-align:center}.event-photo-stage #event-photo-placeholder span{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:#ed1c24;color:white;font-size:34px;box-shadow:0 0 22px #ed1c2466}.event-photo-stage small{color:#999}.event-file-button{display:block;text-align:center;margin:10px 0;padding:12px;border-radius:11px;background:#252023;border:1px solid #ed1c24;color:#fff!important;cursor:pointer}.event-file-status{font-size:11px;color:#aaa;margin:4px 0 12px}.event-edit-grid{margin-bottom:8px}.event-edit-grid .event-select{margin-bottom:4px}.event-composer input[type=range]{width:100%;accent-color:#ed1c24;margin:8px 0 15px}.event-composer label span{float:right;color:#ff747a;font-variant-numeric:tabular-nums}.event-extra-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}.event-extra-card{border:1px solid #393235;border-radius:14px;padding:13px;background:#100e0f}.event-extra-card h3{margin:0 0 10px;font-size:15px}.event-extra-card .muted{font-size:11px}.event-gps-button{width:100%;padding:11px;border:1px solid #ed1c24;border-radius:10px;background:#241416;color:white;font-weight:800}.event-map-preview{display:inline-block;margin:5px 0;color:#ff858a}.event-publish-button{width:100%;min-height:52px;border:0;border-radius:13px;background:linear-gradient(110deg,#f32832,#a70c16);color:#fff;font-size:16px;font-weight:900;box-shadow:0 0 22px #ed1c243d}.event-composer .status{min-height:22px}@media(max-width:700px){.event-form-grid,.event-extra-grid{grid-template-columns:1fr}.event-photo-stage{max-height:390px}.event-form-media{order:-1}.event-composer{padding:13px!important}}@media(prefers-color-scheme:light){body.light .event-composer{background:linear-gradient(155deg,#fff5f5,#fff)!important}body.light .event-composer input:not([type=range]),body.light .event-composer textarea,body.light .event-select{background:#fff;color:#181818}body.light .event-composer label{color:#222}body.light .event-extra-card{background:#fff}}
 </style>
 <style>
 .artist-song-studio{margin:18px 0;border:1px solid rgba(237,28,36,.42);background:radial-gradient(circle at 0 0,rgba(237,28,36,.15),transparent 48%),linear-gradient(145deg,#171719,#09090a);box-shadow:0 12px 34px #0005}
@@ -284,23 +285,38 @@ audio{width:100%;}
 <p id="post-status" class="status" role="status" aria-live="polite"></p>
 </form>
 </section>
-<section class="card" id="event-panel" hidden aria-labelledby="event-title">
-<h2 id="event-title">Publicar evento, show ou ação social</h2>
-<p class="muted">Preencha os dados e toque em Postar. O evento aparece na agenda assim que for enviado.</p>
+<section class="card event-composer" id="event-panel" hidden aria-labelledby="event-title">
+<div class="event-composer-heading"><div><span class="event-composer-kicker">CAPITAL DO TREM • EVENTOS</span><h2 id="event-title">📸 Criar publicação de evento</h2><p class="muted">Prepare seu evento como uma publicação social: foto, corte, efeito, música e localização.</p></div><span class="event-composer-badge">PUBLICAR</span></div>
 <form id="event-form">
-<label for="event-name">Nome do evento</label><input id="event-name" maxlength="120" required>
-<label for="event-date">Data</label><input id="event-date" type="date" required>
-<label for="event-address">Endereço do evento</label><input id="event-address" maxlength="240" required placeholder="Rua, número, bairro e cidade"><a id="event-map-preview" class="event-map-preview" href="#" target="_blank" rel="noopener noreferrer" hidden>📍 Abrir localização no Google Maps</a><p class="muted">Ao informar o endereço, a localização é ativada automaticamente no mapa.</p>
-<details style="margin:8px 0 14px"><summary style="cursor:pointer;color:var(--red);font-weight:800;padding:8px 0">+ Informações opcionais (horário, tipo, descrição e contato)</summary>
-<label for="event-time">Horário (opcional)</label><input id="event-time" type="time">
-<label for="event-category">Tipo</label><select id="event-category" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="show">Festa / Show</option><option value="evento">Evento</option><option value="acao-social">Ação social</option><option value="outro">Outro</option></select>
-<label for="event-description">Descrição (opcional)</label><textarea id="event-description" maxlength="2000" rows="3" placeholder="Se quiser, conte mais detalhes..." style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
-<label for="event-contact">Contato público (opcional)</label><input id="event-contact" maxlength="120"></details>
-<label for="event-poster-upload">Cartaz do evento (JPG, PNG ou WebP, até 5 MB)</label><input id="event-poster-upload" type="file" accept="image/jpeg,image/png,image/webp"><div id="event-poster-preview" class="image-preview" aria-live="polite"></div><p class="muted">O cartaz será enviado junto com o evento na hora da publicação.</p>
-<button type="submit" id="submit-event">📅 Postar evento</button>
+<div class="event-form-grid">
+<div class="event-form-main">
+<label for="event-name">Nome do evento</label><input id="event-name" maxlength="120" required placeholder="Ex.: Baile da comunidade">
+<div class="event-form-two"><div><label for="event-date">Data</label><input id="event-date" type="date" required></div><div><label for="event-time">Horário</label><input id="event-time" type="time"></div></div>
+<label for="event-category">Tipo de evento</label><select id="event-category" class="event-select"><option value="show">Festa / Show</option><option value="evento">Evento cultural</option><option value="acao-social">Ação social</option><option value="outro">Outro</option></select>
+<label for="event-description">Legenda do evento</label><textarea id="event-description" maxlength="2000" rows="3" placeholder="Escreva uma legenda para acompanhar a publicação..."></textarea>
+<label for="event-contact">Contato público (opcional)</label><input id="event-contact" maxlength="120" placeholder="Instagram ou telefone de divulgação">
+</div>
+<div class="event-form-media">
+<div class="event-media-title"><strong>Prévia da publicação</strong><span>4:5 • estilo feed</span></div>
+<div class="event-photo-stage" id="event-photo-stage"><img id="event-poster-preview-image" alt="Prévia editada da imagem do evento" hidden><div id="event-photo-placeholder"><span>＋</span><b>Sua foto ou cartaz</b><small>Escolha uma imagem para começar</small></div></div>
+<label class="event-file-button" for="event-poster-upload">＋ Escolher foto ou cartaz</label><input id="event-poster-upload" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+<div id="event-poster-preview" class="event-file-status" aria-live="polite">Nenhuma imagem selecionada • JPG, PNG ou WebP até 5 MB</div>
+<div class="event-edit-grid">
+<div><label for="event-crop-ratio">Corte da imagem</label><select id="event-crop-ratio" class="event-select"><option value="4:5">Retrato 4:5</option><option value="1:1">Quadrado 1:1</option><option value="16:9">Paisagem 16:9</option><option value="original">Original</option></select></div>
+<div><label for="event-photo-filter">Efeito</label><select id="event-photo-filter" class="event-select"><option value="none">Original</option><option value="vivid">Vibrante</option><option value="warm">Quente</option><option value="mono">Preto e branco</option><option value="retro">Retrô</option><option value="neon">Neon</option><option value="soft">Suave</option></select></div>
+</div>
+<label for="event-photo-zoom">Ajustar corte <span id="event-photo-zoom-value">100%</span></label><input id="event-photo-zoom" type="range" min="100" max="180" value="100">
+<label for="event-photo-brightness">Brilho <span id="event-photo-brightness-value">100%</span></label><input id="event-photo-brightness" type="range" min="70" max="135" value="100">
+</div>
+</div>
+<div class="event-extra-grid">
+<div class="event-extra-card"><h3>🎵 Música da publicação</h3><label for="event-music-track">Escolha uma música do Capital do Trem</label><select id="event-music-track" class="event-select"><option value="">Sem música</option></select><p class="muted">A música escolhida acompanha o evento no feed.</p></div>
+<div class="event-extra-card"><h3>📍 Endereço e GPS</h3><label for="event-address">Endereço do evento</label><input id="event-address" maxlength="240" placeholder="Rua, número, bairro e cidade"><button type="button" id="event-use-gps" class="event-gps-button">◎ Marcar local com GPS</button><p id="event-gps-status" class="muted" role="status" aria-live="polite">Você escolhe quando compartilhar sua localização.</p><input id="event-latitude" type="hidden"><input id="event-longitude" type="hidden"><a id="event-map-preview" class="event-map-preview" href="#" target="_blank" rel="noopener noreferrer" hidden>📍 Conferir localização no mapa</a></div>
+</div>
+<button type="submit" id="submit-event" class="event-publish-button">📅 Publicar evento</button>
 <p id="event-status" class="status" role="status" aria-live="polite"></p>
 </form>
-<h3>Meus envios</h3><div id="my-events" class="muted" aria-live="polite">Seus eventos aparecerão aqui.</div>
+<h3>Meus eventos publicados</h3><div id="my-events" class="muted" aria-live="polite">Seus eventos aparecerão aqui.</div>
 </section>
 <section class="card">
 <h2>Privacidade e segurança</h2>
@@ -374,7 +390,7 @@ const myEvents=document.getElementById('my-events');
 const artistFields={artist_name:'artist-name',style:'artist-style',city:'artist-city',instagram:'artist-instagram',youtube:'artist-youtube',bio:'artist-bio'};
 let currentArtistPhotoUrl=null;function previewFile(inputId,boxId){const input=document.getElementById(inputId);const box=document.getElementById(boxId);if(box.dataset.previewUrl){URL.revokeObjectURL(box.dataset.previewUrl);delete box.dataset.previewUrl;}box.replaceChildren();const file=input.files&&input.files[0];if(!file)return;if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5242880||file.size===0){input.value='';const msg=document.createElement('p');msg.textContent='Escolha JPG, PNG ou WebP de até 5 MB.';box.append(msg);return;}const url=URL.createObjectURL(file);box.dataset.previewUrl=url;const img=document.createElement('img');img.src=url;img.alt='Prévia da imagem selecionada';const msg=document.createElement('p');msg.textContent='Prévia da imagem antes do envio.';box.append(img,msg);}
 document.getElementById('artist-photo-upload').addEventListener('change',()=>previewFile('artist-photo-upload','artist-photo-preview'));
-document.getElementById('event-poster-upload').addEventListener('change',()=>previewFile('event-poster-upload','event-poster-preview'));
+// O editor de eventos aplica corte e filtros antes do upload.
 window.addEventListener('pagehide',()=>['artist-photo-preview','event-poster-preview'].forEach(id=>{const box=document.getElementById(id);if(box.dataset.previewUrl)URL.revokeObjectURL(box.dataset.previewUrl);}));
 
 function clearImagePreview(boxId){
