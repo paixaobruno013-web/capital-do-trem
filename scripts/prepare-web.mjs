@@ -5,6 +5,7 @@ const root = process.cwd();
 const webDir = join(root, 'www');
 const files = [
   'index.html',
+  'estudio.html',
   'offline.html',
   'conta.html',
   'admin.html',
