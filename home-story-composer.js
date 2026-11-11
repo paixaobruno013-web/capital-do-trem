@@ -16,6 +16,7 @@ const flipButton = el('home-story-flip-button');
 const zoomControl = el('home-story-zoom');
 const zoomValue = el('home-story-zoom-value');
 let cameraZoom = 1;
+let holdRecording = false;
 const effectButtons = [...document.querySelectorAll('[data-story-effect]')];
 const effects = {
   natural: { label: 'Natural', css: 'none' },
@@ -109,6 +110,7 @@ async function startCamera() {
     stream = cameraStream;
     cameraZoom = Number(zoomControl?.value || 1);
     if (zoomValue) zoomValue.textContent = cameraZoom.toFixed(1).replace('.0','') + '×';
+    live.style.transform = 'scale(' + cameraZoom + ')';
     live.srcObject = stream;
     live.hidden = false;
     applyEffect();
@@ -373,9 +375,12 @@ recordButton?.addEventListener('pointerdown', event => {
   if (event.pointerType === 'mouse' && event.button !== 0) return;
   event.preventDefault();
   recordButton.setPointerCapture?.(event.pointerId);
+  holdRecording = true;
   if (recorder?.state !== 'recording') toggleRecording();
 });
 const stopHeldRecording = () => {
+  if (!holdRecording) return;
+  holdRecording = false;
   if (recorder?.state === 'recording') toggleRecording();
 };
 recordButton?.addEventListener('pointerup', stopHeldRecording);
@@ -387,6 +392,7 @@ recordButton?.addEventListener('click', event => {
 zoomControl?.addEventListener('input', async () => {
   cameraZoom = Number(zoomControl.value || 1);
   if (zoomValue) zoomValue.textContent = cameraZoom.toFixed(1).replace('.0','') + '×';
+  if (live) live.style.transform = 'scale(' + cameraZoom + ')';
   const track = stream?.getVideoTracks?.()[0];
   const capabilities = track?.getCapabilities?.();
   if (capabilities && 'zoom' in capabilities) {
