@@ -123,6 +123,8 @@ jobs:
         run: node scripts/check-music-library.mjs
       - name: Verificar álbum privado do administrador
         run: node scripts/check-private-admin-gallery.mjs
+      - name: Verificar Stories no perfil do usuário
+        run: node scripts/check-account-stories.mjs
       - name: Conferir arquivos essenciais
         run: |
           test -s www/index.html
