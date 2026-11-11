@@ -10,7 +10,7 @@ const list = el('admin-story-list');
 const dashboard = el('dashboard');
 let loading = false;
 let storySongs = [];
-let musicSelect, musicStart, musicVolume, musicPreview;
+let musicSelect, musicStart, musicVolume, musicDuration, musicPreview;
 
 function message(text) { if (status) status.textContent = text; }
 function dateLabel(value) {
@@ -27,6 +27,8 @@ function mountStoryMusicPicker() {
   for (const song of storySongs) musicSelect.append(new Option(song.artist_name + ' — ' + song.title, song.id));
   const startLabel = document.createElement('label'); startLabel.textContent = 'Iniciar em (segundos)';
   musicStart = document.createElement('input'); musicStart.type = 'number'; musicStart.min = '0'; musicStart.max = '3600'; musicStart.value = '0';
+  const durationLabel = document.createElement('label'); durationLabel.textContent = 'Duração do trecho (5 a 60 segundos)';
+  musicDuration = document.createElement('input'); musicDuration.type = 'number'; musicDuration.min = '5'; musicDuration.max = '60'; musicDuration.step = '1'; musicDuration.value = '15';
   const volumeLabel = document.createElement('label'); volumeLabel.textContent = 'Volume';
   musicVolume = document.createElement('input'); musicVolume.type = 'range'; musicVolume.min = '0'; musicVolume.max = '1'; musicVolume.step = '0.05'; musicVolume.value = '0.8';
   musicPreview = document.createElement('audio'); musicPreview.controls = true; musicPreview.preload = 'none'; musicPreview.hidden = true;
@@ -96,7 +98,7 @@ form?.addEventListener('submit', async event => {
   publishButton.textContent = 'PUBLICANDO STORY…';
   message('Enviando mídia e publicando para todos os usuários…');
   try {
-    await auth.createAdminStory({ file, caption: captionInput.value, musicSongId: musicSelect?.value || '', musicStartSeconds: musicStart?.value || 0, musicVolume: musicVolume?.value || 0.8 });
+    await auth.createAdminStory({ file, caption: captionInput.value, musicSongId: musicSelect?.value || '', musicStartSeconds: musicStart?.value || 0, musicVolume: musicVolume?.value || 0.8, musicDurationSeconds: musicDuration?.value || 15 });
     form.reset();
     await loadStories();
     message('🟢 STORY PUBLICADO! A foto oficial recebeu o aro verde e os usuários conectados serão avisados.');
