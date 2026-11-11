@@ -370,10 +370,110 @@ const eventForm=document.getElementById('event-form');
 const eventDateInput=document.getElementById('event-date');
 const eventAddressInput=document.getElementById('event-address');
 const eventMapPreview=document.getElementById('event-map-preview');
-function updateEventMapPreview(){const address=eventAddressInput.value.trim();if(!address){eventMapPreview.hidden=true;eventMapPreview.href='#';return;}eventMapPreview.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(address);eventMapPreview.hidden=false;}
+function updateEventMapPreview(){
+ const lat=document.getElementById('event-latitude').value;
+ const lng=document.getElementById('event-longitude').value;
+ const address=eventAddressInput.value.trim();
+ if(lat&&lng)eventMapPreview.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(lat+','+lng);
+ else if(address)eventMapPreview.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(address);
+ else{eventMapPreview.hidden=true;eventMapPreview.href='#';return;}
+ eventMapPreview.hidden=false;
+}
 eventAddressInput.addEventListener('input',updateEventMapPreview);
 eventAddressInput.addEventListener('change',updateEventMapPreview);
 const eventStatus=document.getElementById('event-status');
+const eventImageInput=document.getElementById('event-poster-upload');
+const eventImagePreview=document.getElementById('event-poster-preview-image');
+const eventImagePlaceholder=document.getElementById('event-photo-placeholder');
+const eventPhotoStage=document.getElementById('event-photo-stage');
+let eventImageObjectUrl='';
+const eventFilters={
+ none:'none',
+ vivid:'saturate(1.65) contrast(1.12)',
+ warm:'sepia(.22) saturate(1.3)',
+ mono:'grayscale(1) contrast(1.12)',
+ retro:'sepia(.38) saturate(.85) contrast(.95)',
+ neon:'saturate(1.9) contrast(1.28) hue-rotate(-8deg)',
+ soft:'saturate(.86) brightness(1.08)'
+};
+function eventFilterValue(){return eventFilters[document.getElementById('event-photo-filter').value]||'none';}
+function updateEventImagePreview(){
+ const zoom=Number(document.getElementById('event-photo-zoom').value||100);
+ const brightness=Number(document.getElementById('event-photo-brightness').value||100);
+ const filter=eventFilterValue();
+ document.getElementById('event-photo-zoom-value').textContent=zoom+'%';
+ document.getElementById('event-photo-brightness-value').textContent=brightness+'%';
+ eventPhotoStage.style.aspectRatio=document.getElementById('event-crop-ratio').value==='1:1'?'1 / 1':document.getElementById('event-crop-ratio').value==='16:9'?'16 / 9':document.getElementById('event-crop-ratio').value==='original'?(eventImagePreview.naturalWidth&&eventImagePreview.naturalHeight?eventImagePreview.naturalWidth+' / '+eventImagePreview.naturalHeight:'4 / 5'):'4 / 5';
+ eventImagePreview.style.filter=filter+' brightness('+brightness+'%)';
+ eventImagePreview.style.transform='scale('+(zoom/100)+')';
+}
+eventImageInput.addEventListener('change',()=>{
+ const file=eventImageInput.files?.[0];
+ if(eventImageObjectUrl)URL.revokeObjectURL(eventImageObjectUrl);
+ eventImageObjectUrl='';
+ if(!file){eventImagePreview.hidden=true;eventImagePlaceholder.hidden=false;return;}
+ if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){
+  eventImageInput.value='';
+  eventStatus.textContent='Escolha uma imagem JPG, PNG ou WebP de até 5 MB.';
+  return;
+ }
+ eventImageObjectUrl=URL.createObjectURL(file);
+ eventImagePreview.onload=()=>{eventImagePreview.hidden=false;eventImagePlaceholder.hidden=true;updateEventImagePreview();};
+ eventImagePreview.src=eventImageObjectUrl;
+ document.getElementById('event-poster-preview').textContent=file.name+' • '+(file.size/1024/1024).toFixed(1)+' MB';
+ eventStatus.textContent='';
+});
+['event-photo-filter','event-photo-zoom','event-photo-brightness','event-crop-ratio'].forEach(id=>document.getElementById(id).addEventListener('input',updateEventImagePreview));
+document.getElementById('event-crop-ratio').addEventListener('change',updateEventImagePreview);
+async function createEditedEventImage(){
+ const file=eventImageInput.files?.[0];
+ if(!file)return null;
+ const image=new Image();
+ image.src=eventImageObjectUrl||URL.createObjectURL(file);
+ try{await image.decode();}catch{throw new Error('Não foi possível abrir a imagem para edição. Escolha outra foto.');}
+ const ratioChoice=document.getElementById('event-crop-ratio').value;
+ const ratio=ratioChoice==='1:1'?1:ratioChoice==='16:9'?16/9:ratioChoice==='original'?image.naturalWidth/image.naturalHeight:4/5;
+ const zoom=Math.max(1,Math.min(1.8,Number(document.getElementById('event-photo-zoom').value||100)/100));
+ let cropW=image.naturalWidth,cropH=image.naturalHeight;
+ if(cropW/cropH>ratio)cropW=cropH*ratio;else cropH=cropW/ratio;
+ cropW/=zoom;cropH/=zoom;
+ const sx=(image.naturalWidth-cropW)/2,sy=(image.naturalHeight-cropH)/2;
+ const maxSide=1600;
+ const outW=Math.round(ratio>=1?maxSide:maxSide*ratio);
+ const outH=Math.round(ratio>=1?maxSide/ratio:maxSide);
+ const canvas=document.createElement('canvas');canvas.width=outW;canvas.height=outH;
+ const ctx=canvas.getContext('2d');
+ ctx.filter=eventFilterValue()+' brightness('+Number(document.getElementById('event-photo-brightness').value||100)+'%)';
+ ctx.drawImage(image,sx,sy,cropW,cropH,0,0,outW,outH);
+ const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.9));
+ if(!blob)throw new Error('Não foi possível preparar a imagem editada.');
+ return new File([blob],'capital-do-trem-evento.jpg',{type:'image/jpeg',lastModified:Date.now()});
+}
+document.getElementById('event-use-gps').addEventListener('click',()=>{
+ const button=document.getElementById('event-use-gps');
+ const gpsStatus=document.getElementById('event-gps-status');
+ if(!navigator.geolocation){gpsStatus.textContent='Este aparelho não disponibilizou GPS neste navegador.';return;}
+ button.disabled=true;gpsStatus.textContent='Solicitando sua localização…';
+ navigator.geolocation.getCurrentPosition(position=>{
+  const lat=position.coords.latitude,lng=position.coords.longitude;
+  document.getElementById('event-latitude').value=String(lat);
+  document.getElementById('event-longitude').value=String(lng);
+  if(!eventAddressInput.value.trim())eventAddressInput.value='Localização marcada pelo GPS';
+  gpsStatus.textContent='Local marcado com precisão aproximada de '+Math.round(position.coords.accuracy)+' metros.';
+  updateEventMapPreview();button.disabled=false;
+ },error=>{
+  gpsStatus.textContent=error.code===1?'Permita a localização nas configurações do aparelho para usar o GPS.':'Não foi possível obter o GPS agora. Confira o sinal e tente novamente.';
+  button.disabled=false;
+ },{enableHighAccuracy:true,timeout:15000,maximumAge:60000});
+});
+async function loadEventMusicOptions(){
+ const select=document.getElementById('event-music-track');
+ try{
+  const songs=await auth.getEventMusicOptions();
+  select.replaceChildren(new Option('Sem música',''));
+  for(const song of songs)select.add(new Option(song.title+' — '+song.artist_name,song.id));
+ }catch(error){select.replaceChildren(new Option('Músicas indisponíveis no momento',''));console.warn('Não foi possível carregar músicas para eventos:',error);}
+}
 function localDateValue(date=new Date()){const year=date.getFullYear();const month=String(date.getMonth()+1).padStart(2,'0');const day=String(date.getDate()).padStart(2,'0');return `${year}-${month}-${day}`;}
 function refreshAccountEventDateMinimum(){
  const today=localDateValue();
@@ -583,6 +683,9 @@ async function loadBasicProfile(){
   document.getElementById('basic-username').value=profile?.username||'';
   document.getElementById('basic-account-type').value=profile?.account_type||'user';
   artistProfileArea.hidden=(profile?.account_type||'user')!=='artist';
+  const eventAdmin=await auth.isCurrentUserAdmin().catch(()=>false);
+  eventPanel.hidden=(profile?.account_type||'user')!=='artist'&&!eventAdmin;
+  if(!eventPanel.hidden)loadEventMusicOptions();
   document.getElementById('basic-city').value=profile?.city||'';
   document.getElementById('basic-bio').value=profile?.bio||'';
   document.getElementById('basic-public').checked=profile?.is_public===true;
@@ -849,13 +952,25 @@ eventForm.addEventListener('submit',async event=>{
  const today=localDateValue();
  eventDateInput.min=today;
  if(!date||date<today){eventStatus.textContent='Escolha uma data de hoje em diante.';eventDateInput.focus();return;}
- const payload={title:document.getElementById('event-name').value.trim(),event_date:date,event_time:document.getElementById('event-time').value||null,address:document.getElementById('event-address').value.trim(),category:document.getElementById('event-category').value,description:document.getElementById('event-description').value.trim(),contact:document.getElementById('event-contact').value.trim()};
- button.disabled=true;eventStatus.textContent='Publicando evento…';
+ const latitude=document.getElementById('event-latitude').value;
+ const longitude=document.getElementById('event-longitude').value;
+ const payload={title:document.getElementById('event-name').value.trim(),event_date:date,event_time:document.getElementById('event-time').value||null,address:eventAddressInput.value.trim()||(latitude&&longitude?'Localização marcada pelo GPS':''),category:document.getElementById('event-category').value,description:document.getElementById('event-description').value.trim(),contact:document.getElementById('event-contact').value.trim(),latitude:latitude||null,longitude:longitude||null,music_song_id:document.getElementById('event-music-track').value||null};
+ button.disabled=true;eventStatus.textContent='Preparando sua publicação…';
  try{
-  const poster=document.getElementById('event-poster-upload').files[0];
-  if(poster){eventStatus.textContent='Enviando cartaz seguro...';payload.poster_url=await auth.uploadMyMedia(poster,'event');}
-  await auth.submitMyEvent(payload);eventForm.reset();updateEventMapPreview();clearImagePreview('event-poster-preview');eventStatus.textContent='Evento publicado com sucesso! A localização já está vinculada ao endereço no Google Maps.';await loadMyEvents();}
- catch(error){eventStatus.textContent=error?.message||'Não foi possível enviar. Verifique a conexão e tente novamente.';}
+  const editedPoster=await createEditedEventImage();
+  if(editedPoster){eventStatus.textContent='Enviando imagem editada…';payload.poster_url=await auth.uploadMyMedia(editedPoster,'event');}
+  await auth.submitMyEvent(payload);
+  eventForm.reset();
+  if(eventImageObjectUrl)URL.revokeObjectURL(eventImageObjectUrl);
+  eventImageObjectUrl='';eventImagePreview.removeAttribute('src');eventImagePreview.hidden=true;eventImagePlaceholder.hidden=false;
+  eventImagePreview.style.filter='none';eventImagePreview.style.transform='none';
+  document.getElementById('event-poster-preview').textContent='Nenhuma imagem selecionada • JPG, PNG ou WebP até 5 MB';
+  document.getElementById('event-latitude').value='';document.getElementById('event-longitude').value='';
+  document.getElementById('event-gps-status').textContent='Você escolhe quando compartilhar sua localização.';
+  updateEventMapPreview();updateEventImagePreview();
+  eventStatus.textContent='Evento publicado! Sua foto editada, música e localização foram salvas.';
+  await loadMyEvents();
+ }catch(error){eventStatus.textContent=error?.message||'Não foi possível enviar. Verifique a conexão e tente novamente.';}
  finally{button.disabled=false;}
 });
 
