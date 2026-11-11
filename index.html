@@ -12,6 +12,7 @@
  }else if(started)localStorage.removeItem(key);
 }catch(error){}})();
 </script>
+<script>document.documentElement.classList.add('intro-brand-pending');</script>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#000000" id="theme-color">
 <meta name="description" content="Capital do Trem: música, artistas, shows, eventos e ações sociais da nossa comunidade.">
@@ -54,6 +55,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 /* Abertura cinematográfica: fumaça leve atravessando a marca. */
 .intro-smoke{position:fixed;inset:0;z-index:9998;display:grid;place-items:center;overflow:hidden;background:#000;pointer-events:none;animation:intro-screen-out 10s ease-in-out forwards}
 .intro-smoke__brand{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;opacity:0;animation:intro-brand-in 9.5s ease-out forwards}
+html.intro-brand-pending .intro-smoke__brand{opacity:0!important;visibility:hidden!important}
 .intro-smoke__brand img{width:clamp(92px,24vw,150px);height:auto;max-height:150px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(255,255,255,.18))}
 .intro-smoke__brand.custom-opening-image{width:100%;height:100%;justify-content:center;gap:0}
 .intro-smoke__brand.custom-opening-image img{position:absolute;inset:0;width:100vw;height:100vh;max-height:none;object-fit:cover;filter:none}
@@ -1726,11 +1728,11 @@ async function saveOfflineMusic(id,blob,title){
    const finish=()=>{if(finished)return;finished=true;progress=100;paint();screen.classList.add('is-finished');window.setTimeout(()=>screen.remove(),600);};
    const begin=()=>{if(started)return;started=true;startOpeningTrain();window.setTimeout(finish,10000);};
    const loader=window.setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}else window.clearInterval(loader);},220);
-   if(intro.complete&&intro.naturalWidth>0){intro.style.visibility='visible';begin();}
-   else{intro.addEventListener('load',()=>{intro.style.visibility='visible';begin();},{once:true});intro.addEventListener('error',()=>{intro.style.visibility='visible';begin();},{once:true});}
+   if(intro.complete&&intro.naturalWidth>0){intro.style.visibility='visible';document.documentElement.classList.remove('intro-brand-pending');begin();}
+   else{intro.addEventListener('load',()=>{intro.style.visibility='visible';document.documentElement.classList.remove('intro-brand-pending');begin();},{once:true});intro.addEventListener('error',()=>{intro.src='./marca.svg';intro.style.objectFit='contain';intro.style.visibility='visible';document.documentElement.classList.remove('intro-brand-pending');begin();},{once:true});}
   }
  }
-   if(!opening&&!openingVideo){const fallback=document.querySelector('.intro-smoke__brand img');if(fallback)fallback.style.visibility='visible';}
+   if(!opening&&!openingVideo){const fallback=document.querySelector('.intro-smoke__brand img');if(fallback)fallback.style.visibility='visible';const brand=document.querySelector('.intro-smoke__brand');if(brand){brand.style.visibility='visible';brand.style.opacity='1';brand.style.animation='none';}document.documentElement.classList.remove('intro-brand-pending');}
    const headerBgUrl=safeUrl(branding.headerBackgroundImageUrl);
   const appHeader=document.querySelector('body>header');
   if(appHeader&&headerBgUrl){
@@ -1754,13 +1756,14 @@ async function saveOfflineMusic(id,blob,title){
    if(screen){
     const brand=document.querySelector('.intro-smoke__brand');
     if(brand)brand.style.display='none';
+    document.documentElement.classList.remove('intro-brand-pending');
     const video=document.createElement('video');
     video.className='opening-video-background';video.src=currentOpeningVideo;video.poster=currentOpeningImage||profile||'./marca.svg';video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';video.style.opacity='1';video.style.transition='opacity .25s ease';const savedOpeningSound=(()=>{try{return localStorage.getItem('capitaldotrem_intro_sound_v1')!=='off';}catch{return true;}})();
     video.autoplay=true;video.muted=!savedOpeningSound;video.defaultMuted=!savedOpeningSound;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));video.playsInline=true;video.loop=true;video.playbackRate=1;video.preload='auto';video.setAttribute('aria-hidden','true');
     // Camada estática de segurança: se o vídeo demorar ou engasgar, a abertura nunca fica congelada.
     const posterLayer=document.createElement('img');
     posterLayer.alt='';posterLayer.setAttribute('aria-hidden','true');
-    posterLayer.src=currentOpeningImage||profile||'./marca.svg';
+    posterLayer.src=currentOpeningImage||profile||'./marca.svg';posterLayer.loading='eager';posterLayer.decoding='async';posterLayer.fetchPriority='high';
     posterLayer.style.cssText='position:absolute;z-index:1;inset:0;width:100%;height:100%;object-fit:'+(branding.openingFit==='contain'?'contain':'cover')+';object-position:'+((Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%')+';background:#000;opacity:1;transition:opacity .18s ease;pointer-events:none';
     video.style.zIndex='2';video.style.opacity='0';
     screen.insertBefore(posterLayer,screen.firstChild);screen.insertBefore(video,screen.firstChild);screen.classList.add('custom-opening-screen');
@@ -1807,7 +1810,15 @@ async function saveOfflineMusic(id,blob,title){
     window.setTimeout(()=>{if(!clockStarted){video.pause();video.style.opacity='0';beginOpeningClock();}},12000);
    }
   }
- }catch(error){console.warn('Identidade visual padrão mantida.',error);}
+ }catch(error){
+  console.warn('Identidade visual padrão mantida.',error);
+  document.documentElement.classList.remove('intro-brand-pending');
+  const fallbackBrand=document.querySelector('.intro-smoke__brand');
+  if(fallbackBrand&&!fallbackBrand.classList.contains('custom-opening-image')){
+   fallbackBrand.style.display='flex';fallbackBrand.style.visibility='visible';fallbackBrand.style.opacity='1';fallbackBrand.style.animation='none';
+   const fallbackImage=fallbackBrand.querySelector('img');if(fallbackImage){fallbackImage.src='./marca.svg';fallbackImage.style.visibility='visible';}
+  }
+ }
 })();
 </script>
 
