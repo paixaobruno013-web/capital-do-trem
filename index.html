@@ -820,6 +820,30 @@ body.light header.header-has-custom-background::before{
 @keyframes opening-train-cross-sky{from{left:-230px}to{left:calc(100vw + 230px)}}
 @media(prefers-reduced-motion:reduce){.intro-smoke.custom-opening-screen .opening-live-track #opening-live-train{animation:opening-train-cross-sky 9.8s linear 1 both!important}}
 .post-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.saved-publications{margin-top:14px;border-color:#ed1c2455}.saved-publications .item{border-left:3px solid #ed1c24}
+
+/* Botão Logo Ali: formato horizontal com contorno LED vermelho */
+.header-location-row .btn#quick-location{
+  display:block;
+  width:min(100%,440px);
+  min-height:48px;
+  padding:11px 20px;
+  border:1.5px solid #ff2638;
+  border-radius:12px;
+  background:#090909;
+  color:#fff;
+  font-weight:850;
+  letter-spacing:.2px;
+  box-shadow:0 0 5px rgba(255,20,40,.72),0 0 12px rgba(255,20,40,.48),inset 0 0 8px rgba(255,20,40,.12);
+  text-shadow:0 0 7px rgba(255,60,70,.38);
+}
+.header-location-row .btn#quick-location:active,
+.header-location-row .btn#quick-location:focus-visible{
+  box-shadow:0 0 7px rgba(255,20,40,.95),0 0 18px rgba(255,20,40,.68),inset 0 0 10px rgba(255,20,40,.18);
+}
+@media(max-width:520px){
+  .header-location-row .btn#quick-location{width:100%;max-width:440px}
+}
+
 </style><script>
 // Se o Android encerrar o processo enquanto a câmera nativa está aberta, retoma a conversa em vez de reiniciar na página inicial.
 try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(localStorage.getItem(key)||0);if(started&&Date.now()-started<3*60*1000){localStorage.removeItem(key);location.replace('./bate-papo.html?retorno-camera=1');}}catch(error){}
