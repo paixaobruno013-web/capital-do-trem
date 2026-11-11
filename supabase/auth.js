@@ -1489,8 +1489,8 @@ export async function createMyStory({ file, caption = '', musicSongId = '', musi
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para publicar um Story.');
   if (!(file instanceof File)) throw new Error('Escolha uma foto ou vídeo.');
-  const format = await getBrandingUploadFormat(file, { jpg: true, jpeg: true, png: true, webp: true, mp4: true, webm: true });
-  const isVideo = ['mp4', 'webm'].includes(format.extension);
+  const format = await getBrandingUploadFormat(file, { jpg: true, jpeg: true, png: true, webp: true, mp4: true, webm: true, mov: true });
+  const isVideo = ['mp4', 'webm', 'mov'].includes(format.extension);
   const maxSize = isVideo ? 20 * 1024 * 1024 : 8 * 1024 * 1024;
   if (file.size < 1 || file.size > maxSize) throw new Error(isVideo ? 'O vídeo deve ter até 20 MB.' : 'A imagem deve ter até 8 MB.');
   const profile = await getMyBasicProfile();
