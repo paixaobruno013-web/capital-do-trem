@@ -1,8 +1,9 @@
 import { readFile } from 'node:fs/promises';
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [auth, home, migration] = await Promise.all([
+const [auth, home, chat, migration] = await Promise.all([
   read('supabase/auth.js'),
   read('index.html'),
+  read('bate-papo.html'),
   read('supabase/migrations/20261111143000_post_likes_comments.sql')
 ]);
 const checks = [
@@ -19,10 +20,10 @@ const checks = [
   ['mural mostra lista e formulário de comentários', /Comentários[\s\S]*?post-comment-form[\s\S]*?addPostComment\(item\.id/.test(home)],
   ['compartilhamento privado continua disponível', /Koe Fala Tu[\s\S]*?share_text/.test(home)],
   ['área Fazer amigos permanece no menu e na navegação', /data-page="amigos"/.test(home) && /id="amigos"/.test(home)],
-  ['busca e filtro por cidade continuam disponíveis', /id="friends-search"/.test(home) && /id="friends-distance"/.test(home)],
-  ['diretório consulta somente perfis públicos', /getPublicProfiles\(\)/.test(home) && /\.eq\('is_public', true\)/.test(auth)],
-  ['filtro do próprio perfil usa a sessão autenticada sem variável global inexistente', /profiles\.filter\(p=>p\.user_id!==session\?\.user\?\.id\)/.test(home) && !/profiles\.filter\(p=>p\.user_id!==user\?\.id\)/.test(home)],
-  ['atalho para Koe Fala Tu permanece na área de amizades', /id="amigos"[\s\S]*?Abrir Koe Fala Tu/.test(home)]
+  ['busca e filtro por cidade ficam abaixo do bate-papo', /id="chat-friends-search"/.test(chat) && /id="chat-friends-distance"/.test(chat) && /id="fazer-amigos"/.test(chat)],
+  ['diretório consulta somente perfis públicos', /getPublicProfiles\(\)/.test(chat) && /\.eq\('is_public', true\)/.test(auth)],
+  ['filtro do próprio perfil usa a sessão autenticada sem variável global inexistente', /profile\.user_id!==session\?\.user\?\.id/.test(chat) && !/profile\.user_id!==user\?\.id/.test(chat)],
+  ['atalho para Koe Fala Tu permanece na área de amizades', /id="fazer-amigos"[\s\S]*?mensagens\.html/.test(chat) && /bate-papo\.html#fazer-amigos/.test(home)]
 ];
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO') + ' ' + name);
 const failed = checks.filter(([, ok]) => !ok);
