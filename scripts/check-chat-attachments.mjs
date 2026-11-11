@@ -27,14 +27,17 @@ const checks = [
   ['upload do grupo usa pasta group no bucket privado', /export async function uploadChatAttachment[\s\S]*?const path = 'group\/' \+ user\.id[\s\S]*?uploadChatFile\(file, path\)/.test(auth)],
   ['upload privado usa pasta private/conversa/usuário', /const path='private\/'\+conversationId\+'\/'\+user\.id/.test(auth)],
   ['mensagem privada aceita arquivo e preserva o controle de conversa', /export async function sendPrivateMessage\(conversationId,content,file=null\)[\s\S]*?uploadChatFile\(file,path\)[\s\S]*?private_messages/.test(auth)],
-  ['grupo oferece galeria, câmera, áudio e documentos', /addAttachOption\('🖼️','Fotos e vídeos'/.test(group) && /addAttachOption\('📄','Documento'/.test(group) && /addAttachOption\('🎵','Áudio'/.test(group) && /addAttachOption\('📷','Câmera'/.test(group)],
-  ['grupo exibe prévia e remoção do anexo antes do envio', /remove-chat-attachment/.test(group) && /clearSelectedAttachment/.test(group)],
+  ['grupo oferece galeria, câmera, áudio e documentos', /addAttachOption\('🖼️','Galeria • fotos e vídeos'/.test(group) && /addAttachOption\('📄','Arquivos e documentos'/.test(group) && /addAttachOption\('🎵','Áudios e músicas'/.test(group) && /addAttachOption\('📷','Câmera'/.test(group)],
+  ['grupo exibe prévia de foto, vídeo e áudio e permite remover o anexo', /chat-attachment-preview/.test(group) && /URL.createObjectURL\(selectedAttachment\)/.test(group) && /remove-chat-attachment/.test(group) && /clearSelectedAttachment/.test(group)],
+  ['grupo envia arquivos para o bucket privado antes de publicar a mensagem', /selectedAttachment\?await uploadChatAttachment\(selectedAttachment\)/.test(group) && /sendChatMessage\(value,uploaded\)/.test(group)],
+  ['conversa privada permite prévia de foto, vídeo e áudio antes de enviar', /private-attachment-thumb/.test(privateChat) && /URL.createObjectURL\(file\)/.test(privateChat)],
+  ['grupo e conversa privada aceitam anexos de forma consistente no Android e iOS', /uploadChatAttachment/.test(privateChat) && /sendPrivateMessage\(active\.id,value,selectedPrivateFile\)/.test(privateChat)],
   ['grupo renderiza documentos e mídia com URL temporária', /m\.attachment_type==='document'/.test(group) && /m\.attachment_url/.test(group)],
   ['conversa privada oferece menu de anexos e prévia', /id="private-attach"/.test(privateChat) && /id="private-attachment-preview"/.test(privateChat) && /private-attachment-menu/.test(privateChat)],
   ['conversa privada envia arquivo junto da legenda', /sendPrivateMessage\(active\.id,value,selectedPrivateFile\)/.test(privateChat)],
   ['conversa privada renderiza foto, vídeo, áudio e documento', /m\.attachment_type==='image'/.test(privateChat) && /m\.attachment_type==='video'/.test(privateChat) && /m\.attachment_type==='audio'/.test(privateChat) && /m\.attachment_type==='document'/.test(privateChat)],
   ['build Android/iOS inclui páginas e módulo Supabase atualizado', /'mensagens\.html'/.test(prepare) && /'bate-papo\.html'/.test(prepare) && /'supabase\/auth\.js'/.test(prepare)],
-  ['service worker recebeu versão de cache nova e inclui as conversas', /capital-do-trem-v259/.test(worker) && /mensagens\.html/.test(worker) && /bate-papo\.html/.test(worker)]
+  ['service worker recebeu versão de cache nova e inclui as conversas', /capital-do-trem-v260/.test(worker) && /mensagens\.html/.test(worker) && /bate-papo\.html/.test(worker)]
 ];
 const failed = checks.filter(([, ok]) => !ok);
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO') + ' ' + name);
