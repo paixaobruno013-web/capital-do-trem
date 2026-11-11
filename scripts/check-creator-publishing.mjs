@@ -62,3 +62,4 @@ for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO') + ' ' + name
 const failed = checks.filter(([, ok]) => !ok);
 if (failed.length) process.exit(1);
 console.log('Fluxos prioritários do próximo teste verificados: ' + checks.length + ' testes.');
+// Volume hardware bridge and visual refinements are part of the Android test build.
