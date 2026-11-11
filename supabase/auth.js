@@ -1548,3 +1548,68 @@ export async function recordSongPlay(songId) {
   if (error) throw error;
   return true;
 }
+
+// Álbum privado da administração: metadados e mídia só são lidos por administradores.
+// Os envios voluntários dos usuários continuam protegidos por consentimento e RLS.
+export async function getAdminPrivateGallery() {
+  const supabase = initSupabase();
+  if (!(await isCurrentUserAdmin())) throw new Error('Somente o administrador pode abrir o álbum privado.');
+  const { data, error } = await supabase.from('private_gallery_items')
+    .select('id,storage_path,mime_type,file_size,sender_display_name,sender_username,created_at,expires_at')
+    .gt('expires_at', new Date().toISOString())
+    .order('created_at', { ascending: false })
+    .limit(200);
+  if (error) throw error;
+  return await Promise.all((data || []).map(async item => {
+    const { data: signed, error: signedError } = await supabase.storage
+      .from('capital-do-trem-private-gallery')
+      .createSignedUrl(item.storage_path, 15 * 60);
+    if (signedError) throw signedError;
+    return { ...item, signed_url: signed.signedUrl };
+  }));
+}
+
+export async function uploadAdminPrivateGalleryItem(file) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente o administrador pode adicionar arquivos ao álbum.');
+  if (!(file instanceof File)) throw new Error('Selecione uma foto ou vídeo.');
+  const extensions = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'video/mp4': 'mp4', 'video/webm': 'webm' };
+  const extension = extensions[file.type];
+  if (!extension) throw new Error('Use JPG, PNG, WebP, MP4 ou WebM.');
+  if (file.size < 1 || file.size > 20 * 1024 * 1024) throw new Error('O arquivo deve ter até 20 MB.');
+  const path = user.id + '/admin/' + crypto.randomUUID() + '.' + extension;
+  const bucket = supabase.storage.from('capital-do-trem-private-gallery');
+  const { error: uploadError } = await bucket.upload(path, file, {
+    contentType: file.type, cacheControl: '3600', upsert: false
+  });
+  if (uploadError) throw uploadError;
+  const { error: insertError } = await supabase.from('private_gallery_items').insert({
+    user_id: user.id,
+    storage_path: path,
+    mime_type: file.type,
+    file_size: file.size,
+    consent_confirmed: true
+  });
+  if (insertError) {
+    await bucket.remove([path]);
+    throw insertError;
+  }
+  return true;
+}
+
+export async function deleteAdminPrivateGalleryItem(id) {
+  const supabase = initSupabase();
+  if (!(await isCurrentUserAdmin())) throw new Error('Somente o administrador pode remover arquivos do álbum.');
+  const { data: item, error: readError } = await supabase.from('private_gallery_items')
+    .select('id,storage_path').eq('id', id).single();
+  if (readError) throw readError;
+  const { error: storageError } = await supabase.storage
+    .from('capital-do-trem-private-gallery').remove([item.storage_path]);
+  if (storageError) throw storageError;
+  const { error: deleteError } = await supabase.from('private_gallery_items').delete().eq('id', id);
+  if (deleteError) throw deleteError;
+  return true;
+}
+
