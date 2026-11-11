@@ -428,7 +428,7 @@ async function loadMySongs(){
   for(const song of songs){
    const card=document.createElement('div');card.className='notice';card.style.margin='10px 0';
    const title=document.createElement('strong');title.textContent=song.title;
-   const artist=document.createElement('p');artist.textContent=song.artist_name;
+   const artist=document.createElement('p');artist.textContent=song.artist_name+(song.producer_name?' • Produção: '+song.producer_name:'');
    const state=document.createElement('p');state.textContent='Situação: '+(song.status==='published'?'Publicada no catálogo':song.status==='rejected'?'Indisponível — entre em contato com a equipe':'Processando publicação');
    const date=document.createElement('small');date.className='muted';date.textContent=new Date(song.created_at).toLocaleString('pt-BR');
    card.append(title,artist,state,date);mySongs.append(card);
