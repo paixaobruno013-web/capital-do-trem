@@ -416,7 +416,15 @@ export async function moderateItem(table, id, status) {
 
  // Publicação de músicas: somente administradores e membros da equipe autorizados.
 export async function isCurrentUserArtistOrAdmin() {
-  return await isCurrentUserAdmin();
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) return false;
+  if (await isCurrentUserAdmin()) return true;
+  const { data, error } = await supabase.from('artists')
+    .select('id').eq('user_id', user.id).maybeSingle();
+  if (error) throw error;
+  return Boolean(data);
 }
 
 export async function uploadMySong({ file, title, artistName, producerName = '', description = '' }) {
