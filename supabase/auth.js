@@ -1066,7 +1066,7 @@ async function getBrandingUploadFormat(file, allowed) {
  const byMime=mimeExt[String(file?.type||'').toLowerCase()]||'';
  const candidates=[detected,byMime,ext];
  const chosen=candidates.find(candidate=>candidate&&has(candidate));
- if(!chosen)throw new Error('Não reconheci o arquivo. Use imagem JPG/PNG/WebP ou vídeo MP4/WebM. Se veio do WhatsApp, salve o arquivo no aparelho e tente novamente.');
+ if(!chosen)throw new Error('Não reconheci o arquivo. Use imagem JPG/PNG/WebP ou vídeo MP4/MOV/WebM. Se veio do WhatsApp, salve o arquivo no aparelho e tente novamente.');
  const normalized=chosen==='jpeg'?'jpg':chosen;
  const contentType=normalized==='jpg'?'image/jpeg':normalized==='png'?'image/png':normalized==='webp'?'image/webp':normalized==='mp4'?'video/mp4':normalized==='mov'?'video/quicktime':'video/webm';
  return {extension:normalized,contentType};
