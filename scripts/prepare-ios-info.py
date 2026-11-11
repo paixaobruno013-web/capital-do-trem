@@ -12,7 +12,7 @@ with path.open("rb") as stream:
     info = plistlib.load(stream)
 
 info["NSMicrophoneUsageDescription"] = (
-    "O Capital do Trem usa o microfone quando você escolhe gravar uma mensagem de voz no Fala Trem."
+    "O Capital do Trem usa o microfone quando você grava vídeos para Stories ou mensagens de voz."
 )
 info["NSLocationWhenInUseUsageDescription"] = (
     "O Capital do Trem usa sua localização somente quando você toca em “logo ali uai - localização” para encontrar eventos próximos."
@@ -21,7 +21,7 @@ info["NSCameraUsageDescription"] = (
     "O Capital do Trem usa a câmera somente quando você toca para tirar uma foto ou gravar um vídeo para compartilhar no aplicativo."
 )
 info["NSPhotoLibraryUsageDescription"] = (
-    "O Capital do Trem permite escolher fotos e vídeos da sua biblioteca para seu perfil, mensagens e conteúdos enviados pela equipe."
+    "O Capital do Trem permite escolher fotos e vídeos da sua biblioteca para publicar Stories e outros conteúdos que você selecionar."
 )
 
 with path.open("wb") as stream:
