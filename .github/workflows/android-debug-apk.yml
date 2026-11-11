@@ -6,6 +6,8 @@ on:
     branches: [main]
     paths:
       - 'index.html'
+      - 'event-social-composer.js'
+      - 'home-story-composer.js'
       - 'conta.html'
       - 'home-story-composer.js'
       - 'estudio.html'
