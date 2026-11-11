@@ -167,7 +167,7 @@ async function render(){
   if(!grid)return;
   const videos=HOME_VIDEOS;
   grid.replaceChildren(...videos.map(makeCard));
-  setStatus('Tela inicial: seis vídeos originais. Os Shorts e Reels ficam reunidos na área Explorar.');
+  setStatus('Tela inicial: nove vídeos em formato 16:9. Os Shorts e Reels ficam reunidos na área Explorar.');
   renderExploreVideos();
 }
 render();
