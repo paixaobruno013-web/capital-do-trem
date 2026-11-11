@@ -1045,14 +1045,14 @@ export async function getPublicBranding() {
 async function getBrandingUploadFormat(file, allowed) {
  const has=(key)=>Object.prototype.hasOwnProperty.call(allowed,key);
  const ext=String(file?.name||'').split('.').pop().toLowerCase();
- const mimeExt={'image/jpeg':'jpg','image/jpg':'jpg','image/png':'png','image/webp':'webp','video/mp4':'mp4','video/webm':'webm'};
+ const mimeExt={'image/jpeg':'jpg','image/jpg':'jpg','image/png':'png','image/webp':'webp','video/mp4':'mp4','video/webm':'webm','video/quicktime':'mov'};
  let detected='';
  try {
   const b=new Uint8Array(await file.slice(0,16).arrayBuffer());
   if(b[0]===0xff&&b[1]===0xd8&&b[2]===0xff)detected='jpg';
   else if(b[0]===0x89&&b[1]===0x50&&b[2]===0x4e&&b[3]===0x47)detected='png';
   else if(String.fromCharCode(...b.slice(0,4))==='RIFF'&&String.fromCharCode(...b.slice(8,12))==='WEBP')detected='webp';
-  else if(String.fromCharCode(...b.slice(4,8))==='ftyp')detected='mp4';
+  else if(String.fromCharCode(...b.slice(4,8))==='ftyp')detected=String.fromCharCode(...b.slice(8,12))==='qt  '?'mov':'mp4';
   else if(b[0]===0x1a&&b[1]===0x45&&b[2]===0xdf&&b[3]===0xa3)detected='webm';
  } catch {}
  const byMime=mimeExt[String(file?.type||'').toLowerCase()]||'';
@@ -1060,7 +1060,7 @@ async function getBrandingUploadFormat(file, allowed) {
  const chosen=candidates.find(candidate=>candidate&&has(candidate));
  if(!chosen)throw new Error('Não reconheci o arquivo. Use imagem JPG/PNG/WebP ou vídeo MP4/WebM. Se veio do WhatsApp, salve o arquivo no aparelho e tente novamente.');
  const normalized=chosen==='jpeg'?'jpg':chosen;
- const contentType=normalized==='jpg'?'image/jpeg':normalized==='png'?'image/png':normalized==='webp'?'image/webp':normalized==='mp4'?'video/mp4':'video/webm';
+ const contentType=normalized==='jpg'?'image/jpeg':normalized==='png'?'image/png':normalized==='webp'?'image/webp':normalized==='mp4'?'video/mp4':normalized==='mov'?'video/quicktime':'video/webm';
  return {extension:normalized,contentType};
 }
 
@@ -1386,7 +1386,7 @@ export async function createAdminStory({ file, caption = '', musicSongId = '', m
   if (userError) throw userError;
   if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente o administrador pode publicar Stories.');
   if (!(file instanceof File)) throw new Error('Escolha uma foto ou vídeo para o Story.');
-  const format = await getBrandingUploadFormat(file, { jpg: true, jpeg: true, png: true, webp: true, mp4: true, webm: true });
+  const format = await getBrandingUploadFormat(file, { jpg: true, jpeg: true, png: true, webp: true, mp4: true, webm: true, mov: true });
   const isVideo = ['mp4', 'webm'].includes(format.extension);
   const maxSize = isVideo ? 20 * 1024 * 1024 : 8 * 1024 * 1024;
   if (file.size < 1 || file.size > maxSize) throw new Error(isVideo ? 'O vídeo deve ter até 20 MB.' : 'A imagem deve ter até 8 MB.');
