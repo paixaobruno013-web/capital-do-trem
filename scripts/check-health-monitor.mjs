@@ -13,5 +13,7 @@ assert.match(update, /safeFileName/, 'caminhos devem ser reduzidos ao nome do ar
 assert.match(diagnostic, /Histórico de falhas deste aparelho/, 'diagnóstico deve exibir histórico local');
 assert.match(diagnostic, /Exportar relatório/, 'diagnóstico deve permitir exportar relatório');
 assert.match(diagnostic, /clearIncidents/, 'diagnóstico deve permitir limpar histórico');
+assert.match(update, /item\.kind==='javascript'\|\|item\.kind==='promise'/, 'tarefas longas e falhas de recursos não devem disparar falso alerta de instabilidade');
+assert.match(update, /duplicate\|\|recoveryShown/, 'erros repetidos em sequência devem ser deduplicados no alerta');
 
 console.log('Monitoramento local de falhas e painel de diagnóstico verificados.');
