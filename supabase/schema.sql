@@ -501,11 +501,19 @@ drop policy if exists "audio_upload_artist_or_admin" on storage.objects;
 create policy "audio_upload_artist_own_folder_or_admin" on storage.objects
   for insert to authenticated
   with check (
-    bucket_id='capital-do-trem-audio'
-    and (storage.foldername(name))[1]=(select auth.uid())::text
+    bucket_id = 'capital-do-trem-audio'
+    and (storage.foldername(name))[1] = (select auth.uid())::text
     and (
       (select private.is_admin())
-      or exists (select 1 from public.artists a where a.user_id=(select auth.uid()))
+      or (
+        exists (
+          select 1 from public.profiles p
+          where p.user_id = (select auth.uid()) and p.account_type = 'artist'
+        )
+        and exists (
+          select 1 from public.artists a where a.user_id = (select auth.uid())
+        )
+      )
     )
   );
 drop policy if exists "audio_read_published_owner_admin" on storage.objects;
