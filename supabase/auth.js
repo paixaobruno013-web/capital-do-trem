@@ -696,43 +696,79 @@ export async function leaveChatGroup() {
   return data;
 }
 
+// Arquivos do chat: bucket privado, permissões por grupo/conversa e links temporários.
+const CHAT_ATTACHMENT_BUCKET = 'capital-do-trem-chat';
+const CHAT_ATTACHMENT_TYPES = {
+  jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp',
+  mp4:'video/mp4',webm:'video/webm',
+  mp3:'audio/mpeg',m4a:'audio/mp4',aac:'audio/aac',ogg:'audio/ogg',oga:'audio/ogg',wav:'audio/wav',
+  pdf:'application/pdf',txt:'text/plain',csv:'text/csv',
+  doc:'application/msword',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  xls:'application/vnd.ms-excel',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  ppt:'application/vnd.ms-powerpoint',pptx:'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+};
+function describeChatFile(file) {
+  if (!(file instanceof File)) throw new Error('Escolha um arquivo do celular.');
+  const extension = String(file.name || '').split('.').pop().toLowerCase();
+  const rawMime = String(file.type || '').toLowerCase().split(';')[0].trim();
+  const mime = Object.values(CHAT_ATTACHMENT_TYPES).includes(rawMime) ? rawMime : CHAT_ATTACHMENT_TYPES[extension];
+  if (!mime) throw new Error('Formato não permitido. Envie foto, vídeo, áudio, PDF, texto ou documento Office.');
+  const type = mime.startsWith('image/') ? 'image' : mime.startsWith('video/') ? 'video' : mime.startsWith('audio/') ? 'audio' : 'document';
+  if (file.size < 1 || file.size > 20 * 1024 * 1024) throw new Error('O arquivo precisa ter até 20 MB.');
+  if (type === 'image' && file.size > 12 * 1024 * 1024) throw new Error('Fotos precisam ter até 12 MB.');
+  return { type, mime, extension, name: String(file.name || 'arquivo').slice(0,180), size: file.size };
+}
+async function uploadChatFile(file, path) {
+  const supabase = initSupabase();
+  const meta = describeChatFile(file);
+  const { error } = await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).upload(path, file, {
+    contentType: meta.mime, cacheControl: '60', upsert: false
+  });
+  if (error) throw error;
+  return { ...meta, path };
+}
+async function signChatAttachment(path) {
+  if (!path) return null;
+  const supabase = initSupabase();
+  const { data, error } = await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).createSignedUrl(path, 3600);
+  if (error) throw error;
+  return data?.signedUrl || null;
+}
+async function hydrateChatMessage(message) {
+  if (!message?.attachment_path) return message;
+  return { ...message, attachment_url: await signChatAttachment(message.attachment_path) };
+}
+async function hydrateChatMessages(messages) {
+  const supabase = initSupabase();
+  const paths = [...new Set((messages || []).map(m => m.attachment_path).filter(Boolean))];
+  if (!paths.length) return messages || [];
+  const { data, error } = await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).createSignedUrls(paths, 3600);
+  if (error) throw error;
+  const signed = new Map((data || []).filter(item => item?.path && item?.signedUrl).map(item => [item.path, item.signedUrl]));
+  return (messages || []).map(message => ({
+    ...message,
+    attachment_url: message.attachment_path ? (signed.get(message.attachment_path) || null) : message.attachment_url
+  }));
+}
+
 // Bate-papo geral em tempo real para todos os usuários autenticados.
 export async function getChatMessages(limit = 60) {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('chat_messages')
-    .select('id, author_id, author_name, content, created_at, author_avatar_type, author_avatar_url, author_avatar_data, attachment_url, attachment_type, attachment_name, attachment_mime, attachment_size')
+    .select('id, author_id, author_name, content, created_at, author_avatar_type, author_avatar_url, author_avatar_data, attachment_url, attachment_path, attachment_type, attachment_name, attachment_mime, attachment_size')
     .order('created_at', { ascending: false }).limit(Math.min(Math.max(Number(limit) || 60, 1), 100));
   if (error) throw error;
-  // Busca as mensagens mais recentes e as apresenta em ordem cronológica.
-  return (data || []).reverse();
+  return await hydrateChatMessages((data || []).reverse());
 }
 
 export async function uploadChatAttachment(file) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
-  if (!user) throw new Error('Entre na sua conta para enviar mídia.');
-  if (!(file instanceof File)) throw new Error('Selecione uma foto, vídeo ou áudio.');
-  const rawMime = String(file.type || '').toLowerCase().split(';')[0].trim();
-  const extension = String(file.name || '').toLowerCase().match(/\\.([a-z0-9]+)$/)?.[1] || '';
-  const imageExt = {jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp'};
-  const videoExt = {mp4:'video/mp4',webm:'video/webm'};
-  const audioExt = {mp3:'audio/mpeg',m4a:'audio/mp4',aac:'audio/aac',ogg:'audio/ogg',oga:'audio/ogg',wav:'audio/wav'};
-  const aliases = {'audio/x-wav':'audio/wav','audio/wave':'audio/wav','audio/vnd.wave':'audio/wav','audio/x-m4a':'audio/mp4','audio/m4a':'audio/mp4','audio/mp3':'audio/mpeg','audio/x-mp3':'audio/mpeg','audio/x-aac':'audio/aac','application/ogg':'audio/ogg'};
-  const mime = aliases[rawMime] || rawMime || imageExt[extension] || videoExt[extension] || audioExt[extension] || '';
-  const isImage = ['image/jpeg','image/png','image/webp'].includes(mime);
-  const isVideo = ['video/mp4','video/webm'].includes(mime);
-  const isAudio = ['audio/mpeg','audio/mp4','audio/aac','audio/ogg','audio/wav','audio/webm'].includes(mime);
-  if (!isImage && !isVideo && !isAudio) throw new Error('Formato não permitido. Use JPG, PNG, WebP, MP4, WebM ou áudio MP3, M4A, AAC, OGG e WAV.');
-  const max = isImage ? 8*1024*1024 : 20*1024*1024;
-  if (file.size < 1 || file.size > max) throw new Error(isImage ? 'A imagem deve ter até 8 MB.' : 'O vídeo ou áudio deve ter até 20 MB.');
-  const ext = isImage ? ({'image/jpeg':'jpg','image/png':'png','image/webp':'webp'}[mime]) : isVideo ? ({'video/mp4':'mp4','video/webm':'webm'}[mime]) : ({'audio/mpeg':'mp3','audio/mp4':'m4a','audio/aac':'aac','audio/ogg':'ogg','audio/wav':'wav','audio/webm':'webm'}[mime]);
-  const path = user.id + '/chat/' + crypto.randomUUID() + '.' + ext;
-  const { error } = await supabase.storage.from('capital-do-trem-media').upload(path,file,{contentType:mime,cacheControl:'3600',upsert:false});
-  if (error) throw error;
-  const { data } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
-  if (!data?.publicUrl) throw new Error('Não foi possível gerar o link da mídia.');
-  return { url:data.publicUrl, type:isImage?'image':isVideo?'video':'audio', name:file.name, mime, size:file.size };
+  if (!user) throw new Error('Entre na sua conta para enviar arquivos.');
+  const meta = describeChatFile(file);
+  const path = 'group/' + user.id + '/' + crypto.randomUUID() + '.' + meta.extension;
+  return await uploadChatFile(file, path);
 }
 
 export async function sendChatMessage(content, attachment = null) {
@@ -741,20 +777,30 @@ export async function sendChatMessage(content, attachment = null) {
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para participar do bate-papo.');
   const cleanContent = String(content || '').trim();
-  if ((!cleanContent && !attachment) || cleanContent.length > 1000) throw new Error('Escreva uma mensagem ou anexe uma mídia. O texto pode ter até 1.000 caracteres.');
-  const payload = { author_id:user.id, content:cleanContent || (attachment?.type === 'image' ? '📷 Imagem' : attachment?.type === 'video' ? '🎬 Vídeo' : '🎵 Áudio') };
-  if (attachment) Object.assign(payload,{attachment_url:attachment.url,attachment_type:attachment.type,attachment_name:attachment.name,attachment_mime:attachment.mime,attachment_size:attachment.size});
+  if ((!cleanContent && !attachment) || cleanContent.length > 1000) throw new Error('Escreva uma mensagem ou anexe um arquivo. O texto pode ter até 1.000 caracteres.');
+  const fallback = attachment?.type === 'image' ? '📷 Foto' : attachment?.type === 'video' ? '🎬 Vídeo' : attachment?.type === 'audio' ? '🎵 Áudio' : '📎 ' + (attachment?.name || 'Documento');
+  const payload = { author_id:user.id, content:cleanContent || fallback };
+  if (attachment) Object.assign(payload,{
+    attachment_path:attachment.path,attachment_type:attachment.type,attachment_name:attachment.name,
+    attachment_mime:attachment.mime,attachment_size:attachment.size
+  });
   const { data, error } = await supabase.from('chat_messages').insert(payload)
-    .select('id, author_id, author_name, content, created_at, author_avatar_type, author_avatar_url, author_avatar_data, attachment_url, attachment_type, attachment_name, attachment_mime, attachment_size').single();
-  if (error) throw error;
-  return data;
+    .select('id, author_id, author_name, content, created_at, author_avatar_type, author_avatar_url, author_avatar_data, attachment_url, attachment_path, attachment_type, attachment_name, attachment_mime, attachment_size').single();
+  if (error) {
+    if (attachment?.path) await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).remove([attachment.path]).catch(() => {});
+    throw error;
+  }
+  return await hydrateChatMessage(data);
 }
 
 export function subscribeChatMessages(onMessage, onStatus) {
   const supabase = initSupabase();
   const channel = supabase.channel('capital-do-trem-chat')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, payload => {
-      if (typeof onMessage === 'function') onMessage(payload.new);
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, async payload => {
+      if (typeof onMessage === 'function') {
+        try { onMessage(await hydrateChatMessage(payload.new)); }
+        catch (error) { console.warn('Não foi possível abrir o anexo da mensagem.', error); onMessage(payload.new); }
+      }
     }).subscribe(status => {
       if (typeof onStatus === 'function') onStatus(status);
     });
@@ -851,32 +897,51 @@ export async function decidePrivateConversation(conversationId,decision) {
 export async function getPrivateMessages(conversationId) {
   const supabase=initSupabase();
   const {data,error}=await supabase.from('private_messages')
-    .select('id,conversation_id,sender_id,content,created_at')
+    .select('id,conversation_id,sender_id,content,created_at,attachment_path,attachment_type,attachment_name,attachment_mime,attachment_size')
     .eq('conversation_id',conversationId).order('created_at',{ascending:true}).limit(100);
   if(error)throw error;
-  return data||[];
+  return await hydrateChatMessages(data||[]);
 }
 
-export async function sendPrivateMessage(conversationId,content) {
+export async function sendPrivateMessage(conversationId,content,file=null) {
   const supabase=initSupabase();
   const {data:{user},error:userError}=await supabase.auth.getUser();
   if(userError)throw userError;
   if(!user)throw new Error('Entre na sua conta para enviar mensagens.');
   const clean=String(content||'').trim();
-  if(!clean||clean.length>2000)throw new Error('A mensagem deve ter entre 1 e 2.000 caracteres.');
+  if(clean.length>2000)throw new Error('A mensagem pode ter até 2.000 caracteres.');
+  if(!clean&&!file)throw new Error('Escreva uma mensagem ou escolha um arquivo.');
+  let attachment=null;
+  if(file){
+    const meta=describeChatFile(file);
+    const path='private/'+conversationId+'/'+user.id+'/'+crypto.randomUUID()+'.'+meta.extension;
+    attachment=await uploadChatFile(file,path);
+  }
+  const fallback=attachment?.type==='image'?'📷 Foto':attachment?.type==='video'?'🎬 Vídeo':attachment?.type==='audio'?'🎵 Áudio':'📎 '+(attachment?.name||'Documento');
+  const payload={conversation_id:conversationId,sender_id:user.id,content:clean||fallback};
+  if(attachment)Object.assign(payload,{
+    attachment_path:attachment.path,attachment_type:attachment.type,attachment_name:attachment.name,
+    attachment_mime:attachment.mime,attachment_size:attachment.size
+  });
   const {data,error}=await supabase.from('private_messages')
-    .insert({conversation_id:conversationId,sender_id:user.id,content:clean})
-    .select('id,conversation_id,sender_id,content,created_at').single();
-  if(error)throw error;
+    .insert(payload)
+    .select('id,conversation_id,sender_id,content,created_at,attachment_path,attachment_type,attachment_name,attachment_mime,attachment_size').single();
+  if(error){
+    if(attachment?.path)await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).remove([attachment.path]).catch(()=>{});
+    throw error;
+  }
   await supabase.from('private_conversations').update({updated_at:new Date().toISOString()}).eq('id',conversationId);
-  return data;
+  return await hydrateChatMessage(data);
 }
 
 export async function subscribePrivateMessages(conversationId,onMessage,onStatus) {
   const supabase=initSupabase();
   const channel=supabase.channel('private-chat-'+conversationId)
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'private_messages',filter:'conversation_id=eq.'+conversationId},payload=>{
-      if(typeof onMessage==='function')onMessage(payload.new);
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'private_messages',filter:'conversation_id=eq.'+conversationId},async payload=>{
+      if(typeof onMessage==='function'){
+        try{onMessage(await hydrateChatMessage(payload.new));}
+        catch(error){console.warn('Não foi possível abrir o anexo privado.',error);onMessage(payload.new);}
+      }
     }).subscribe(status=>{if(typeof onStatus==='function')onStatus(status);});
   return ()=>{supabase.removeChannel(channel);};
 }
