@@ -39,6 +39,57 @@ function userStoryGroups() {
   for (const items of groups.values()) items.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
   return groups;
 }
+function renderHomeStoryTray() {
+  const tray = document.getElementById('home-stories-list');
+  if (!tray) return;
+  const groups = userStoryGroups();
+  const seen = seenIds();
+  const entries = [];
+  const activeOfficial = officialStories.filter(s => new Date(s.expires_at).getTime() > Date.now());
+  if (activeOfficial.length) entries.push({ id: 'official', name: 'Capital do Trem', stories: activeOfficial, official: true });
+  for (const [authorId, items] of groups) {
+    const active = items.filter(s => new Date(s.expires_at).getTime() > Date.now());
+    if (!active.length) continue;
+    const latest = active[active.length - 1];
+    entries.push({ id: authorId, name: latest.display_name || 'Usuário Uai', stories: active, avatar: latest.avatar_url || '', latest });
+  }
+  tray.replaceChildren();
+  if (!entries.length) {
+    const empty = document.createElement('p');
+    empty.className = 'muted home-stories-empty';
+    empty.textContent = 'Os Stories da comunidade aparecerão aqui. Publique o seu pela sua conta.';
+    tray.append(empty);
+    return;
+  }
+  for (const entry of entries) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'home-story-item';
+    button.setAttribute('aria-label', 'Ver Stories de ' + entry.name);
+    const ring = document.createElement('span');
+    ring.className = 'home-story-ring' + (entry.stories.every(s => seen.has(s.id)) ? ' seen' : '');
+    const avatar = document.createElement('span');
+    avatar.className = 'home-story-avatar';
+    const imageUrl = entry.official ? '' : entry.avatar;
+    if (imageUrl && /^https:\/\//i.test(imageUrl)) {
+      const image = document.createElement('img');
+      image.src = imageUrl;
+      image.alt = '';
+      image.loading = 'lazy';
+      image.referrerPolicy = 'no-referrer';
+      avatar.append(image);
+    } else {
+      avatar.textContent = entry.official ? 'CT' : (entry.name.trim().charAt(0).toUpperCase() || 'U');
+    }
+    ring.append(avatar);
+    const name = document.createElement('span');
+    name.className = 'home-story-name';
+    name.textContent = entry.name;
+    button.append(ring, name);
+    button.addEventListener('click', () => openViewer(entry.stories, 'Stories de ' + entry.name, button));
+    tray.append(button);
+  }
+}
 function updateOfficialRing() {
   if (!logo) return;
   const active = officialStories.filter(s => new Date(s.expires_at).getTime() > Date.now());
@@ -145,6 +196,7 @@ async function refreshStories({ notify = false, previousAdmin = new Set(), previ
     userStories = users;
     updateOfficialRing();
     updateUserProfileRings();
+    renderHomeStoryTray();
     if (notify) {
       const newOfficial = admins.some(s => !previousAdmin.has(s.id));
       const newUser = users.some(s => !previousUsers.has(s.id));
