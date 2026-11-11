@@ -164,7 +164,8 @@ function renderStory(index) {
   captionBox.replaceChildren();
   const media = document.createElement(story.media_type === 'video' ? 'video' : 'img');
   media.src = story.media_url;
-  let storySeconds = 7;\n  if (story.media_type === 'video') {
+  let storySeconds = 7;
+  if (story.media_type === 'video') {
     media.controls = true;
     media.autoplay = true;
     media.playsInline = true;
