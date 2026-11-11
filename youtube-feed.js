@@ -21,8 +21,8 @@ function activateVideoButton(button) {
 }
 
 const PINNED_HOME_TRACKS = [
-  { id: '-c2QERKILzg', title: 'Quarta música da seleção', order: '4º • Música' },
-  { id: 'HHKsZAS1eMk', title: 'Quinta música da seleção', order: '5º • Música' },
+  { id: '-c2QERKILzg', title: 'Quinta música da seleção', order: '5º • Música' },
+  { id: 'HHKsZAS1eMk', title: 'Sexta música da seleção', order: '6º • Música' },
 ];
 
 function createHomeVideoCard(video, orderText, linkText = 'Assistir no YouTube') {
