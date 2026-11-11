@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 
 const read = (path) => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [room, enhancements, emoji, privateChat, worker, stories, home, auth, adminMedia] = await Promise.all([
+const [room, enhancements, emoji, privateChat, worker, stories, home, auth, adminMedia, packageJson, capacitorConfig, androidWorkflow, iosWorkflow] = await Promise.all([
   read('bate-papo.html'),
   read('chat-enhancements.js'),
   read('emoji-picker.js'),
@@ -10,7 +10,11 @@ const [room, enhancements, emoji, privateChat, worker, stories, home, auth, admi
   read('stories-ui.js'),
   read('index.html'),
   read('supabase/auth.js'),
-  read('admin-media.js')
+  read('admin-media.js'),
+  read('package.json'),
+  read('capacitor.config.ts'),
+  read('.github/workflows/android-debug-apk.yml'),
+  read('.github/workflows/ios-build.yml')
 ]);
 
 const checks = [
@@ -25,6 +29,12 @@ const checks = [
   ['mensagens privadas possuem botão de emojis e seletor', /id="private-emoji-toggle"/.test(privateChat) && /id="emoji-tray"[^>]*data-emoji-picker/.test(privateChat)],
   ['service worker inclui os módulos de chat e mensagens privadas', /chat-enhancements\.js/.test(worker) && /emoji-picker\.js/.test(worker) && /mensagens\.html/.test(worker)],
 
+  ['seletor mantém campo de mensagem e envio visíveis enquanto aberto', !/emoji-open #message[^{}]*display:none/.test(privateChat) && !/emoji-open #send[^{}]*display:none/.test(privateChat) && !/emoji-open #message[^{}]*display:none/.test(room) && !/emoji-open #send[^{}]*display:none/.test(room)],
+  ['seletor insere emoji na posição do cursor e atualiza recentes', /setRangeText\\(e,start,end,'end'\\)/.test(emoji) && /remember\\(e\\)/.test(emoji)],
+  ['grupo mantém câmera, gravação de áudio e envio disponíveis com emojis abertos', !/composer\\.emoji-open[^{}]*display:none/.test(room) && /id=\"camera-open\"/.test(room) && /id=\"send\"/.test(room)],
+  ['aplicativo usa Capacitor 8 em versões alinhadas para Android e iOS', /\"@capacitor\\/(android|core|ios)\": \"8\\.6\\.0\"/.test(packageJson) && /appId: 'com\\.capitaldotrem\\.app'/.test(capacitorConfig)],
+  ['compilação Android valida SDK e alvo de API 36', /platforms;android-36/.test(androidWorkflow) && /targetSdkVersion/.test((await read(' .github/workflows/store-package-validation.yml'.trim())) )],
+  ['compilação iOS usa Xcode em macOS e sincroniza Capacitor', /runs-on: macos-latest/.test(iosWorkflow) && /npx cap sync ios/.test(iosWorkflow) && /xcodebuild/.test(iosWorkflow)],
   ['Stories da comunidade não criam uma faixa de perfis duplicados', !/id="community-story-tray"/.test(home) && !/community-story-chip/.test(stories)],
   ['Stories são vinculados à foto do perfil existente pelo ID do usuário', /dataset\.profileUserId=profile\.user_id/.test(home) && /community-profile-avatar\[data-profile-user-id\]/.test(stories)],
   ['foto do perfil abre os Stories com suporte a teclado', /avatar\.addEventListener\('click', open\)/.test(stories) && /avatar\.addEventListener\('keydown'/.test(stories)],
