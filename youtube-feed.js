@@ -7,14 +7,7 @@ const status = document.getElementById('youtube-feed-status');
 let initialSessionPromise;
 function getInitialSession(){if(!initialSessionPromise)initialSessionPromise=getCurrentSession().catch(()=>null);return initialSessionPromise;}
 
-const SHORTS = [
-  'XG6J1-wxmqY','2pi4Chy_T7k','AYaC4UX3LQM','Ln7uxqY68u4','MBXrQa52x7I',
-  '6g-LDLVRXmM','l0LLjmqqGPg','6oqpTDwEz_k','x4Wbv87Pl9k','Hhe4uvhFh5M',
-  '5xUC-8Zu--s','8YI6twT5FIQ','uDmGRWA_hMU','78IJ7SVpvI4','v2fvGO7GaHs',
-  'VLDQtWADNA0','Kjsypc0JzB0','dFVVsD0Nsfg','NcMLXKNkGzg','Pu_QnJPSntA'
-].map((id,index)=>({id,title:'Vídeo da Capital do Trem '+(index+1)}));
-
-const CHANNEL_FALLBACK = [
+const HOME_VIDEOS = [
   {id:'LmI04iuudmQ',title:'Vídeo do canal Capital do Trem'},
   {id:'DDHrNCagaD0',title:'Vídeo do canal Capital do Trem'},
   {id:'eQHIsU_mamM',title:'Vídeo do canal Capital do Trem'},
@@ -27,7 +20,7 @@ function setStatus(message){if(status)status.textContent=message;}
 function videoUrl(id){return 'https://youtu.be/'+encodeURIComponent(id);}
 function createPlayer(id,title){
   const frame=document.createElement('iframe');
-  frame.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?playsinline=1&rel=0';
+  frame.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?playsinline=1&rel=0&autoplay=1';
   frame.title=title;
   frame.loading='lazy';
   frame.referrerPolicy='strict-origin-when-cross-origin';
@@ -126,16 +119,8 @@ function makeCard(video,index){
 }
 async function render(){
   if(!grid)return;
-  const seen=new Set();
-  let videos=SHORTS.concat(CHANNEL_FALLBACK);
-  try{
-    const response=await fetch(FEED_ENDPOINT,{headers:{apikey:PUBLIC_KEY,Accept:'application/json'},cache:'no-store',signal:AbortSignal.timeout(10000)});
-    if(response.ok){const data=await response.json();if(Array.isArray(data.videos))videos=videos.concat(data.videos);}
-  }catch(error){console.warn('Feed automático do canal indisponível:',error);}
-  videos=videos.filter(video=>video&&/^[A-Za-z0-9_-]{11}$/.test(video.id||'')&&!seen.has(video.id)&&seen.add(video.id));
-  // Mistura determinística: intercala a lista enviada com os vídeos do canal, sem criar categorias.
-  videos=videos.map((video,index)=>({video,key:(index*7)%videos.length})).sort((a,b)=>a.key-b.key).map(item=>item.video);
+  const videos=HOME_VIDEOS;
   grid.replaceChildren(...videos.map(makeCard));
-  setStatus(videos.length+' vídeos disponíveis no mesmo feed. A reprodução acontece dentro do aplicativo.');
+  setStatus('Exibindo os seis vídeos originais da tela inicial. Os 20 Shorts ficam na área Explorar por categoria.');
 }
 render();
