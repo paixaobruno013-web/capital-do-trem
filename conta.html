@@ -463,6 +463,8 @@ async function loadArtistSongArea(profile){
   return;
  }
  submit.disabled=false;
+ const artistNameField=document.getElementById('artist-song-submit-artist');
+ if(profile.artist_name && !artistNameField.value)artistNameField.value=profile.artist_name;
  artistSongStatus.textContent='Sua ficha artística está pronta. Escolha a faixa que deseja enviar.';
  try{
   const songs=await auth.getMySongs();
