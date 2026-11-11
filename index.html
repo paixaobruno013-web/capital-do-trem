@@ -1814,7 +1814,7 @@ async function saveOfflineMusic(id,blob,title){
   console.warn('Identidade visual padrão mantida.',error);
   document.documentElement.classList.remove('intro-brand-pending');
   const fallbackBrand=document.querySelector('.intro-smoke__brand');
-  if(fallbackBrand&&!fallbackBrand.classList.contains('custom-opening-image')){
+  if(fallbackBrand&&!fallbackBrand.classList.contains('custom-opening-image')&&fallbackBrand.style.display!=='none'){
    fallbackBrand.style.display='flex';fallbackBrand.style.visibility='visible';fallbackBrand.style.opacity='1';fallbackBrand.style.animation='none';
    const fallbackImage=fallbackBrand.querySelector('img');if(fallbackImage){fallbackImage.src='./marca.svg';fallbackImage.style.visibility='visible';}
   }
