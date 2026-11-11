@@ -333,7 +333,7 @@ export async function submitMyEvent(eventData) {
   const title = String(eventData.title || '').trim();
   const address = String(eventData.address || '').trim();
   if (title.length < 2) throw new Error('Informe o nome do evento.');
-  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(String(eventData.event_date || ''))) throw new Error('Informe uma data válida.');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(eventData.event_date || ''))) throw new Error('Informe uma data válida.');
   const today = new Date();
   const localToday = [today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
   if (eventData.event_date < localToday) throw new Error('A data do evento já passou.');
