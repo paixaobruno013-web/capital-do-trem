@@ -109,9 +109,9 @@ body.light .messages{background:linear-gradient(180deg,#fff8f8,#f4f4f4)}
 #private-emoji-toggle{flex:0 0 44px;min-width:44px;border-radius:50%;padding:6px;font-size:21px}
 #compose .emoji-picker{display:none;width:100%;flex:0 0 100%;order:-1;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
 #compose .emoji-picker.is-open{display:block}
-#compose.emoji-open{display:flex;flex-wrap:wrap}
+#compose.emoji-open{display:flex;flex-wrap:wrap;align-items:center}
 #compose.emoji-open #emoji-tray{display:block;max-height:min(48vh,390px);overflow:auto}
-#compose.emoji-open #message,#compose.emoji-open #send,#compose.emoji-open #private-emoji-toggle{display:none}
+#compose.emoji-open #message,#compose.emoji-open #send,#compose.emoji-open #private-emoji-toggle{display:flex}
 #compose .emoji-close{min-height:30px;padding:4px 9px;border:1px solid var(--line);border-radius:999px;background:var(--panel2);color:var(--fg);font-size:11px;font-weight:700}
 #compose .emoji-picker-heading{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 #compose .emoji-picker-heading>span{margin-right:auto}
@@ -136,7 +136,7 @@ body.light .messages{background:linear-gradient(180deg,#fff8f8,#f4f4f4)}
 #compose #message{flex:1 1 auto!important;width:0;min-width:0!important;min-height:42px!important;padding:8px 10px!important;border:0!important;border-radius:22px!important;background:#252529!important;color:#fff!important}
 #compose #send{flex:0 0 44px!important;width:44px;min-width:44px!important;height:44px;min-height:44px!important;padding:0!important;border-radius:50%!important;font-size:18px!important}
 #private-emoji-toggle{flex:0 0 40px!important;width:40px;min-width:40px!important;height:40px;min-height:40px!important;border:0!important;background:transparent!important;box-shadow:none!important}
-#compose .emoji-picker{order:2;flex:0 0 100%!important}
+#compose .emoji-picker{order:-1!important;flex:0 0 100%!important;max-height:min(48vh,390px);overflow:auto}
 #compose.emoji-open{flex-wrap:wrap!important;border-radius:18px!important}
 @media(max-width:680px){#thread-panel{min-height:calc(100dvh - 120px)}.messages{flex:1;min-height:0}.compose{margin-top:8px!important}#compose #message{font-size:16px!important}}
 
@@ -145,7 +145,7 @@ body.light .messages{background:linear-gradient(180deg,#fff8f8,#f4f4f4)}
 #compose .private-attachment-preview{display:flex;align-items:center;gap:10px;flex:0 0 100%;min-width:0;padding:10px 12px;border:1px solid #ed1c2455;border-radius:13px;background:#242427}
 .private-attachment-preview[hidden]{display:none}
 #compose.has-attachment{flex-wrap:wrap!important}
-#compose.emoji-open #private-attach{display:none}
+#compose.emoji-open #private-attach{display:flex}
 .private-attachment-preview .file-copy{min-width:0;flex:1}
 .private-attachment-thumb{width:58px;height:58px;flex:0 0 58px;display:grid;place-items:center;overflow:hidden;border-radius:11px;background:#111;font-size:25px;color:#fff}
 .private-attachment-thumb img,.private-attachment-thumb video{width:100%;height:100%;max-width:none;object-fit:cover}
