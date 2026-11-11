@@ -1497,3 +1497,54 @@ export async function deleteMyAccount(confirmation) {
   await supabase.auth.signOut({ scope: 'local' });
   return data;
 }
+
+
+// Biblioteca musical pessoal sincronizada pela conta entre Android, iOS e web.
+export async function getMyMusicLibrary() {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para acessar sua biblioteca.');
+  const [saved, recent] = await Promise.all([
+    supabase.from('saved_songs').select('song_id,created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(200),
+    supabase.from('song_play_history').select('song_id,last_played_at').eq('user_id', user.id).order('last_played_at', { ascending: false }).limit(30)
+  ]);
+  if (saved.error) throw saved.error;
+  if (recent.error) throw recent.error;
+  return {
+    savedSongIds: (saved.data || []).map(row => row.song_id),
+    recentSongIds: (recent.data || []).map(row => row.song_id)
+  };
+}
+
+export async function toggleSavedSong(songId) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para salvar músicas.');
+  const { data: existing, error: lookupError } = await supabase.from('saved_songs')
+    .select('song_id').eq('user_id', user.id).eq('song_id', songId).maybeSingle();
+  if (lookupError) throw lookupError;
+  if (existing) {
+    const { error } = await supabase.from('saved_songs').delete().eq('user_id', user.id).eq('song_id', songId);
+    if (error) throw error;
+    return false;
+  }
+  const { error } = await supabase.from('saved_songs').insert({ user_id: user.id, song_id: songId });
+  if (error) throw error;
+  return true;
+}
+
+export async function recordSongPlay(songId) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) return false;
+  const { error } = await supabase.from('song_play_history').upsert({
+    user_id: user.id,
+    song_id: songId,
+    last_played_at: new Date().toISOString()
+  }, { onConflict: 'user_id,song_id' });
+  if (error) throw error;
+  return true;
+}
