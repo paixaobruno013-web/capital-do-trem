@@ -2,39 +2,6 @@ name: Android test APK
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'index.html'
-      - 'event-social-composer.js'
-      - 'home-story-composer.js'
-      - 'conta.html'
-      - 'home-story-composer.js'
-      - 'estudio.html'
-      - 'admin.html'
-      - 'bate-papo.html'
-      - 'chat-enhancements.js'
-      - 'supabase/**'
-      - 'scripts/**'
-      - 'package.json'
-      - 'capacitor.config.ts'
-      - 'sw.js'
-      - '.github/workflows/android-debug-apk.yml'
-      - 'offline.html'
-      - 'admin-media.js'
-      - 'emoji-picker.js'
-      - 'stories-ui.js'
-      - 'admin-stories.js'
-      - 'account-stories.js'
-      - 'update.js'
-      - 'manifest.webmanifest'
-      - 'supabase-config.js'
-      - 'privacidade.html'
-      - 'avatar.html'
-      - 'mensagens.html'
-      - 'diagnostico.html'
-      - 'marca.svg'
-      - 'assets/**'
 
 permissions:
   contents: read
