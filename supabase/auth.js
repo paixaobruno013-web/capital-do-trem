@@ -465,7 +465,7 @@ export async function uploadMySong({ file, title, artistName, producerName = '',
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para enviar uma música.');
-  // Artistas com ficha própria enviam para análise; a equipe mantém a publicação no catálogo.
+  // Artistas com ficha própria publicam diretamente no catálogo; a equipe não precisa aprovar cada envio.
   const isAdmin = await isCurrentUserAdmin();
   if (!isAdmin) {
     const { data: artistProfile, error: artistError } = await supabase.from('artists')
@@ -502,7 +502,7 @@ export async function uploadMySong({ file, title, artistName, producerName = '',
   if (uploadError) throw uploadError;
   const { data, error } = await supabase.from('songs').insert({
     user_id:user.id,title:cleanTitle,artist_name:cleanArtist,producer_name:cleanProducer,description:cleanDescription,
-    storage_path:path,mime_type:canonicalMime,file_size:file.size,status:isAdmin?'published':'pending'
+    storage_path:path,mime_type:canonicalMime,file_size:file.size,status:'published'
   }).select('id,title,artist_name,producer_name,status,created_at').single();
   if (error) {
     await supabase.storage.from('capital-do-trem-audio').remove([path]);
