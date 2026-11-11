@@ -14,6 +14,19 @@ A decisão do projeto é manter o Capital do Trem gratuito para baixar e usar, s
 
 Atualizado em 10/11/2026. Este documento separa o que já existe no repositório do que ainda precisa ser comprovado antes do lançamento.
 
+## Atualização técnica — 11/11/2026
+
+As compilações de CI no commit `0e884e3c` foram concluídas com sucesso:
+- [x] APK Android de depuração gerado como artefato de teste (não é pacote de publicação).
+- [x] Compilação iOS para simulador concluída.
+- [x] Compilação iOS para dispositivo concluída sem assinatura.
+- [x] Site/PWA publicado.
+- [x] Verificações automáticas do código concluídas.
+
+**Ainda não há publicação nas lojas.** O APK atual é debug; o build iOS de dispositivo é unsigned. Nenhum deles deve ser enviado à Play Console ou ao App Store Connect.
+
+Foi adicionado o workflow `.github/workflows/store-package-validation.yml`, que prepara uma validação específica do Android App Bundle e do archive iOS, ambos sem assinatura. Esses artefatos servem para confirmar empacotamento e metadados; não substituem a assinatura de distribuição, credenciais de desenvolvedor, testes em aparelhos reais ou revisão das lojas.
+
 ## Situação técnica verificada no repositório
 
 - Identificador configurado no Capacitor: `com.capitaldotrem.app`.
@@ -50,11 +63,11 @@ Fontes oficiais:
 
 ## Bloqueios antes de enviar à Play Store
 
-- [ ] Gerar o projeto Android nativo e confirmar que compila em ambiente limpo.
-- [ ] Configurar `targetSdk` 36 ou superior para novo app enviado depois de 31/08/2026.
+- [x] Gerar o projeto Android nativo e confirmar compilação limpa em CI (a validação em aparelho real ainda está pendente).
+- [ ] Confirmar no AAB de validação que `targetSdk` é 36 ou superior e registrar o resultado.
 - [ ] Definir `versionCode` e `versionName` de lançamento.
 - [ ] Criar e guardar com segurança a chave de assinatura de produção; gerar um Android App Bundle (.aab) assinado. Não publicar APK debug.
-- [ ] Instalar o pacote de lançamento em aparelhos reais e testar login, cadastro, navegação, áudio, reprodução com tela bloqueada (se suportada), upload autorizado, chat, eventos, localização, links externos, offline e atualização.
+- [ ] Instalar o pacote de lançamento assinado em aparelhos reais e testar login, cadastro, navegação, áudio, reprodução com tela bloqueada (se suportada), upload autorizado, chat, eventos, localização, links externos, offline e atualização.
 - [ ] Conferir no Supabase as políticas RLS e as permissões de Storage. A restrição na interface não substitui a proteção no servidor.
 - [ ] Validar a política de privacidade contra o comportamento real do app nativo e os SDKs incluídos.
 - [x] Implementar fluxo autenticado de exclusão de conta dentro de Minha conta e página pública de instruções: https://paixaobruno013-web.github.io/capital-do-trem/account-deletion.html (a validação real com conta de teste ainda é necessária antes do envio).
@@ -63,6 +76,18 @@ Fontes oficiais:
 - [ ] Criar ícone de loja 512×512, imagem de destaque 1024×500 e capturas de tela reais do app em execução.
 - [ ] Fazer teste interno e, se a conta for pessoal criada após 13/11/2023, teste fechado com pelo menos 12 participantes inscritos continuamente por 14 dias antes de solicitar acesso à produção.
 - [ ] Enviar para análise e só então iniciar a distribuição pública.
+
+## Bloqueios antes de enviar à App Store
+
+- [ ] Confirmar inscrição ativa no Apple Developer Program e acesso ao App Store Connect.
+- [ ] Configurar certificado de distribuição, perfil de provisionamento e assinatura do archive/IPA.
+- [ ] Criar o registro do app no App Store Connect com o Bundle ID `com.capitaldotrem.app`.
+- [ ] Fazer testes em iPhone real, inclusive câmera, microfone, fotos, localização, notificações, áudio, login, exclusão de conta e retorno de apps externos.
+- [ ] Revisar a experiência nativa para que o app ofereça utilidade e recursos próprios além de um site reempacotado; a diretriz 4.2 da Apple é um ponto de atenção para apps baseados em WebView.
+- [ ] Conferir a política de privacidade e preencher as declarações App Privacy com os dados coletados pelo app e por todos os SDKs/serviços integrados.
+- [ ] Disponibilizar acesso de demonstração à equipe de revisão, se houver áreas protegidas por login.
+- [ ] Preparar capturas de tela reais, descrição, categoria, classificação etária e notas de revisão.
+- [ ] Enviar para TestFlight, testar e depois submeter à revisão da App Store.
 
 ## Texto inicial para a ficha da loja
 
