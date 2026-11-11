@@ -53,8 +53,7 @@ const checks = [
   ['câmera pendente é encerrada se a pessoa fechar os Stories antes da permissão', story.includes('let cameraRequestId = 0') && story.includes('const requestId = ++cameraRequestId') && story.includes('requestId !== cameraRequestId') && story.includes('cameraRequestId += 1;')],
   ['câmera dos Stories ocupa a tela inteira do telefone', home.includes('#home-story-composer{position:fixed') && home.includes('#home-story-composer-card{position:absolute;inset:0;width:100%;height:100%') && home.includes('#home-story-camera-stage{position:absolute;inset:0;width:100%;height:100%')],
   ['zoom fica acima do botão central de foto/gravação', home.includes('.home-story-zoom{position:absolute') && home.includes('bottom:calc(env(safe-area-inset-bottom,0px) + 208px)') && home.includes('.home-story-compose-controls{position:absolute') && home.includes('bottom:calc(env(safe-area-inset-bottom,0px) + 116px)')],
-  ['álbum, virar câmera e efeitos ficam na faixa inferior', home.includes('#home-story-album-button{left:18px}') && home.includes('#home-story-flip-button{right:18px}') && home.includes('.home-story-effects{position:absolute') && home.includes('bottom:calc(env(safe-area-inset-bottom,0px) + 58px)')]]
-];
+  ['álbum, virar câmera e efeitos ficam na faixa inferior', home.includes('#home-story-album-button{left:18px}') && home.includes('#home-story-flip-button{right:18px}') && home.includes('.home-story-effects{position:absolute') && home.includes('bottom:calc(env(safe-area-inset-bottom,0px) + 58px)')]];
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO') + ' ' + name);
 const failed = checks.filter(([, ok]) => !ok);
 if (failed.length) process.exit(1);
