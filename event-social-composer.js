@@ -6,6 +6,7 @@ const form = byId('event-social-form');
 const fileInput = byId('event-social-photo');
 const preview = byId('event-social-preview');
 const status = byId('event-social-status');
+const dateInput = byId('event-social-date');
 let sourceImage = null;
 let objectUrl = null;
 let gps = { latitude: null, longitude: null };
@@ -15,8 +16,15 @@ function setStatus(message, error = false) {
   status.textContent = message;
   status.style.color = error ? '#ff858b' : '';
 }
+function updateEventDateMinimum() {
+  if (!dateInput) return;
+  const now = new Date();
+  dateInput.min = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
+  if (dateInput.value && dateInput.value < dateInput.min) dateInput.value = '';
+}
 function openComposer() {
   if (!modal) return;
+  updateEventDateMinimum();
   modal.hidden = false;
   modal.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
