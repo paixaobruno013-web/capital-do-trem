@@ -18,7 +18,9 @@ const CHANNEL_FALLBACK = [
   {id:'LmI04iuudmQ',title:'Vídeo do canal Capital do Trem'},
   {id:'DDHrNCagaD0',title:'Vídeo do canal Capital do Trem'},
   {id:'eQHIsU_mamM',title:'Vídeo do canal Capital do Trem'},
-  {id:'W4wnKF5AHQA',title:'Vídeo do canal Capital do Trem'}
+  {id:'W4wnKF5AHQA',title:'Vídeo do canal Capital do Trem'},
+  {id:'-c2QERKILzg',title:'Música da seleção Capital do Trem'},
+  {id:'HHKsZAS1eMk',title:'Música da seleção Capital do Trem'}
 ];
 
 function setStatus(message){if(status)status.textContent=message;}
