@@ -27,6 +27,7 @@ const checks = [
   ['evento oferece foto, corte, efeitos, GPS e música', ['event-social-photo','event-social-zoom','event-social-filter','event-social-gps','event-social-music'].every(id => home.includes('id="'+id+'"'))],
   ['evento salva imagem cortada com efeito e envia publicação', eventComposer.includes('makeCroppedImage') && eventComposer.includes('getCurrentPosition') && eventComposer.includes('submitMyEvent(')],
   ['data do evento valida formato AAAA-MM-DD corretamente', auth.includes("if (!/^\\d{4}-\\d{2}-\\d{2}$/")],
+  ['painel de evento bloqueia datas passadas no calendário', eventComposer.includes('dateInput.min =')],
   ['evento pode ser publicado por qualquer conta autenticada', eventPolicy.includes('create policy events_insert_authenticated') && eventPolicy.includes('created_by = (select auth.uid())') && !eventPolicy.includes("account_type='artist'")],
   ['schema base mantém publicação comunitária de eventos', schema.includes('create policy events_insert_authenticated') && schema.includes('created_by = (select auth.uid())') && !schema.includes('create policy "events_publish_artist_or_admin"')],
   ['painel musical fica na área de perfil artístico', account.includes('id="artist-profile-area" hidden') && account.includes("artistProfileArea.hidden=(profile?.account_type||'user')!=='artist'")],
