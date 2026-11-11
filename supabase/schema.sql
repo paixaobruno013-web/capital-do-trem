@@ -320,23 +320,6 @@ create policy "events_read_published_or_admin" on public.events
 drop policy if exists "events_submit_pending" on public.events;
 drop policy if exists "events_publish_immediately" on public.events;
 drop policy if exists "events_publish_artist_or_admin" on public.events;
-create policy "events_publish_artist_or_admin" on public.events
-  for insert to authenticated
-  with check (
-    created_by=(select auth.uid())
-    and status='published'
-    and (
-      (select private.is_admin())
-      or exists (
-        select 1 from public.profiles p
-        where p.user_id=(select auth.uid()) and p.account_type='artist'
-      )
-    )
-    and (
-      music_song_id is null
-      or exists (select 1 from public.songs s where s.id=music_song_id and s.status='published')
-    )
-  );
 
 drop policy if exists "events_edit_own_pending_or_admin" on public.events;
 create policy "events_edit_own_pending_or_admin" on public.events
@@ -450,6 +433,23 @@ alter table public.events
   drop constraint if exists events_longitude_range,
   add constraint events_longitude_range check (longitude is null or longitude between -180 and 180);
 create index if not exists events_published_date_idx on public.events(status,event_date,event_time);
+create policy "events_publish_artist_or_admin" on public.events
+  for insert to authenticated
+  with check (
+    created_by=(select auth.uid())
+    and status='published'
+    and (
+      (select private.is_admin())
+      or exists (
+        select 1 from public.profiles p
+        where p.user_id=(select auth.uid()) and p.account_type='artist'
+      )
+    )
+    and (
+      music_song_id is null
+      or exists (select 1 from public.songs s where s.id=music_song_id and s.status='published')
+    )
+  );
 alter table public.songs enable row level security;
 grant select, insert, update, delete on public.songs to authenticated;
 grant select on public.songs to anon;
