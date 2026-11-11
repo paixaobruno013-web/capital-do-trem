@@ -63,6 +63,11 @@ jobs:
           grep -q 'create policy "songs_insert_artist_pending_or_admin"' supabase/schema.sql
           grep -q 'create policy "audio_upload_artist_own_folder_or_admin"' supabase/schema.sql
           grep -q 'producer_name text not null default' supabase/schema.sql
+          grep -q 'video/quicktime' supabase/schema.sql
+          grep -q "video/quicktime':'mov'" supabase/auth.js
+          grep -q 'android.permission.CAMERA' scripts/configure-android-media.py
+          grep -q 'NSCameraUsageDescription' scripts/prepare-ios-info.py
+          test -s supabase/migrations/20261111174500_allow_quicktime_story_media.sql
           if grep -q 'create policy "songs_insert_artist_or_admin"' supabase/schema.sql; then echo 'ERRO: política antiga de músicas continua ativa no schema.'; exit 1; fi
           if grep -q 'create policy "audio_upload_artist_or_admin"' supabase/schema.sql; then echo 'ERRO: política antiga de Storage continua ativa no schema.'; exit 1; fi
           if grep -q 'create policy "songs_insert_registered_users"' supabase/schema.sql; then
