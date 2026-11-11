@@ -26,6 +26,9 @@ const checks = [
   ['gravador encerra faixas do microfone', /getTracks\(\)\.forEach\(track=>track\.stop\(\)\)/.test(enhancements)],
   ['gravador tem limite de 60 segundos', /60000/.test(enhancements)],
   ['seletor oferece categorias e recentes', /Mais usados/.test(emoji) && /emoji-category-tabs/.test(emoji) && /renderRecent\(\)/.test(emoji)],
+  ['seletor usa imagens Twemoji com fallback para ampliar compatibilidade de emojis', /cdn\\.jsdelivr\\.net\\/gh\\/jdecked\\/twemoji/.test(emoji) && /emoji-fallback/.test(emoji)],
+  ['Fazer Amigos aparece abaixo do bate-papo e lista somente perfis públicos', /id=\"fazer-amigos\"/.test(room) && /chat-friends-directory/.test(room) && /getPublicProfiles\(\)/.test(room) && /is_public/.test(auth)],
+  ['atalho Fazer Amigos da página inicial direciona para a área abaixo do chat', /bate-papo\\.html#fazer-amigos/.test(home)],
   ['mensagens privadas possuem botão de emojis e seletor', /id="private-emoji-toggle"/.test(privateChat) && /id="emoji-tray"[^>]*data-emoji-picker/.test(privateChat)],
   ['service worker inclui os módulos de chat e mensagens privadas', /chat-enhancements\.js/.test(worker) && /emoji-picker\.js/.test(worker) && /mensagens\.html/.test(worker)],
 
