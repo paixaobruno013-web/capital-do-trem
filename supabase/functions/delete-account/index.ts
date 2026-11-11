@@ -11,6 +11,7 @@ const BUCKETS = [
   "capital-do-trem-media",
   "capital-do-trem-audio",
   "capital-do-trem-private-gallery",
+  "capital-do-trem-chat",
   "brand-assets",
 ];
 const CONFIRMATION = "EXCLUIR MINHA CONTA";
@@ -22,6 +23,33 @@ function json(data: unknown, status = 200) {
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "no-store" },
   });
+}
+
+async function collectChatAttachmentFiles(admin: ReturnType<typeof createClient>, bucketName: string, userId: string) {
+  const files = await collectUserFiles(admin, bucketName, "group/" + userId);
+  let offset = 0;
+  while (true) {
+    const { data, error } = await admin.storage.from(bucketName).list("private", {
+      limit: PAGE_SIZE,
+      offset,
+      sortBy: { column: "name", order: "asc" },
+    });
+    if (error) throw new Error("Não foi possível verificar todos os anexos privados da conta.");
+    const folders = data ?? [];
+    for (const entry of folders) {
+      if (!entry.name || entry.name === "." || entry.name === ".." || entry.name.includes("/")) {
+        throw new Error("Foi encontrado um caminho de anexo inválido.");
+      }
+      if (entry.id == null || entry.metadata == null) {
+        const userFolder = "private/" + entry.name + "/" + userId;
+        files.push(...await collectUserFiles(admin, bucketName, userFolder));
+        if (files.length > MAX_FILES) throw new Error("A conta possui arquivos demais para uma exclusão automática. Entre em contato com a equipe.");
+      }
+    }
+    if (folders.length < PAGE_SIZE) break;
+    offset += PAGE_SIZE;
+  }
+  return [...new Set(files)];
 }
 
 async function collectUserFiles(admin: ReturnType<typeof createClient>, bucketName: string, userId: string) {
@@ -120,7 +148,9 @@ Deno.serve(async (req: Request) => {
     const filesByBucket: Record<string, string[]> = {};
     let totalFiles = 0;
     for (const bucket of BUCKETS) {
-      const files = await collectUserFiles(admin, bucket, user.id);
+      const files = bucket === "capital-do-trem-chat"
+        ? await collectChatAttachmentFiles(admin, bucket, user.id)
+        : await collectUserFiles(admin, bucket, user.id);
       filesByBucket[bucket] = files;
       totalFiles += files.length;
     }
