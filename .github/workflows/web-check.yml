@@ -73,7 +73,7 @@ jobs:
           grep -q "video/quicktime':'mov'" supabase/auth.js
           grep -q 'android.permission.CAMERA' scripts/configure-android-media.py
           grep -q 'NSCameraUsageDescription' scripts/prepare-ios-info.py
-          test -s supabase/migrations/20261111174500_allow_quicktime_story_media.sql
+          test -s supabase/migrations/20261111172220_allow_quicktime_story_media.sql
           if grep -q 'create policy "songs_insert_artist_or_admin"' supabase/schema.sql; then echo 'ERRO: política antiga de músicas continua ativa no schema.'; exit 1; fi
           if grep -q 'create policy "audio_upload_artist_or_admin"' supabase/schema.sql; then echo 'ERRO: política antiga de Storage continua ativa no schema.'; exit 1; fi
           if grep -q 'create policy "songs_insert_registered_users"' supabase/schema.sql; then
@@ -184,7 +184,7 @@ jobs:
           test -s www/supabase/auth.js
           test -s supabase/schema.sql
           test -s supabase/migrations/2026-11-06-music-catalog.sql
-          test -s supabase/migrations/20261111173000_artist_song_submissions_with_producer.sql
+          test -s supabase/migrations/20261111171633_artist_song_submissions_with_producer.sql
           test -s supabase/migrations/20261111173500_retire_legacy_artist_song_upload_policies.sql
           test -s www/manifest.webmanifest
           echo "Preparação web concluída: arquivos essenciais encontrados."
