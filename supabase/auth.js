@@ -1400,7 +1400,7 @@ export async function createAdminStory({ file, caption = '' }) {
     caption: cleanCaption,
     published: true,
     expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-  }).select('id,media_url,media_type,caption,created_at,expires_at,published').single();
+  }).select('id,media_url,media_type,caption,music_url,music_title,music_artist,music_start_seconds,music_volume,created_at,expires_at,published').single();
   if (error) {
     await supabase.storage.from('capital-do-trem-media').remove([path]);
     throw error;
@@ -1411,7 +1411,7 @@ export async function createAdminStory({ file, caption = '' }) {
 export async function getActiveAdminStories() {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('admin_stories')
-    .select('id,media_url,media_type,caption,created_at,expires_at')
+    .select('id,media_url,media_type,caption,music_url,music_title,music_artist,music_start_seconds,music_volume,created_at,expires_at')
     .eq('published', true)
     .gt('expires_at', new Date().toISOString())
     .order('created_at', { ascending: true });
@@ -1457,7 +1457,7 @@ export function subscribeAdminStories(callback) {
 // Stories pessoais da comunidade — cada conta gerencia os próprios.
 // Stories públicos para a comunidade e expiração automática em 24h.
 // ============================================================
-export async function createMyStory({ file, caption = '' }) {
+export async function createMyStory({ file, caption = '', musicSongId = '', musicStartSeconds = 0, musicVolume = 0.8 }) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
@@ -1470,6 +1470,14 @@ export async function createMyStory({ file, caption = '' }) {
   const profile = await getMyBasicProfile();
   const avatar = await getMyAvatar().catch(() => null);
   const cleanCaption = String(caption || '').trim().slice(0, 280);
+  let music = { music_song_id: null, music_url: null, music_title: '', music_artist: '', music_start_seconds: 0, music_volume: 0.8 };
+  if (musicSongId) {
+    const { data: song, error: songError } = await supabase.from('songs').select('id,title,artist_name,storage_path').eq('id', musicSongId).eq('status', 'published').single();
+    if (songError || !song) throw new Error('Essa música não está disponível para uso nos Stories.');
+    const { data: signed, error: signedError } = await supabase.storage.from('capital-do-trem-audio').createSignedUrl(song.storage_path, 25 * 60 * 60);
+    if (signedError || !signed?.signedUrl) throw new Error('Não foi possível preparar a música para o Story.');
+    music = { music_song_id: song.id, music_url: signed.signedUrl, music_title: String(song.title || '').slice(0,120), music_artist: String(song.artist_name || '').slice(0,100), music_start_seconds: Math.max(0, Math.min(3600, Number(musicStartSeconds) || 0)), music_volume: Math.max(0, Math.min(1, Number(musicVolume) || 0)) };
+  }
   const path = user.id + '/stories/' + crypto.randomUUID() + '.' + format.extension;
   const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, {
     contentType: format.contentType, cacheControl: '3600', upsert: false
@@ -1490,8 +1498,9 @@ export async function createMyStory({ file, caption = '' }) {
     media_url: mediaUrl,
     media_type: isVideo ? 'video' : 'image',
     caption: cleanCaption,
+    ...music,
     expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-  }).select('id,author_id,display_name,username,avatar_url,media_url,media_type,caption,created_at,expires_at').single();
+  }).select('id,author_id,display_name,username,avatar_url,media_url,media_type,caption,music_url,music_title,music_artist,music_start_seconds,music_volume,created_at,expires_at').single();
   if (error) {
     await supabase.storage.from('capital-do-trem-media').remove([path]);
     throw error;
@@ -1515,7 +1524,7 @@ export async function getMyStories() {
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para ver seus Stories.');
   const { data, error } = await supabase.from('user_stories')
-    .select('id,media_path,media_url,media_type,caption,created_at,expires_at')
+    .select('id,media_path,media_url,media_type,caption,music_url,music_title,music_artist,music_start_seconds,music_volume,created_at,expires_at')
     .eq('author_id', user.id)
     .order('created_at', { ascending: false })
     .limit(30);
