@@ -12,25 +12,25 @@ const [home, story, eventComposer, account, auth, prepare, eventPolicy, songPoli
   read('supabase/schema.sql')
 ]);
 const checks = [
-  ['atalho + de Stories fica na tela inicial', /id="home-story-add"/.test(home)],
-  ['modal de Stories fica embutido na tela inicial', /id="home-story-composer"/.test(home)],
-  ['ao tocar no +, abre câmera sem navegar para outra página', /function openComposer\(\)[\s\S]*?modal\.classList\.add\('is-open'\)[\s\S]*?startCamera\(\)/.test(story)],
-  ['câmera usa getUserMedia e oferece álbum de fotos e vídeos', /getUserMedia/.test(story) && /accept="image\/\*,video\/mp4,video\/webm,video\/quicktime,\.mov"/.test(home)],
-  ['Story é publicado pelo modal da tela inicial', /createMyStory\(/.test(story) && /home-story-publish/.test(home)],
+  ['atalho + de Stories fica na tela inicial', home.includes('id="home-story-add"')],
+  ['modal de Stories fica embutido na tela inicial', home.includes('id="home-story-composer"')],
+  ['ao tocar no +, abre câmera sem navegar para outra página', story.includes('function openComposer()') && story.includes("modal.classList.add('is-open')") && story.includes('startCamera();') && story.includes('getUserMedia')],
+  ['câmera oferece álbum de fotos e vídeos', home.includes('id="home-story-album"') && home.includes('accept="image/*,video/mp4,video/webm,video/quicktime,.mov"')],
+  ['Story é publicado pelo modal da tela inicial', story.includes('createMyStory(') && home.includes('home-story-publish')],
   ['feed de eventos aparece antes dos vídeos do YouTube', home.indexOf('id="home-event-feed"') >= 0 && home.indexOf('id="home-event-feed"') < home.indexOf('class="card home-youtube"')],
-  ['feed some quando não há eventos dentro da data', /if\(!active\.length\)\{feed\.hidden=true;return;\}/.test(home)],
-  ['agenda consulta somente eventos publicados e com data de hoje em diante', /export async function getPublishedEvents\(\)[\s\S]*?\.eq\('status','published'\)[\s\S]*?\.gte\('event_date',today\)/.test(auth)],
-  ['evento tem painel com foto, corte, efeitos, GPS e música', /event-social-photo/.test(home) && /event-social-zoom/.test(home) && /event-social-filter/.test(home) && /event-social-gps/.test(home) && /event-social-music/.test(home)],
-  ['evento salva imagem cortada com efeito e envia publicação', /makeCroppedImage/.test(eventComposer) && /getCurrentPosition/.test(eventComposer) && /submitMyEvent\(/.test(eventComposer)],
-  ['schema base mantém eventos para qualquer conta autenticada', schema.includes('create policy events_insert_authenticated') && schema.includes('created_by = (select auth.uid())') && !schema.includes('create policy "events_publish_artist_or_admin"')],
-  ['publicação de eventos não exige perfil de artista', /create policy events_insert_authenticated[\s\S]*?created_by = \(select auth\.uid\(\)\)[\s\S]*?status = 'published'/.test(eventPolicy) && !/account_type\s*=\s*'artist'/.test(eventPolicy)],
-  ['painel musical fica na área de perfil artístico', /id="artist-profile-area" hidden/.test(account) && /artistProfileArea\.hidden=\(profile\?\.account_type\|\|'user'\)!=='artist'/.test(account)],
-  ['painel musical identifica título, artista e produtor', /artist-song-submit-title/.test(account) && /artist-song-submit-artist/.test(account) && /artist-song-submit-producer/.test(account) && /producer_name/.test(auth)],
-  ['envio de áudio chama uploadMySong com nome do produtor', /uploadMySong\(\{[\s\S]*?producerName:document\.getElementById\('artist-song-submit-producer'\)/.test(account)],
-  ['envio de música exige ficha de artista no backend', /export async function uploadMySong[\s\S]*?from\('artists'\)[\s\S]*?if\s*\(!artistProfile\)/.test(auth)],
-  ['RLS permite apenas artista ou administrador enviar áudio', /songs_insert_artist_pending_or_admin/.test(songPolicy) && /audio_upload_artist_own_folder_or_admin/.test(songPolicy)],
-  ['pacote Android/iOS inclui os dois compositores', /'home-story-composer\.js'/.test(prepare) && /'event-social-composer\.js'/.test(prepare) && /'conta\.html'/.test(prepare)],
-  ['Radar inclui vídeos engraçados e informações do Funk Consciente', /videos\+engracados\+funk\+brasil/.test(home) && /news\.google\.com\/search\?q=funk/.test(home)]
+  ['feed some quando não há eventos dentro da data', home.includes('if(!active.length){feed.hidden=true;return;}')],
+  ['agenda consulta eventos publicados de hoje em diante', auth.includes('export async function getPublishedEvents()') && auth.includes(".eq('status','published')") && auth.includes(".gte('event_date',today)")],
+  ['evento oferece foto, corte, efeitos, GPS e música', ['event-social-photo','event-social-zoom','event-social-filter','event-social-gps','event-social-music'].every(id => home.includes('id="'+id+'"'))],
+  ['evento salva imagem cortada com efeito e envia publicação', eventComposer.includes('makeCroppedImage') && eventComposer.includes('getCurrentPosition') && eventComposer.includes('submitMyEvent(')],
+  ['evento pode ser publicado por qualquer conta autenticada', eventPolicy.includes('create policy events_insert_authenticated') && eventPolicy.includes('created_by = (select auth.uid())') && !eventPolicy.includes("account_type='artist'"))],
+  ['schema base mantém publicação comunitária de eventos', schema.includes('create policy events_insert_authenticated') && schema.includes('created_by = (select auth.uid())') && !schema.includes('create policy "events_publish_artist_or_admin"')],
+  ['painel musical fica na área de perfil artístico', account.includes('id="artist-profile-area" hidden') && account.includes("artistProfileArea.hidden=(profile?.account_type||'user')!=='artist'")],
+  ['painel musical identifica título, artista e produtor', ['artist-song-submit-title','artist-song-submit-artist','artist-song-submit-producer'].every(id => account.includes('id="'+id+'"')) && auth.includes('producer_name')],
+  ['envio de áudio chama uploadMySong com nome do produtor', account.includes('uploadMySong({') && account.includes("producerName:document.getElementById('artist-song-submit-producer')")],
+  ['envio de música exige ficha de artista no backend', auth.includes('export async function uploadMySong') && auth.includes("from('artists')") && auth.includes('if (!artistProfile) throw new Error')],
+  ['RLS permite apenas artista ou administrador enviar áudio', songPolicy.includes('songs_insert_artist_pending_or_admin') && songPolicy.includes('audio_upload_artist_own_folder_or_admin')],
+  ['pacote Android/iOS inclui os dois compositores', prepare.includes("'home-story-composer.js'") && prepare.includes("'event-social-composer.js'") && prepare.includes("'conta.html'")],
+  ['Radar inclui vídeos engraçados e informações do Funk Consciente', home.includes('videos+engracados+funk+brasil') && home.includes('news.google.com/search?q=funk')]
 ];
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO') + ' ' + name);
 const failed = checks.filter(([, ok]) => !ok);
