@@ -1796,7 +1796,8 @@ async function saveOfflineMusic(id,blob,title){
     const finish=()=>{if(finished)return;finished=true;progress=100;paint();screen.classList.add('is-finished');window.setTimeout(()=>screen.remove(),600);};
     const beginOpeningClock=()=>{if(clockStarted)return;clockStarted=true;startOpeningTrain();finishTimer=window.setTimeout(finish,10000);};
     const loader=window.setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}else window.clearInterval(loader);},220);
-    video.addEventListener('playing',beginOpeningClock,{once:true});
+    // Abertura e trem começam junto do poster; a rede não pode empurrar a duração para 20+ segundos.
+    beginOpeningClock();
     video.addEventListener('loadeddata',()=>{
      video.playbackRate=1;
      video.play().then(()=>{if(savedOpeningSound&&!video.muted)audioButton.remove();}).catch(async error=>{
@@ -1807,7 +1808,7 @@ async function saveOfflineMusic(id,blob,title){
     video.addEventListener('error',()=>{console.warn('Vídeo de abertura indisponível; mantendo a imagem de poster.');beginOpeningClock();},{once:true});
     // A duração da abertura é fixa em 10 segundos, independentemente da duração do arquivo.
     video.addEventListener('ended',finish,{once:true});
-    window.setTimeout(()=>{if(!clockStarted){video.pause();video.style.opacity='0';beginOpeningClock();}},12000);
+    // O poster e a animação continuam mesmo se o vídeo não terminar de carregar; a abertura fecha no relógio fixo de 10 s.
    }
   }
  }catch(error){
