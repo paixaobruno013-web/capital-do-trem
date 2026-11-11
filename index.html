@@ -845,6 +845,28 @@ body.light header.header-has-custom-background::before{
   .header-location-row .btn#quick-location{width:100%;max-width:440px}
 }
 
+
+/* Publicação social de eventos */
+.home-friends{border:1px solid rgba(237,28,36,.45)!important;background:linear-gradient(145deg,#171012,#080808)!important}
+.home-friends-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.home-friends-row h2{margin:0;font-size:20px}
+.home-friends-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.event-social-modal[hidden]{display:none!important}
+.event-social-modal{position:fixed;inset:0;z-index:1200;display:flex;align-items:flex-end;justify-content:center;padding:12px;background:rgba(0,0,0,.82);overflow:auto}
+.event-social-panel{width:min(100%,620px);max-height:94dvh;overflow:auto;background:#0b0b0b;color:#fff;border:1px solid #ed1c24;border-radius:20px;padding:18px;box-shadow:0 0 28px #ed1c2444}
+.event-social-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.event-social-top h2{margin:0;font-size:22px}
+.event-social-close{width:42px;min-width:42px;padding:0;font-size:24px;background:#252525;border:1px solid #444}
+.event-social-panel label{display:block;margin:12px 0 5px;font-weight:800;font-size:13px}
+.event-social-panel input,.event-social-panel textarea,.event-social-panel select{width:100%;min-height:44px;padding:11px;border:1px solid #393939;border-radius:10px;background:#050505;color:#fff;font:inherit;font-size:16px}
+.event-social-panel textarea{min-height:76px}
+.event-social-preview-wrap{margin:12px 0;border-radius:14px;overflow:hidden;background:#050505;border:1px solid #333}
+.event-social-preview-wrap img{display:block;width:100%;max-height:430px;aspect-ratio:4/5;object-fit:cover;transform-origin:center}
+.event-social-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.event-social-gps-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.event-social-gps-row button{flex:0 0 auto}
+#event-social-status{min-height:24px;margin:12px 0;font-size:13px}
+@media(min-width:650px){.event-social-modal{align-items:center}.event-social-panel{max-height:90dvh}}
 </style><script>
 // Se o Android encerrar o processo enquanto a câmera nativa está aberta, retoma a conversa em vez de reiniciar na página inicial.
 try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(localStorage.getItem(key)||0);if(started&&Date.now()-started<3*60*1000){localStorage.removeItem(key);location.replace('./bate-papo.html?retorno-camera=1');}}catch(error){}
@@ -880,6 +902,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <div class="home-event-feed-heading"><div><span>AGENDA DA COMUNIDADE</span><h2 id="home-event-feed-title">📅 Eventos próximos</h2></div><a href="#eventos" data-go="eventos">Ver agenda</a></div>
 <div id="home-event-feed-list" class="home-event-feed-list" aria-live="polite"></div>
 </section>
+<section class="card home-friends" id="home-friends" aria-labelledby="home-friends-title"><div class="home-friends-row"><div><h2 id="home-friends-title">🤝 Friends — Fazer amizades</h2><p class="muted">Conheça a comunidade e encontre novas amizades no Capital do Trem.</p></div><a class="btn" href="./bate-papo.html#fazer-amigos">Entrar no Friends</a></div><div class="home-friends-actions"><a class="btn alt" href="./bate-papo.html#fazer-amigos">Ver pessoas da comunidade</a><a class="btn alt" href="#eventos" data-go="eventos">Eventos da galera</a></div></section>
 <section class="card home-youtube" aria-labelledby="home-youtube-title">
 <h2 id="home-youtube-title">▶ Vídeos da Capital do Trem</h2>
 <p class="muted">Os vídeos mais recentes do canal oficial, atualizados automaticamente.</p><p id="youtube-feed-status" class="muted" role="status" aria-live="polite">Conferindo as novidades do canal…</p>
@@ -906,7 +929,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <label for="song-catalog-search" class="muted" style="display:block;margin:14px 0 5px;font-weight:700">🔎 Buscar por música ou artista</label><input id="song-catalog-search" type="search" inputmode="search" autocomplete="off" placeholder="Digite o nome da música ou do artista…" aria-controls="published-song-catalog" style="margin:0 0 8px"><p id="song-catalog-count" class="muted" role="status" aria-live="polite" style="margin:0 0 10px">Carregando músicas…</p><div id="published-song-catalog" class="list" aria-live="polite"><p class="muted">Carregando catálogo compartilhado…</p></div></div><div class="card"><h3>🎧 Player do Capital do Trem</h3><label for="audio">Escolha uma música autorizada que esteja no seu aparelho</label><input id="audio" type="file" accept="audio/*"><audio id="player" controls preload="metadata" style="width:100%;margin:12px 0"></audio><div class="social" style="align-items:center"><button class="btn" id="download-audio" type="button" disabled>⬇ Baixar música</button><span id="audio-status" class="muted" role="status" aria-live="polite">Selecione um áudio para ouvir e baixar nesta demonstração.</span></div><p class="muted">O player oferece controles de reprodução e pode continuar tocando com a tela bloqueada, conforme o suporte do navegador e as configurações de economia de bateria do celular. O download salva o arquivo selecionado neste aparelho.</p><p class="muted">Só compartilhe ou baixe músicas que você tenha autorização para distribuir.</p></div></section>
 <section class="page" id="eventos">
 <div class="card"><h2>📍 Logo ali</h2><p class="muted">Encontre shows, bailes, encontros e ações sociais próximos de onde você está.</p><button class="btn" id="find-nearby">Usar localização do meu celular</button><p id="location-status" class="muted" aria-live="polite">Sua localização só será acessada se você tocar no botão e autorizar o GPS. As coordenadas serão usadas para abrir o Google Maps e não serão salvas pelo Capital do Trem.</p><a id="nearby-map" class="btn alt" href="#" target="_blank" rel="noopener" hidden>Abrir mapa com opções próximas</a></div>
-<div class="card"><h2>📅 Agenda do Capital do Trem</h2><p class="muted">Shows, bailes, encontros e atividades culturais divulgadas pela comunidade.</p><p class="muted">📸 Cartazes, data, local e compartilhamento em um formato de divulgação visual.</p><div id="public-events" aria-live="polite"><p class="muted">A agenda compartilhada será carregada quando o banco estiver conectado.</p></div><p class="muted">A agenda é compartilhada. Para publicar um evento, entre na sua conta e use a área “Enviar evento”. O formulário de prévia abaixo serve para preparar uma mensagem e compartilhar os detalhes.</p><a class="btn" href="./conta.html">Entrar e publicar evento</a>
+<div class="card"><h2>📅 Agenda do Capital do Trem</h2><p class="muted">Shows, bailes, encontros e atividades culturais divulgadas pela comunidade.</p><p class="muted">📸 Cartazes, data, local e compartilhamento em um formato de divulgação visual.</p><div id="public-events" aria-live="polite"><p class="muted">A agenda compartilhada será carregada quando o banco estiver conectado.</p></div><p class="muted">A agenda é compartilhada. Para publicar um evento, entre na sua conta e use a área “Enviar evento”. O formulário de prévia abaixo serve para preparar uma mensagem e compartilhar os detalhes.</p><button class="btn" id="event-social-open" type="button">＋ Publicar evento</button><p class="muted">Qualquer pessoa com conta pode publicar: aniversário, encontro, show, baile ou ação social.</p><a class="btn alt" href="./conta.html">Minha conta</a>
 <label for="event-name">Nome do evento</label><input id="event-name" maxlength="100" required placeholder="Ex.: Baile da comunidade">
 <label for="event-date">Data</label><input id="event-date" type="date" required>
 <label for="event-time">Horário</label><input id="event-time" type="time" required>
@@ -1573,7 +1596,7 @@ function renderHomeEventFeed(events){
   const events=await module.getPublishedEvents();
   renderHomeEventFeed(events);
   const refreshHomeFeed=async()=>{try{renderHomeEventFeed(await module.getPublishedEvents());}catch(error){console.warn('Não foi possível atualizar o feed de eventos:',error);}};
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshHomeFeed();});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshHomeFeed();});\n  window.addEventListener('capital:events-updated',refreshHomeFeed);
   const nowForExpiry=new Date();
   const nextLocalMidnight=new Date(nowForExpiry.getFullYear(),nowForExpiry.getMonth(),nowForExpiry.getDate()+1,0,0,5);
   window.setTimeout(refreshHomeFeed,Math.max(1000,nextLocalMidnight-nowForExpiry));
@@ -2113,6 +2136,26 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
   <p id="capital-story-caption"></p>
  </section>
 </div>
+<section class="event-social-modal" id="event-social-composer" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="event-social-heading">
+ <div class="event-social-panel">
+  <div class="event-social-top"><div><h2 id="event-social-heading">📸 Criar publicação de evento</h2><p class="muted">Prepare sua foto como em uma rede social.</p></div><button class="event-social-close" id="event-social-close" type="button" aria-label="Fechar">×</button></div>
+  <form id="event-social-form">
+   <label for="event-social-photo">Foto do evento</label><input id="event-social-photo" type="file" accept="image/jpeg,image/png,image/webp">
+   <div class="event-social-preview-wrap" id="event-social-preview-wrap" hidden><img id="event-social-preview" alt="Prévia da foto com corte e efeito"></div>
+   <div class="event-social-controls"><div><label for="event-social-zoom">Corte / enquadramento</label><input id="event-social-zoom" type="range" min="1" max="2.4" step=".05" value="1"></div><div><label for="event-social-filter">Efeito na imagem</label><select id="event-social-filter"><option value="none">Original</option><option value="contrast(1.18) saturate(1.25)">Vibrante</option><option value="grayscale(1) contrast(1.12)">Preto e branco</option><option value="sepia(.55) saturate(1.15)">Vintage</option><option value="brightness(1.12) saturate(1.08)">Claro</option><option value="contrast(1.25) brightness(.92)">Drama</option></select></div></div>
+   <label for="event-social-title">Nome do evento</label><input id="event-social-title" maxlength="120" required placeholder="Ex.: Aniversário, encontro, baile…">
+   <div class="event-social-controls"><div><label for="event-social-date">Data</label><input id="event-social-date" type="date" required></div><div><label for="event-social-time">Horário</label><input id="event-social-time" type="time"></div></div>
+   <label for="event-social-address">Endereço / local</label><input id="event-social-address" maxlength="240" required placeholder="Rua, número, bairro e cidade">
+   <div class="event-social-gps-row"><button class="btn alt" id="event-social-gps" type="button">📍 Usar GPS</button><span class="muted" id="event-social-gps-status">Opcional: use o GPS ou digite o endereço.</span></div>
+   <label for="event-social-kind">Tipo de evento</label><select id="event-social-kind"><option value="evento">Aniversário / encontro</option><option value="show">Show / baile</option><option value="acao-social">Ação social</option><option value="outro">Outro</option></select>
+   <label for="event-social-music">Adicionar música</label><select id="event-social-music"><option value="">Sem música</option></select>
+   <label for="event-social-description">Legenda / informações</label><textarea id="event-social-description" maxlength="2000" placeholder="Conte os detalhes para a comunidade…"></textarea>
+   <p id="event-social-status" role="status" aria-live="polite">Sua publicação ficará visível na agenda enquanto estiver dentro da data.</p>
+   <button class="btn" id="event-social-publish" type="submit" style="width:100%">Publicar evento</button>
+  </form>
+ </div>
+</section>
+<script type="module" src="./event-social-composer.js"></script>
 <script type="module" src="./home-story-composer.js"></script>
 <script type="module" src="./stories-ui.js"></script>
 </body></html>
