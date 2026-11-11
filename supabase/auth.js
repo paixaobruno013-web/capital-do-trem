@@ -392,14 +392,14 @@ export async function getModerationQueue() {
     supabase.from('artists').select('id, artist_name, style, city, bio, status, created_at').eq('status','pending').order('created_at',{ascending:true}),
     supabase.from('events').select('id, title, event_date, event_time, address, category, description, status, created_at').eq('status','pending').order('created_at',{ascending:true}),
     supabase.from('posts').select('id, content, status, created_at').eq('status','pending').order('created_at',{ascending:true}),
-    supabase.from('songs').select('id,title,artist_name,description,status,created_at').eq('status','pending').order('created_at',{ascending:true})
+    supabase.from('songs').select('id,title,artist_name,producer_name,description,status,created_at').eq('status','pending').order('created_at',{ascending:true})
   ]);
   for (const result of [artists,events,posts,songs]) if (result.error) throw result.error;
   return {
     artists: (artists.data||[]).map(item=>({id:item.id,title:item.artist_name,detail:[item.style,item.city,item.bio].filter(Boolean).join(' • ')})),
     events: (events.data||[]).map(item=>({id:item.id,title:item.title,detail:[item.category,item.event_date,item.event_time,item.address,item.description].filter(Boolean).join(' • ')})),
     posts: (posts.data||[]).map(item=>({id:item.id,title:'Divulgação da comunidade',detail:item.content})),
-    songs: (songs.data||[]).map(item=>({id:item.id,title:item.title,detail:[item.artist_name,item.description].filter(Boolean).join(' • ')}))
+    songs: (songs.data||[]).map(item=>({id:item.id,title:item.title,detail:[item.artist_name,item.producer_name?'Produção: '+item.producer_name:'',item.description].filter(Boolean).join(' • ')}))
   };
 }
 
