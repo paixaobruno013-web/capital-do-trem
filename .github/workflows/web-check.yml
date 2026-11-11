@@ -189,5 +189,6 @@ jobs:
           test -s supabase/migrations/20261111171633_artist_song_submissions_with_producer.sql
           test -s supabase/migrations/20261111172006_retire_legacy_artist_song_upload_policies.sql
           test -s supabase/migrations/20261111174525_artist_song_direct_publication.sql
+          test -s supabase/migrations/20261111174839_restrict_artist_music_to_artist_accounts.sql
           test -s www/manifest.webmanifest
           echo "Preparação web concluída: arquivos essenciais encontrados."
