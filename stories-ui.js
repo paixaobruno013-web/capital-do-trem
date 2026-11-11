@@ -20,6 +20,7 @@ let toastTimer = null;
 let unsubscribers = [];
 let profileObserver;
 let lastTrigger = null;
+let activeStoryAudio = null;
 
 function seenIds() {
   try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]')); }
@@ -140,6 +141,7 @@ function showToast(message) {
 function clearAdvance() { clearTimeout(advanceTimer); advanceTimer = null; }
 function closeViewer() {
   clearAdvance();
+  if (activeStoryAudio) { activeStoryAudio.pause(); activeStoryAudio.removeAttribute('src'); activeStoryAudio = null; }
   viewer?.classList.remove('is-open');
   viewer?.setAttribute('aria-hidden', 'true');
   if (mediaBox) mediaBox.replaceChildren();
@@ -155,12 +157,15 @@ function renderStory(index) {
   updateOfficialRing();
   updateUserProfileRings();
   mediaBox.replaceChildren();
+  if (activeStoryAudio) { activeStoryAudio.pause(); activeStoryAudio.removeAttribute('src'); activeStoryAudio = null; }
+  captionBox.replaceChildren();
   const media = document.createElement(story.media_type === 'video' ? 'video' : 'img');
   media.src = story.media_url;
   if (story.media_type === 'video') {
     media.controls = true;
     media.autoplay = true;
     media.playsInline = true;
+    if (story.music_url) media.muted = true;
     media.addEventListener('ended', () => renderStory(currentIndex + 1));
   } else {
     media.alt = 'Story de ' + (story.display_name || 'Capital do Trem');
@@ -168,7 +173,21 @@ function renderStory(index) {
   }
   mediaBox.append(media);
   const author = story.author_id ? (story.display_name || 'Usuário Uai') + (story.username ? ' • @' + story.username : '') : 'Capital do Trem • Oficial';
-  captionBox.textContent = author + (story.caption ? ' — ' + story.caption : '');
+  const caption = document.createElement('div');
+  caption.textContent = author + (story.caption ? ' — ' + story.caption : '');
+  captionBox.append(caption);
+  if (story.music_url && /^https:\/\//i.test(story.music_url)) {
+    const music = document.createElement('audio');
+    music.controls = true; music.preload = 'auto'; music.playsInline = true;
+    music.src = story.music_url; music.volume = Math.max(0, Math.min(1, Number(story.music_volume ?? 0.8)));
+    music.setAttribute('aria-label', 'Música do Story: ' + (story.music_title || 'trilha musical'));
+    const musicLabel = document.createElement('small'); musicLabel.className = 'muted';
+    musicLabel.textContent = '🎵 ' + (story.music_artist ? story.music_artist + ' — ' : '') + (story.music_title || 'Música do Capital do Trem');
+    captionBox.append(musicLabel, music);
+    activeStoryAudio = music;
+    music.addEventListener('loadedmetadata', () => { try { music.currentTime = Math.max(0, Number(story.music_start_seconds) || 0); } catch {} }, { once: true });
+    music.play().catch(() => { musicLabel.textContent += ' • Toque em reproduzir para ouvir'; });
+  }
   if (progress) {
     progress.style.transition = 'none';
     progress.style.transform = 'scaleX(1)';
