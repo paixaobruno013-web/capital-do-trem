@@ -291,8 +291,11 @@
   });
   while(incidents.length>MAX_ITEMS)incidents.shift();
   persist();
-  const recent=incidents.filter(item=>now-item.time<90000);
-  if(recent.length<3||recoveryShown)return;
+  // Só erros reais de execução entram no gatilho do aviso. Tarefas longas isoladas
+  // e falhas de recursos opcionais são registradas, mas não interrompem a atividade.
+  const recent=incidents.filter(item=>now-item.time<90000&&(item.kind==='javascript'||item.kind==='promise'));
+  const duplicate=incidents.slice(0,-1).some(item=>item.kind===kind&&item.file===safeFileName(details.file)&&item.line===(Number.isFinite(details.line)?Math.max(0,details.line):0)&&now-item.time<30000);
+  if(recent.length<3||duplicate||recoveryShown)return;
   recoveryShown=true;
   const notice=document.createElement('aside');
   notice.setAttribute('role','status');
