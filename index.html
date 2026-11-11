@@ -1643,6 +1643,7 @@ async function saveOfflineMusic(id,blob,title){
    const title=document.createElement('h3');title.textContent=song.title;
    const artist=document.createElement('p');artist.className='muted';artist.textContent=song.artist_name;
    card.append(title,artist);
+   if(song.producer_name){const producer=document.createElement('p');producer.className='muted';producer.textContent='🎚️ Produção: '+song.producer_name;card.append(producer);}
    if(song.description){const desc=document.createElement('p');desc.textContent=song.description;card.append(desc);}
    const audioUrl=safeHttpsUrl(song.audio_url);const downloadUrl=safeHttpsUrl(song.download_url)||audioUrl;
    if(audioUrl){
