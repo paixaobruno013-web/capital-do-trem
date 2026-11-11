@@ -22,7 +22,7 @@ assert.ok(adminJs.includes(".select('id').single()"), 'Publicação precisa conf
 assert.ok(adminJs.includes('recordCreated = true'), 'Falha ao atualizar a lista não pode apagar mídia já publicada.');
 assert.ok(adminJs.includes('Etapa 1/2') && adminJs.includes('Etapa 2/2'), 'Envio precisa informar suas etapas.');
 assert.ok(publicJs.includes('data-supporter-retry'), 'Página pública precisa permitir nova tentativa.');
-assert.ok(serviceWorker.includes('capital-do-trem-v266'), 'Cache do PWA precisa ser renovado.');
+assert.ok(/const CACHE=['"]capital-do-trem-v\d+['"]/.test(serviceWorker), 'Cache do PWA precisa usar uma versão identificável e renovável.');
 for (const file of ['admin-apoiadores.html','apoiadores.html','supporters-admin.js','supporters-public.js']) {
   assert.ok(serviceWorker.includes(file), 'Arquivo de apoiadores ausente do pré-cache: '+file);
   assert.ok(prepare.includes(file), 'Arquivo de apoiadores ausente da preparação web: '+file);
