@@ -17,8 +17,8 @@ const checks = [
   [edge.includes('slice(0, 4)') && edge.includes('Access-Control-Allow-Origin'), 'Feed não limita os quatro vídeos nem libera CORS'],
   [worker.includes('youtube-feed.js') && /capital-do-trem-v[0-9]+/.test(worker), 'Service worker não atualiza o módulo do YouTube'],
   [feed.includes("id:'W4wnKF5AHQA'") && feed.includes("id:'-c2QERKILzg'") && feed.includes("id:'HHKsZAS1eMk'"), 'Vídeo 4 e músicas 5 e 6 continuam no feed unificado'],
-  [feed.includes('SHORTS.concat(CHANNEL_FALLBACK)') && feed.includes("title:'Música da seleção Capital do Trem'"), 'Músicas selecionadas permanecem misturadas sem categorias'],
-  [feed.includes('grid.replaceChildren(...videos.map(makeCard))') && feed.includes('Mistura determinística'), 'Feed único renderiza vídeos e músicas na mesma sequência']
+  [feed.includes('const HOME_VIDEOS = [') && feed.includes('const SHORTS = [') && feed.includes("title:'Música da seleção Capital do Trem'") && !feed.includes('SHORTS.concat('), 'Seis vídeos da home separados da biblioteca de 20 Shorts'],
+  [feed.includes('grid.replaceChildren(...videos.map(makeCard))') && feed.includes('const videos=HOME_VIDEOS;') && feed.includes('seis vídeos originais'), 'Home renderiza somente os seis vídeos originais']
 ];
 for (const [ok, message] of checks) { console.log((ok ? 'OK  ' : 'ERRO ') + message); if (!ok) process.exitCode = 1; }
 if (!process.exitCode) console.log('Coleção de publicações, Direct e feed automático do YouTube: verificações aprovadas.');
