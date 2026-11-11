@@ -8,7 +8,7 @@ const [auth, home, migration] = await Promise.all([
 const checks = [
   ['curtidas únicas por usuário e publicação', /primary key \(post_id, user_id\)/.test(migration)],
   ['curtidas só em publicações publicadas', /post_likes_insert_self[\s\S]*?status = 'published'/.test(migration)],
-  ['comentários vinculados à conta e à publicação', /author_id uuid not null references auth\.users[\s\S]*?post_id uuid not null references public\.posts/.test(migration)],
+  ['comentários vinculados à conta e à publicação', /post_id uuid not null references public\.posts[\s\S]*?author_id uuid not null references auth\.users/.test(migration)],
   ['nome do comentarista definido pelo perfil no banco', /set_post_comment_author_name[\s\S]*?profiles p[\s\S]*?new\.author_name/.test(migration)],
   ['leitura pública de comentários e curtidas com RLS', /post_comments_read_public[\s\S]*?to anon, authenticated/.test(migration) && /post_likes_read_public[\s\S]*?to anon, authenticated/.test(migration)],
   ['envio de comentários exige usuário autenticado e post publicado', /post_comments_insert_self[\s\S]*?auth\.uid\(\)[\s\S]*?status = 'published'/.test(migration)],
