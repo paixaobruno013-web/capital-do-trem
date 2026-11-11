@@ -434,6 +434,7 @@ create policy "songs_read_published_owner_admin" on public.songs
   using (status='published' or user_id=(select auth.uid()) or (select private.is_admin()));
 drop policy if exists "songs_insert_own_pending" on public.songs;
 drop policy if exists "songs_insert_admin_only" on public.songs;
+drop policy if exists "songs_insert_artist_or_admin" on public.songs;
 create policy "songs_insert_artist_pending_or_admin" on public.songs
   for insert to authenticated
   with check (
@@ -462,6 +463,7 @@ on conflict (id) do update set public=false,file_size_limit=excluded.file_size_l
   allowed_mime_types=excluded.allowed_mime_types;
 drop policy if exists "audio_upload_own_folder" on storage.objects;
 drop policy if exists "audio_upload_admin_only" on storage.objects;
+drop policy if exists "audio_upload_artist_or_admin" on storage.objects;
 create policy "audio_upload_artist_own_folder_or_admin" on storage.objects
   for insert to authenticated
   with check (
