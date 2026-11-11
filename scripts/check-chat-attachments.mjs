@@ -15,7 +15,7 @@ const checks = [
   ['política de leitura verifica membro do grupo ou participante da conversa aceita', /chat_private_files_read_authorized[\s\S]*?is_current_chat_group_member[\s\S]*?private_conversations[\s\S]*?status = 'accepted'/.test(migration)],
   ['política de envio limita caminho ao usuário e conversa autorizada', /chat_private_files_upload_authorized[\s\S]*?auth\.uid\(\)::text[\s\S]*?status = 'accepted'/.test(migration)],
   ['mensagens privadas guardam caminho e metadados do anexo', /alter table public\.private_messages[\s\S]*?attachment_path[\s\S]*?attachment_type[\s\S]*?attachment_size/.test(migration)],
-  ['URLs de anexos são assinadas por tempo limitado', /createSignedUrl\(path, 3600\)/.test(auth) && /createSignedUrls\(paths, 3600\)/.test(auth)],
+  ['URLs de anexos são assinadas por tempo limitado', /createSignedUrl\(path, 900\)/.test(auth) && /createSignedUrls\(paths, 900\)/.test(auth)],
   ['upload do grupo usa pasta group no bucket privado', /export async function uploadChatAttachment[\s\S]*?const path = 'group\/' \+ user\.id[\s\S]*?uploadChatFile\(file, path\)/.test(auth)],
   ['upload privado usa pasta private/conversa/usuário', /const path='private\/'\+conversationId\+'\/'\+user\.id/.test(auth)],
   ['mensagem privada aceita arquivo e preserva o controle de conversa', /export async function sendPrivateMessage\(conversationId,content,file=null\)[\s\S]*?uploadChatFile\(file,path\)[\s\S]*?private_messages/.test(auth)],
