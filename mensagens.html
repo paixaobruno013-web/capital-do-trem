@@ -123,6 +123,22 @@ body.light .messages{background:linear-gradient(180deg,#fff8f8,#f4f4f4)}
 #compose .emoji-category-tabs button[aria-pressed=true]{border-color:var(--red);color:var(--red)}
 #compose .emoji-category-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;max-height:190px;overflow-y:auto}
 #compose .emoji-category-grid .emoji-choice{width:100%;min-height:36px;padding:3px;border:0;background:transparent;color:var(--fg);font-size:22px}
+
+/* Direct + teclado móvel compacto inspirado no WhatsApp. */
+#thread-panel{background:linear-gradient(180deg,rgba(15,15,17,.97),rgba(5,5,6,.97));border-color:#ed1c2438}
+#thread-panel .section-title{position:sticky;top:0;z-index:5;background:rgba(8,8,9,.96);padding:8px 0 12px}
+#chat-title{font-size:16px!important;font-weight:850;letter-spacing:.2px}
+#thread-presence{font-size:11px;color:#9ca3af}
+.messages{border:0!important;border-radius:0!important;background:transparent!important;padding:14px 8px 20px!important;gap:9px}
+.bubble{max-width:min(82%,520px);padding:10px 13px;border-radius:18px 18px 18px 5px;background:#242427;border:1px solid #ffffff12}
+.bubble.mine{background:#a91325;border-color:#ff5b6a55;border-radius:18px 18px 5px 18px}
+.compose{position:sticky;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:8;display:flex!important;flex-wrap:nowrap!important;gap:6px!important;align-items:center!important;padding:7px!important;border:1px solid #343438!important;border-radius:28px!important;background:#171719!important;box-shadow:0 -5px 22px #0008!important}
+#compose #message{flex:1 1 auto!important;width:0;min-width:0!important;min-height:42px!important;padding:8px 10px!important;border:0!important;border-radius:22px!important;background:#252529!important;color:#fff!important}
+#compose #send{flex:0 0 44px!important;width:44px;min-width:44px!important;height:44px;min-height:44px!important;padding:0!important;border-radius:50%!important;font-size:18px!important}
+#private-emoji-toggle{flex:0 0 40px!important;width:40px;min-width:40px!important;height:40px;min-height:40px!important;border:0!important;background:transparent!important;box-shadow:none!important}
+#compose .emoji-picker{order:2;flex:0 0 100%!important}
+#compose.emoji-open{flex-wrap:wrap!important;border-radius:18px!important}
+@media(max-width:680px){#thread-panel{min-height:calc(100dvh - 120px)}.messages{flex:1;min-height:0}.compose{margin-top:8px!important}#compose #message{font-size:16px!important}}
 </style></head>
 <body><a class="skip" href="#main">Pular para o conteúdo</a>
 <header><img src="./marca.svg" alt="Capital do Trem"><h1>Minhas conversas</h1><p class="muted">Conversas individuais com convite e aceite antes de começar.</p><div class="actions"><a class="btn" href="./index.html">Início</a><a class="btn" href="./bate-papo.html">Fala Trem • Geral</a><a class="btn" href="./conta.html">Minha conta</a><button id="theme" type="button">☀️ Claro</button></div></header>
