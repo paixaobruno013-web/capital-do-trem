@@ -5,6 +5,22 @@ import re
 import sys
 
 root = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("android")
+manifest = root / "app/src/main/AndroidManifest.xml"
+if not manifest.is_file():
+    raise SystemExit(f"AndroidManifest.xml não encontrado: {manifest}")
+manifest_text = manifest.read_text(encoding="utf-8")
+required_permissions = [
+    "android.permission.CAMERA",
+    "android.permission.RECORD_AUDIO",
+    "android.permission.MODIFY_AUDIO_SETTINGS",
+]
+for permission in required_permissions:
+    declaration = f'<uses-permission android:name="{permission}" />'
+    if permission not in manifest_text:
+        manifest_text = manifest_text.replace("<application", f"    {declaration}\\n    <application", 1)
+manifest.write_text(manifest_text, encoding="utf-8")
+print("Permissões nativas de câmera e áudio declaradas no AndroidManifest.xml.")
+
 matches = list(root.glob("app/src/main/java/**/MainActivity.java"))
 if not matches:
     raise SystemExit("MainActivity.java não encontrado após npx cap add android")
