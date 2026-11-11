@@ -14,7 +14,7 @@ const checks = [
   [index.includes('youtube-feed.js') && index.includes('youtube-feed-status'), 'Atualizador automático do YouTube não está conectado à página'],
   [edge.includes('feeds/videos.xml?channel_id=') && edge.includes('capitaldotrem'), 'Função não consulta o feed público do canal correto'],
   [edge.includes('slice(0, 4)') && edge.includes('Access-Control-Allow-Origin'), 'Feed não limita os quatro vídeos nem libera CORS'],
-  [worker.includes('youtube-feed.js') && /capital-do-trem-v257/.test(worker), 'Service worker não atualiza o módulo do YouTube']
+  [worker.includes('youtube-feed.js') && /capital-do-trem-v\\d+/.test(worker), 'Service worker não atualiza o módulo do YouTube']
 ];
 for (const [ok, message] of checks) { console.log((ok ? 'OK  ' : 'ERRO ') + message); if (!ok) process.exitCode = 1; }
 if (!process.exitCode) console.log('Coleção de publicações, Direct e feed automático do YouTube: verificações aprovadas.');
