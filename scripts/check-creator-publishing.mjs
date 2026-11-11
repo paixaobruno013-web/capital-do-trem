@@ -17,6 +17,8 @@ const [home, story, eventComposer, account, auth, prepare, eventPolicy, songPoli
   read('youtube-feed.js'),
   read('supabase/migrations/20261111190000_video_feed_interactions.sql')
 ]);
+const homeVideosBlock = youtubeFeed.match(/const HOME_VIDEOS = \[([\s\S]*?)\n\];/);
+const shortsBlock = youtubeFeed.match(/const SHORTS = \[([\s\S]*?)\n\]\.map/);
 const checks = [
   ['atalho + de Stories fica na tela inicial', home.includes('id="home-story-add"')],
   ['modal de Stories fica embutido na tela inicial', home.includes('id="home-story-composer"')],
@@ -45,8 +47,8 @@ const checks = [
   ['GPS tem permissões nativas configuradas no Android e iOS', androidConfig.includes('android.permission.ACCESS_FINE_LOCATION') && androidConfig.includes('android.permission.ACCESS_COARSE_LOCATION') && iosConfig.includes('NSLocationWhenInUseUsageDescription')],
   ['Explorar reúne atalhos de humor, criadores, música, notícias e Funk Consciente', home.includes('id="radar-funk-consciente"') && home.includes('Explorar — vídeos e novidades') && home.includes('videos+engracados+brasil+shorts') && home.includes('criadores+influenciadores+brasil+shorts') && home.includes('funk+consciente+clipes+musica') && home.includes('news.google.com/search?q=funk') && home.includes('funk+consciente+entrevistas+projetos+sociais')],
   ['atalho independente Estúdio/câmera removido da navegação principal', !home.includes('href="./estudio.html"') && !home.includes('📸 Estúdio')],
-  ['biblioteca mantém os 20 Shorts enviados e player incorporado do YouTube', (youtubeFeed.match(/'([A-Za-z0-9_-]{11})'/g)||[]).length >= 20 && youtubeFeed.includes('youtube-nocookie.com/embed/') && home.includes('<script type="module" src="./youtube-feed.js"></script>')],
-  ['tela inicial renderiza só os seis vídeos originais e mantém os 20 Shorts preservados para Explorar', youtubeFeed.includes('const HOME_VIDEOS = [') && youtubeFeed.includes('const SHORTS = [') && youtubeFeed.includes('const videos=HOME_VIDEOS;') && !youtubeFeed.includes('SHORTS.concat(') && youtubeFeed.includes('Koe Fala Tu') && youtubeFeed.includes('navigator.share')],
+  ['biblioteca mantém 25 Shorts do YouTube e player incorporado', shortsBlock && (shortsBlock[1].match(/'([A-Za-z0-9_-]{11})'/g)||[]).length === 25 && youtubeFeed.includes('youtube-nocookie.com/embed/') && home.includes('<script type="module" src="./youtube-feed.js"></script>')],
+  ['tela inicial renderiza exatamente nove vídeos horizontais e separa os Shorts em Explorar', homeVideosBlock && (homeVideosBlock[1].match(/\{id:/g)||[]).length === 9 && youtubeFeed.includes('const videos=HOME_VIDEOS;') && !youtubeFeed.includes('SHORTS.concat(') && youtubeFeed.includes('Koe Fala Tu') && youtubeFeed.includes('navigator.share')],
   ['curtidas e comentários usam tabelas com RLS e propriedade por usuário', videoPolicy.includes('create table if not exists public.video_likes') && videoPolicy.includes('create table if not exists public.video_comments') && videoPolicy.includes('enable row level security') && videoPolicy.includes('auth.uid()')],
   ['câmera frontal/traseira e efeitos permanecem dentro do modal de Stories', home.includes('id="home-story-flip-button"') && home.includes('data-story-effect="night"') && home.includes('id="home-story-composer"') && story.includes("facingMode = facingMode === 'environment' ? 'user' : 'environment'")],
   ['encerramento da câmera aguarda o MediaRecorder finalizar o último trecho', story.includes("activeRecorder.addEventListener('stop', releaseCameraResources, { once: true })") && story.includes('activeRecorder.stop();')],
