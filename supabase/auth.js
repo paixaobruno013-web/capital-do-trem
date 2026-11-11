@@ -1613,3 +1613,19 @@ export async function deleteAdminPrivateGalleryItem(id) {
   return true;
 }
 
+
+
+// Publicações salvas: coleção particular sincronizada pela conta.
+export async function getMySavedPosts() {
+ const supabase=initSupabase();const {data:{user},error:userError}=await supabase.auth.getUser();if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para ver seus itens salvos.');
+ const {data:saved,error:savedError}=await supabase.from('saved_posts').select('post_id,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(200);if(savedError)throw savedError;
+ const ids=(saved||[]).map(row=>row.post_id);if(!ids.length)return [];
+ const {data:posts,error:postsError}=await supabase.from('posts').select('id,content,created_at').in('id',ids).eq('status','published');if(postsError)throw postsError;
+ const byId=new Map((posts||[]).map(post=>[post.id,post]));return ids.map(id=>byId.get(id)).filter(Boolean);
+}
+export async function toggleSavedPost(postId) {
+ const supabase=initSupabase();const {data:{user},error:userError}=await supabase.auth.getUser();if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para salvar publicações.');if(!postId)throw new Error('Publicação inválida.');
+ const {data:existing,error:lookupError}=await supabase.from('saved_posts').select('post_id').eq('user_id',user.id).eq('post_id',postId).maybeSingle();if(lookupError)throw lookupError;
+ if(existing){const {error}=await supabase.from('saved_posts').delete().eq('user_id',user.id).eq('post_id',postId);if(error)throw error;return false;}
+ const {error}=await supabase.from('saved_posts').insert({user_id:user.id,post_id:postId});if(error)throw error;return true;
+}
