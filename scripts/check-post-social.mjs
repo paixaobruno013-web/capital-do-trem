@@ -22,7 +22,7 @@ const checks = [
   ['mural mostra botão de curtir e contagem', /getPostSocial\(item\.id\)[\s\S]*?Curtido[\s\S]*?likeCount/.test(home)],
   ['mural mostra lista e formulário de comentários', /Comentários[\s\S]*?post-comment-form[\s\S]*?addPostComment\(item\.id/.test(home)],
   ['compartilhamento privado continua disponível', /Koe Fala Tu[\s\S]*?share_text/.test(home)],
-  ['área Fazer amigos permanece no menu e na navegação', /data-page="amigos"/.test(home) && /id="amigos"/.test(home)],
+  ['Fazer Amigos fica abaixo do bate-papo sem ícone extra na tela inicial', !/data-page="amigos"/.test(home) && /id="fazer-amigos"/.test(chat)],
   ['busca e filtro por cidade ficam abaixo do bate-papo', /id="chat-friends-search"/.test(chat) && /id="chat-friends-distance"/.test(chat) && /id="fazer-amigos"/.test(chat)],
   ['diretório consulta somente perfis públicos', /getPublicProfiles\(\)/.test(chat) && /\.eq\('is_public', true\)/.test(auth)],
   ['filtro do próprio perfil usa a sessão autenticada sem variável global inexistente', /profile\.user_id!==session\?\.user\?\.id/.test(chat) && !/profile\.user_id!==user\?\.id/.test(chat)],
