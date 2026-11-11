@@ -1599,7 +1599,8 @@ function renderHomeEventFeed(events){
   const events=await module.getPublishedEvents();
   renderHomeEventFeed(events);
   const refreshHomeFeed=async()=>{try{renderHomeEventFeed(await module.getPublishedEvents());}catch(error){console.warn('Não foi possível atualizar o feed de eventos:',error);}};
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshHomeFeed();});\n  window.addEventListener('capital:events-updated',refreshHomeFeed);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshHomeFeed();});
+  window.addEventListener('capital:events-updated',refreshHomeFeed);
   const nowForExpiry=new Date();
   const nextLocalMidnight=new Date(nowForExpiry.getFullYear(),nowForExpiry.getMonth(),nowForExpiry.getDate()+1,0,0,5);
   window.setTimeout(refreshHomeFeed,Math.max(1000,nextLocalMidnight-nowForExpiry));
