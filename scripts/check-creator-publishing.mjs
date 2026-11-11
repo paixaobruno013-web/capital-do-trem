@@ -49,7 +49,8 @@ const checks = [
   ['curtidas e comentários usam tabelas com RLS e propriedade por usuário', videoPolicy.includes('create table if not exists public.video_likes') && videoPolicy.includes('create table if not exists public.video_comments') && videoPolicy.includes('enable row level security') && videoPolicy.includes('auth.uid()')],
   ['câmera frontal/traseira e efeitos permanecem dentro do modal de Stories', home.includes('id="home-story-flip-button"') && home.includes('data-story-effect="night"') && home.includes('id="home-story-composer"') && story.includes("facingMode = facingMode === 'environment' ? 'user' : 'environment'")],
   ['encerramento da câmera aguarda o MediaRecorder finalizar o último trecho', story.includes("activeRecorder.addEventListener('stop', releaseCameraResources, { once: true })") && story.includes('activeRecorder.stop();')],
-  ['gravação não finge aplicar efeitos se captureStream não estiver disponível', story.includes("throw new Error('Canvas captureStream indisponível')") && story.includes('if (!videoStream)')]
+  ['gravação não finge aplicar efeitos se captureStream não estiver disponível', story.includes("throw new Error('Canvas captureStream indisponível')") && story.includes('if (!videoStream)')],
+  ['câmera pendente é encerrada se a pessoa fechar os Stories antes da permissão', story.includes('let cameraRequestId = 0') && story.includes('const requestId = ++cameraRequestId') && story.includes('requestId !== cameraRequestId') && story.includes('cameraRequestId += 1;')]
 ];
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO') + ' ' + name);
 const failed = checks.filter(([, ok]) => !ok);
