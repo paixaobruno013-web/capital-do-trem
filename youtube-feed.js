@@ -7,6 +7,14 @@ const status = document.getElementById('youtube-feed-status');
 let initialSessionPromise;
 function getInitialSession(){if(!initialSessionPromise)initialSessionPromise=getCurrentSession().catch(()=>null);return initialSessionPromise;}
 
+// Biblioteca original de 20 Shorts enviada pelo usuário; será exibida nas quatro categorias de Explorar.
+const SHORTS = [
+  'XG6J1-wxmqY','2pi4Chy_T7k','AYaC4UX3LQM','Ln7uxqY68u4','MBXrQa52x7I',
+  '6g-LDLVRXmM','l0LLjmqqGPg','6oqpTDwEz_k','x4Wbv87Pl9k','Hhe4uvhFh5M',
+  '5xUC-8Zu--s','8YI6twT5FIQ','uDmGRWA_hMU','78IJ7SVpvI4','v2fvGO7GaHs',
+  'VLDQtWADNA0','Kjsypc0JzB0','dFVVsD0Nsfg','NcMLXKNkGzg','Pu_QnJPSntA'
+].map((id,index)=>({id,title:'Vídeo enviado '+(index+1)}));
+
 const HOME_VIDEOS = [
   {id:'LmI04iuudmQ',title:'Vídeo do canal Capital do Trem'},
   {id:'DDHrNCagaD0',title:'Vídeo do canal Capital do Trem'},
