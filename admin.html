@@ -5,6 +5,7 @@
 <meta name="theme-color" content="#000000"><meta name="description" content="Painel de administração do Capital do Trem.">
 <title>Administração — Capital do Trem</title>
 <style>
+.private-gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px}.private-gallery-card{min-width:0;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel2)}.private-gallery-card img,.private-gallery-card video{display:block;width:100%;max-height:320px;object-fit:contain;background:#000;border-radius:9px}.private-gallery-card .meta{overflow-wrap:anywhere;font-size:13px;color:var(--muted);margin:8px 0}.private-gallery-card .actions{margin-top:8px}
 :root{color-scheme:dark;--bg:#000;--panel:#111;--panel2:#191919;--fg:#fff;--muted:#aaa;--red:#ed1c24;--line:#333}
 body.light{color-scheme:light;--bg:#f5f5f5;--panel:#fff;--panel2:#eee;--fg:#111;--muted:#555;--line:#ddd}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,Arial,sans-serif}
@@ -117,6 +118,7 @@ audio{width:100%;}
 <a class="command-link" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener noreferrer"><span class="glyph">▶</span>YouTube</a>
 <a class="command-link" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener noreferrer"><span class="glyph">◎</span>Instagram</a>
 <a class="command-link" href="#queue"><span class="glyph">⚙</span>Moderação</a>
+<a class="command-link" href="#private-gallery-section"><span class="glyph">🔒</span>Álbum privado</a>
 </nav>
 
 <section class="command-section" id="header-background-section">
@@ -267,6 +269,23 @@ audio{width:100%;}
  </div>
 </section>
 
+
+<section class="command-section" id="private-gallery-section">
+ <div class="actions" style="justify-content:space-between;align-items:center">
+  <h2>🔒 Álbum privado do administrador</h2>
+  <button id="private-gallery-refresh" class="secondary" type="button">Atualizar álbum</button>
+ </div>
+ <p class="muted">Somente a conta administradora consegue visualizar e abrir as mídias. Os arquivos enviados pela comunidade aparecem aqui apenas quando há consentimento; os arquivos são privados e expiram em 48 horas.</p>
+ <div class="item">
+  <label for="private-gallery-file">Adicionar foto ou vídeo ao álbum</label>
+  <input id="private-gallery-file" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm">
+  <button id="private-gallery-upload" type="button">Guardar no álbum privado</button>
+  <p id="private-gallery-upload-status" class="status" role="status" aria-live="polite">JPG, PNG, WebP, MP4 ou WebM • até 20 MB.</p>
+ </div>
+ <p id="private-gallery-status" class="status" role="status" aria-live="polite">Entre como administrador para carregar o álbum.</p>
+ <div id="private-gallery-list" class="private-gallery-grid"><p class="muted">Conteúdo protegido por acesso administrativo.</p></div>
+</section>
+
 <section class="command-section" id="admin-stories-section">
 <h2>Stories do administrador</h2>
 <p class="muted">Publique avisos, novidades, fotos ou vídeos. O aro da foto oficial ficará verde enquanto houver Stories novos. Cada Story fica disponível por 24 horas.</p>
@@ -299,7 +318,7 @@ const loginStatus=document.getElementById('login-status'),queueStatus=document.g
 const queue=document.getElementById('queue'),loginForm=document.getElementById('login-form');
 let auth=null,currentUser=null;
 function node(tag,cls,text){const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;}
-function showLoggedOut(){currentUser=null;loginPanel.hidden=false;dashboard.hidden=true;}
+function showLoggedOut(){currentUser=null;loginPanel.hidden=false;dashboard.hidden=true;const gallery=document.getElementById('private-gallery-list');if(gallery)gallery.replaceChildren(node('p','muted','Conteúdo protegido por acesso administrativo.'));}
 async function enterDashboard(user){
  currentUser=user;
  // A conta proprietária pode inicializar o primeiro administrador com validação no banco.
@@ -311,6 +330,7 @@ async function enterDashboard(user){
  await loadBranding();
  await loadQueue();
  await loadChatModeration();
+ await loadPrivateGallery();
 }
 
 async function removeImageSetting(kind,button,status,after){
@@ -659,6 +679,48 @@ async function loadChatModeration(){
   }
  }catch(error){area.replaceChildren(node('p','muted','Não foi possível carregar a moderação do Koe Fala Tu agora. Confira a conexão e as permissões do banco e tente atualizar a fila.'));}
 }
+
+async function loadPrivateGallery(){
+ const area=document.getElementById('private-gallery-list');
+ const status=document.getElementById('private-gallery-status');
+ area.replaceChildren();status.textContent='Carregando conteúdo privado…';
+ try{
+  const items=await auth.getAdminPrivateGallery();
+  if(!items.length){area.append(node('p','muted','O álbum está vazio no momento.'));status.textContent='Nenhuma foto ou vídeo ativo. Os itens expiram em 48 horas.';return;}
+  for(const item of items){
+   const card=node('article','private-gallery-card');
+   const media=item.mime_type.startsWith('video/')?node('video',''):node('img','');
+   media.src=item.signed_url;
+   if(media.tagName==='VIDEO'){media.controls=true;media.playsInline=true;media.preload='metadata';media.setAttribute('aria-label','Vídeo privado enviado por '+(item.sender_display_name||'Participante'));}
+   else {media.alt='Foto privada enviada por '+(item.sender_display_name||'Participante');media.loading='lazy';}
+   const sender=node('strong','',item.sender_display_name||'Participante');
+   const date=node('p','meta','Recebido em '+new Date(item.created_at).toLocaleString('pt-BR'));
+   const expiry=node('p','meta','Expira em '+new Date(item.expires_at).toLocaleString('pt-BR'));
+   const actions=node('div','actions');
+   const open=node('a','btn secondary','Abrir mídia');open.href=item.signed_url;open.target='_blank';open.rel='noopener noreferrer';
+   const remove=node('button','secondary','Excluir');remove.addEventListener('click',async()=>{
+    if(!window.confirm('Excluir definitivamente esta mídia do álbum privado?'))return;
+    remove.disabled=true;
+    try{await auth.deleteAdminPrivateGalleryItem(item.id);await loadPrivateGallery();}
+    catch(error){status.textContent=error?.message||'Não foi possível excluir esta mídia.';remove.disabled=false;}
+   });
+   actions.append(open,remove);card.append(media,sender,date,expiry,actions);area.append(card);
+  }
+  status.textContent=items.length+' arquivo(s) privado(s) ativo(s). Links temporários expiram em 15 minutos; o conteúdo expira em 48 horas.';
+ }catch(error){area.replaceChildren(node('p','muted','Não foi possível abrir o álbum.'));status.textContent=error?.message||'Falha ao carregar o álbum privado.';}
+}
+const privateGalleryFile=document.getElementById('private-gallery-file');
+const privateGalleryUpload=document.getElementById('private-gallery-upload');
+const privateGalleryUploadStatus=document.getElementById('private-gallery-upload-status');
+privateGalleryUpload.addEventListener('click',async()=>{
+ const file=privateGalleryFile.files?.[0];if(!file){privateGalleryUploadStatus.textContent='Escolha uma foto ou vídeo primeiro.';return;}
+ privateGalleryUpload.disabled=true;privateGalleryUploadStatus.textContent='Guardando mídia privada…';
+ try{await auth.uploadAdminPrivateGalleryItem(file);privateGalleryFile.value='';privateGalleryUploadStatus.textContent='Mídia guardada no álbum privado.';await loadPrivateGallery();}
+ catch(error){privateGalleryUploadStatus.textContent=error?.message||'Não foi possível guardar a mídia.';}
+ finally{privateGalleryUpload.disabled=false;}
+});
+document.getElementById('private-gallery-refresh').addEventListener('click',loadPrivateGallery);
+
 loginForm.addEventListener('submit',async event=>{
  event.preventDefault();const button=document.getElementById('login-button');button.disabled=true;loginStatus.textContent='Verificando acesso...';
  try{await auth.signInAccount({email:document.getElementById('admin-email').value.trim(),password:document.getElementById('admin-password').value});const session=await auth.getCurrentSession();if(session?.user)await enterDashboard(session.user);}
@@ -666,7 +728,7 @@ loginForm.addEventListener('submit',async event=>{
  finally{button.disabled=false;}
 });
 document.getElementById('refresh-queue').textContent='Atualizar tudo';
-document.getElementById('refresh-queue').addEventListener('click',async()=>{await Promise.all([loadQueue(),loadChatModeration()]);});
+document.getElementById('refresh-queue').addEventListener('click',async()=>{await Promise.all([loadQueue(),loadChatModeration(),loadPrivateGallery()]);});
 document.getElementById('refresh-chat').addEventListener('click',loadChatModeration);
 document.getElementById('logout').addEventListener('click',async()=>{await auth.signOutAccount();showLoggedOut();loginStatus.textContent='Você saiu do painel.';});
 try{
