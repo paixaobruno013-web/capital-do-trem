@@ -119,6 +119,8 @@ jobs:
           echo "Políticas de perfil, configurações e avatar sincronizado verificadas."
       - name: Verificar fluxo de exclusão de conta
         run: node scripts/check-account-deletion.mjs
+      - name: Verificar biblioteca musical sincronizada
+        run: node scripts/check-music-library.mjs
       - name: Conferir arquivos essenciais
         run: |
           test -s www/index.html
