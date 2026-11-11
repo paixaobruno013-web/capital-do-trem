@@ -17,7 +17,7 @@ required_permissions = [
 for permission in required_permissions:
     declaration = f'<uses-permission android:name="{permission}" />'
     if permission not in manifest_text:
-        manifest_text = manifest_text.replace("<application", f"    {declaration}\\n    <application", 1)
+        manifest_text = manifest_text.replace("<application", f"    {declaration}\n    <application", 1)
 manifest.write_text(manifest_text, encoding="utf-8")
 print("Permissões nativas de câmera e áudio declaradas no AndroidManifest.xml.")
 
