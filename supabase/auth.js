@@ -1423,7 +1423,7 @@ export async function getAdminStories() {
   const supabase = initSupabase();
   if (!(await isCurrentUserAdmin())) throw new Error('Acesso administrativo não autorizado.');
   const { data, error } = await supabase.from('admin_stories')
-    .select('id,media_url,media_type,caption,created_at,expires_at,published')
+    .select('id,media_url,media_type,caption,music_url,music_title,music_artist,music_start_seconds,music_volume,created_at,expires_at,published')
     .order('created_at', { ascending: false })
     .limit(30);
   if (error) throw error;
@@ -1511,7 +1511,7 @@ export async function createMyStory({ file, caption = '', musicSongId = '', musi
 export async function getActiveUserStories() {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('user_stories')
-    .select('id,author_id,display_name,username,avatar_url,media_url,media_type,caption,created_at,expires_at')
+    .select('id,author_id,display_name,username,avatar_url,media_url,media_type,caption,music_url,music_title,music_artist,music_start_seconds,music_volume,created_at,expires_at')
     .gt('expires_at', new Date().toISOString())
     .order('created_at', { ascending: true });
   if (error) throw error;
