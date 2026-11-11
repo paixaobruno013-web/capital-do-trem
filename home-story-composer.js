@@ -34,6 +34,7 @@ let selectedFile = null;
 let previewUrl = '';
 let recordLimit = null;
 let busy = false;
+let cameraRequestId = 0;
 
 function say(text) { if (status) status.textContent = text; }
 function effectCss() { return effects[activeEffect]?.css || 'none'; }
@@ -84,6 +85,7 @@ function setSelected(file) {
   say(file.name + ' • ' + (file.size / 1024 / 1024).toFixed(1) + ' MB');
 }
 async function startCamera() {
+  const requestId = ++cameraRequestId;
   stopCamera();
   clearPreview();
   if (!navigator.mediaDevices?.getUserMedia) {
@@ -92,10 +94,16 @@ async function startCamera() {
     return false;
   }
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
+    const cameraStream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: facingMode }, width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: true
     });
+    // The user may close the composer or switch cameras while permission is pending.
+    if (requestId !== cameraRequestId || !modal?.classList.contains('is-open')) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      return false;
+    }
+    stream = cameraStream;
     live.srcObject = stream;
     live.hidden = false;
     applyEffect();
@@ -104,6 +112,7 @@ async function startCamera() {
     say('Câmera pronta. Escolha um efeito ou capture sua mídia.');
     return true;
   } catch (error) {
+    if (requestId !== cameraRequestId || !modal?.classList.contains('is-open')) return false;
     message.textContent = 'Não foi possível abrir a câmera. Confira a permissão ou use o álbum.';
     say(error?.name === 'NotAllowedError'
       ? 'Permita o acesso à câmera nas configurações do aparelho ou escolha uma mídia do álbum.'
@@ -149,6 +158,8 @@ function releaseCameraResources() {
   stopCamera();
 }
 function closeComposer() {
+  // Invalidate any getUserMedia request that has not resolved yet.
+  cameraRequestId += 1;
   const activeRecorder = recorder;
   if (activeRecorder?.state === 'recording') {
     // Let MediaRecorder finish writing its final chunk before stopping its tracks.
