@@ -1192,6 +1192,52 @@ export async function saveAdminOpeningMediaSettings(options = {}) {
 /* Imagem de fundo do painel central, com enquadramento e desfoque ajustáveis. */
 
 
+/* Envia vídeos maiores por TUS para tolerar oscilações de rede no celular. */
+async function uploadOpeningVideoFile(supabase, path, file, contentType, onProgress) {
+  if (file.size <= 6 * 1024 * 1024) {
+    const { error } = await supabase.storage.from('capital-do-trem-media').upload(path, file, {
+      contentType, cacheControl: '3600', upsert: false
+    });
+    if (error) throw error;
+    onProgress?.(100);
+    return;
+  }
+
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError) throw sessionError;
+  if (!session?.access_token) throw new Error('Sua sessão expirou. Entre novamente no painel administrador.');
+
+  let TusUpload;
+  try {
+    ({ Upload: TusUpload } = await import('https://cdn.jsdelivr.net/npm/tus-js-client@4/+esm'));
+  } catch {
+    throw new Error('Não foi possível iniciar o envio seguro do vídeo. Atualize o painel e tente novamente.');
+  }
+
+  const projectId = new URL(SUPABASE_URL).hostname.split('.')[0];
+  await new Promise((resolve, reject) => {
+    const upload = new TusUpload(file, {
+      endpoint: `https://${projectId}.storage.supabase.co/storage/v1/upload/resumable`,
+      retryDelays: [0, 3000, 5000, 10000, 20000],
+      headers: { authorization: `Bearer ${session.access_token}` },
+      uploadDataDuringCreation: true,
+      removeFingerprintOnSuccess: true,
+      metadata: {
+        bucketName: 'capital-do-trem-media',
+        objectName: path,
+        contentType,
+        cacheControl: '3600'
+      },
+      chunkSize: 6 * 1024 * 1024,
+      onError: reject,
+      onProgress: (uploaded, total) => onProgress?.(Math.min(99, Math.round(uploaded / total * 100))),
+      onSuccess: resolve
+    });
+    upload.start();
+  });
+  onProgress?.(100);
+}
+
 /* Permite ao administrador substituir a abertura por vídeo MP4 ou WebM. */
 export async function saveAdminOpeningVideo(file, options = {}) {
   const supabase = initSupabase();
@@ -1200,12 +1246,11 @@ export async function saveAdminOpeningVideo(file, options = {}) {
   if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode alterar o vídeo de abertura.');
   if (!(file instanceof File)) throw new Error('Escolha um vídeo MP4 ou WebM.');
   const format = await getBrandingUploadFormat(file, { mp4: true, webm: true });
-  if (file.size < 1 || file.size > 50 * 1024 * 1024) throw new Error('O vídeo deve ter até 50 MB.');
+  if (file.size < 1 || file.size > 20 * 1024 * 1024) throw new Error('O vídeo deve ter até 20 MB. O armazenamento atual do aplicativo aceita esse limite.');
   const path = user.id + '/branding/opening-video-' + crypto.randomUUID() + '.' + format.extension;
-  const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, { contentType: format.contentType, cacheControl: '3600', upsert: false });
-  if (uploadError) throw uploadError;
+  await uploadOpeningVideoFile(supabase, path, file, format.contentType, options.onProgress);
   const { data: publicData } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
-  if (!publicData?.publicUrl) throw new Error('Não foi possível gerar o endereço público do vídeo.');
+  if (!publicData?.publicUrl) throw new Error('O vídeo foi enviado, mas não foi possível gerar o endereço público.');
   const now = new Date().toISOString();
   const { error: saveError } = await supabase.from('site_settings').upsert([
     { setting_key: 'app_opening_video_url', setting_value: publicData.publicUrl, updated_at: now },
