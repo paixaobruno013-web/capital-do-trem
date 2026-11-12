@@ -38,6 +38,15 @@ body.light .card,body.light .panel,body.light .conversation,body.light .message-
 <h1>Verificação do banco de dados</h1>
 <p class="muted">Esta página faz apenas consultas de leitura. Não cria, altera nem apaga dados.</p>
 </header>
+<section class="card" aria-labelledby="pwa-title">
+ <strong id="pwa-title">Instalação no Chrome e Safari</strong>
+ <p class="muted">Esta verificação confere os arquivos básicos de instalação e o funcionamento do modo offline neste navegador.</p>
+ <div class="actions"><button id="pwa-check" type="button">Verificar instalação</button></div>
+ <div id="pwa-results" aria-live="polite">
+  <p class="muted">Toque em Verificar instalação para conferir este aparelho.</p>
+ </div>
+ <p class="muted">No Android: Chrome → menu ⋮ → Instalar app. No iPhone: Safari → Compartilhar → Adicionar à Tela de Início.</p>
+</section>
 <section class="card">
 <p>Toque no botão para verificar conexão, perfis, artistas, eventos, divulgações, músicas, bate-papo, curtidas, comentários e espaços de mídia. A verificação é somente leitura.</p>
 <div class="actions"><button id="check" type="button">Verificar agora</button><a class="btn" href="./">Voltar ao aplicativo</a></div>
@@ -182,5 +191,43 @@ renderHealth();
 
 const themeButton=document.getElementById('theme-toggle');const themeKey='capitaldotrem_theme_v1';function setTheme(value){const light=value==='light';document.body.classList.toggle('light',light);themeButton.textContent=light?'🌙 Escuro':'☀️ Claro';themeButton.setAttribute('aria-pressed',String(light));document.querySelector('meta[name="theme-color"]').content=light?'#f5f5f5':'#000000';}let initial='dark';try{initial=localStorage.getItem(themeKey)==='light'?'light':'dark';}catch{}setTheme(initial);themeButton.addEventListener('click',()=>{const next=document.body.classList.contains('light')?'dark':'light';setTheme(next);try{localStorage.setItem(themeKey,next);}catch{}});window.addEventListener('storage',event=>{if(event.key===themeKey)setTheme(event.newValue==='light'?'light':'dark');});
 </script>
-</main><script src="./update.js" defer></script>
+</main>
+<script>
+(()=> {
+ const button=document.getElementById('pwa-check');
+ const target=document.getElementById('pwa-results');
+ if(!button||!target)return;
+ const row=(label,ok,detail)=>{
+  const item=document.createElement('div');
+  item.className='result '+(ok?'good':'bad');
+  const title=document.createElement('strong');title.textContent=(ok?'✓ ':'✕ ')+label;
+  const text=document.createElement('p');text.className='muted';text.textContent=detail;
+  item.append(title,text);target.append(item);
+ };
+ button.addEventListener('click',async()=>{
+  button.disabled=true;target.replaceChildren();
+  row('Conexão segura HTTPS',window.isSecureContext,window.isSecureContext?'O navegador está usando uma origem segura.':'Abra o endereço oficial HTTPS do Capital do Trem.');
+  try{
+   const response=await fetch('./manifest.webmanifest',{cache:'no-store'});
+   if(!response.ok)throw new Error('Manifesto HTTP '+response.status);
+   const manifest=await response.json();
+   const valid=manifest.name==='Capital do Trem'&&manifest.display==='standalone'&&Array.isArray(manifest.icons)&&manifest.icons.some(icon=>icon.src&&icon.type==='image/svg+xml');
+   row('Manifesto de instalação',valid,valid?'Nome, modo de abertura e ícone foram encontrados.':'O manifesto existe, mas precisa de revisão.');
+  }catch(error){row('Manifesto de instalação',false,error.message||'Não foi possível ler o manifesto.');}
+  if('serviceWorker' in navigator){
+   try{
+    const registration=await navigator.serviceWorker.getRegistration('./');
+    const active=!!registration?.active;
+    row('Service Worker',active,active?'O trabalhador do aplicativo está ativo neste navegador.':'Ainda não há Service Worker ativo. Mantenha a internet ligada e recarregue a página.');
+   }catch(error){row('Service Worker',false,error.message||'Não foi possível consultar o Service Worker.');}
+  }else row('Service Worker',false,'Este navegador não oferece suporte ao modo offline do aplicativo.');
+  const standalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+  const ua=navigator.userAgent||'';
+  const ios=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  row('Instalação neste aparelho',standalone,standalone?'O Capital do Trem já está aberto como aplicativo instalado.':ios?'Para instalar, use Safari → Compartilhar → Adicionar à Tela de Início.':'Se o Chrome oferecer, toque em Instalar app ou Adicionar à tela inicial.');
+  button.disabled=false;
+ });
+})();
+</script>
+<script src="./update.js" defer></script>
 </body></html>
