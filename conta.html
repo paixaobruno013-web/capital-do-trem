@@ -195,7 +195,6 @@ audio{width:100%;}
   <label class="artist-audio-drop" for="artist-song-submit-file"><span>＋</span><strong>Escolher arquivo de áudio</strong><small>MP3, M4A, AAC, WAV ou OGG • até 50 MB</small></label>
   <input id="artist-song-submit-file" type="file" accept="audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/x-wav,audio/ogg,.mp3,.m4a,.aac,.wav,.ogg" required hidden>
   <div id="artist-song-submit-file-info" class="artist-audio-file-info">Nenhum arquivo selecionado</div>
-  <div class="artist-song-preview-wrap"><audio id="artist-song-submit-preview" controls preload="metadata" hidden></audio></div>
   <div class="artist-song-fields">
    <div><label for="artist-song-submit-title">Nome da música *</label><input id="artist-song-submit-title" maxlength="120" placeholder="Título da sua faixa" required></div>
    <div><label for="artist-song-submit-artist">Nome artístico *</label><input id="artist-song-submit-artist" maxlength="100" placeholder="Como seu público conhece você" required></div>
@@ -568,8 +567,6 @@ const artistSongForm=document.getElementById('artist-song-submit-form');
 const artistSongStatus=document.getElementById('artist-song-submit-status');
 const artistSongHistory=document.getElementById('artist-song-submit-history');
 const artistSongFile=document.getElementById('artist-song-submit-file');
-const artistSongPreview=document.getElementById('artist-song-submit-preview');
-let artistSongPreviewUrl='';
 async function loadArtistSongArea(profile){
  const submit=document.getElementById('artist-song-submit-button');
  if(!profile){
@@ -597,15 +594,12 @@ async function loadArtistSongArea(profile){
  }catch(error){artistSongHistory.textContent='Não foi possível carregar seu histórico agora.';}
 }
 artistSongFile?.addEventListener('change',()=>{
- if(artistSongPreviewUrl)URL.revokeObjectURL(artistSongPreviewUrl);
- artistSongPreviewUrl='';
  const file=artistSongFile.files?.[0];
  const info=document.getElementById('artist-song-submit-file-info');
- if(!file){info.textContent='Nenhum arquivo selecionado';artistSongPreview.hidden=true;artistSongPreview.removeAttribute('src');return;}
+ if(!file){info.textContent='Nenhum arquivo selecionado';return;}
  info.textContent=file.name+' • '+(file.size/1024/1024).toFixed(1)+' MB';
  if(file.size>50*1024*1024){artistSongStatus.textContent='O arquivo ultrapassa o limite de 50 MB.';artistSongFile.value='';info.textContent='Escolha um arquivo de até 50 MB.';return;}
- artistSongPreviewUrl=URL.createObjectURL(file);artistSongPreview.src=artistSongPreviewUrl;artistSongPreview.hidden=false;
-});
+ });
 artistSongForm?.addEventListener('submit',async event=>{
  event.preventDefault();
  const button=document.getElementById('artist-song-submit-button');
@@ -619,9 +613,8 @@ artistSongForm?.addEventListener('submit',async event=>{
    artistName:document.getElementById('artist-song-submit-artist').value.trim(),
    producerName:document.getElementById('artist-song-submit-producer').value.trim()
   });
-  artistSongForm.reset();artistSongPreview.hidden=true;artistSongPreview.removeAttribute('src');
-  if(artistSongPreviewUrl)URL.revokeObjectURL(artistSongPreviewUrl);artistSongPreviewUrl='';
-  document.getElementById('artist-song-submit-file-info').textContent='Nenhum arquivo selecionado';
+  artistSongForm.reset();
+   document.getElementById('artist-song-submit-file-info').textContent='Nenhum arquivo selecionado';
   artistSongStatus.textContent=saved.status==='published'?'Sua música já está no catálogo!':'Sua música foi publicada no catálogo!';
   await loadArtistSongArea(await auth.getMyArtistProfile());
  }catch(error){artistSongStatus.textContent=error?.message||'Não foi possível enviar sua música. Confira o arquivo e tente novamente.';}
