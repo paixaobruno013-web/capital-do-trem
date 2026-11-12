@@ -127,7 +127,7 @@ audio{width:100%;}
 <p class="muted">Um lugar só para atualizar as imagens principais e o vídeo de abertura. As alterações publicadas aparecem para todos.</p>
 <div class="item"><h3>1. Cabeceira do perfil</h3><p class="muted">Imagem atrás da foto e do nome Capital do Trem.</p><img id="casa-header-preview" alt="Prévia da cabeceira" style="display:block;width:100%;max-width:420px;aspect-ratio:16/6;object-fit:cover;border-radius:12px;background:#080808"><label for="casa-header-file">Escolher imagem da cabeceira</label><input id="casa-header-file" type="file" accept="image/jpeg,image/png,image/webp"><button id="casa-header-save" type="button">Salvar cabeceira</button><p id="casa-header-status" class="status" role="status" aria-live="polite">Selecione uma imagem para atualizar.</p></div>
 <div class="item"><h3>2. Capa do painel</h3><p class="muted">Envie a arte completa com a frase “AQUI A MÚSICA NÃO PARA!”.</p><img id="casa-cover-preview" alt="Prévia da capa" style="display:block;width:100%;max-width:420px;aspect-ratio:16/9;object-fit:cover;border-radius:12px;background:#080808"><label for="casa-cover-file">Escolher capa do painel</label><input id="casa-cover-file" type="file" accept="image/jpeg,image/png,image/webp"><button id="casa-cover-save" type="button">Salvar capa</button><p id="casa-cover-status" class="status" role="status" aria-live="polite">A frase deve estar na própria imagem enviada.</p></div>
-<div class="item"><h3>3. Vídeo de abertura e áudio</h3><p class="muted">Atualize o vídeo e escolha se o som começa ativo. Android e iPhone podem exigir um toque para liberar o áudio automático.</p><video id="casa-opening-preview" controls playsinline muted style="display:none;width:100%;max-width:280px;max-height:420px;background:#000;border-radius:12px"></video><label for="casa-opening-file">Escolher vídeo MP4 ou WebM (até 20 MB)</label><input id="casa-opening-file" type="file" accept="video/mp4,video/webm,.mp4,.webm"><label for="casa-opening-sound">Áudio do vídeo</label><select id="casa-opening-sound"><option value="on">Som ativo ao abrir</option><option value="off">Abrir sem som</option></select><label for="casa-opening-volume">Volume padrão</label><div class="range-row"><span class="muted">0% — 100%</span><output id="casa-opening-volume-value">70%</output><input id="casa-opening-volume" type="range" min="0" max="100" step="1" value="70"></div><button id="casa-opening-save" type="button">Salvar vídeo e opções de áudio</button><p id="casa-opening-status" class="status" role="status" aria-live="polite">O volume e a preferência de áudio ficam salvos para a abertura.</p></div>
+<div class="item"><h3>3. Vídeo de abertura e áudio</h3><p class="muted">Atualize o vídeo e escolha se o som começa ativo. Android e iPhone podem exigir um toque para liberar o áudio automático.</p><video id="casa-opening-preview" controls playsinline muted style="display:none;width:100%;max-width:280px;max-height:420px;background:#000;border-radius:12px"></video><label for="casa-opening-file">Escolher vídeo MP4 ou WebM (até 50 MB)</label><input id="casa-opening-file" type="file" accept="video/mp4,video/webm,.mp4,.webm"><label for="casa-opening-sound">Áudio do vídeo</label><select id="casa-opening-sound"><option value="on">Som ativo ao abrir</option><option value="off">Abrir sem som</option></select><label for="casa-opening-volume">Volume padrão</label><div class="range-row"><span class="muted">0% — 100%</span><output id="casa-opening-volume-value">70%</output><input id="casa-opening-volume" type="range" min="0" max="100" step="1" value="70"></div><button id="casa-opening-save" type="button">Salvar vídeo e opções de áudio</button><p id="casa-opening-status" class="status" role="status" aria-live="polite">O volume e a preferência de áudio ficam salvos para a abertura.</p></div>
 </section>
 <section class="command-section" id="header-background-section" hidden>
  <h2>Fundo do cabeçalho inicial • atrás da foto e do nome verificado</h2>
@@ -192,7 +192,7 @@ audio{width:100%;}
  <select id="opening-media-mode"><option value="image">Imagem • 10 segundos</option><option value="video">Vídeo • 10 segundos de abertura</option></select>
  <div class="item" id="opening-media-direct-panel">
   <h3>Envio direto da mídia de abertura</h3>
-  <p class="muted">Escolha separadamente: vídeo MP4/WebM até 20 MB ou imagem JPG/PNG/WebP até 5 MB.</p>
+  <p class="muted">Escolha separadamente: vídeo MP4/WebM até 50 MB ou imagem JPG/PNG/WebP até 5 MB.</p>
   <label for="opening-video-file-direct">Selecionar VÍDEO (MP4/WebM)</label><input id="opening-video-file-direct" type="file" accept="video/mp4,video/webm,.mp4,.webm">
   <video id="opening-video-preview-direct" controls playsinline muted style="display:none;width:100%;max-width:260px;max-height:420px;background:#000"></video>
   <label for="opening-video-audio-mode">Áudio do vídeo na abertura</label>
@@ -245,7 +245,7 @@ audio{width:100%;}
 
 <section class="command-section" id="opening-video-section" hidden>
  <h2>Substituir vídeo de abertura</h2>
- <p class="muted">Envie um vídeo MP4 ou WebM de até 20 MB. O vídeo será exibido em tela cheia na abertura do aplicativo; para permitir reprodução automática no Android e iPhone, ele começa sem áudio. A vinheta sonora do aplicativo continua independente.</p>
+ <p class="muted">Envie um vídeo MP4 ou WebM de até 50 MB. O vídeo será exibido em tela cheia na abertura do aplicativo; para permitir reprodução automática no Android e iPhone, ele começa sem áudio. A vinheta sonora do aplicativo continua independente.</p>
  <div class="item">
   <video id="opening-video-preview" controls playsinline muted style="display:none;width:100%;max-width:280px;height:497px;max-height:none;aspect-ratio:9/16;object-fit:cover;object-position:50% 50%;background:#000;border-radius:12px;margin:12px auto"></video>
   <label for="opening-video-file">Selecionar vídeo de abertura</label>
@@ -331,7 +331,7 @@ function setupCasaPanel(){
  const hf=document.getElementById('casa-header-file'),hp=document.getElementById('casa-header-preview'),hs=document.getElementById('casa-header-status');
  const cf=document.getElementById('casa-cover-file'),cp=document.getElementById('casa-cover-preview'),cs=document.getElementById('casa-cover-status');
  const vf=document.getElementById('casa-opening-file'),vp=document.getElementById('casa-opening-preview'),vs=document.getElementById('casa-opening-status'),sound=document.getElementById('casa-opening-sound'),vol=document.getElementById('casa-opening-volume'),volOut=document.getElementById('casa-opening-volume-value');
- const preview=(input,img,status,isVideo)=>input.addEventListener('change',()=>{const file=input.files?.[0];if(!file)return;const max=isVideo?20:8;const ext=String(file.name||'').split('.').pop().toLowerCase();const validVideo=isVideo&&(['mp4','webm'].includes(ext)||['video/mp4','video/webm'].includes(file.type));if(file.size<1||file.size>max*1024*1024){status.textContent='O vídeo precisa ter até 20 MB para caber no armazenamento atual.';input.value='';return;}if(isVideo&&!validVideo){status.textContent='Formato não reconhecido. Escolha um vídeo MP4 ou WebM.';input.value='';return;}const url=URL.createObjectURL(file);img.src=url;if(isVideo)img.style.display='block';status.textContent='Prévia carregada. Toque em salvar para publicar.';});
+ const preview=(input,img,status,isVideo)=>input.addEventListener('change',()=>{const file=input.files?.[0];if(!file)return;const max=isVideo?50:8;const ext=String(file.name||'').split('.').pop().toLowerCase();const validVideo=isVideo&&(['mp4','webm'].includes(ext)||['video/mp4','video/webm'].includes(file.type));if(file.size<1||file.size>max*1024*1024){status.textContent='O vídeo precisa ter até 50 MB.';input.value='';return;}if(isVideo&&!validVideo){status.textContent='Formato não reconhecido. Escolha um vídeo MP4 ou WebM.';input.value='';return;}const url=URL.createObjectURL(file);img.src=url;if(isVideo)img.style.display='block';status.textContent='Prévia carregada. Toque em salvar para publicar.';});
  preview(hf,hp,hs,false);preview(cf,cp,cs,false);preview(vf,vp,vs,true);
  vol.addEventListener('input',()=>volOut.textContent=vol.value+'%');
  document.getElementById('casa-header-save').addEventListener('click',async()=>{const f=hf.files?.[0],b=document.getElementById('casa-header-save');if(!f){hs.textContent='Escolha primeiro a imagem da cabeceira.';return;}b.disabled=true;hs.textContent='Publicando cabeceira…';try{hp.src=await auth.saveAdminHeaderBackground(f,{x:50,y:50,blur:0,fit:'cover'});hf.value='';hs.textContent='Cabeceira atualizada para todos!';}catch(e){hs.textContent=e?.message||'Falha ao salvar.';}finally{b.disabled=false;}});
@@ -419,7 +419,7 @@ openingMediaUnifiedFile.addEventListener('change',()=>{
  const isVideo=(file.type||'').startsWith('video/')||['mp4','webm'].includes(ext);
  const isImage=(file.type||'').startsWith('image/')||['jpg','jpeg','png','webp'].includes(ext);
  if(!isVideo&&!isImage){openingMediaUnifiedStatus.textContent='Formato não reconhecido. Use JPG, PNG, WebP, MP4 ou WebM.';return;}
- if(isVideo&&file.size>20*1024*1024){openingMediaUnifiedStatus.textContent='O vídeo precisa ter até 20 MB.';openingMediaUnifiedFile.value='';return;}
+ if(isVideo&&file.size>50*1024*1024){openingMediaUnifiedStatus.textContent='O vídeo precisa ter até 50 MB.';openingMediaUnifiedFile.value='';return;}
  if(isImage&&file.size>5*1024*1024){openingMediaUnifiedStatus.textContent='A imagem precisa ter até 5 MB.';openingMediaUnifiedFile.value='';return;}
  document.getElementById('opening-media-mode').value=isVideo?'video':'image';
  document.getElementById('opening-media-mode').dispatchEvent(new Event('change'));
@@ -487,7 +487,7 @@ document.getElementById('opening-media-save-settings').addEventListener('click',
 });
 openingVideoFile.addEventListener('change',()=>{
  const file=openingVideoFile.files?.[0];if(!file)return;
- if(file.size<1||file.size>20*1024*1024){openingVideoStatus.textContent='O vídeo precisa ter até 20 MB.';openingVideoFile.value='';return;}
+ if(file.size<1||file.size>50*1024*1024){openingVideoStatus.textContent='O vídeo precisa ter até 50 MB.';openingVideoFile.value='';return;}
  openingVideoPreview.src=URL.createObjectURL(file);openingVideoPreview.style.display='block';document.getElementById('opening-media-frame-preview').src='./marca.svg';paintOpeningMediaPreview();openingVideoStatus.textContent='Prévia pronta. Ajuste o enquadramento e toque em usar este vídeo.';
 });
 openingVideoSave.addEventListener('click',async()=>{
