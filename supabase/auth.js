@@ -1246,7 +1246,7 @@ export async function saveAdminOpeningVideo(file, options = {}) {
   if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode alterar o vídeo de abertura.');
   if (!(file instanceof File)) throw new Error('Escolha um vídeo MP4 ou WebM.');
   const format = await getBrandingUploadFormat(file, { mp4: true, webm: true });
-  if (file.size < 1 || file.size > 20 * 1024 * 1024) throw new Error('O vídeo deve ter até 20 MB. O armazenamento atual do aplicativo aceita esse limite.');
+  if (file.size < 1 || file.size > 50 * 1024 * 1024) throw new Error('O vídeo deve ter até 50 MB.');
   const path = user.id + '/branding/opening-video-' + crypto.randomUUID() + '.' + format.extension;
   await uploadOpeningVideoFile(supabase, path, file, format.contentType, options.onProgress);
   const { data: publicData } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
