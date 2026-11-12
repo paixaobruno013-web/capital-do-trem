@@ -53,8 +53,14 @@
   if(target?.matches?.('input[type="file"]'))return;
   if(target?.form)saveForm(target.form);
  },true);
+ const findFileInput=target=>{
+  const direct=target?.closest?.('input[type="file"]');
+  if(direct)return direct;
+  const label=target?.closest?.('label');
+  return label?.control?.matches?.('input[type="file"]')?label.control:null;
+ };
  document.addEventListener('click',event=>{
-  const input=event.target?.closest?.('input[type="file"]');
+  const input=findFileInput(event.target);
   if(!input)return;
   try{
    for(const form of forms())saveForm(form);
