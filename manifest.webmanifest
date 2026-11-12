@@ -1,6 +1,7 @@
 {
   "name": "Capital do Trem",
   "short_name": "Capital do Trem",
+  "id": "./",
   "description": "Música, cultura e comunidade.",
   "start_url": "./",
   "scope": "./",
@@ -13,7 +14,7 @@
       "src": "./marca.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ],
   "lang": "pt-BR",
