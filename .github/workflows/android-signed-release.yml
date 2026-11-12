@@ -1,0 +1,101 @@
+name: Preparar APK Android assinado
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-signed-release
+  cancel-in-progress: false
+
+jobs:
+  signed-release:
+    name: Gerar e verificar APK de distribuição
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      ANDROID_RELEASE_KEYSTORE_BASE64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
+      ANDROID_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
+      ANDROID_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
+      ANDROID_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
+    steps:
+      - name: Validar presença das credenciais sem exibi-las
+        shell: bash
+        run: |
+          set -euo pipefail
+          for name in ANDROID_RELEASE_KEYSTORE_BASE64 ANDROID_RELEASE_STORE_PASSWORD ANDROID_RELEASE_KEY_ALIAS ANDROID_RELEASE_KEY_PASSWORD; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::Falta configurar o segredo protegido: $name"
+              exit 1
+            fi
+          done
+
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+
+      - name: Instalar ferramentas Android
+        run: sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Preparar aplicativo e projeto Android
+        run: |
+          npm install --no-audit --no-fund
+          npm run build:web
+          npx cap add android
+          npx cap sync android
+          python3 scripts/configure-android-media.py android
+
+      - name: Restaurar chave de assinatura protegida
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          printf '%s' "$ANDROID_RELEASE_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/capital-do-trem-release.jks"
+          test -s "$RUNNER_TEMP/capital-do-trem-release.jks"
+
+      - name: Gerar APK Release assinado
+        working-directory: android
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./gradlew --no-daemon assembleRelease \
+            -Pandroid.injected.signing.store.file="$RUNNER_TEMP/capital-do-trem-release.jks" \
+            -Pandroid.injected.signing.store.password="$ANDROID_RELEASE_STORE_PASSWORD" \
+            -Pandroid.injected.signing.key.alias="$ANDROID_RELEASE_KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$ANDROID_RELEASE_KEY_PASSWORD"
+
+      - name: Verificar assinatura e integridade do APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="android/app/build/outputs/apk/release/app-release.apk"
+          test -s "$APK"
+          apksigner verify --verbose --print-certs "$APK"
+          sha256sum "$APK" | tee capital-do-trem-android-release.sha256
+
+      - name: Publicar artefato privado para validação
+        uses: actions/upload-artifact@v4
+        with:
+          name: capital-do-trem-android-release-signed
+          path: |
+            android/app/build/outputs/apk/release/app-release.apk
+            capital-do-trem-android-release.sha256
+          if-no-files-found: error
+          retention-days: 7
