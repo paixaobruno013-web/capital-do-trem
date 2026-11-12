@@ -212,7 +212,19 @@ const themeButton=document.getElementById('theme-toggle');const themeKey='capita
    if(!response.ok)throw new Error('Manifesto HTTP '+response.status);
    const manifest=await response.json();
    const valid=manifest.name==='Capital do Trem'&&manifest.display==='standalone'&&Array.isArray(manifest.icons)&&manifest.icons.some(icon=>icon.src&&icon.type==='image/svg+xml');
-   row('Manifesto de instalação',valid,valid?'Nome, modo de abertura e ícone foram encontrados.':'O manifesto existe, mas precisa de revisão.');
+   row('Manifesto de instalação',valid,valid?'Nome, modo de abertura e ícone vetorial foram encontrados.':'O manifesto existe, mas precisa de revisão.');
+   const pngIcon=manifest.icons.find(icon=>icon.type==='image/png'&&icon.sizes==='180x180');
+   if(pngIcon){
+    try{
+     const iconResponse=await fetch(new URL(pngIcon.src,location.href),{cache:'no-store'});
+     if(!iconResponse.ok)throw new Error('Ícone HTTP '+iconResponse.status);
+     const iconBlob=await iconResponse.blob();
+     const bitmap=await createImageBitmap(iconBlob);
+     const iconValid=iconBlob.type==='image/png'&&bitmap.width===180&&bitmap.height===180;
+     row('Ícone PNG do iPhone',iconValid,iconValid?'Imagem PNG 180×180 carregada corretamente.':'O arquivo do ícone não tem o formato ou tamanho esperado.');
+     bitmap.close();
+    }catch(iconError){row('Ícone PNG do iPhone',false,iconError.message||'Não foi possível carregar o ícone.');}
+   }else row('Ícone PNG do iPhone',false,'O manifesto não declara um PNG 180×180.');
   }catch(error){row('Manifesto de instalação',false,error.message||'Não foi possível ler o manifesto.');}
   if('serviceWorker' in navigator){
    try{
