@@ -13,6 +13,7 @@
 }catch(error){}})();
 </script>
 <script>document.documentElement.classList.add('intro-brand-pending');</script>
+<script src="./file-picker-guard.js"></script>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#000000" id="theme-color">
 <meta name="description" content="Capital do Trem: música, artistas, shows, eventos e ações sociais da nossa comunidade.">
@@ -888,13 +889,17 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <script>
 (function(){
  const INTRO_SESSION_KEY='capitaldotrem_intro_seen_session_v1';
+ const FILE_PICKER_RETURN_KEY='capitaldotrem_file_picker_return_at_v1';
  let show=true;
  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)show=false;
- // A abertura acontece uma vez por sessão; voltar do chat/conta para o início não a repete.
+ // Se o Android recriar o WebView ao voltar do seletor, retoma sem repetir a abertura.
  try{
+  const returnedAt=Number(localStorage.getItem(FILE_PICKER_RETURN_KEY)||0);
+  if(returnedAt&&Date.now()-returnedAt<10*60*1000)show=false;
+  if(returnedAt)localStorage.removeItem(FILE_PICKER_RETURN_KEY);
   if(sessionStorage.getItem(INTRO_SESSION_KEY)==='1')show=false;
   else sessionStorage.setItem(INTRO_SESSION_KEY,'1');
- }catch(error){/* Se o armazenamento estiver bloqueado, mantém a abertura normal. */}
+ }catch(error){/* Mantém a navegação normal se o armazenamento estiver bloqueado. */}
  if(!show)document.documentElement.classList.add('intro-smoke-skip');
 })();
 </script>
@@ -1848,8 +1853,8 @@ async function saveOfflineMusic(id,blob,title){
   const openingScreenAtBoot=document.getElementById('intro-smoke');
   if(openingScreenAtBoot){openingScreenAtBoot.classList.add('custom-opening-screen');document.documentElement.classList.remove('intro-brand-pending');}
   const brandingRequest=auth.getPublicBranding().then(value=>{try{localStorage.setItem(BRANDING_CACHE_KEY,JSON.stringify(value||{}));}catch{}return value||{};});
-  const branding=cachedBranding||await brandingRequest;
-  if(cachedBranding)brandingRequest.catch(()=>{});
+  // Sempre prioriza as configurações atuais do servidor; cache local é somente fallback offline.
+  const branding=await brandingRequest.catch(()=>cachedBranding||{});
   const safeUrl=value=>typeof value==='string'&&value.startsWith('https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/')?value:'';
   const profile=safeUrl(branding.profileImageUrl),opening=safeUrl(branding.openingImageUrl),openingVideo=safeUrl(branding.openingVideoUrl); 
   // Uploads recebem caminhos únicos no Storage; não é necessário furar o cache a cada abertura.
@@ -1901,7 +1906,7 @@ async function saveOfflineMusic(id,blob,title){
     if(brand)brand.style.display='none';
     document.documentElement.classList.remove('intro-brand-pending');
     const video=document.createElement('video');
-    video.className='opening-video-background';video.src=currentOpeningVideo;video.removeAttribute('poster');video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';video.style.opacity='1';video.style.transition='opacity .25s ease';const savedOpeningSound=(()=>{try{return localStorage.getItem('capitaldotrem_intro_sound_v1')!=='off';}catch{return true;}})();
+    video.className='opening-video-background';video.src=currentOpeningVideo+(currentOpeningVideo.includes('?')?'&':'?')+'cdt_opening='+Date.now();video.removeAttribute('poster');video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';video.style.opacity='1';video.style.transition='opacity .25s ease';const savedOpeningSound=(()=>{try{return localStorage.getItem('capitaldotrem_intro_sound_v1')!=='off';}catch{return true;}})();
     video.autoplay=true;video.muted=!savedOpeningSound;video.defaultMuted=!savedOpeningSound;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));video.playsInline=true;video.loop=true;video.playbackRate=1;video.preload='auto';video.setAttribute('aria-hidden','true');
     // Exibe somente o vídeo: não cria uma imagem de marca por cima da gravação.
     video.style.zIndex='2';video.style.opacity='1';
