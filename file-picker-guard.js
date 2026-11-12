@@ -34,7 +34,7 @@
     const draft=JSON.parse(raw);
     if(!draft||Date.now()-Number(draft.savedAt||0)>30*60*1000)continue;
     for(const [selector,value] of Object.entries(draft.values||{})){
-     const field=selector.startsWith('#')?form.querySelector('#'+CSS.escape(selector.slice(1))):form.elements.namedItem(selector.slice(5));
+     const field=selector.startsWith('#')?form.elements.namedItem(selector.slice(1)):form.elements.namedItem(selector.slice(5));
      if(field&&'value'in field&&String(field.value||'')==='')field.value=value;
     }
    }catch{}
@@ -59,7 +59,7 @@
   try{
    for(const form of forms())saveForm(form);
    localStorage.setItem(FILE_PICKER_RETURN_KEY,String(Date.now()));
-   localStorage.setItem(FILE_PICKER_RETURN_URL_KEY,location.href);
+   localStorage.setItem(FILE_PICKER_RETURN_URL_KEY,location.pathname);
   }catch{}
  },true);
  document.addEventListener('DOMContentLoaded',restoreForms,{once:true});
