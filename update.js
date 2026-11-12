@@ -172,8 +172,8 @@
  navigator.connection?.addEventListener?.('change',verifyRealConnection);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)verifyRealConnection();});
  window.setTimeout(verifyRealConnection,500);
- // Mantém a detecção de quedas silenciosas sem consultar a rede a cada 5 segundos.
- window.setInterval(verifyRealConnection,5*1000);
+ // Eventos online/offline continuam imediatos; a sondagem periódica fica em 60 s para poupar bateria e dados móveis.
+ window.setInterval(verifyRealConnection,60*1000);
  if(!supportsServiceWorkerUpdates||!('serviceWorker' in navigator))return;
  let registration=null,reloading=false;
  const banner=document.createElement('aside');
