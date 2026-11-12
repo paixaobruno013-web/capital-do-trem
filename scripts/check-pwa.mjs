@@ -31,6 +31,13 @@ if (!Array.isArray(manifest.icons) || manifest.icons.length === 0) {
 }
 for (const icon of manifest.icons) {
   if (!icon.src) throw new Error('Ícone do manifesto sem caminho src.');
+  if (/^https:\/\//i.test(icon.src)) {
+    if (!['zmjxkfjzrbbxyvgkwirv.supabase.co'].includes(new URL(icon.src).hostname)) {
+      throw new Error('Ícone remoto fora da origem aprovada: ' + icon.src);
+    }
+    continue;
+  }
+  if (/^(?:data:|\/\/)/i.test(icon.src)) throw new Error('Origem de ícone não permitida: ' + icon.src);
   const iconPath = resolve(dirname(manifestPath), decodeURIComponent(icon.src.split(/[?#]/, 1)[0]));
   try {
     await access(iconPath);
