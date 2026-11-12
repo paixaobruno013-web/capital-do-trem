@@ -1365,10 +1365,27 @@ window.addEventListener('beforeinstallprompt',event=>{
  event.preventDefault();installPrompt=event;installButton.hidden=false;
 });
 installButton.addEventListener('click',async()=>{
- if(!installPrompt){alert('Para instalar: abra o menu do Chrome (⋮) e escolha “Instalar app” ou “Adicionar à tela inicial”.');return;}
- installPrompt.prompt();
- await installPrompt.userChoice;
- installPrompt=null;installButton.hidden=true;
+ const ua=navigator.userAgent||'';
+ const isIOS=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+ const isStandalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+ if(isStandalone){alert('O Capital do Trem já está instalado neste aparelho. Abra pelo ícone da tela inicial.');return;}
+ if(!window.isSecureContext){alert('Para instalar com segurança, abra o endereço oficial do Capital do Trem usando HTTPS.');return;}
+ if(installPrompt){
+  installPrompt.prompt();
+  await installPrompt.userChoice;
+  installPrompt=null;
+  installButton.hidden=true;
+  return;
+ }
+ if(isIOS){
+  alert('Para instalar no iPhone/iPad:\n1. Abra o Capital do Trem no Safari.\n2. Toque em Compartilhar.\n3. Escolha “Adicionar à Tela de Início”.\n4. Confirme em “Adicionar”.');
+  return;
+ }
+ if(/android/i.test(ua)){
+  alert('Para instalar no Android:\n1. Abra o Capital do Trem no Chrome.\n2. Toque no menu ⋮.\n3. Escolha “Instalar app” ou “Adicionar à tela inicial”.');
+  return;
+ }
+ alert('Abra o Capital do Trem em um navegador compatível e procure a opção “Instalar app” ou “Adicionar à tela inicial” no menu de compartilhamento/navegação.');
 });
 window.addEventListener('appinstalled',()=>{installButton.hidden=true;installPrompt=null;});
 let audioObjectUrl='';
