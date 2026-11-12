@@ -10,6 +10,12 @@
    return at>0&&Date.now()-at<MAX_AGE;
   }catch{return false;}
  };
+ const clearReturnMarkers=()=>{
+  try{
+   localStorage.removeItem(FILE_PICKER_RETURN_KEY);
+   localStorage.removeItem(FILE_PICKER_RETURN_URL_KEY);
+  }catch{}
+ };
  const forms=()=>Array.from(document.forms).filter(form=>form.querySelector('input[type="file"]'));
  const draftKey=form=>DRAFT_PREFIX+(location.pathname||'/')+':'+(form.id||form.getAttribute('name')||'upload-form');
  const saveForm=form=>{
@@ -26,7 +32,13 @@
   try{localStorage.setItem(draftKey(form),JSON.stringify({savedAt:Date.now(),values}));}catch{}
  };
  const restoreForms=()=>{
-  if(!recentReturn())return;
+  if(!recentReturn()){
+   try{
+    const at=Number(localStorage.getItem(FILE_PICKER_RETURN_KEY)||0);
+    if(at&&Date.now()-at>=MAX_AGE)clearReturnMarkers();
+   }catch{}
+   return;
+  }
   for(const form of forms()){
    try{
     const raw=localStorage.getItem(draftKey(form));
@@ -34,15 +46,14 @@
     const draft=JSON.parse(raw);
     if(!draft||Date.now()-Number(draft.savedAt||0)>30*60*1000)continue;
     for(const [selector,value] of Object.entries(draft.values||{})){
-     const field=selector.startsWith('#')?form.elements.namedItem(selector.slice(1)):form.elements.namedItem(selector.slice(5));
+     const isId=selector.startsWith('#');
+     const wanted=selector.slice(isId?1:5);
+     const field=Array.from(form.elements||[]).find(candidate=>candidate&&(isId?candidate.id===wanted:candidate.name===wanted));
      if(field&&'value'in field&&String(field.value||'')==='')field.value=value;
     }
    }catch{}
   }
-  try{
-   localStorage.removeItem(FILE_PICKER_RETURN_KEY);
-   localStorage.removeItem(FILE_PICKER_RETURN_URL_KEY);
-  }catch{}
+  clearReturnMarkers();
  };
  document.addEventListener('input',event=>{
   const form=event.target?.form;
@@ -50,7 +61,10 @@
  },true);
  document.addEventListener('change',event=>{
   const target=event.target;
-  if(target?.matches?.('input[type="file"]'))return;
+  if(target?.matches?.('input[type="file"]')){
+   clearReturnMarkers();
+   return;
+  }
   if(target?.form)saveForm(target.form);
  },true);
  const findFileInput=target=>{
@@ -68,13 +82,7 @@
    localStorage.setItem(FILE_PICKER_RETURN_URL_KEY,location.pathname);
   }catch{}
  },true);
- document.addEventListener('DOMContentLoaded',restoreForms,{once:true});
- window.addEventListener('focus',()=>window.setTimeout(()=>{
-  if(document.visibilityState==='visible'&&recentReturn()){
-   try{
-    localStorage.removeItem(FILE_PICKER_RETURN_KEY);
-    localStorage.removeItem(FILE_PICKER_RETURN_URL_KEY);
-   }catch{}
-  }
- },1800));
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',restoreForms,{once:true});
+ else restoreForms();
+ window.addEventListener('pageshow',restoreForms);
 })();
