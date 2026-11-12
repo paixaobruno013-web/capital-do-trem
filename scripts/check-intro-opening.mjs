@@ -3,7 +3,8 @@ const index = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const checks = [
   ['retorno do seletor de arquivos não repete o vídeo de abertura', /FILE_PICKER_RETURN_KEY/.test(index) && /file-picker-guard\.js/.test(index)],
   ['abertura consulta branding atual antes de usar o cache local', /const branding=await brandingRequest\.catch\(\(\)=>cachedBranding\|\|\{\}\)/.test(index)],
-  ['vídeo de abertura ignora cache antigo do navegador', /cdt_opening=/.test(index)],
+  ['vídeo de abertura usa o endereço único publicado sem duplicar parâmetros de cache', /video\.src=currentOpeningVideo/.test(index) && !/cdt_opening=/.test(index)],
+  ['camadas de vídeos antigos são removidas antes de inserir a abertura atual', /querySelectorAll\('video, \.opening-video-background, \.opening-video-fallback'\)/.test(index)],
   ['bloqueio da marca antiga é ativado no head antes da abertura', index.indexOf("classList.add('intro-brand-pending')") < index.indexOf('<body')],
   ['CSS mantém a marca padrão invisível enquanto carrega a arte oficial', /intro-brand-pending \.intro-smoke__brand\{opacity:0!important;visibility:hidden!important\}/.test(index)],
   ['imagem de abertura só aparece depois de carregar ou cair no fallback', /intro\.addEventListener\('load',[\s\S]*?intro-brand-pending/.test(index) && /intro\.addEventListener\('error',[\s\S]*?marca\.svg[\s\S]*?intro-brand-pending/.test(index)],
