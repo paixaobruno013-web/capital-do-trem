@@ -1,5 +1,5 @@
-const CACHE='capital-do-trem-v288';
-const CORE_FILES=['./','./index.html','./offline.html','./marca.svg','./manifest.webmanifest','./update.js','./assets/favela-header.webp','./assets/banner-speakers.webp'];
+const CACHE='capital-do-trem-v289';
+const CORE_FILES=['./','./index.html','./offline.html','./marca.svg','./manifest.webmanifest','./update.js','./diagnostico.html','./assets/favela-header.webp','./assets/banner-speakers.webp'];
 const OPTIONAL_FILES=['./admin.html','./file-picker-guard.js','./estudio.html','./admin-media.js','./privacidade.html','./account-deletion.html','./conta.html','./supabase/auth.js','./diagnostico.html','./bate-papo.html','./chat-enhancements.js','./emoji-picker.js','./stories-ui.js','./home-story-composer.js','./event-social-composer.js','./admin-stories.js','./account-stories.js','./avatar.html','./mensagens.html','./youtube-feed.js','./admin-apoiadores.html','./apoiadores.html','./supporters-admin.js','./supporters-public.js'];
 
 self.addEventListener('install',event=>{
