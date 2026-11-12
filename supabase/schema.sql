@@ -1323,7 +1323,7 @@ alter table public.chat_messages
     (attachment_url is not null and attachment_type is not null and attachment_name is not null and attachment_mime is not null and attachment_size is not null)
   );
 
--- O bucket permite os mesmos formatos validados pelo cliente e limite de até 20 MB.
+-- O bucket de mídia permite os formatos validados pelo cliente e arquivos de até 50 MB.
 update storage.buckets
 set file_size_limit = 52428800,
     allowed_mime_types = array[
