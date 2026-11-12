@@ -1,5 +1,9 @@
 import { readFile } from 'node:fs/promises';
-const index = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+const [index, admin, auth] = await Promise.all([
+  readFile(new URL('../index.html', import.meta.url), 'utf8'),
+  readFile(new URL('../admin.html', import.meta.url), 'utf8'),
+  readFile(new URL('../supabase/auth.js', import.meta.url), 'utf8')
+]);
 const checks = [
   ['retorno do seletor de arquivos não repete o vídeo de abertura', /FILE_PICKER_RETURN_KEY/.test(index) && /file-picker-guard\.js/.test(index)],
   ['abertura consulta branding atual antes de usar o cache local', /const branding=await brandingRequest\.catch\(\(\)=>cachedBranding\|\|\{\}\)/.test(index)],
@@ -14,6 +18,11 @@ const checks = [
   ['vídeo da abertura tem fallback visual se falhar ou não carregar em cinco segundos', /const showOpeningFallback=\(\)=>/.test(index) && /fallbackTimer=window\.setTimeout\(showOpeningFallback,5000\)/.test(index) && /video\.addEventListener\('error',[\s\S]*?showOpeningFallback\(\)/.test(index)],
   ['listeners do vídeo são registrados antes de iniciar o carregamento', /video\.addEventListener\('loadeddata'[\s\S]*?video\.load\(\)/.test(index)],
   ['trem de três vagões mantém a travessia configurada em 9,8 segundos', /opening-train-cross-sky 9\.8s/.test(index) && /opening-train-travel 9\.8s/.test(index) && /opening-wagon-rear/.test(index) && /opening-wagon-dancers/.test(index) && /opening-wagon-front/.test(index)],
+  ['painel principal respeita o limite real de 20 MB do bucket de mídia', /const max=isVideo\?20:8/.test(admin) && /file\.size>20\*1024\*1024/.test(admin) && /file\.size > 20 \* 1024 \* 1024/.test(auth)],
+  ['painel aceita somente vídeo MP4 ou WebM e informa formato inválido', /validVideo=isVideo&&\(\['mp4','webm'\]\.includes\(ext\)/.test(admin) && /Escolha um vídeo MP4 ou WebM/.test(admin)],
+  ['vídeos maiores que 6 MB usam envio retomável TUS com progresso', /tus-js-client@4/.test(auth) && /storage\.supabase\.co\/storage\/v1\/upload\/resumable/.test(auth) && /chunkSize: 6 \* 1024 \* 1024/.test(auth) && /options\.onProgress/.test(auth)],
+  ['painel salva a preferência de áudio com a opção correta', /muted:sound\.value==='off'/.test(admin)],
+  ['painel mostra progresso no envio do vídeo da abertura', /Enviando vídeo da abertura… '\+p\+'%'/ .test(admin)]
   ['abertura por imagem encerra sem acessar variável de vídeo inexistente', /const finish=\(\)=>\{if\(finished\)return;finished=true;progress=100;paint\(\);screen\.querySelector\('video'\)\?\.pause\(\);/.test(index)]
 ];
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO ') + name);
