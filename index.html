@@ -12,6 +12,31 @@
  }else if(started)localStorage.removeItem(key);
 }catch(error){}})();
 </script>
+<script>
+/* Retoma a tela de origem antes de montar a abertura quando o Android recria o WebView após o seletor. */
+(()=>{
+ const FILE_PICKER_RETURN_KEY='capitaldotrem_file_picker_return_at_v1';
+ const FILE_PICKER_RETURN_URL_KEY='capitaldotrem_file_picker_return_url_v1';
+ try{
+  const started=Number(localStorage.getItem(FILE_PICKER_RETURN_KEY)||0);
+  if(!started)return;
+  if(Date.now()-started>120000){
+   localStorage.removeItem(FILE_PICKER_RETURN_KEY);
+   localStorage.removeItem(FILE_PICKER_RETURN_URL_KEY);
+   return;
+  }
+  const savedUrl=localStorage.getItem(FILE_PICKER_RETURN_URL_KEY)||'';
+  if(savedUrl){
+   const target=new URL(savedUrl,location.href);
+   if(target.origin===location.origin&&target.pathname!==location.pathname){
+    location.replace(target.href);
+    return;
+   }
+  }
+  document.documentElement.classList.add('intro-smoke-skip');
+ }catch(error){}
+})();
+</script>
 <script>document.documentElement.classList.add('intro-brand-pending');</script>
 <script src="./file-picker-guard.js"></script>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
