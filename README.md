@@ -20,7 +20,7 @@ O Capital do Trem é um projeto de comunidade e divulgação da cultura musical,
 
 ## Configurar o banco de dados\n\nConsulte [SUPABASE-SETUP.md](./SUPABASE-SETUP.md) para abrir o SQL original, evitar tradução automática no celular e configurar o Supabase com segurança.\n\n## Gratuito para a comunidade
 
-O Capital do Trem foi definido para continuar gratuito: sem mensalidade, assinatura ou compras dentro do aplicativo. Enquanto não houver orçamento para a taxa única de cadastro da Google Play, a distribuição será pelo site/PWA gratuito: abra https://paixaobruno013-web.github.io/capital-do-trem/ no Chrome do Android e use **⋮ → Adicionar à tela inicial** (ou **Instalar aplicativo**, se aparecer). Isso instala um atalho da versão web; não é um APK publicado na loja.
+O Capital do Trem manterá uma experiência comunitária gratuita e está preparando planos opcionais: Artista VIP por R$ 20/mês e Usuário Uai Apoiador por R$ 100/ano. Nenhuma cobrança está ativa. O selo de apoiador não é selo de verificação de identidade. Enquanto não houver orçamento para a taxa única de cadastro da Google Play, a distribuição será pelo site/PWA gratuito: abra https://paixaobruno013-web.github.io/capital-do-trem/ no Chrome do Android e use **⋮ → Adicionar à tela inicial** (ou **Instalar aplicativo**, se aparecer). Isso instala um atalho da versão web; não é um APK publicado na loja.
 
 ## Instalar gratuitamente no iPhone
 
