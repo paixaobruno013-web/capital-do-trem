@@ -533,25 +533,33 @@ export async function getPublishedSongs() {
     .select('id,title,artist_name,producer_name,description,storage_path')
     .eq('status','published').order('created_at',{ascending:false}).limit(100);
   if (error) throw error;
-  const songs = await Promise.all((data || []).map(async song => {
-    const storage = supabase.storage.from('capital-do-trem-audio');
-    const [{ data: signed, error: signedError }, { data: downloadable, error: downloadError }] = await Promise.all([
-      storage.createSignedUrl(song.storage_path, 60 * 60),
-      storage.createSignedUrl(song.storage_path, 60 * 60, { download: true })
-    ]);
-    if (signedError) throw signedError;
-    if (downloadError) throw downloadError;
+  const items = data || [];
+  if (!items.length) return [];
+  const storage = supabase.storage.from('capital-do-trem-audio');
+  const paths = items.map(song => song.storage_path);
+  // Gera os links em lote: duas chamadas de Storage em vez de duas chamadas por música.
+  const [{ data: signed, error: signedError }, { data: downloadable, error: downloadError }] = await Promise.all([
+    storage.createSignedUrls(paths, 60 * 60),
+    storage.createSignedUrls(paths, 60 * 60, { download: true })
+  ]);
+  if (signedError) throw signedError;
+  if (downloadError) throw downloadError;
+  const signedByPath = new Map((signed || []).map(item => [item.path, item.signedUrl]));
+  const downloadByPath = new Map((downloadable || []).map(item => [item.path, item.signedUrl]));
+  return items.map(song => {
+    const audioUrl = signedByPath.get(song.storage_path);
+    const downloadUrl = downloadByPath.get(song.storage_path);
+    if (!audioUrl || !downloadUrl) throw new Error('Não foi possível preparar os links de áudio de todas as músicas. Tente novamente.');
     return {
       id:song.id,
       title:song.title,
       artist_name:song.artist_name,
       producer_name:song.producer_name || '',
       description:song.description,
-      audio_url:signed.signedUrl,
-      download_url:downloadable.signedUrl
+      audio_url:audioUrl,
+      download_url:downloadUrl
     };
-  }));
-  return songs;
+  });
 }
 
 // Agenda pública: visitantes podem consultar eventos publicados diretamente.
