@@ -204,7 +204,7 @@ audio{width:100%;}
   <p id="artist-song-submit-status" class="status" role="status" aria-live="polite"></p>
  </form>
  <div class="artist-song-history"><h4>Meus envios</h4><div id="artist-song-submit-history" aria-live="polite">Suas faixas enviadas aparecerão aqui.</div></div>
- <p class="muted artist-song-review-note">Ao publicar, sua música entra diretamente no catálogo público. Envie somente faixas de sua autoria ou que você tenha autorização para distribuir.</p>
+ <p class="muted artist-song-review-note">Publicação direta, sem análise prévia do áudio. São verificadas apenas as informações da faixa, o formato e o limite de tamanho. Envie somente músicas de sua autoria ou que você tenha autorização para distribuir.</p>
 </section>
 
 </div>
@@ -555,7 +555,7 @@ songForm.addEventListener('submit',async event=>{
  const button=document.getElementById('submit-song');
  const file=document.getElementById('song-audio-file').files[0];
  if(!file){songStatus.textContent='Selecione o arquivo de áudio.';return;}
- button.disabled=true;songStatus.textContent='Enviando música para publicação pela equipe…';
+ button.disabled=true;songStatus.textContent='Publicando sua música diretamente no catálogo…';
  try{
   await auth.uploadMySong({file,title:document.getElementById('song-title').value.trim(),artistName:document.getElementById('song-artist-name').value.trim(),producerName:document.getElementById('song-producer-name').value.trim()});
   songForm.reset();songStatus.textContent='Música publicada no catálogo.';
@@ -605,7 +605,7 @@ artistSongForm?.addEventListener('submit',async event=>{
  const button=document.getElementById('artist-song-submit-button');
  const file=artistSongFile.files?.[0];
  if(!file){artistSongStatus.textContent='Escolha o arquivo da sua música.';return;}
- button.disabled=true;artistSongStatus.textContent='Enviando sua faixa com segurança…';
+ button.disabled=true;artistSongStatus.textContent='Publicando sua faixa diretamente no catálogo…';
  try{
   const saved=await auth.uploadMySong({
    file,
