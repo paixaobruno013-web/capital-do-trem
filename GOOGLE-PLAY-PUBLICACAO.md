@@ -1,18 +1,18 @@
 # Publicação do Capital do Trem na Google Play
 
-# Modelo de distribuição definido: gratuito e sem investimento
+# Modelo de distribuição: comunidade gratuita com planos opcionais em preparação
 
-A decisão do projeto é manter o Capital do Trem gratuito para baixar e usar, sem mensalidade, assinatura ou compras dentro do aplicativo. Não contratar serviços pagos nem iniciar etapas que exijam pagamento sem autorização expressa do responsável.
+O Capital do Trem manterá uma experiência comunitária gratuita. O responsável aprovou preparar duas modalidades opcionais: Artista VIP por R$ 20/mês e Usuário Uai Apoiador por R$ 100/ano. O plano gratuito continua existindo. Os benefícios, limites e condições devem ser exibidos com clareza antes de qualquer compra. **Nenhuma cobrança está ativa neste momento.** Não contratar serviços nem iniciar pagamentos sem autorização expressa.
 
 **Plano imediato sem custo de cadastro em loja:** manter a versão web/PWA publicada no GitHub Pages e orientar os usuários Android a abrir o site no Chrome e usar o menu **⋮ → Adicionar à tela inicial** (ou **Instalar aplicativo**, quando essa opção aparecer). Isso cria um atalho instalável, mas não é um APK/AAB distribuído pela Play Store.
 
-**Google Play:** fica como etapa futura, pausada enquanto a decisão for não gastar. A conta de desenvolvedor exige taxa única de cadastro (US$ 25, conforme a regra consultada); portanto, não é uma opção de custo zero. Não há cobrança por download de um app gratuito, mas o cadastro inicial continua sendo pago.
+**Google Play:** continua como etapa futura e depende de conta de desenvolvedor, configuração, testes e revisão. A taxa de cadastro indicada na documentação é US$ 25; confirmar o valor vigente na própria console antes de qualquer pagamento. A existência de planos opcionais não significa que produtos de assinatura já estejam cadastrados ou disponíveis.
 
-**Regra de produto:** não adicionar paywall, assinatura, plano premium ou cobrança para ouvir, curtir, comentar, baixar músicas, conversar ou acessar eventos. Qualquer futura fonte de apoio/patrocínio deverá ser opcional e não bloquear as funções comunitárias.
+**Regra de produto:** manter acesso gratuito às funções comunitárias essenciais. Planos opcionais não podem ser apresentados como ativos antes da integração e dos testes. O selo de Usuário Uai Apoiador é diferente de um selo de verificação de identidade. Os limites planejados são até 200 músicas para o acesso gratuito e até 300 para Artista VIP; a regra exata de contagem (por playlist ou por conta) precisa ser definida antes da tela de compra.
 
 ---
 
-Atualizado em 11/11/2026. Este documento separa o que já existe no repositório do que ainda precisa ser comprovado antes do lançamento.
+Atualizado em 12/11/2026. Este documento separa o que já existe no repositório do que ainda precisa ser comprovado antes do lançamento.
 
 ## Atualização técnica — 11/11/2026
 
