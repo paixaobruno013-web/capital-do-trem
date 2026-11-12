@@ -538,7 +538,7 @@ values (
   'capital-do-trem-media',
   'capital-do-trem-media',
   true,
-  20971520,
+  52428800,
   array['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/webm', 'video/quicktime']
 )
 on conflict (id) do update
@@ -1325,7 +1325,7 @@ alter table public.chat_messages
 
 -- O bucket permite os mesmos formatos validados pelo cliente e limite de até 20 MB.
 update storage.buckets
-set file_size_limit = 20971520,
+set file_size_limit = 52428800,
     allowed_mime_types = array[
       'image/jpeg','image/png','image/webp',
       'video/mp4','video/webm',
@@ -1683,7 +1683,7 @@ begin
 end $$;
 -- Permitir Stories em imagem e vídeo no bucket compartilhado.
 update storage.buckets
-set file_size_limit = 20971520,
+set file_size_limit = 52428800,
     allowed_mime_types = array['image/jpeg','image/png','image/webp','video/mp4','video/webm']
 where id = 'capital-do-trem-media';
 
