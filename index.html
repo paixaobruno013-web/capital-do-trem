@@ -20,7 +20,7 @@
  try{
   const started=Number(localStorage.getItem(FILE_PICKER_RETURN_KEY)||0);
   if(!started)return;
-  if(Date.now()-started>120000){
+  if(Date.now()-started>2*60*1000){
    localStorage.removeItem(FILE_PICKER_RETURN_KEY);
    localStorage.removeItem(FILE_PICKER_RETURN_URL_KEY);
    return;
