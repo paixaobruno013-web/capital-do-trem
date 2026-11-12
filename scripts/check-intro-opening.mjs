@@ -27,9 +27,9 @@ const checks = [
   ['painel salva a preferência de áudio com a opção correta', /muted:sound\.value==='off'/.test(admin)],
   ['painel mostra progresso no envio do vídeo da abertura', /Enviando vídeo da abertura… '\+p\+'%'/ .test(admin)],
   ['abertura por imagem encerra sem acessar variável de vídeo inexistente', /const finish=\(\)=>\{if\(finished\)return;finished=true;progress=100;paint\(\);screen\.querySelector\('video'\)\?\.pause\(\);/.test(index)]
+  ['restauração localiza campos pelo id real ou pelo name, sem usar namedItem para id', pickerGuard.includes('Array.from(form.elements||[]).find') && !pickerGuard.includes('form.elements.namedItem(selector.slice(1))')],
+  ['restauração também roda após DOMContentLoaded e em pageshow', pickerGuard.includes("if(document.readyState==='loading')") && pickerGuard.includes("window.addEventListener('pageshow',restoreForms)")]
 ];
-  ['restauração localiza campos pelo id real ou pelo name, sem usar namedItem para id', (()=>{const guard=pickerGuard;return /Array\\.from\\(form\\.elements\\|\\|\\[\\]\\)\\.find/.test(guard) && !/form\\.elements\\.namedItem\\(selector\\.slice\\(1\\)\\)/.test(guard);})()],
-  ['restauração também roda se o script iniciar após DOMContentLoaded e em pageshow', /document\\.readyState==='loading'/.test(pickerGuard) && /window\\.addEventListener\\('pageshow',restoreForms\\)/.test(pickerGuard)],
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO ') + name);
 if (checks.some(([, ok]) => !ok)) process.exit(1);
 console.log('Abertura: ' + checks.length + ' verificações aprovadas.');
