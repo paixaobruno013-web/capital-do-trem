@@ -9,6 +9,7 @@ const files = [
   'offline.html',
   'conta.html',
   'admin.html',
+  'file-picker-guard.js',
   'admin-media.js',
   'admin-apoiadores.html',
   'apoiadores.html',
