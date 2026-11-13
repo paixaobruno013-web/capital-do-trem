@@ -36,11 +36,17 @@ if (checks.some(([, ok]) => !ok)) process.exit(1);
 console.log('Abertura: ' + checks.length + ' verificações aprovadas.');
 
 // Social profile and full-screen music player regression checks.
-const profileHtml = readFileSync(new URL('../perfil.html', import.meta.url), 'utf8');
-const homeHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-for (const expected of ['id="profile-cover"', 'id="cover-file"', 'data-tab="posts"', 'data-tab="videos"', 'data-tab="likes"', 'id="profile-posts"', 'id="profile-videos"', 'id="profile-likes"', 'avatar-add']) {
-  assert(profileHtml.includes(expected), 'Perfil deve incluir: ' + expected);
-}
-for (const expected of ['player-previous', 'player-next', 'player-rewind', 'player-forward', 'player-repeat', 'player-cover']) {
-  assert(homeHtml.includes(expected), 'Player deve incluir: ' + expected);
-}
+const profileHtml = await readFile(new URL('../perfil.html', import.meta.url), 'utf8');
+const profileChecks = [
+  ['capa personalizável e seletor de imagem', profileHtml.includes('id="profile-cover"') && profileHtml.includes('id="cover-file"') && profileHtml.includes('uploadMyProfileCover')],
+  ['atalho para trocar a foto de perfil', profileHtml.includes('avatar-add')],
+  ['abas com áreas independentes de publicações, vídeos e curtidas', ['id="profile-posts"','id="profile-videos"','id="profile-likes"'].every(value => profileHtml.includes(value)) && profileHtml.includes('profile-content-panel')],
+  ['contadores de publicações, seguidores e seguindo', profileHtml.includes("'publicações'") && profileHtml.includes("'seguidores'") && profileHtml.includes("'seguindo'")]
+];
+const musicChecks = [
+  ['player imersivo com capa ampliada', index.includes('player-cover') && index.includes('94vw')],
+  ['player com anterior, próximo, voltar, avançar e repetir', ['player-previous','player-next','player-rewind','player-forward','player-repeat'].every(value => index.includes(value))]
+];
+for (const [name, ok] of [...profileChecks, ...musicChecks]) console.log((ok ? 'OK  ' : 'ERRO ') + name);
+if ([...profileChecks, ...musicChecks].some(([, ok]) => !ok)) process.exit(1);
+console.log('Perfil e player: ' + (profileChecks.length + musicChecks.length) + ' verificações.');
