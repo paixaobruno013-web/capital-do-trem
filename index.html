@@ -101,7 +101,7 @@ html.intro-smoke-skip .intro-smoke{display:none!important}
 @keyframes intro-smoke-pass{0%{transform:translate3d(-12%,18%,0) scale(.82);opacity:0}15%{opacity:.88}72%{opacity:.7}100%{transform:translate3d(150%,-12%,0) scale(1.2);opacity:0}}
 @keyframes intro-brand-in{0%,18%{opacity:0;transform:translateY(10px) scale(.97)}42%,78%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-5px) scale(1.02)}}
 @keyframes intro-screen-out{0%,78%{opacity:1}100%{opacity:0;visibility:hidden}}
-@media(prefers-reduced-motion:reduce){.intro-smoke{display:none!important}}
+@media(prefers-reduced-motion:reduce){.intro-smoke{animation:none!important}.intro-smoke__cloud{animation:none!important;opacity:.28!important}}
 
 
 /* Identidade LED vermelha: brilho controlado para destacar sem cansar a leitura. */
@@ -2076,7 +2076,7 @@ async function deleteOfflineMusic(id){
   // Sempre prioriza as configurações atuais do servidor; cache local é somente fallback offline.
   const branding=await brandingRequest.catch(()=>cachedBranding||{});
   const safeUrl=value=>typeof value==='string'&&value.startsWith('https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/')?value:'';
-  const profile=safeUrl(branding.profileImageUrl),opening=safeUrl(branding.openingImageUrl),openingVideo=safeUrl(branding.openingVideoUrl); 
+  const profile=safeUrl(branding.profileImageUrl),opening=safeUrl(branding.openingImageUrl),openingVideo=safeUrl(branding.openingVideoUrl)||'https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/31937786-c321-445f-ae1c-de018eca95c8/branding/opening-video-738faf34-9bbb-45b6-9a67-a4dc0fe265f5.mp4'; 
   // Uploads recebem caminhos únicos no Storage; não é necessário furar o cache a cada abertura.
   // Manter a URL estável permite reutilizar o arquivo já baixado e reduz espera/rede móvel.
   const currentOpeningImage=opening,currentOpeningVideo=openingVideo;
@@ -2172,11 +2172,12 @@ async function deleteOfflineMusic(id){
      try{video.pause();video.removeAttribute('src');video.load();}catch{}
      video.remove();openingPoster.style.opacity='1';
      audioButton.style.display='none';
-     beginOpeningClock();
+     // O relógio só começa quando o vídeo realmente entra em reprodução; o fallback inicia a abertura se a mídia falhar.
+
     };
     // Abertura e trem começam juntos; a rede não pode empurrar a duração para 20+ segundos.
     beginOpeningClock();
-    video.addEventListener('playing',()=>{clearTimeout(fallbackTimer);if(savedOpeningSound&&!video.muted)audioButton.remove();});
+    video.addEventListener('playing',()=>{clearTimeout(fallbackTimer);beginOpeningClock();if(savedOpeningSound&&!video.muted)audioButton.remove();});
     video.addEventListener('loadeddata',async()=>{
      video.playbackRate=1;
      try{
@@ -2195,7 +2196,7 @@ async function deleteOfflineMusic(id){
     // Se a rede não entregar um quadro em cinco segundos, a abertura usa a imagem aprovada em vez de ficar preta.
     // O relógio de 7 segundos é a única condição de encerramento da abertura.
     video.load();
-    fallbackTimer=window.setTimeout(()=>{if(!openingFrameShown)showOpeningFallback();},5000);
+    fallbackTimer=window.setTimeout(()=>{if(!openingFrameShown)showOpeningFallback();},12000);
    }
   }
  }catch(error){
