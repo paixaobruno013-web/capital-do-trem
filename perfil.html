@@ -122,7 +122,14 @@ document.getElementById('story-viewer').addEventListener('click',e=>{if(e.target
     if((mode==='posts'||mode==='likes')&&!mediaItems.length){const tile=document.createElement('article');tile.className='post post-text';tile.append(el('p',String(post.content||'Publicação').trim(),'post-caption-text'));addOwnerPostAction(tile,post);target.append(tile);continue;}
     for(const item of mediaItems){if(mode==='videos'&&item.media_type!=='video')continue;if(mode==='posts'&&item.media_type==='video')continue;visible.push({post,item});}
    }
-   if(!visible.length&&!target.children.length){target.append(el('p',mode==='likes'?'Este usuário ainda não curtiu publicações públicas.':mode==='videos'?'Este perfil ainda não publicou vídeos.':'Este perfil ainda não publicou nada.','post empty'));return;}
+   if(!visible.length&&!target.children.length){
+    const empty=el('p',mode==='likes'?'As publicações que este perfil curtir aparecerão aqui.':mode==='videos'?'Os vídeos publicados por este perfil aparecerão aqui.':'Este perfil ainda não tem publicações.','post empty');
+    target.append(empty);
+    if(mode==='posts'&&social.isOwner){
+     const publish=document.createElement('a');publish.className='action';publish.href='./index.html#divulgue';publish.textContent='＋ Publicar primeira foto ou vídeo';publish.style.display='inline-flex';publish.style.margin='8px 0 14px';target.append(publish);
+    }
+    return;
+   }
    for(const {post,item} of visible){const tile=document.createElement('article');tile.className='post';const url=safeUrl(item.url);if(!url)continue;const media=document.createElement(item.media_type==='video'?'video':'img');media.src=url;if(media.tagName==='VIDEO'){media.controls=true;media.playsInline=true;media.preload='metadata';}else{media.alt=item.alt_text||'Publicação de '+profile.display_name;media.loading='lazy';}tile.append(media);const caption=String(post.content||'').replace(/^\\u200b$/,'').trim();if(caption)tile.append(el('span',caption,'post-caption'));addOwnerPostAction(tile,post);target.append(tile);}
   };
   renderPosts(grid,postsCount,'posts');renderPosts(videoGrid,postsCount,'videos');
