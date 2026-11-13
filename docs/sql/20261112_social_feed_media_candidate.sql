@@ -4,28 +4,9 @@
 
 begin;
 
--- 1) Permitir leitura anônima apenas onde as políticas públicas já definem
--- conteúdo público. A exigência de usuário registrado fica somente nas escritas.
-drop policy if exists require_registered_user on public.posts;
-create policy posts_registered_insert
-  on public.posts as restrictive for insert to authenticated
-  with check ((select private.is_registered_user()));
-create policy posts_registered_update
-  on public.posts as restrictive for update to authenticated
-  using ((select private.is_registered_user()))
-  with check ((select private.is_registered_user()));
-create policy posts_registered_delete
-  on public.posts as restrictive for delete to authenticated
-  using ((select private.is_registered_user()));
-
-drop policy if exists require_registered_user on public.profiles;
-create policy profiles_registered_insert
-  on public.profiles as restrictive for insert to authenticated
-  with check ((select private.is_registered_user()));
-create policy profiles_registered_update
-  on public.profiles as restrictive for update to authenticated
-  using ((select private.is_registered_user()))
-  with check ((select private.is_registered_user()));
+-- 1) Não alterar as políticas existentes de posts e profiles.
+-- Elas já concedem SELECT a anon para posts publicados e perfis públicos.
+-- As regras atuais de autenticação e escrita permanecem intactas.
 
 -- 2) Metadados das mídias do feed. Arquivos ficam no bucket existente,
 -- mas só os caminhos vinculados a posts publicados são apresentados no feed.
