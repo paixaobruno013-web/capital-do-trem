@@ -571,7 +571,7 @@ export async function getPublishedSongs() {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('songs')
     .select('id,title,artist_name,producer_name,description,storage_path,status')
-    .in('status',['pending','published']).order('created_at',{ascending:false}).limit(100);
+    .eq('status','published').order('created_at',{ascending:false}).limit(100);
   if (error) throw error;
   const items = data || [];
   if (!items.length) return [];
