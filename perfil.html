@@ -12,10 +12,10 @@ header{height:58px;border-bottom:1px solid var(--line);display:flex;align-items:
 .brand{font-weight:950;letter-spacing:1.4px}.brand small{display:block;color:var(--muted);font-size:9px;letter-spacing:2px}
 .header-actions{display:flex;gap:8px}.icon-button{width:40px;height:40px;border:1px solid #3a3a3a;border-radius:50%;background:#111;color:#fff;display:grid;place-items:center;text-decoration:none}
 main{max-width:760px;margin:auto;padding-bottom:60px}
-.cover{height:190px;position:relative;background:#171717 url('./assets/favela-header.webp') center 48%/cover no-repeat;border-bottom:2px solid var(--red)}
+.cover{height:220px;position:relative;background:#171717 url('./assets/favela-header.webp') center 48%/cover no-repeat;border-bottom:2px solid var(--red)}.cover-stats{position:absolute;z-index:2;right:12px;bottom:12px;display:grid;grid-template-columns:repeat(3,minmax(65px,1fr));gap:8px;padding:8px 10px;border:1px solid #ffffff40;border-radius:12px;background:#050505b8;backdrop-filter:blur(6px);text-align:center;max-width:72%}.cover-stat strong{display:block;font-size:19px;line-height:1.1;font-weight:950;color:#fff}.cover-stat span{display:block;font-size:10px;color:#eee;white-space:nowrap}
 .cover:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#000b,transparent 65%)}
 .profile-identity{position:relative;padding:0 16px 16px;background:var(--bg)}
-.identity-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:-58px;position:relative;z-index:2}
+.identity-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:-48px;position:relative;z-index:2}
 .avatar{width:116px;height:116px;flex:0 0 116px;border:4px solid #050505;outline:2px solid var(--red);border-radius:50%;overflow:hidden;background:#151515;display:grid;place-items:center;font-size:40px;font-weight:900;box-shadow:0 0 16px #ed1c2470}
 .avatar img{width:100%;height:100%;object-fit:cover}
 .profile-actions{display:flex;gap:8px;padding-bottom:5px}
@@ -24,8 +24,7 @@ main{max-width:760px;margin:auto;padding-bottom:60px}
 .name{font-size:24px;line-height:1.2;margin:12px 0 2px;overflow-wrap:anywhere}.handle{color:var(--muted);margin:0 0 8px}
 .role{display:inline-block;color:#ff777c;border:1px solid #ed1c2466;border-radius:999px;padding:2px 9px;font-size:12px}
 .bio{white-space:pre-wrap;overflow-wrap:anywhere;margin:10px 0 0}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0 4px;padding:13px 6px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);text-align:center}
-.stat strong{display:block;font-size:19px;font-weight:950}.stat span{font-size:12px;color:var(--muted)}
+.profile-tabs{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.profile-tab{border:0;border-bottom:3px solid transparent;background:transparent;color:#aaa;padding:13px 5px 10px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:7px}.profile-tab[aria-selected=true]{color:#fff;border-bottom-color:var(--red)}.profile-tab svg{width:20px;height:20px}
 .stories{padding:15px 14px 10px;border-bottom:1px solid var(--line)}
 .section-title{font-size:14px;font-weight:900;margin:0 0 12px;letter-spacing:.3px}
 .story-rail{display:flex;gap:14px;overflow-x:auto;padding:2px 1px 9px;scrollbar-width:thin}
@@ -44,22 +43,22 @@ main{max-width:760px;margin:auto;padding-bottom:60px}
 #story-viewer.open{display:flex}.story-stage{width:min(100%,430px);height:min(82vh,760px);background:#111;border:1px solid #444;border-radius:16px;overflow:hidden;position:relative;display:flex;flex-direction:column}
 .story-stage img,.story-stage video{width:100%;height:100%;object-fit:contain;min-height:0;background:#000}
 .story-caption{padding:10px 14px;color:#fff}.story-close{position:absolute;right:10px;top:10px;z-index:2;border:0;border-radius:50%;width:38px;height:38px;background:#000b;color:white;font-size:23px}
-@media(max-width:420px){.cover{height:165px}.avatar{width:102px;height:102px;flex-basis:102px}.identity-row{margin-top:-51px}.profile-actions{gap:5px}.action{padding:7px 9px;font-size:12px}.name{font-size:22px}}
+@media(max-width:420px){.cover{height:190px}.cover-stats{right:8px;bottom:8px;gap:4px;padding:7px 6px;max-width:70%}.cover-stat strong{font-size:17px}.cover-stat span{font-size:9px}.avatar{width:102px;height:102px;flex-basis:102px}.identity-row{margin-top:-47px}.profile-actions{gap:5px}.action{padding:7px 9px;font-size:12px}.name{font-size:22px}}
 body.light{color-scheme:light;--bg:#f5f5f5;--panel:#fff;--line:#ddd;--fg:#171717;--muted:#666}body.light header{background:#fff}body.light .action.secondary{background:#fff;color:#111}body.light .avatar{border-color:#f5f5f5}
 </style>
 </head>
 <body>
 <header><div class="brand">CAPITAL DO TREM<small>PERFIL DA COMUNIDADE</small></div><div class="header-actions"><a class="icon-button" href="./index.html" aria-label="Início">⌂</a><a class="icon-button" href="./conta.html" aria-label="Minha conta">⋯</a></div></header>
 <main>
-<div class="cover" role="img" aria-label="Favela e helicóptero"></div>
+<div class="cover" role="img" aria-label="Capa Capital do Trem com favela"><div class="cover-stats" id="cover-stats"></div></div>
 <section class="profile-identity" id="profile-card" aria-live="polite"><p class="muted">Carregando perfil...</p></section>
 <section class="stories"><h2 class="section-title">STORIES</h2><div class="story-rail" id="profile-stories"><a class="story add" href="./conta.html"><span class="story-ring story-add-ring"><span class="story-add-avatar" id="add-story-avatar">U</span><span class="plus">+</span></span><span class="story-name">Seu Story</span></a></div></section>
-<section class="posts"><h2 class="section-title">PUBLICAÇÕES</h2><div class="post-grid" id="profile-posts"><p class="post empty">Carregando publicações...</p></div></section>
+<nav class="profile-tabs" aria-label="Conteúdo do perfil"><button class="profile-tab" type="button" data-tab="posts" aria-selected="true">▦ Publicações</button><button class="profile-tab" type="button" data-tab="videos" aria-selected="false">▷ Vídeos</button><button class="profile-tab" type="button" data-tab="likes" aria-selected="false">♡ Curtidas</button></nav><section class="posts"><div class="post-grid" id="profile-posts"><p class="post empty">Carregando publicações...</p></div></section>
 <a class="back" href="./index.html#comunidade">← Voltar à comunidade</a>
 </main>
 <div id="story-viewer" role="dialog" aria-modal="true" aria-label="Visualizador de Stories"><div class="story-stage"><button class="story-close" id="story-close" aria-label="Fechar">×</button><div id="story-media" style="flex:1;min-height:0;display:grid;place-items:center"></div><div class="story-caption" id="story-caption"></div></div></div>
 <script type="module">
-const card=document.getElementById('profile-card'),grid=document.getElementById('profile-posts'),storyRail=document.getElementById('profile-stories');
+const card=document.getElementById('profile-card'),grid=document.getElementById('profile-posts'),storyRail=document.getElementById('profile-stories'),coverStats=document.getElementById('cover-stats');
 const safeUrl=v=>typeof v==='string'&&v.startsWith('https://')?v:null;
 const el=(tag,value,cls='')=>{const n=document.createElement(tag);n.textContent=value||'';if(cls)n.className=cls;return n;};
 const fmt=n=>new Intl.NumberFormat('pt-BR').format(n||0);
@@ -91,28 +90,21 @@ document.getElementById('story-viewer').addEventListener('click',e=>{if(e.target
   const name=el('h1',profile.display_name||'Participante do Capital do Trem','name');
   const handle=el('p','@'+profile.username,'handle');
   const role=el('span',profile.account_type==='artist'?'Artista / DJ':'Usuário Uai','role');
-  const stats=document.createElement('div');stats.className='stats';
   const postsCount=await api.getPublicProfilePosts(profile.user_id);
-  const stat=(value,label,id)=>{const box=document.createElement('div');box.className='stat';const strong=el('strong',fmt(value));if(id)strong.id=id;box.append(strong,el('span',label));return box;};
-  stats.append(stat(postsCount.length,'publicações'),stat(social.followers,'seguidores','followers-count'),stat(social.following,'seguindo'));
-  card.replaceChildren(identity,name,handle,role,stats);
+  const stat=(value,label,id)=>{const box=document.createElement('div');box.className='cover-stat';const strong=el('strong',fmt(value));if(id)strong.id=id;box.append(strong,el('span',label));return box;};
+  coverStats.replaceChildren(stat(postsCount.length,'publicações'),stat(social.followers,'seguidores','followers-count'),stat(social.following,'seguindo'));
+  card.replaceChildren(identity,name,handle,role);
   if(profile.city)card.append(el('p','📍 '+profile.city,'muted'));
   if(profile.bio)card.append(el('p',profile.bio,'bio'));
-  grid.replaceChildren();
-  if(!postsCount.length)grid.append(el('p','Este perfil ainda não publicou nada.','post empty'));
-  for(const post of postsCount){
-   if(!post.media.length&&!String(post.content||'').replace(/^\u200b$/,'').trim()){continue;}
-   if(!post.media.length){const tile=el('article',String(post.content||'').replace(/^\u200b$/,'').trim(),'post empty');grid.append(tile);continue;}
-   for(const item of post.media){
-    const tile=document.createElement('article');tile.className='post';
-    const url=safeUrl(item.url);if(!url)continue;
-    const media=document.createElement(item.media_type==='video'?'video':'img');media.src=url;
-    if(media.tagName==='VIDEO'){media.controls=true;media.playsInline=true;media.preload='metadata';}else{media.alt=item.alt_text||'Publicação de '+profile.display_name;media.loading='lazy';}
-    tile.append(media);
-    const caption=String(post.content||'').replace(/^\u200b$/,'').trim();if(caption)tile.append(el('span',caption,'post-caption'));
-    grid.append(tile);
-   }
-  }
+  const renderPosts=(items,mode='posts')=>{
+   grid.replaceChildren();const visible=[];
+   for(const post of items||[])for(const item of post.media||[]){if(mode==='videos'&&item.media_type!=='video')continue;visible.push({post,item});}
+   if(!visible.length){grid.append(el('p',mode==='likes'?'Este usuário ainda não curtiu publicações públicas.':mode==='videos'?'Este perfil ainda não publicou vídeos.':'Este perfil ainda não publicou nada.','post empty'));return;}
+   for(const {post,item} of visible){const tile=document.createElement('article');tile.className='post';const url=safeUrl(item.url);if(!url)continue;const media=document.createElement(item.media_type==='video'?'video':'img');media.src=url;if(media.tagName==='VIDEO'){media.controls=true;media.playsInline=true;media.preload='metadata';}else{media.alt=item.alt_text||'Publicação de '+profile.display_name;media.loading='lazy';}tile.append(media);const caption=String(post.content||'').replace(/^\u200b$/,'').trim();if(caption)tile.append(el('span',caption,'post-caption'));grid.append(tile);}
+  };
+  renderPosts(postsCount);
+  const tabs=[...document.querySelectorAll('.profile-tab')];
+  for(const tab of tabs)tab.addEventListener('click',async()=>{tabs.forEach(item=>item.setAttribute('aria-selected',String(item===tab)));const mode=tab.dataset.tab;if(mode==='likes'){grid.replaceChildren(el('p','Carregando curtidas...','post empty'));try{renderPosts(await api.getPublicProfileLikedPosts(profile.user_id),'likes');}catch(error){grid.replaceChildren(el('p','Não foi possível carregar as curtidas públicas.','post empty'));}}else renderPosts(postsCount,mode);});
   const {getActiveUserStories,getMyFollowingProfileIds}=await import('./supabase/auth.js');
   try{
    const [all,followingIds]=await Promise.all([getActiveUserStories(),getMyFollowingProfileIds()]);
