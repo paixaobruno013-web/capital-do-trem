@@ -74,6 +74,10 @@ jobs:
         run: |
           node --check scripts/check-social-owner-delete.mjs
           node scripts/check-social-owner-delete.mjs
+      - name: Verificar armazenamento privado das mídias sociais
+        run: |
+          node --check scripts/check-social-private-media.mjs
+          node scripts/check-social-private-media.mjs
       - name: Verificar curtidas e comentários do mural
         run: |
           node --check scripts/check-post-social.mjs
