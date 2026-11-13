@@ -112,10 +112,12 @@ document.getElementById('story-viewer').addEventListener('click',e=>{if(e.target
     grid.append(tile);
    }
   }
-  const {getActiveUserStories}=await import('./supabase/auth.js');
+  const {getActiveUserStories,getMyFollowingProfileIds}=await import('./supabase/auth.js');
   try{
-   const all=await getActiveUserStories(),groups=new Map();
-   for(const story of all){if(!groups.has(story.author_id))groups.set(story.author_id,[]);groups.get(story.author_id).push(story);}
+   const [all,followingIds]=await Promise.all([getActiveUserStories(),getMyFollowingProfileIds()]);
+   const visibleStories=all.filter(story=>followingIds.includes(story.author_id));
+   const groups=new Map();
+   for(const story of visibleStories){if(!groups.has(story.author_id))groups.set(story.author_id,[]);groups.get(story.author_id).push(story);}
    for(const [author,items] of groups){
     const latest=items[items.length-1];const button=document.createElement('button');button.className='story';button.type='button';
     const ring=document.createElement('span');ring.className='story-ring';const img=document.createElement('img');img.src=safeUrl(latest.avatar_url)||'./marca.svg';img.alt='';ring.append(img);
