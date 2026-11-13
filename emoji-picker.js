@@ -15,11 +15,10 @@ const GROUPS=[
 {name:'Objetos',items:'📱 💻 ⌚ 📷 📹 📺 📻 🔋 💡 🔦 💰 💳 💎 🔑 🔒 🛠️ 🔧 ⚙️ 📌 📍 ✂️ 📝 📚 📦 📫 📣 🔔 🚨 ✅ ❌ ⚠️ ⭐ 🌟 ✨ 💯 🔥'}
 ];
 const STORE='capitaldotrem_emoji_recent_v1';
-const emojiFontStyle=document.createElement('style');emojiFontStyle.textContent='.emoji-choice{font-family:"Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",sans-serif}.emoji-choice .cdt-emoji-image{width:1.35em;height:1.35em;object-fit:contain;vertical-align:middle}.emoji-fallback[hidden]{display:none}';document.head.append(emojiFontStyle);
+const emojiFontStyle=document.createElement('style');emojiFontStyle.textContent='.emoji-choice{font-family:"Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",sans-serif;font-variant-emoji:emoji}.emoji-choice{line-height:1.35}';document.head.append(emojiFontStyle);
 function recent(){try{const a=JSON.parse(localStorage.getItem(STORE)||'[]');return Array.isArray(a)?a.filter(x=>typeof x==='string'&&x.length<=12):[]}catch{return[]}}
 function remember(e){const a=[e,...recent().filter(x=>x!==e)].slice(0,24);try{localStorage.setItem(STORE,JSON.stringify(a))}catch{}}
-function twemojiUrl(e){const code=Array.from(e).map(ch=>ch.codePointAt(0).toString(16)).filter(code=>code!=='fe0f').join('-');return 'https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/'+code+'.svg'}
-function makeButton(e){const b=document.createElement('button');b.type='button';b.className='emoji-choice';b.dataset.emoji=e;b.setAttribute('aria-label','Inserir emoji '+e);const fallback=document.createElement('span');fallback.textContent=e;fallback.className='emoji-fallback';const img=document.createElement('img');img.className='cdt-emoji-image';img.src=twemojiUrl(e);img.alt='';img.setAttribute('aria-hidden','true');img.loading='lazy';img.addEventListener('load',()=>fallback.hidden=true,{once:true});img.addEventListener('error',()=>img.remove(),{once:true});b.append(img,fallback);return b}
+function makeButton(e){const b=document.createElement('button');b.type='button';b.className='emoji-choice';b.dataset.emoji=e;b.setAttribute('aria-label','Inserir emoji '+e);b.textContent=e;return b}
 function build(root){
  const input=document.querySelector(root.dataset.input||'#message');if(!input)return;
  root.classList.add('emoji-picker');
