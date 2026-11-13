@@ -577,30 +577,48 @@ export async function getPublishedSongs() {
   if (!items.length) return [];
   const storage = supabase.storage.from('capital-do-trem-audio');
   const paths = items.map(song => song.storage_path);
-  // Gera os links em lote: duas chamadas de Storage em vez de duas chamadas por música.
-  const [{ data: signed, error: signedError }, { data: downloadable, error: downloadError }] = await Promise.all([
-    storage.createSignedUrls(paths, 60 * 60),
-    storage.createSignedUrls(paths, 60 * 60, { download: true })
-  ]);
-  if (signedError) throw signedError;
-  if (downloadError) throw downloadError;
-  const signedByPath = new Map((signed || []).map(item => [item.path, item.signedUrl]));
-  const downloadByPath = new Map((downloadable || []).map(item => [item.path, item.signedUrl]));
-  return items.map(song => {
-    const audioUrl = signedByPath.get(song.storage_path);
-    const downloadUrl = downloadByPath.get(song.storage_path);
-    if (!audioUrl || !downloadUrl) throw new Error('Não foi possível preparar os links de áudio de todas as músicas. Tente novamente.');
-    return {
-      id:song.id,
-      title:song.title,
-      artist_name:song.artist_name,
-      producer_name:song.producer_name || '',
-      description:song.description,
-      status:song.status,
-      audio_url:audioUrl,
-      download_url:downloadUrl
-    };
-  });
+  let signedRows = [];
+  try {
+    const result = await storage.createSignedUrls(paths, 60 * 60);
+    if (result.error) throw result.error;
+    signedRows = result.data || [];
+  } catch (batchError) {
+    console.warn('Links em lote indisponíveis; tentando preparar cada música separadamente.', batchError);
+  }
+  const signedByPath = new Map(signedRows.filter(item => item?.path && item?.signedUrl && !item?.error).map(item => [item.path, item.signedUrl]));
+  const missing = items.filter(song => !signedByPath.has(song.storage_path));
+  if (missing.length) {
+    const fallbackRows = await Promise.all(missing.map(async song => {
+      try {
+        const result = await storage.createSignedUrl(song.storage_path, 60 * 60);
+        return result.error || !result.data?.signedUrl ? null : [song.storage_path, result.data.signedUrl];
+      } catch {
+        return null;
+      }
+    }));
+    for (const entry of fallbackRows) if (entry) signedByPath.set(entry[0], entry[1]);
+  }
+  let downloadByPath = new Map();
+  try {
+    const result = await storage.createSignedUrls(paths, 60 * 60, { download: true });
+    if (!result.error) downloadByPath = new Map((result.data || []).filter(item => item?.path && item?.signedUrl && !item?.error).map(item => [item.path, item.signedUrl]));
+  } catch (downloadError) {
+    console.warn('Links de download indisponíveis; mantendo a reprodução das músicas.', downloadError);
+  }
+  const available = items.filter(song => signedByPath.has(song.storage_path));
+  if (!available.length) {
+    throw new Error('As faixas estão cadastradas, mas o armazenamento não liberou os links de reprodução. Nenhuma música foi apagada; é necessário revisar o acesso ao bucket de áudio.');
+  }
+  return available.map(song => ({
+    id:song.id,
+    title:song.title,
+    artist_name:song.artist_name,
+    producer_name:song.producer_name || '',
+    description:song.description,
+    status:song.status,
+    audio_url:signedByPath.get(song.storage_path),
+    download_url:downloadByPath.get(song.storage_path) || signedByPath.get(song.storage_path)
+  }));
 }
 
 // Agenda pública: visitantes podem consultar eventos publicados diretamente.
