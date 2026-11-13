@@ -1,5 +1,5 @@
 import {
-  initSupabase, getActiveAdminStories, getActiveUserStories,
+  initSupabase, getActiveAdminStories, getActiveUserStories, getMyBasicProfile,
   subscribeAdminStories, subscribeUserStories
 } from './supabase/auth.js';
 
@@ -56,6 +56,27 @@ function renderHomeStoryTray() {
     entries.push({ id: authorId, name: latest.display_name || 'Usuário Uai', stories: active, avatar: latest.avatar_url || '', latest });
   }
   tray.replaceChildren();
+  const addStory = document.createElement('button');
+  addStory.type = 'button';addStory.className = 'home-story-item home-story-add-item';
+  addStory.setAttribute('aria-label','Adicionar seu Story');addStory.title='Adicionar Story';
+  const addRing=document.createElement('span');addRing.className='home-story-ring';
+  const addAvatar=document.createElement('span');addAvatar.className='home-story-avatar';
+  const addFallback=document.createElement('span');addFallback.textContent='U';addFallback.setAttribute('aria-hidden','true');addAvatar.append(addFallback);
+  const addPlus=document.createElement('span');addPlus.className='home-story-add-plus';addPlus.textContent='+';addPlus.setAttribute('aria-hidden','true');
+  addRing.append(addAvatar,addPlus);
+  const addName=document.createElement('span');addName.className='home-story-name';addName.textContent='Seu story';
+  addStory.append(addRing,addName);
+  addStory.addEventListener('click',()=>document.getElementById('home-story-add')?.click());
+  tray.append(addStory);
+  getMyBasicProfile().then(profile=>{
+    if(!addAvatar.isConnected)return;
+    const avatarUrl=profile?.avatar_url;
+    if(avatarUrl&&/^https:\/\//i.test(avatarUrl)){
+      const image=document.createElement('img');image.src=avatarUrl;image.alt='';image.loading='lazy';image.referrerPolicy='no-referrer';
+      image.onerror=()=>{image.remove();addFallback.textContent=(profile.display_name||'U').trim().charAt(0).toUpperCase()||'U';};
+      addAvatar.replaceChildren(image);
+    }else addFallback.textContent=(profile?.display_name||'U').trim().charAt(0).toUpperCase()||'U';
+  }).catch(()=>{});
   if (!entries.length) {
     const empty = document.createElement('p');
     empty.className = 'muted home-stories-empty';
