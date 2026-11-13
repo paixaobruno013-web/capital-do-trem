@@ -34,6 +34,7 @@ jobs:
         run: |
           node --check home-story-composer.js
           node --check event-social-composer.js
+          node --check social-feed-composer.js
           node --check scripts/check-creator-publishing.mjs
           node scripts/check-creator-publishing.mjs
       - name: Verificar sintaxe do módulo Supabase
