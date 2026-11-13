@@ -608,16 +608,103 @@ export async function submitMyPost(content) {
   return data;
 }
 
-// Mural público: visitantes recebem divulgações publicadas diretamente.
+// Envio de mídia para uma publicação própria do feed social.
+export async function uploadMyPostMedia(file, postId, sortOrder = 0, altText = '') {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para publicar fotos e vídeos.');
+  if (!(file instanceof File)) throw new Error('Selecione uma foto ou vídeo.');
+  const allowed = {
+    'image/jpeg': { ext: 'jpg', type: 'image', max: 10 * 1024 * 1024 },
+    'image/png': { ext: 'png', type: 'image', max: 10 * 1024 * 1024 },
+    'image/webp': { ext: 'webp', type: 'image', max: 10 * 1024 * 1024 },
+    'video/mp4': { ext: 'mp4', type: 'video', max: 50 * 1024 * 1024 },
+    'video/webm': { ext: 'webm', type: 'video', max: 50 * 1024 * 1024 },
+    'video/quicktime': { ext: 'mov', type: 'video', max: 50 * 1024 * 1024 }
+  };
+  const rule = allowed[file.type];
+  if (!rule) throw new Error('Formato não aceito. Use JPG, PNG, WebP, MP4, WebM ou MOV.');
+  if (file.size < 1 || file.size > rule.max) {
+    throw new Error(rule.type === 'image' ? 'Cada foto deve ter até 10 MB.' : 'Cada vídeo deve ter até 50 MB.');
+  }
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(postId || ''))) {
+    throw new Error('Publicação inválida. Atualize a página e tente novamente.');
+  }
+  const { data: post, error: postError } = await supabase.from('posts')
+    .select('id, author_id, status').eq('id', postId).maybeSingle();
+  if (postError) throw postError;
+  if (!post || post.author_id !== user.id || post.status !== 'published') {
+    throw new Error('Só é possível anexar mídia à sua própria publicação publicada.');
+  }
+  const order = Number.isInteger(sortOrder) ? Math.max(0, Math.min(9, sortOrder)) : 0;
+  const safeAlt = String(altText || '').trim().slice(0, 200);
+  const path = user.id + '/posts/' + postId + '/' + crypto.randomUUID() + '.' + rule.ext;
+  const bucket = supabase.storage.from('capital-do-trem-media');
+  const { error: uploadError } = await bucket.upload(path, file, {
+    contentType: file.type, cacheControl: '3600', upsert: false
+  });
+  if (uploadError) throw uploadError;
+  const { data, error } = await supabase.from('post_media').insert({
+    post_id: postId,
+    owner_id: user.id,
+    bucket_id: 'capital-do-trem-media',
+    storage_path: path,
+    media_type: rule.type,
+    mime_type: file.type,
+    byte_size: file.size,
+    sort_order: order,
+    alt_text: safeAlt
+  }).select('id, post_id, media_type, mime_type, byte_size, sort_order, alt_text, storage_path').single();
+  if (error) {
+    await bucket.remove([path]).catch(() => {});
+    throw error;
+  }
+  const { data: publicData } = bucket.getPublicUrl(path);
+  return { ...data, url: publicData?.publicUrl || null };
+}
+
+// Mural público: visitantes recebem publicações e metadados das mídias públicas.
+
 export async function getPublishedPosts() {
   const supabase = initSupabase();
-  const { data, error } = await supabase.from('posts')
-    .select('id, content, created_at')
+  const { data: posts, error } = await supabase.from('posts')
+    .select('id, author_id, content, created_at')
     .eq('status', 'published')
     .order('created_at', { ascending: false })
     .limit(50);
   if (error) throw error;
-  return data || [];
+  if (!posts?.length) return [];
+  const postIds = posts.map(post => post.id);
+  const authorIds = [...new Set(posts.map(post => post.author_id).filter(Boolean))];
+  const [mediaResult, profilesResult] = await Promise.all([
+    supabase.from('post_media')
+      .select('id, post_id, media_type, mime_type, sort_order, alt_text, storage_path')
+      .in('post_id', postIds)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true }),
+    authorIds.length
+      ? supabase.from('profiles')
+          .select('user_id, display_name, username, account_type, avatar_type, avatar_url, avatar_data')
+          .eq('is_public', true)
+          .in('user_id', authorIds)
+      : Promise.resolve({ data: [], error: null })
+  ]);
+  if (mediaResult.error) throw mediaResult.error;
+  if (profilesResult.error) throw profilesResult.error;
+  const profileById = new Map((profilesResult.data || []).map(profile => [profile.user_id, profile]));
+  const mediaByPost = new Map();
+  for (const media of mediaResult.data || []) {
+    const { data: publicData } = supabase.storage.from('capital-do-trem-media').getPublicUrl(media.storage_path);
+    const item = { ...media, url: publicData?.publicUrl || null };
+    if (!mediaByPost.has(media.post_id)) mediaByPost.set(media.post_id, []);
+    mediaByPost.get(media.post_id).push(item);
+  }
+  return posts.map(post => ({
+    ...post,
+    author: profileById.get(post.author_id) || null,
+    media: mediaByPost.get(post.id) || []
+  }));
 }
 
 // Perfil básico para qualquer participante. A visibilidade pública é opcional.
