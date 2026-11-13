@@ -2025,3 +2025,69 @@ export async function toggleSavedPost(postId) {
  if(existing){const {error}=await supabase.from('saved_posts').delete().eq('user_id',user.id).eq('post_id',postId);if(error)throw error;return false;}
  const {error}=await supabase.from('saved_posts').insert({user_id:user.id,post_id:postId});if(error)throw error;return true;
 }
+
+// Rede de seguidores dos perfis públicos.
+export async function getPublicProfileSocial(userId) {
+  const supabase = initSupabase();
+  const [followers, following, { data: { user }, error: userError }] = await Promise.all([
+    supabase.from('profile_follows').select('follower_id', { count: 'exact', head: true }).eq('followed_id', userId),
+    supabase.from('profile_follows').select('followed_id', { count: 'exact', head: true }).eq('follower_id', userId),
+    supabase.auth.getUser()
+  ]);
+  if (userError) throw userError;
+  if (followers.error) throw followers.error;
+  if (following.error) throw following.error;
+  let isFollowing = false;
+  if (user && user.id !== userId) {
+    const { data, error } = await supabase.from('profile_follows')
+      .select('followed_id').eq('follower_id', user.id).eq('followed_id', userId).maybeSingle();
+    if (error) throw error;
+    isFollowing = !!data;
+  }
+  return { followers: followers.count || 0, following: following.count || 0, isFollowing, isOwner: user?.id === userId };
+}
+
+export async function toggleProfileFollow(userId) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para seguir este perfil.');
+  if (!userId || user.id === userId) throw new Error('Você não pode seguir seu próprio perfil.');
+  const { data: existing, error: lookupError } = await supabase.from('profile_follows')
+    .select('followed_id').eq('follower_id', user.id).eq('followed_id', userId).maybeSingle();
+  if (lookupError) throw lookupError;
+  if (existing) {
+    const { error } = await supabase.from('profile_follows').delete()
+      .eq('follower_id', user.id).eq('followed_id', userId);
+    if (error) throw error;
+    return false;
+  }
+  const { error } = await supabase.from('profile_follows').insert({ follower_id: user.id, followed_id: userId });
+  if (error) throw error;
+  return true;
+}
+
+export async function getPublicProfilePosts(userId) {
+  const clean = String(userId || '');
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(clean)) {
+    throw new Error('Perfil inválido.');
+  }
+  const supabase = initSupabase();
+  const { data: posts, error: postsError } = await supabase.from('posts')
+    .select('id,content,created_at').eq('author_id', clean).eq('status', 'published')
+    .order('created_at', { ascending: false }).limit(100);
+  if (postsError) throw postsError;
+  if (!posts?.length) return [];
+  const { data: media, error: mediaError } = await supabase.from('post_media')
+    .select('id,post_id,media_type,mime_type,alt_text,storage_path,sort_order')
+    .in('post_id', posts.map(post => post.id)).order('sort_order', { ascending: true });
+  if (mediaError) throw mediaError;
+  const byPost = new Map();
+  const bucket = supabase.storage.from('capital-do-trem-media');
+  for (const item of media || []) {
+    const { data } = bucket.getPublicUrl(item.storage_path);
+    if (!byPost.has(item.post_id)) byPost.set(item.post_id, []);
+    byPost.get(item.post_id).push({ ...item, url: data?.publicUrl || null });
+  }
+  return posts.map(post => ({ ...post, media: (byPost.get(post.id) || []).filter(item => item.url) }));
+}
