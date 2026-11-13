@@ -17,6 +17,9 @@ const [home, composer, auth, worker, prepare, migration, limits, ownerIndex, acc
 ]);
 
 const checks = [
+  ['stories começam com círculo da foto do usuário e botão +, sem ícone de câmera visível', storiesUi.includes('home-story-add-item') && storiesUi.includes('home-story-add-plus') && storiesUi.includes('getMyBasicProfile') && home.includes('id="home-story-add"') && home.includes('home-stories-hint') && !home.includes('>📷</button>')],
+  ['abertura mantém arte aprovada até o primeiro quadro real do vídeo, evitando flash preto', home.includes('openingPoster') && home.includes('revealOpeningFrame') && home.includes("video.style.opacity='0'") && home.includes('requestVideoFrameCallback') && home.includes('capital-do-trem-v296')],
+
   ['catálogo musical organiza cada faixa em cartão vertical com capa individual, título e artista', home.includes('music-track-card') && home.includes('music-track-cover') && home.includes('makeSongCover') && home.includes('CAPITAL DO TREM') && home.includes("index%2===0?'left':'right'")],
   ['player musical abre em tela cheia com voltar, pausar, adiantar e repetir', home.includes('capital-song-player') && home.includes('player-back') && home.includes('player-main') && home.includes('player-forward') && home.includes('player-repeat') && home.includes('player-progress')],
   ['biblioteca salva e recentes abrem o mesmo player imersivo', home.includes('openSongPlayer(song,audio,card.querySelector') && home.includes("playButton.addEventListener('click',()=>openSongPlayer")],
