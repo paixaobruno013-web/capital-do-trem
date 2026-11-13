@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 
 const read = (path) => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [room, enhancements, emoji, privateChat, worker, stories, home, auth, adminMedia, packageJson, capacitorConfig, androidWorkflow, iosWorkflow] = await Promise.all([
+const [room, enhancements, emoji, privateChat, worker, stories, home, auth, adminMedia, packageJson, capacitorConfig, androidWorkflow, iosWorkflow, moderationMigration] = await Promise.all([
   read('bate-papo.html'),
   read('chat-enhancements.js'),
   read('emoji-picker.js'),
@@ -14,11 +14,13 @@ const [room, enhancements, emoji, privateChat, worker, stories, home, auth, admi
   read('package.json'),
   read('capacitor.config.ts'),
   read('.github/workflows/android-debug-apk.yml'),
-  read('.github/workflows/ios-build.yml')
+  read('.github/workflows/ios-build.yml'),
+  read('supabase/migrations/20261113080000_post_publication_song_restrictions.sql')
 ]);
 
 const checks = [
   ['chat geral possui formulário e campo de mensagem', /id="composer"/.test(room) && /id="message"/.test(room)],
+  ['moderação do chat exige perfil de artista aprovado e reserva bloqueio global ao administrador', moderationMigration.includes("a.status = 'published'") && moderationMigration.includes("if p_action in ('release', 'block_app') and not v_admin then") && moderationMigration.includes('private.is_admin()') && !moderationMigration.includes('moderator.group_id')],
   ['chat geral possui área do seletor de emojis', /id="emoji-tray"[^>]*data-emoji-picker/.test(room)],
   ['botão de emojis é inserido no formulário', /emojiButton\.type\s*=\s*['"]button['"][\s\S]*?emojiButton\.id\s*=\s*['"]emoji-toggle['"]/.test(enhancements) && /form\.insertBefore\(tools,input\)/.test(enhancements)],
   ['botão de gravação de áudio é criado e inserido', /recordButton\.id\s*=\s*['"]record-audio['"]/.test(enhancements) && /tools\.append\(emojiButton,recordButton\)/.test(enhancements)],
