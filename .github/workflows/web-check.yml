@@ -212,3 +212,25 @@ jobs:
           test -s supabase/migrations/20261111174839_restrict_artist_music_to_artist_accounts.sql
           test -s www/manifest.webmanifest
           echo "Preparação web concluída: arquivos essenciais encontrados."
+
+      - name: Registrar diagnóstico automático dos testes web
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+          COMMIT_SHA: ${{ github.sha }}
+          BRANCH_NAME: ${{ github.ref_name }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          {
+            echo '## Diagnóstico automático — testes web'
+            echo "- Resultado dos testes: **${JOB_STATUS}**"
+            echo "- Branch: \`${BRANCH_NAME}\`"
+            echo "- Commit: \`${COMMIT_SHA}\`"
+            echo "- Execução: ${RUN_URL}"
+            if [ "$JOB_STATUS" = success ]; then
+              echo '- Verificações concluídas sem falhas reportadas pelo workflow.'
+            else
+              echo '- Ação necessária: revisar a primeira etapa com falha e seus logs; não aplicar correções sem validar o impacto.'
+            fi
+            echo '- Segurança: nenhuma publicação em produção é realizada por este diagnóstico.'
+          } >> "$GITHUB_STEP_SUMMARY"
