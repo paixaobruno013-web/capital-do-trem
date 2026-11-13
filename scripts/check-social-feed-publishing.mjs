@@ -34,7 +34,7 @@ const checks = [
   ['migração restringe inclusão à conta proprietária e pasta própria', migration.includes('post_media_insert_own') && migration.includes('owner_id = (select auth.uid())') && migration.includes("storage_path like (select auth.uid())::text || '/posts/%'")],
   ['migração impede mídia acima de 10 itens por post', migration.includes('unique (post_id, sort_order)') && migration.includes('sort_order between 0 and 9')],
   ['migração limita tamanho de foto/vídeo e indexa proprietário', limits.includes('byte_size <= 10485760') && limits.includes('byte_size <= 52428800') && ownerIndex.includes('post_media_owner_id_idx')],
-  ['schema base não recria nem substitui as políticas antigas de posts/perfis', !migration.includes('drop policy') && !migration.includes('alter table public.posts') && !migration.includes('alter table public.profiles')]
+  ['migração de mídia não altera as tabelas nem políticas de posts/perfis', !migration.includes('drop policy') && !migration.includes('alter table public.posts') && !migration.includes('alter table public.profiles')]
 ];
 
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO') + ' ' + name);
