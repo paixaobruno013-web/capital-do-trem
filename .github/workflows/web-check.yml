@@ -70,6 +70,10 @@ jobs:
           node --check scripts/check-social-feed-publishing.mjs
           node scripts/check-social-feed-publishing.mjs
           test -s www/social-feed-composer.js
+      - name: Verificar exclusão de publicações pelo titular
+        run: |
+          node --check scripts/check-social-owner-delete.mjs
+          node scripts/check-social-owner-delete.mjs
       - name: Verificar curtidas e comentários do mural
         run: |
           node --check scripts/check-post-social.mjs
