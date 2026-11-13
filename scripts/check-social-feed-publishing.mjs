@@ -13,6 +13,9 @@ const [home, composer, auth, worker, prepare, migration, limits, ownerIndex] = a
 ]);
 
 const checks = [
+  ['navegação principal mostra os acessos de Início, Publicar, Eventos, Músicas e Comunidade', ['inicio','social','eventos','musicas','comunidade'].every(id => home.includes('data-page="'+id+'"'))],
+  ['navegação inclui Artistas, Amigos, Apoiadores, Divulgações, Ajuda, Koe Fala Tu e Perfil', ['artistas','amigos','parcerias','divulgue','duvidas'].every(id => home.includes('data-page="'+id+'"')) && home.includes('Koe Fala Tu') && home.includes('nav-profile')],
+  ['atalhos da página inicial deixam visíveis as áreas mais procuradas', home.includes('aria-label="Acessos rápidos do Capital do Trem"') && ['Publicar foto ou vídeo','Eventos','Músicas','Comunidade','Artistas','Amigos','Lançamentos e divulgações','Koe Fala Tu','Minha conta','Apoiadores'].every(label => home.includes(label))],
   ['compositor de publicação está presente na página Divulgue', home.includes('id="social-post-form"') && home.includes('id="social-post-files"') && home.includes('id="social-post-submit"')],
   ['compositor só libera o formulário após autenticação', composer.includes('getCurrentSession()') && composer.includes('watchAuthChanges') && composer.includes('form.hidden = !signedIn')],
   ['legenda é opcional apenas quando existe mídia e respeita a restrição mínima do banco', composer.includes('if (!pendingContent && !pendingFiles.length)') && auth.includes('allowEmpty = false') && auth.includes('(!allowEmpty && cleanContent.length < 1)') && auth.includes("const storedContent = allowEmpty && cleanContent.length === 0 ? '\\u200b' : cleanContent;") && auth.includes('content: storedContent')],
