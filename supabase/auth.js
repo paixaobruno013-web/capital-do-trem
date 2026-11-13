@@ -2101,3 +2101,32 @@ export async function getMyFollowingProfileIds() {
   if (error) throw error;
   return (data || []).map(row => row.followed_id);
 }
+export async function getPublicProfileLikedPosts(userId) {
+  const clean = String(userId || '');
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(clean)) {
+    throw new Error('Perfil inválido.');
+  }
+  const supabase = initSupabase();
+  const { data: likes, error: likesError } = await supabase.from('post_likes')
+    .select('post_id,created_at').eq('user_id', clean).order('created_at', { ascending: false }).limit(100);
+  if (likesError) throw likesError;
+  const ids = (likes || []).map(item => item.post_id);
+  if (!ids.length) return [];
+  const { data: posts, error: postsError } = await supabase.from('posts')
+    .select('id,author_id,content,created_at').in('id', ids).eq('status', 'published');
+  if (postsError) throw postsError;
+  const byId = new Map((posts || []).map(post => [post.id, post]));
+  const ordered = ids.map(id => byId.get(id)).filter(Boolean);
+  const { data: media, error: mediaError } = await supabase.from('post_media')
+    .select('id,post_id,media_type,mime_type,alt_text,storage_path,sort_order')
+    .in('post_id', ordered.map(post => post.id)).order('sort_order', { ascending: true });
+  if (mediaError) throw mediaError;
+  const bucket = supabase.storage.from('capital-do-trem-media');
+  const byPost = new Map();
+  for (const item of media || []) {
+    const { data } = bucket.getPublicUrl(item.storage_path);
+    if (!byPost.has(item.post_id)) byPost.set(item.post_id, []);
+    byPost.get(item.post_id).push({ ...item, url: data?.publicUrl || null });
+  }
+  return ordered.map(post => ({ ...post, media: (byPost.get(post.id) || []).filter(item => item.url) }));
+}
