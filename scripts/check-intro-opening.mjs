@@ -4,8 +4,11 @@ const [index, admin, auth] = await Promise.all([
   readFile(new URL('../admin.html', import.meta.url), 'utf8'),
   readFile(new URL('../supabase/auth.js', import.meta.url), 'utf8')
 ]);
+const update = await readFile(new URL('../update.js', import.meta.url), 'utf8');
 const pickerGuard = await readFile(new URL('../file-picker-guard.js', import.meta.url), 'utf8');
 const checks = [
+  ['alerta offline aguarda o DOM e aparece mesmo se a conexão cair durante a abertura da página', /document.addEventListener\('DOMContentLoaded',showOffline,\{once:true\}\)/.test(update) && /if\(!alertBox.isConnected\)/.test(update)],
+  ['alerta offline dura 13 segundos e a verificação automática ocorre a cada 10 segundos', /offlineAlertTimer=window.setTimeout\(\(\)=>\{alertBox.style.display='none';offlineAlertActive=false;[\s\S]*?\},13000\)/.test(update) && /window.setInterval\(verifyRealConnection,10\*1000\)/.test(update)],
   ['retorno do seletor restaura a rota antes da abertura', /const FILE_PICKER_RETURN_KEY/.test(index) && /FILE_PICKER_RETURN_URL_KEY/.test(index) && /intro-smoke-skip/.test(index) && /file-picker-guard\.js/.test(index)],
   ['Minha conta carrega a proteção do seletor', /file-picker-guard\.js/.test(await readFile(new URL('../conta.html', import.meta.url), 'utf8'))],
   ['proteção persiste somente campos não sensíveis e nunca tenta restaurar arquivos', /DRAFT_PREFIX/.test(await readFile(new URL('../file-picker-guard.js', import.meta.url), 'utf8')) && /'file','password','hidden'/.test(await readFile(new URL('../file-picker-guard.js', import.meta.url), 'utf8'))],
@@ -17,10 +20,13 @@ const checks = [
   ['imagem de abertura só aparece depois de carregar ou cair no fallback', /intro\.addEventListener\('load',[\s\S]*?intro-brand-pending/.test(index) && /intro\.addEventListener\('error',[\s\S]*?marca\.svg[\s\S]*?intro-brand-pending/.test(index)],
   ['vídeo de abertura aparece sem poster estático ou logo extra', /video\.removeAttribute\('poster'\)/.test(index) && !/posterLayer/.test(index) && !/video\.poster=/.test(index)],
   ['vídeo permanece visível sem poster em espera ou travamento', !/video\.addEventListener\('waiting'/.test(index) && !/video\.addEventListener\('stalled'/.test(index) && /video\.style\.opacity='1'/.test(index)],
-  ['abertura inicia o relógio junto do poster e permanece em 7 segundos mesmo com vídeo lento', /beginOpeningClock\(\);[\s\S]*?video\.addEventListener\('loadeddata'/.test(index) && /finishTimer=window\.setTimeout\(finish,7000\)/.test(index) && !/12000/.test(index)],
-  ['vídeo da abertura tem fallback visual se falhar ou não carregar em cinco segundos', /const showOpeningFallback=\(\)=>/.test(index) && /fallbackTimer=window\.setTimeout\(showOpeningFallback,5000\)/.test(index) && /video\.addEventListener\('error',[\s\S]*?showOpeningFallback\(\)/.test(index)],
+  ['abertura inicia o relógio quando o vídeo começa e permanece por 10 segundos', /video\.addEventListener\('playing',[\s\S]*?beginOpeningClock\(\)[\s\S]*?video\.addEventListener\('loadeddata'/.test(index) && /finishTimer=window\.setTimeout\(finish,10000\)/.test(index)],
+  ['vídeo da abertura tem fallback visual se falhar ou não carregar em cinco segundos', /const showOpeningFallback=\(\)=>/.test(index) && /fallbackTimer=window\.setTimeout\(\(\)=>\{if\(!openingFrameShown\)showOpeningFallback\(\);\},5000\)/.test(index) && /video\.addEventListener\('error',[\s\S]*?showOpeningFallback\(\)/.test(index)],
+  ['fallback também inicia a apresentação de dez segundos', /A imagem de segurança também recebe a apresentação completa de 10 segundos/.test(index) && /showOpeningFallback=\(\)=>\{[\s\S]*?beginOpeningClock\(\)/.test(index)],
+  ['abertura é exibida em toda nova abertura, não apenas uma vez por sessão', !/capitaldotrem_intro_seen_session_v1/.test(index) && /A apresentação deve ocorrer em toda abertura real do aplicativo/.test(index)],
   ['listeners do vídeo são registrados antes de iniciar o carregamento', /video\.addEventListener\('loadeddata'[\s\S]*?video\.load\(\)/.test(index)],
-  ['trem de três vagões mantém a travessia configurada em 5 segundos', /opening-train-cross-sky 5s/.test(index) && /opening-train-travel 5s/.test(index) && /opening-wagon-rear/.test(index) && /opening-wagon-dancers/.test(index) && /opening-wagon-front/.test(index)],
+  ['trem de três vagões atravessa a abertura em 9,8 segundos', /opening-train-cross-sky 9.8s/.test(index) && /opening-train-travel 9.8s/.test(index) && /opening-wagon-rear/.test(index) && /opening-wagon-dancers/.test(index) && /opening-wagon-front/.test(index)],
+  ['frase foi removida da abertura e o banner continua no painel inicial', !/class="opening-slogan"/.test(index) && !index.includes('.intro-smoke.custom-opening-screen .opening-slogan') && /class="hero reference-banner"/.test(index) && /AQUI A MÚSICA/.test(index)],
   ['painel e backend aceitam vídeos de abertura até 50 MB, conforme o bucket', /const max=isVideo\?50:8/.test(admin) && /file\.size>50\*1024\*1024/.test(admin) && /file\.size > 50 \* 1024 \* 1024/.test(auth)],
   ['painel aceita somente vídeo MP4 ou WebM e informa formato inválido', /validVideo=isVideo&&\(\['mp4','webm'\]\.includes\(ext\)/.test(admin) && /Escolha um vídeo MP4 ou WebM/.test(admin)],
   ['vídeos maiores que 6 MB usam envio retomável TUS com progresso', /tus-js-client@4/.test(auth) && /storage\.supabase\.co\/storage\/v1\/upload\/resumable/.test(auth) && /chunkSize: 6 \* 1024 \* 1024/.test(auth) && /options\.onProgress/.test(auth)],
@@ -33,3 +39,31 @@ const checks = [
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO ') + name);
 if (checks.some(([, ok]) => !ok)) process.exit(1);
 console.log('Abertura: ' + checks.length + ' verificações aprovadas.');
+
+// Social profile and full-screen music player regression checks.
+const profileHtml = await readFile(new URL('../perfil.html', import.meta.url), 'utf8');
+const profileChecks = [
+  ['capa personalizável e seletor de imagem', profileHtml.includes('id="profile-cover"') && profileHtml.includes('id="cover-file"') && auth.includes('uploadMyProfileCover')],
+  ['atalho para trocar a foto de perfil', profileHtml.includes('avatar-add')],
+  ['abas com áreas independentes de publicações, vídeos e curtidas', ['id="profile-posts"','id="profile-videos"','id="profile-likes"'].every(value => profileHtml.includes(value)) && profileHtml.includes('profile-content-panel')],
+  ['contadores de publicações, seguidores e seguindo', profileHtml.includes("'publicações'") && profileHtml.includes("'seguidores'") && profileHtml.includes("'seguindo'")],
+  ['JavaScript do perfil sem sequências de quebra de linha inválidas', !profileHtml.includes(';\\n  if')],
+  ['Stories exibem a história do perfil visitado', profileHtml.includes('story.author_id===profile.user_id')],
+  ['aba Curtidas também mostra publicações somente de texto', profileHtml.includes("(mode==='posts'||mode==='likes')&&!mediaItems.length")]
+];
+const musicChecks = [
+  ['player imersivo com capa ampliada', index.includes('player-cover') && index.includes('94vw')],
+  ['player com anterior, próximo, voltar, avançar e repetir', ['player-previous','player-next','player-rewind','player-forward','player-repeat'].every(value => index.includes(value))],
+  ['catálogo mantém faixas válidas mesmo se um link individual falhar', auth.includes('const available = items.filter(song => signedByPath.has(song.storage_path))') && auth.includes('createSignedUrl(song.storage_path, 60 * 60)')]
+];
+for (const [name, ok] of [...profileChecks, ...musicChecks]) console.log((ok ? 'OK  ' : 'ERRO ') + name);
+if ([...profileChecks, ...musicChecks].some(([, ok]) => !ok)) process.exit(1);
+console.log('Perfil e player: ' + (profileChecks.length + musicChecks.length) + ' verificações.');
+
+const connectionChecks = [
+  ['alerta de sinal restabelecido permanece por 13 segundos', /reconnectTimer=window\.setTimeout\(\(\)=>\{alertBox\.style\.display='none';\},13000\)/.test(update)],
+  ['alerta offline permanece por 13 segundos', /offlineAlertTimer=window\.setTimeout[\s\S]*?13000/.test(update)],
+  ['checagem de internet ocorre a cada 10 segundos', /setInterval\(verifyRealConnection,10\*1000\)/.test(update)]
+];
+for (const [name, ok] of connectionChecks) console.log((ok ? 'OK  ' : 'ERRO ') + name);
+if (connectionChecks.some(([, ok]) => !ok)) process.exit(1);

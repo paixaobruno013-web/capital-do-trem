@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 
 const read = (path) => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [room, enhancements, emoji, privateChat, worker, stories, home, auth, adminMedia, packageJson, capacitorConfig, androidWorkflow, iosWorkflow] = await Promise.all([
+const [room, enhancements, emoji, privateChat, worker, stories, home, auth, adminMedia, packageJson, capacitorConfig, androidWorkflow, iosWorkflow, moderationMigration] = await Promise.all([
   read('bate-papo.html'),
   read('chat-enhancements.js'),
   read('emoji-picker.js'),
@@ -14,11 +14,13 @@ const [room, enhancements, emoji, privateChat, worker, stories, home, auth, admi
   read('package.json'),
   read('capacitor.config.ts'),
   read('.github/workflows/android-debug-apk.yml'),
-  read('.github/workflows/ios-build.yml')
+  read('.github/workflows/ios-build.yml'),
+  read('supabase/migrations/20261113080000_post_publication_song_restrictions.sql')
 ]);
 
 const checks = [
   ['chat geral possui formulário e campo de mensagem', /id="composer"/.test(room) && /id="message"/.test(room)],
+  ['moderação do chat exige perfil de artista aprovado e reserva bloqueio global ao administrador', moderationMigration.includes("a.status = 'published'") && moderationMigration.includes("if p_action in ('release', 'block_app') and not v_admin then") && moderationMigration.includes('private.is_admin()') && !moderationMigration.includes('moderator.group_id') && moderationMigration.includes('p_target_user_id = auth.uid()') && moderationMigration.includes('public.admin_users au')],
   ['chat geral possui área do seletor de emojis', /id="emoji-tray"[^>]*data-emoji-picker/.test(room)],
   ['botão de emojis é inserido no formulário', /emojiButton\.type\s*=\s*['"]button['"][\s\S]*?emojiButton\.id\s*=\s*['"]emoji-toggle['"]/.test(enhancements) && /form\.insertBefore\(tools,input\)/.test(enhancements)],
   ['botão de gravação de áudio é criado e inserido', /recordButton\.id\s*=\s*['"]record-audio['"]/.test(enhancements) && /tools\.append\(emojiButton,recordButton\)/.test(enhancements)],
@@ -26,12 +28,12 @@ const checks = [
   ['gravador encerra faixas do microfone', /getTracks\(\)\.forEach\(track=>track\.stop\(\)\)/.test(enhancements)],
   ['gravador tem limite de 60 segundos', /60000/.test(enhancements)],
   ['seletor oferece categorias e recentes', /Mais usados/.test(emoji) && /emoji-category-tabs/.test(emoji) && /renderRecent\(\)/.test(emoji)],
-  ['seletor usa imagens Twemoji com fallback para ampliar compatibilidade de emojis', emoji.includes('cdn.jsdelivr.net/gh/jdecked/twemoji') && /emoji-fallback/.test(emoji)],
+  ['seletor renderiza emojis Unicode nativamente sem depender de imagens externas', /font-variant-emoji:emoji/.test(emoji) && /b\.textContent=e/.test(emoji) && !emoji.includes('twemojiUrl')],
   ['Fazer Amigos aparece abaixo do bate-papo e lista somente perfis públicos', /id=\"fazer-amigos\"/.test(room) && /chat-friends-directory/.test(room) && /getPublicProfiles\(\)/.test(room) && /is_public/.test(auth)],
   ['Fazer Amigos não cria ícone extra na navegação inicial e permanece abaixo do chat', !/data-page=\"amigos\"/.test(home) && /id=\"fazer-amigos\"/.test(room) && /chat-friends-directory/.test(room)],
   ['mensagens privadas possuem botão de emojis e seletor', /id="private-emoji-toggle"/.test(privateChat) && /id="emoji-tray"[^>]*data-emoji-picker/.test(privateChat)],
-  ['mensagens do bate-papo geral usam imagens emoji com fallback', /function appendEmojiText\(/.test(room) && /appendEmojiText\(body,part\)/.test(room)],
-  ['conversas privadas e grupo renderizam emojis com suporte visual ampliado', /function appendEmojiText\(/.test(privateChat) && /appendEmojiText\(b,m\.content\|\|''\)/.test(privateChat) && /appendEmojiText\(box,m\.content\|\|''\)/.test(privateChat)],
+  ['mensagens do bate-papo geral preservam emojis Unicode completos sem dependência externa', /function appendEmojiText\(target,value\)/.test(room) && /Preserva a sequência Unicode completa/.test(room) && /appendEmojiText\(body,part\)/.test(room)],
+  ['conversas privadas e grupo preservam emojis Unicode completos nas mensagens', /function appendEmojiText\(target,value\)/.test(privateChat) && /Preserva a sequência Unicode completa/.test(privateChat) && /appendEmojiText\(b,m\.content\|\|''\)/.test(privateChat) && /appendEmojiText\(box,m\.content\|\|''\)/.test(privateChat)],
   ['service worker inclui os módulos de chat e mensagens privadas', /chat-enhancements\.js/.test(worker) && /emoji-picker\.js/.test(worker) && /mensagens\.html/.test(worker)],
 
   ['seletor mantém campo de mensagem e envio visíveis enquanto aberto', !privateChat.includes('#compose.emoji-open #message,#compose.emoji-open #send,#compose.emoji-open #private-emoji-toggle{display:none}') && !room.includes('.composer.emoji-open #message,.composer.emoji-open #camera-open,.composer.emoji-open #record-audio,.composer.emoji-open #send,.composer.emoji-open .chat-tools{display:none!important}')],
@@ -50,13 +52,15 @@ const checks = [
   ['arte padrão antiga fica oculta até confirmar a mídia atual', home.includes('<img src="marca.svg" alt="" style="visibility:hidden">') && home.includes("if(opening&&!openingVideo)")],
   ['vídeo de abertura aparece sem poster ou logo extra durante o carregamento', home.includes("video.removeAttribute('poster')") && !home.includes('video.poster=') && home.includes("video.style.opacity='1'")],
   ['vídeo usa pré-carregamento e velocidade normal', home.includes("video.preload='auto'") && home.includes('video.playbackRate=1')],
-  ['relógio de 7 segundos começa imediatamente e não espera o vídeo reproduzir', home.includes('beginOpeningClock();') && home.indexOf('beginOpeningClock();') < home.indexOf("video.addEventListener('loadeddata'") && !home.includes("video.addEventListener('playing',beginOpeningClock")],
-  ['abertura de vídeo mantém duração fixa de 7 segundos e interrompe o áudio ao fechar', home.includes('finishTimer=window.setTimeout(finish,7000)') && home.includes("video.pause();screen.classList.add('is-finished')") && home.includes("video.addEventListener('ended',finish")],
-  ['trem de 5 segundos começa junto do relógio de 7 segundos', home.includes('clockStarted=true;startOpeningTrain();finishTimer=window.setTimeout(finish,7000)') && home.includes("opening-train-cross-sky 5s linear 1 both") && home.includes("video.addEventListener('error',()=>{console.warn('Falha ao carregar o vídeo de abertura; usando a imagem de segurança.');showOpeningFallback();")],
-  ['abertura com imagem sincroniza trem por 5 segundos e duração total de 7 segundos', home.includes('const begin=()=>{if(started)return;started=true;startOpeningTrain();window.setTimeout(finish,7000);}') && home.includes("animation:opening-train-cross-sky 5s linear 1 both!important") && home.includes('Abertura de 7 segundos com som ligado por padrão.')],
+  ['relógio de 10 segundos começa quando o vídeo realmente reproduz', home.includes("video.addEventListener('playing',()=>{if(finished)return;clearTimeout(fallbackTimer);beginOpeningClock();") && home.includes('finishTimer=window.setTimeout(finish,10000)')],
+  ['abertura de vídeo mantém duração fixa de 10 segundos e mantém o áudio até o fim', home.includes('finishTimer=window.setTimeout(finish,10000)') && home.includes('video.pause();openingPoster.remove();screen.classList.add(\'is-finished\')') && !home.includes("video.addEventListener('ended',finish")],
+  ['trem de 9,8 segundos começa junto do relógio de 10 segundos', home.includes('clockStarted=true;startOpeningTrain();finishTimer=window.setTimeout(finish,10000)') && home.includes("opening-train-cross-sky 9.8s linear 1 both") && home.includes("video.addEventListener('error',()=>{console.warn('Falha ao carregar o vídeo de abertura; usando a imagem de segurança.');showOpeningFallback();")],
+  ['abertura com imagem sincroniza trem por 9,8 segundos e duração total de 10 segundos', home.includes('const begin=()=>{if(started)return;started=true;startOpeningTrain();window.setTimeout(finish,10000);}') && home.includes("animation:opening-train-cross-sky 9.8s linear 1 both!important") && home.includes('Abertura de 10 segundos com som ligado por padrão.')],
   ['autoplay com som bloqueado tenta iniciar mudo e oferece ativação', home.includes('video.muted=true;video.defaultMuted=true') && home.includes("audioButton.style.display='block'")],
-  ['vídeo lento usa imagem de segurança após cinco segundos e encerra no relógio de 7 segundos', !home.includes("video.addEventListener('waiting'") && !home.includes("video.addEventListener('stalled'") && home.includes('finishTimer=window.setTimeout(finish,7000)') && home.includes('fallbackTimer=window.setTimeout(showOpeningFallback,5000)') && home.includes('beginOpeningClock();') && !home.includes('12000')],
-  ['publicação do vídeo confirma URL gravada e resposta de vídeo', adminMedia.includes('saved.openingVideoUrl!==url') && adminMedia.includes("method:'HEAD',cache:'no-store'") && adminMedia.includes('content-type') ]
+  ['vídeo lento usa imagem de segurança após doze segundos e então exibe a abertura por 10 segundos', !home.includes("video.addEventListener('waiting'") && !home.includes("video.addEventListener('stalled'") && home.includes('finishTimer=window.setTimeout(finish,10000)') && home.includes('fallbackTimer=window.setTimeout(()=>{if(!openingFrameShown)showOpeningFallback();},5000)') && home.includes('const showOpeningFallback=()=>') && home.includes('beginOpeningClock();')],
+  ['abertura remove a sobreposição sem transição para impedir rastro do quadro anterior', home.includes("video.style.transition='none'") && home.includes(";z-index:2;opacity:1;transition:none'") && home.includes("video.style.opacity='1';openingPoster.remove();")],
+  ['publicação do vídeo confirma URL gravada e resposta de vídeo', adminMedia.includes('saved.openingVideoUrl!==url') && adminMedia.includes("method:'HEAD',cache:'no-store'") && adminMedia.includes('content-type')],
+  ['texto AQUI A MÚSICA NÃO PARA foi removido somente da abertura e o banner inicial foi restaurado', !home.includes('class="opening-slogan"') && !home.includes('.intro-smoke.custom-opening-screen .opening-slogan') && home.includes('class="hero reference-banner"')]
 
 
 ];

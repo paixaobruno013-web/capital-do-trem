@@ -338,17 +338,9 @@ function drawIncoming(){
  if(!pending.length){box.append(node('p','empty','Nenhum convite recebido.'));return;}
  for(const c of pending){const row=node('div','person'),copy=node('div','person-copy'),name=node('strong',null,personName(partner(c))),meta=node('span','small','Quer conversar com você.'),accept=node('button','primary','Aceitar'),decline=node('button',null,'Recusar'),actions=node('div','actions');copy.append(name,meta);actions.append(accept,decline);for(const [btn,decision] of [[accept,'accepted'],[decline,'declined']])btn.addEventListener('click',async()=>{btn.disabled=true;try{await decidePrivateConversation(c.id,decision);await refresh();if(decision==='accepted'){const latest=state.conversations.find(x=>x.id===c.id);if(latest)openConversation(latest);}}catch(e){$('status').textContent=e.message||'Não foi possível atualizar o convite.';btn.disabled=false;}});row.append(avatarNode(profileFor(partner(c))),copy,actions);box.append(row);}
 }
-function emojiAssetUrl(value){const code=Array.from(value).map(ch=>ch.codePointAt(0).toString(16)).filter(code=>code!=='fe0f').join('-');return 'https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/'+code+'.svg'}
 function appendEmojiText(target,value){
- const source=String(value||'');
- if(typeof Intl.Segmenter!=='function'){target.append(document.createTextNode(source));return;}
- const segments=new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(source);
- for(const part of segments){
-  const chunk=part.segment;
-  if(/[\p{Extended_Pictographic}\p{Regional_Indicator}]/u.test(chunk)||chunk.includes('\u20e3')){
-   const img=document.createElement('img');img.className='cdt-emoji-image';img.src=emojiAssetUrl(chunk);img.alt=chunk;img.setAttribute('role','img');img.loading='lazy';img.addEventListener('error',()=>img.replaceWith(document.createTextNode(chunk)),{once:true});target.append(img);
-  }else target.append(document.createTextNode(chunk));
- }
+ // Preserva a sequência Unicode completa: emojis compostos, tons de pele, bandeiras e famílias.
+ target.append(document.createTextNode(String(value||'')));
 }
 function drawMessage(m){
  if($('messages').querySelector('[data-id="'+m.id+'"]'))return;

@@ -56,7 +56,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Capital do Trem">
 <meta name="twitter:description" content="A música da nossa quebrada! Música, cultura e comunidade.">
-<link rel="apple-touch-icon" sizes="180x180" href="https://zmjxkfjzrbbxyvgkwirv.supabase.co/functions/v1/capital-do-trem-pwa-icon">
+<link rel="apple-touch-icon" sizes="180x180" href="https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/31937786-c321-445f-ae1c-de018eca95c8/branding/official-logo-d2daa073-35ba-456e-90ee-f156c9a1d450.jpg">
 <link rel="manifest" href="manifest.webmanifest"><title>Capital do Trem</title>
 <style>
 :root{color-scheme:dark;--bg:#000000;--panel:#0b0b0b;--panel2:#141414;--fg:#fff;--muted:#aaa;--red:#ed1c24;--line:#292929}
@@ -80,8 +80,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @media(min-width:650px){.hero{padding:34px}.hero p{max-width:650px}}
  .connection-status{margin:0 0 12px;padding:11px 13px;border:1px solid var(--red);border-radius:10px;background:var(--panel2);color:var(--fg)}.connection-status[hidden]{display:none}
  .skip-link{position:absolute;left:12px;top:-60px;z-index:1000;background:var(--red);color:#fff;padding:12px 16px;border-radius:9px;font-weight:800;text-decoration:none}.skip-link:focus{top:12px}
-/* Abertura cinematográfica: fumaça leve atravessando a marca. */
-.intro-smoke{position:fixed;inset:0;z-index:9998;display:grid;place-items:center;overflow:hidden;background:#000;pointer-events:none;animation:intro-screen-out 7s ease-in-out forwards}
+/* Abertura cinematográfica de 10 segundos: fumaça leve atravessando a marca. */
+.intro-smoke{position:fixed;inset:0;z-index:9998;display:grid;place-items:center;overflow:hidden;background:#000;pointer-events:none;animation:intro-screen-out 10s ease-in-out forwards}
 .intro-smoke__brand{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;opacity:0;animation:intro-brand-in 6.5s ease-out forwards}
 html.intro-brand-pending .intro-smoke__brand{opacity:0!important;visibility:hidden!important}
 .intro-smoke__brand img{width:clamp(92px,24vw,150px);height:auto;max-height:150px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(255,255,255,.18))}
@@ -101,7 +101,7 @@ html.intro-smoke-skip .intro-smoke{display:none!important}
 @keyframes intro-smoke-pass{0%{transform:translate3d(-12%,18%,0) scale(.82);opacity:0}15%{opacity:.88}72%{opacity:.7}100%{transform:translate3d(150%,-12%,0) scale(1.2);opacity:0}}
 @keyframes intro-brand-in{0%,18%{opacity:0;transform:translateY(10px) scale(.97)}42%,78%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-5px) scale(1.02)}}
 @keyframes intro-screen-out{0%,78%{opacity:1}100%{opacity:0;visibility:hidden}}
-@media(prefers-reduced-motion:reduce){.intro-smoke{display:none!important}}
+@media(prefers-reduced-motion:reduce){.intro-smoke{animation:none!important}.intro-smoke__cloud{animation:none!important;opacity:.28!important}}
 
 
 /* Identidade LED vermelha: brilho controlado para destacar sem cansar a leitura. */
@@ -383,6 +383,7 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
 .home-event-feed{margin-bottom:14px;border:1px solid rgba(237,28,36,.5)!important;background:linear-gradient(150deg,#1a1012,#080808 78%)!important;box-shadow:0 0 20px #ed1c2416}.home-event-feed[hidden]{display:none!important}.home-event-feed-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}.home-event-feed-heading span{font-size:10px;font-weight:900;letter-spacing:1.5px;color:#ff7078}.home-event-feed-heading h2{margin:4px 0;font-size:21px}.home-event-feed-heading>a{color:#fff;text-decoration:none;border:1px solid #ed1c24;border-radius:999px;padding:7px 11px;font-size:12px;font-weight:800}.home-event-feed-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}.home-event-feed-card{min-width:0;overflow:hidden;border:1px solid #3a292c;border-radius:14px;background:#100d0e}.home-event-feed-card img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;background:#050505}.home-event-feed-card-body{padding:11px}.home-event-feed-card h3{margin:0 0 7px;font-size:16px;overflow-wrap:anywhere}.home-event-feed-meta{font-size:12px;color:#c7babc;margin:5px 0}.home-event-feed-card audio{width:100%;height:38px;margin-top:8px}.home-event-feed-card .home-event-map{display:inline-block;margin-top:8px;color:#ff777e;font-size:12px;font-weight:800}.home-event-feed-card .home-event-description{font-size:13px;line-height:1.45;color:#ddd;white-space:pre-wrap}.home-event-feed-share{width:100%;margin-top:9px;min-height:38px;border:1px solid #ed1c24;border-radius:10px;background:#211416;color:#fff;font-weight:800}@media(max-width:520px){.home-event-feed-list{grid-template-columns:1fr}.home-event-feed-card img{max-height:440px;object-fit:cover}}.home-youtube{border-color:rgba(237,28,36,.55);box-shadow:0 0 18px rgba(237,28,36,.12)}
 .home-youtube h2{margin:0 0 5px;font-size:clamp(21px,4vw,28px)}
 .home-youtube-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
+.social-feed-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.social-feed-heading h2{margin:0}.social-feed-filters{display:flex;gap:6px}.social-feed-filter{border:1px solid #454545;background:#111;color:#ddd;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:850}.social-feed-filter.active{border-color:#ed1c24;background:#ed1c24;color:#fff;box-shadow:0 0 12px #ed1c2440}.social-feed-filter:disabled{opacity:.45;cursor:not-allowed}.social-feed-hint{font-size:12px;color:var(--muted);margin:8px 0 12px}
 .home-stories{margin-bottom:14px;padding:13px!important}.home-stories-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}.home-stories-heading h2{font-size:17px;margin:0}.home-stories-heading>a{color:var(--fg);font-size:12px;font-weight:800;text-decoration:none;border:1px solid #ed1c24;border-radius:999px;padding:7px 10px}.home-stories-list{display:flex;gap:13px;overflow-x:auto;padding:12px 2px 5px;scroll-snap-type:x proximity;overscroll-behavior-x:contain}.home-story-item{flex:0 0 72px;width:72px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:var(--fg);font:inherit;cursor:pointer;scroll-snap-align:start}.home-story-ring{width:66px;height:66px;border-radius:50%;padding:3px;display:grid;place-items:center;background:linear-gradient(135deg,#ffcc33,#ed1c24,#a855f7);box-shadow:0 0 12px #ed1c2440}.home-story-ring.seen{background:#777;box-shadow:none}.home-story-avatar{width:100%;height:100%;border-radius:50%;border:2px solid #080808;background:#171717;color:#fff;display:grid;place-items:center;overflow:hidden;font-size:20px;font-weight:900}.home-story-avatar img{width:100%;height:100%;object-fit:cover}.home-story-name{width:100%;font-size:11px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.home-story-item:focus-visible{outline:2px solid #ed1c24;outline-offset:3px;border-radius:12px}.home-stories-empty{font-size:12px;padding:4px 0}@media(prefers-reduced-motion:no-preference){.home-story-ring{transition:transform .18s ease}.home-story-item:active .home-story-ring{transform:scale(.94)}}
 .home-youtube-video{min-width:0;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--panel2)}
 .home-youtube-order{display:block;margin-bottom:8px;color:var(--red);font-size:12px;font-weight:900;letter-spacing:.3px}
@@ -583,7 +584,7 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
  border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
  transform:translate(-50%,-58%)!important;font-size:27px!important;line-height:1!important;
  white-space:nowrap!important;filter:drop-shadow(0 1px 3px #000)!important;
- animation:opening-train-travel 5s linear 1 forwards!important;
+ animation:opening-train-travel 9.8s linear 1 forwards!important;
 }
 @keyframes opening-train-travel{
  from{left:-140px}
@@ -795,7 +796,7 @@ html.auth-check-pending body{visibility:hidden}
   transform:translateY(-58%)!important;font-size:clamp(27px,7vw,36px)!important;
   line-height:1!important;white-space:nowrap!important;
   filter:drop-shadow(0 2px 4px #000) drop-shadow(0 0 7px rgba(255,20,28,.7))!important;
-  animation:opening-train-cross-sky 5s linear 1 both!important;
+  animation:opening-train-cross-sky 9.8s linear 1 both!important;
 }
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train .opening-locomotive{
   transform:none!important;
@@ -809,10 +810,10 @@ html.auth-check-pending body{visibility:hidden}
 }
 
 
-/* Abertura: duração total de 10s; locomotiva à frente puxando os três vagões por 9,8s. */
+/* Abertura: duração total de 7s; locomotiva atravessa a tela em 5s. */
 .intro-smoke.custom-opening-screen{animation:none!important;opacity:1!important}
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train{
-  animation:opening-train-cross-sky 5s linear 1 both!important;
+  animation:opening-train-cross-sky 9.8s linear 1 both!important;
 }
 @keyframes opening-train-cross-sky{
   from{left:-190px}
@@ -853,13 +854,13 @@ body.light header.header-has-custom-background::before{
 .intro-smoke.custom-opening-screen .opening-live-spinner,.intro-smoke.custom-opening-screen .opening-live-loader>strong,.intro-smoke.custom-opening-screen #opening-live-progress{display:none!important}
 .intro-smoke.custom-opening-screen .opening-live-track{position:absolute!important;left:0!important;right:0!important;top:50%!important;bottom:auto!important;width:100%!important;height:44px!important;border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}
 .intro-smoke.custom-opening-screen .opening-live-track:before{content:"";position:absolute;left:0;right:0;bottom:5px;height:2px;background:linear-gradient(90deg,transparent,#ed1c24 15%,#aaa 50%,#ed1c24 85%,transparent);opacity:.8}
-.intro-smoke.custom-opening-screen .opening-live-track #opening-live-train{position:absolute!important;z-index:3!important;top:50%!important;left:-230px!important;display:flex!important;flex-flow:row nowrap!important;align-items:flex-end!important;justify-content:flex-start!important;gap:3px!important;width:max-content!important;height:42px!important;max-width:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;transform:translateY(-58%)!important;font-size:clamp(27px,7vw,36px)!important;line-height:1!important;white-space:nowrap!important;filter:drop-shadow(0 2px 4px #000) drop-shadow(0 0 7px rgba(255,20,28,.7))!important;animation:opening-train-cross-sky 5s linear 1 both!important}
+.intro-smoke.custom-opening-screen .opening-live-track #opening-live-train{position:absolute!important;z-index:3!important;top:50%!important;left:-230px!important;display:flex!important;flex-flow:row nowrap!important;align-items:flex-end!important;justify-content:flex-start!important;gap:3px!important;width:max-content!important;height:42px!important;max-width:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;transform:translateY(-58%)!important;font-size:clamp(27px,7vw,36px)!important;line-height:1!important;white-space:nowrap!important;filter:drop-shadow(0 2px 4px #000) drop-shadow(0 0 7px rgba(255,20,28,.7))!important;animation:opening-train-cross-sky 9.8s linear 1 both!important}
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train .opening-locomotive{order:4!important;transform:scaleX(-1)!important;font-size:36px!important;line-height:1!important}
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train .opening-wagon-rear{order:1!important}
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train .opening-wagon-dancers{order:2!important}
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train .opening-wagon-front{order:3!important}
 @keyframes opening-train-cross-sky{from{left:-230px}to{left:calc(100vw + 230px)}}
-@media(prefers-reduced-motion:reduce){.intro-smoke.custom-opening-screen .opening-live-track #opening-live-train{animation:opening-train-cross-sky 5s linear 1 both!important}}
+@media(prefers-reduced-motion:reduce){.intro-smoke.custom-opening-screen .opening-live-track #opening-live-train{animation:opening-train-cross-sky 9.8s linear 1 both!important}}
 .post-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.saved-publications{margin-top:14px;border-color:#ed1c2455}.saved-publications .item{border-left:3px solid #ed1c24}
 
 /* Botão Logo Ali: formato horizontal com contorno LED vermelho */
@@ -911,11 +912,40 @@ body.light header.header-has-custom-background::before{
 // Se o Android encerrar o processo enquanto a câmera nativa está aberta, retoma a conversa em vez de reiniciar na página inicial.
 try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(localStorage.getItem(key)||0);if(started&&Date.now()-started<3*60*1000){localStorage.removeItem(key);location.replace('./bate-papo.html?retorno-camera=1');}}catch(error){}
 </script>
-</head>
+<style>
+.profile-menu-cluster{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:56px}
+.profile-overflow{position:relative;z-index:120}
+.profile-overflow summary{list-style:none;cursor:pointer;display:grid;place-items:center;width:34px;height:25px;border-radius:8px;color:var(--fg);font-size:24px;font-weight:900;line-height:1}
+.profile-overflow summary::-webkit-details-marker{display:none}
+.profile-overflow[open] summary{background:var(--panel2);color:var(--red)}
+.profile-overflow-panel{position:absolute;right:0;top:29px;z-index:500;display:grid;min-width:205px;padding:7px;border:1px solid var(--line);border-radius:12px;background:#090909;box-shadow:0 12px 34px #000a}
+.profile-overflow-panel a{display:block;padding:10px 12px;border-radius:8px;color:#fff;text-decoration:none;font-size:13px}
+.profile-overflow-panel a:hover,.profile-overflow-panel a:focus{background:#241012;color:#fff}
+.profile-avatar-link{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--fg);text-decoration:none;font-size:11px;font-weight:800}
+.profile-avatar-link:first-letter{font-size:25px}
+.profile-avatar-link{font-size:11px}
+.profile-avatar-link::before{content:"";position:absolute}
+.reference-trending>h2{margin:0 0 12px;font-size:20px}
+.saved-publications{margin-top:14px;padding-top:10px;border-top:1px solid var(--line)}
+.saved-publications summary{cursor:pointer;font-weight:800}
+.home-friends-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.home-music-entry{border-color:rgba(237,28,36,.45);background:linear-gradient(145deg,var(--panel2),var(--panel))}
+.home-youtube{order:2}
+@media(max-width:759px){header .header-action-groups{align-items:flex-end;flex-direction:row;justify-content:center;gap:12px;margin-top:8px}.header-action-row{width:auto}.profile-overflow-panel{right:-10px}}
+</style>
+<style id="capital-music-player-styles">
+#published-song-catalog{display:grid;gap:14px}.music-track-card{display:grid;grid-template-columns:minmax(104px,132px) minmax(0,1fr);gap:13px;align-items:start;background:#101010;border:1px solid #292929;border-radius:14px;padding:12px;min-width:0}.music-track-cover{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px;background:#080808;display:block}.music-track-info{min-width:0}.music-track-info h3{margin:0 0 4px;overflow-wrap:anywhere}.music-track-info p{margin:3px 0}.music-track-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.music-track-actions button,.music-track-actions a{min-height:40px;font-size:13px}.music-track-audio{display:none!important}
+#capital-song-player{position:fixed;inset:0;z-index:99999;background:#050505;color:#fff;display:none;overflow:auto;padding:env(safe-area-inset-top) 18px env(safe-area-inset-bottom);font-family:system-ui,sans-serif}#capital-song-player.is-open{display:flex;flex-direction:column}#capital-song-player .player-top{display:flex;align-items:center;justify-content:space-between;min-height:58px}#capital-song-player .player-back{border:0;background:transparent;color:#fff;font-size:16px;padding:10px}#capital-song-player .player-cover{width:min(94vw,560px);max-height:54vh;aspect-ratio:1/1;object-fit:cover;border-radius:14px;align-self:center;margin:clamp(8px,2.5vh,24px) auto 16px;box-shadow:0 12px 40px #000}#capital-song-player .player-title{text-align:center;font-size:23px;font-weight:900;margin:0}#capital-song-player .player-artist{text-align:center;color:#aaa;margin:5px 0 12px}#capital-song-player .player-status{min-height:22px;margin:0 0 10px;text-align:center;color:#ffb3b6;font-size:13px}#capital-song-player .player-status[hidden]{display:none}#capital-song-player .player-progress{width:100%;accent-color:#ed1c24}#capital-song-player .player-times{display:flex;justify-content:space-between;color:#aaa;font-size:12px}#capital-song-player .player-controls{display:flex;align-items:center;justify-content:center;gap:clamp(10px,5vw,28px);margin:25px 0}#capital-song-player .player-controls button{width:54px;height:54px;border-radius:50%;border:1px solid #333;background:#171717;color:#fff;font-size:20px}#capital-song-player .player-controls .player-main{width:70px;height:70px;background:#ed1c24;border-color:#ed1c24;font-size:26px}#capital-song-player .player-controls button[aria-pressed=true]{color:#ff454c;border-color:#ed1c24}@media(max-width:390px){.music-track-card{grid-template-columns:94px minmax(0,1fr);gap:10px;padding:9px}.music-track-actions{gap:5px}.music-track-actions button,.music-track-actions a{padding:8px;font-size:12px}}
+</style><style id="home-story-add-profile-style">
+.home-stories-hint{font-size:11px;color:var(--muted,#aaa)}
+.home-story-item.home-story-add-item .home-story-ring{background:linear-gradient(135deg,#ed1c24,#080808);position:relative}
+.home-story-item.home-story-add-item .home-story-avatar{border-color:#080808}
+.home-story-add-plus{position:absolute;right:-2px;bottom:-2px;width:25px;height:25px;border-radius:50%;display:grid;place-items:center;background:#ed1c24;color:#fff;border:2px solid #080808;font-size:20px;line-height:1;font-weight:900;box-shadow:0 0 10px #ed1c2480}
+.home-story-add-item .home-story-name{font-weight:800;color:var(--fg)}
+</style></head>
 <body>
 <script>
 (function(){
- const INTRO_SESSION_KEY='capitaldotrem_intro_seen_session_v1';
  const FILE_PICKER_RETURN_KEY='capitaldotrem_file_picker_return_at_v1';
  let show=true;
  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)show=false;
@@ -924,36 +954,63 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
   const returnedAt=Number(localStorage.getItem(FILE_PICKER_RETURN_KEY)||0);
   if(returnedAt&&Date.now()-returnedAt<10*60*1000)show=false;
   if(returnedAt)localStorage.removeItem(FILE_PICKER_RETURN_KEY);
-  if(sessionStorage.getItem(INTRO_SESSION_KEY)==='1')show=false;
-  else sessionStorage.setItem(INTRO_SESSION_KEY,'1');
+  // A apresentação deve ocorrer em toda abertura real do aplicativo; só é pulada no retorno do seletor de arquivos.
  }catch(error){/* Mantém a navegação normal se o armazenamento estiver bloqueado. */}
  if(!show)document.documentElement.classList.add('intro-smoke-skip');
 })();
 </script>
 <div class="intro-smoke" id="intro-smoke" aria-hidden="true">
  <div class="intro-smoke__cloud"></div>
- <div class="intro-smoke__brand"><img src="marca.svg" alt="" style="visibility:hidden"><strong>CAPITAL DO TREM</strong><span>A MÚSICA DA NOSSA QUEBRADA!</span></div>
- <div class="opening-clean-zone" aria-hidden="true"></div>
+ <div class="intro-smoke__brand"><img src="marca.svg" alt="" style="visibility:hidden"><strong>CAPITAL DO TREM</strong><span>A MÚSICA DA NOSSA QUEBRADA!</span></div>\n <div class="opening-clean-zone" aria-hidden="true"></div>
  <div class="opening-live-loader" id="opening-live-loader" role="status" aria-live="polite"><div class="opening-live-spinner" aria-hidden="true"></div><strong>Carregando...</strong><div class="opening-live-track"><span id="opening-live-progress"></span><span class="opening-live-train" id="opening-live-train" aria-hidden="true"><span class="opening-wagon opening-wagon-speakers opening-wagon-rear" aria-label="Primeiro vagão: alto-falante"><span class="opening-wagon-load opening-speaker-backward">🔊</span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-dancers" aria-label="Segundo vagão: rapaz e moça dançando"><span class="opening-wagon-load"><span class="opening-dancer female" aria-label="moça dançando">💃<i class="arm arm-left"></i><i class="arm arm-right"></i></span><span class="opening-dancer male" aria-label="rapaz dançando">🕺<i class="arm arm-left"></i><i class="arm arm-right"></i></span></span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-speakers opening-wagon-front" aria-label="Terceiro vagão: alto-falante"><span class="opening-wagon-load opening-speaker-forward">🔊</span><span class="opening-wagon-deck"></span></span><span class="opening-locomotive" aria-label="Locomotiva à frente puxando os três vagões">🚂</span></span></div></div>
 </div>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
-<header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem <span class="verified-badge" role="img" aria-label="Perfil oficial verificado">✓</span></h1><p class="tag">A música da nossa quebrada!</p><div class="header-action-groups"><div class="header-action-row"><a class="btn alt" href="./conta.html">👤 Minha conta</a><a class="btn alt" href="./mensagens.html">✉️ Minhas conversas</a><a class="btn alt" href="./avatar.html">🎭 Meu avatar</a><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button></div><div class="header-action-row"><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn instagram-button" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a></div><div class="header-action-row"><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som da abertura: ligado</button></div></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Abertura de 7 segundos com som ligado por padrão. Você pode desativar permanentemente neste aparelho.</p><div class="header-location-row"><button class="btn alt" id="quick-location" type="button">📍 Logo ali Uai - Localização</button></div></header>
+<header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem <span class="verified-badge" role="img" aria-label="Perfil oficial verificado">✓</span></h1><p class="tag">A música da nossa quebrada!</p><div class="header-action-groups"><div class="profile-menu-cluster"><details class="profile-overflow"><summary aria-label="Mais opções do perfil" title="Mais opções">⋮</summary><div class="profile-overflow-panel"><a href="./conta.html#access-panel">Criar conta / Entrar</a><a href="./conta.html#basic-profile-panel">Meu perfil</a><a href="./conta.html#sign-out">Sair da conta</a><a href="./index.html#eventos">Eventos</a><a href="./index.html#comunidade">Comunidade e perfis</a><a href="./index.html#artistas">Artistas</a><a href="./index.html#divulgue">Publicar e divulgar</a><a href="./apoiadores.html">Apoiadores</a><a href="./avatar.html">Meu avatar</a><a href="./diagnostico.html">Informações e ajuda</a><a href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">YouTube</a><a href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Instagram</a></div></details><a class="profile-avatar-link" href="./conta.html" aria-label="Abrir perfil individual">👤<span>Perfil</span></a></div><div class="header-action-row"><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som da abertura</button></div></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Abertura de 10 segundos com som ligado por padrão. Você pode desativar permanentemente neste aparelho.</p><div class="header-location-row"><button class="btn alt" id="quick-location" type="button">📍 Logo ali Uai - Localização</button></div></header>
 <main id="main-content" tabindex="-1">
 <p id="connection-status" class="connection-status" role="status" aria-live="polite" hidden></p>
 <section class="hero reference-banner"><h2>AQUI A MÚSICA<br><strong>NÃO PARA!</strong></h2><p>Conectando a quebrada!</p><div class="social"><button class="btn" data-go="musicas">▶ Ouvir músicas</button><button class="btn alt" data-go="comunidade">Comunidade</button></div></section>
-<nav id="nav" aria-label="Navegação principal"><button class="active" data-page="inicio" aria-controls="inicio" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11h2v10h6v-6h4v6h6V11h2L12 3z"/></svg>Início</button><a class="nav-chat" href="./bate-papo.html" aria-label="Abrir chat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.7 2 11.3c0 2.2 1 4.2 2.7 5.7L4 21l4.4-2.1c1.1.4 2.3.6 3.6.6 5.5 0 10-3.7 10-8.2S17.5 3 12 3zm-4 9a1.3 1.3 0 1 1 0-2.6A1.3 1.3 0 0 1 8 12zm4 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6zm4 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6z"/></svg>Chat</a><button data-page="musicas" aria-controls="musicas"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="music-note-stem" d="M10 17V5.2L21 3v12"/><circle cx="7" cy="18" r="3.2"/><circle cx="18" cy="16" r="3.2"/></svg>Músicas</button><button data-page="artistas" aria-controls="artistas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v3h4v3a5 5 0 0 1-5 5 5 5 0 0 1-3 2.8V20h5v2H6v-2h5v-3.2A5 5 0 0 1 8 14a5 5 0 0 1-5-5V6h4V3zm10 5v4a3 3 0 0 0 2-3V8h-2zM5 8v1a3 3 0 0 0 2 3V8H5z"/></svg>Ranking</button><a class="nav-profile" href="./conta.html" aria-label="Abrir meu perfil"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0 2c-4.4 0-8 2.2-8 5v2h16v-2c0-2.8-3.6-5-8-5z"/></svg>Perfil</a></nav>
-<section class="page active" id="inicio"><section class="home-stories card" aria-labelledby="home-stories-title"><div class="home-stories-heading"><h2 id="home-stories-title">Stories da quebrada</h2><button id="home-story-add" type="button" aria-label="Criar Story" title="Criar Story">＋</button></div><div id="home-stories-list" class="home-stories-list" aria-label="Stories recentes"><p class="muted">Carregando Stories…</p></div></section><section class="card home-event-feed" id="home-event-feed" aria-labelledby="home-event-feed-title" hidden>
-<div class="home-event-feed-heading"><div><span>AGENDA DA COMUNIDADE</span><h2 id="home-event-feed-title">📅 Eventos próximos</h2></div><a href="#eventos" data-go="eventos">Ver agenda</a></div>
-<div id="home-event-feed-list" class="home-event-feed-list" aria-live="polite"></div>
+
+<nav id="nav" aria-label="Navegação principal">
+<button class="active" data-page="inicio" aria-controls="inicio" aria-current="page"><span aria-hidden="true">⌂</span>Início</button>
+<button data-page="divulgue" aria-controls="divulgue"><span aria-hidden="true">＋</span>Publicar</button>
+<a class="nav-chat" href="./bate-papo.html" aria-label="Abrir conversas e grupos"><span aria-hidden="true">☏</span>Conversas</a>
+<button data-page="musicas" aria-controls="musicas"><span aria-hidden="true">♫</span>Músicas</button>
+<a class="nav-profile" href="./conta.html" aria-label="Abrir meu perfil"><span aria-hidden="true">♙</span>Perfil</a>
+</nav>
+<section class="page active" id="inicio">
+<section class="home-stories card" aria-labelledby="home-stories-title">
+ <div class="home-stories-heading"><h2 id="home-stories-title">Stories da quebrada</h2><span class="home-stories-hint">Compartilhe seu momento</span><button id="home-story-add" type="button" hidden aria-hidden="true" tabindex="-1"></button></div>
+ <div id="home-stories-list" class="home-stories-list" aria-label="Stories recentes"><p class="muted">Carregando Stories…</p></div>
 </section>
-<section class="card home-friends" id="home-friends" aria-labelledby="home-friends-title"><div class="home-friends-row"><div><h2 id="home-friends-title">🤝 Friends — Fazer amizades</h2><p class="muted">Conheça a comunidade e encontre novas amizades no Capital do Trem.</p></div><a class="btn" href="./bate-papo.html#fazer-amigos">Entrar no Friends</a></div><div class="home-friends-actions"><a class="btn alt" href="./bate-papo.html#fazer-amigos">Ver pessoas da comunidade</a><a class="btn alt" href="#eventos" data-go="eventos">Eventos da galera</a></div></section>
 <section class="card home-youtube" aria-labelledby="home-youtube-title">
-<h2 id="home-youtube-title">▶ Vídeos da Capital do Trem</h2>
-<p class="muted">Os seis vídeos originais do projeto. Quando houver evento dentro da data, sua divulgação aparece aqui acima desta seleção.</p>
-<p id="youtube-feed-status" class="muted" role="status" aria-live="polite">Carregando vídeos…</p>
-<div class="home-youtube-grid" aria-live="polite"></div>
+ <h2 id="home-youtube-title">▶ Vídeos do Capital do Trem</h2>
+ <p id="youtube-feed-status" class="muted" role="status" aria-live="polite">Carregando vídeos…</p>
+ <div class="home-youtube-grid" aria-live="polite"></div>
 </section>
-<div class="home-shortcuts reference-shortcuts" aria-label="Atalhos principais"><button type="button" data-go="musicas"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="music-note-stem" d="M10 17V5.2L21 3v12"/><circle cx="7" cy="18" r="3.2"/><circle cx="18" cy="16" r="3.2"/></svg>Músicas</button><button type="button" data-go="comunidade"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zm8 0a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM8 13c-3.5 0-6 1.8-6 4v3h11v-3c0-2.2-2.5-4-5-4zm8 0c-.6 0-1.2.1-1.8.2 1.7 1 2.8 2.3 2.8 3.8v3h5v-3c0-2.2-2.5-4-6-4z"/></svg>Comunidade</button><button type="button" data-go="eventos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h2v3h6V2h2v3h3v17H4V5h3V2zm-1 8v10h12V10H6zm2 2h3v3H8v-3z"/></svg>Eventos</button><button type="button" data-go="artistas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v3h4v3a5 5 0 0 1-5 5 5 5 0 0 1-3 2.8V20h5v2H6v-2h5v-3.2A5 5 0 0 1 8 14a5 5 0 0 1-5-5V6h4V3zm10 5v4a3 3 0 0 0 2-3V8h-2zM5 8v1a3 3 0 0 0 2 3V8H5z"/></svg>Ranking</button><a href="./conta.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 13a7.8 7.8 0 0 0 0-2l2-1.5-2-3.5-2.4 1a7.8 7.8 0 0 0-1.7-1L15 3H9l-.4 3a7.8 7.8 0 0 0-1.7 1l-2.4-1-2 3.5 2 1.5a7.8 7.8 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a7.8 7.8 0 0 0 1.7 1L9 21h6l.4-3a7.8 7.8 0 0 0 1.7-1l2.4 1 2-3.5-2.1-1.5zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>Configurações</a></div><div class="grid"><article class="card"><h3>🎧 Música independente</h3><p class="muted">Espaço para lançamentos, artistas e sons da cena.</p></article><article class="card"><h3>📅 Cultura e eventos</h3><p class="muted">Divulgação de encontros, bailes e atividades culturais.</p></article><article class="card"><h3>🤝 Comunidade</h3><p class="muted">Ações sociais, parcerias e informação para fortalecer a comunidade.</p></article></div><div class="card reference-trending"><h3>🔥 Em Alta na Comunidade</h3><p class="muted">Novidades, lançamentos e recados da comunidade em um mural visual para compartilhar.</p><div id="public-posts" class="list" aria-live="polite"><p class="muted">Carregando publicações da comunidade…</p></div><section class="saved-publications card" aria-labelledby="saved-publications-title"><h3 id="saved-publications-title">🔖 Publicações salvas</h3><p class="muted">Sua coleção particular, como os itens salvos do Instagram. Só você pode ver o que guardou.</p><div id="saved-publications-login" class="muted">Entre na sua conta para acessar seus itens salvos.</div><div id="saved-publications-list" class="list" aria-live="polite" hidden></div><p id="saved-publications-status" class="muted" role="status" aria-live="polite"></p></section></div><div class="card reference-extra-links"><h3>Mais do Capital do Trem</h3><p><a href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">YouTube</a> · <a href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Instagram</a> · <a href="./conta.html">Minha conta</a> · <a href="./mensagens.html">Minhas conversas</a> · <a href="./apoiadores.html">🤝 Apoiadores</a></p></div><div class="card"><h3>📣 Mural da comunidade</h3><p class="muted">Publicações aprovadas pela equipe do Capital do Trem.</p><p class="muted">As publicações da comunidade aparecem na área “Em Alta na Comunidade” acima.</p></div><div class="notice">O mural mostra somente divulgações aprovadas pela equipe. Para enviar uma publicação, entre na sua conta e use a área de divulgação. <a href="./conta.html">Acessar minha conta</a>.</div></section>
+<section class="card home-event-feed" id="home-event-feed" aria-labelledby="home-event-feed-title" hidden>
+ <div class="home-event-feed-heading"><div><span>EVENTOS DA GALERA</span><h2 id="home-event-feed-title">📅 Eventos na timeline</h2></div><a href="#eventos" data-go="eventos">Ver eventos</a></div>
+ <div id="home-event-feed-list" class="home-event-feed-list" aria-live="polite"></div>
+</section>
+<section class="card reference-trending" aria-labelledby="home-timeline-title">
+ <div class="social-feed-heading"><h2 id="home-timeline-title">📰 Rede social da comunidade</h2><div class="social-feed-filters" role="group" aria-label="Filtrar publicações"><button type="button" class="social-feed-filter active" id="feed-filter-all" aria-pressed="true">Todos</button><button type="button" class="social-feed-filter" id="feed-filter-following" aria-pressed="false">Seguindo</button></div></div>
+ <p class="social-feed-hint" id="feed-filter-hint">Acompanhe as publicações da comunidade ou veja somente quem você segue.</p>
+ <div id="public-posts" class="list" aria-live="polite"><p class="muted">Carregando fotos, vídeos e publicações…</p></div>
+ <details class="saved-publications">
+  <summary>🔖 Minhas publicações salvas</summary>
+  <p class="muted">Sua coleção particular de publicações guardadas.</p>
+  <div id="saved-publications-login" class="muted">Entre na sua conta para acessar seus itens salvos.</div>
+  <div id="saved-publications-list" class="list" aria-live="polite" hidden></div>
+  <p id="saved-publications-status" class="muted" role="status" aria-live="polite"></p>
+ </details>
+</section>
+<section class="card home-friends" id="home-friends" aria-labelledby="home-friends-title">
+ <div class="home-friends-row"><div><h2 id="home-friends-title">💬 Conversas, amizades e grupos</h2><p class="muted">Chame seus amigos, conheça gente nova e participe das conversas da comunidade.</p></div><a class="btn" href="./bate-papo.html">Abrir Koe Fala Tu</a></div>
+ <div class="home-friends-actions"><a class="btn alt" href="./mensagens.html">Conversas privadas</a><a class="btn alt" href="./bate-papo.html#fazer-amigos">Fazer amizades</a><a class="btn alt" href="./bate-papo.html">Grupos</a></div>
+</section>
+<section class="card home-music-entry">
+ <h2>🎵 Música é a nossa identidade</h2><p class="muted">Explore os sons, artistas e lançamentos do Capital do Trem.</p><button class="btn" type="button" data-go="musicas">Entrar na área de músicas</button>
+</section>
+</section>
 <section class="page" id="musicas"><div class="card"><h2>🎵 Central de músicas</h2><p class="muted">Um espaço para ouvir os sons dentro do Capital do Trem, sem precisar abrir o YouTube.</p><p class="muted">Músicas publicadas pela comunidade, com reprodução, download, curtidas e comentários.</p><div class="music-discovery-head"><a class="btn alt" href="https://www.youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ Videoclipes e canal</a><span class="muted">Novos sons da cena independente</span></div><section class="card music-library" id="music-library" aria-labelledby="music-library-title">
 <h3 id="music-library-title">🎼 Minha biblioteca</h3>
 <p class="muted">Suas músicas salvas e as últimas que você ouviu. A biblioteca acompanha sua conta nos seus aparelhos.</p>
@@ -965,6 +1022,13 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 </div>
 </div>
 <p id="music-library-status" class="muted" role="status" aria-live="polite"></p>
+<section class="card" id="offline-music-library" aria-labelledby="offline-music-title">
+<h4 id="offline-music-title">🚂 Playlist salva neste aparelho</h4>
+<p class="muted">Estas músicas ficam guardadas no celular e podem tocar mesmo sem internet.</p>
+<div id="offline-music-list" class="list"><p class="muted">Procurando músicas salvas neste aparelho…</p></div>
+<audio id="offline-music-player" controls preload="metadata" style="width:100%;margin:10px 0" aria-label="Reprodutor da playlist offline"></audio>
+<p id="offline-music-status" class="muted" role="status" aria-live="polite">As músicas guardadas aparecem aqui, mesmo sem entrar na conta.</p>
+</section>
 </section>
 <label for="song-catalog-search" class="muted" style="display:block;margin:14px 0 5px;font-weight:700">🔎 Buscar por música ou artista</label><input id="song-catalog-search" type="search" inputmode="search" autocomplete="off" placeholder="Digite o nome da música ou do artista…" aria-controls="published-song-catalog" style="margin:0 0 8px"><p id="song-catalog-count" class="muted" role="status" aria-live="polite" style="margin:0 0 10px">Carregando músicas…</p><div id="published-song-catalog" class="list" aria-live="polite"><p class="muted">Carregando catálogo compartilhado…</p></div></div><div class="card"><h3>🎧 Player do Capital do Trem</h3><label for="audio">Escolha uma música autorizada que esteja no seu aparelho</label><input id="audio" type="file" accept="audio/*"><audio id="player" controls preload="metadata" style="width:100%;margin:12px 0"></audio><div class="social" style="align-items:center"><button class="btn" id="download-audio" type="button" disabled>⬇ Baixar música</button><span id="audio-status" class="muted" role="status" aria-live="polite">Selecione um áudio para ouvir e baixar nesta demonstração.</span></div><p class="muted">O player oferece controles de reprodução e pode continuar tocando com a tela bloqueada, conforme o suporte do navegador e as configurações de economia de bateria do celular. O download salva o arquivo selecionado neste aparelho.</p><p class="muted">Só compartilhe ou baixe músicas que você tenha autorização para distribuir.</p></div></section>
 <section class="page" id="eventos">
@@ -1021,8 +1085,8 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <button class="btn" id="artist-copy" type="button">Copiar apresentação</button><button class="btn alt" id="share-artist" type="button">Compartilhar apresentação</button><button class="btn alt" id="artist-clear" type="button">Limpar campos</button>
 <p id="artist-status" class="muted" aria-live="polite"></p></div>
 </section>
-<section class="page" id="parcerias"><div class="card"><h2>🏆 Parcerias</h2><p>Comerciantes, marcas, produtores e apoiadores podem fortalecer o movimento.</p><a class="btn instagram-button" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Fale com a equipe pelo Instagram</a></div></section>
-<section class="page" id="divulgue"><div class="card"><h2>📣 Envie sua divulgação</h2><p class="muted">As divulgações são publicadas diretamente no mural da comunidade, sem fila de aprovação.</p><p>Entre na sua conta para enviar lançamento, notícia, parceria ou iniciativa da comunidade.</p><a class="btn" href="./conta.html">Entrar ou criar conta para divulgar</a></div></section>
+
+<section class="page" id="divulgue"><div class="card"><h2>📣 Envie sua publicação</h2><p class="muted">Compartilhe texto, fotos e vídeos com a comunidade Capital do Trem.</p><div id="social-post-login"><p>Entre na sua conta para publicar.</p><a class="btn" href="./conta.html">Entrar ou criar conta</a></div><form id="social-post-form" hidden><label for="social-post-content">O que você quer compartilhar?</label><textarea id="social-post-content" maxlength="1500" placeholder="Conte sua novidade, lançamento, parceria ou iniciativa…"></textarea><label for="social-post-files">Fotos e vídeos (até 10 arquivos)</label><input id="social-post-files" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" multiple><p class="muted">Fotos até 10 MB cada. Vídeos até 50 MB cada. Até 10 arquivos e 100 MB no total. Formatos: JPG, PNG, WebP, MP4, WebM ou MOV. Você também pode publicar somente uma foto ou vídeo, sem legenda.</p><button class="btn" id="social-post-submit" type="submit" style="width:100%">Publicar no Capital do Trem</button><p id="social-post-status" class="muted" role="status" aria-live="polite"></p></form></div></section>
 <section class="page" id="duvidas">
 <div class="card"><h2>❓ Dúvidas frequentes</h2><p class="muted">Informações rápidas para quem está chegando ao Capital do Trem.</p></div>
 <div class="card"><h3>📍 O que é o “Logo Ali”?</h3><p>É uma forma simples de procurar shows, eventos e ações sociais próximos de você. Toque no botão e autorize o GPS se desejar. O site usa a localização para abrir o Google Maps; não guarda suas coordenadas.</p></div>
@@ -1501,7 +1565,8 @@ updateConnectionStatus();
    const status=document.createElement('span');status.className='community-online-dot'+(onlineIds.has(profile.user_id)?' is-online':'');status.setAttribute('role','img');status.setAttribute('aria-label',onlineIds.has(profile.user_id)?'Online':'Offline');status.title=onlineIds.has(profile.user_id)?'Online':'Offline';
    const statusText=document.createElement('span');statusText.className='community-online-label';statusText.textContent=onlineIds.has(profile.user_id)?'Online':'Offline';
    meta.append(status,statusText);onlineNodes.set(profile.user_id,{dot:status,label:statusText});
-   copy.append(name,handle,meta);
+   if(profile.username){const profileLink=document.createElement('a');profileLink.href='./perfil.html?u='+encodeURIComponent(profile.username);profileLink.className='community-profile-open';profileLink.style.cssText='display:inline-flex;flex-direction:column;gap:1px;color:inherit;text-decoration:none';profileLink.append(name,handle);copy.append(profileLink,meta);}
+   else copy.append(name,handle,meta);
    if(profile.city){const city=document.createElement('p');city.className='muted community-profile-city';city.textContent=profile.city;copy.append(city);}
    if(profile.bio){const bio=document.createElement('p');bio.className='community-profile-bio';bio.textContent=profile.bio;copy.append(bio);}
    card.append(avatar,copy);container.append(card);
@@ -1577,26 +1642,47 @@ updateConnectionStatus();
   }
  }catch(error){const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar a vitrine de artistas agora. Tente novamente em instantes.';container.replaceChildren(message);}
 })();
-// Mural público: somente divulgações aprovadas pela equipe.
+// Mural público: publicações da comunidade Capital do Trem.
 (async()=>{
  const container=document.getElementById('public-posts');
  try{
   const module=await import('./supabase/auth.js');
   module.initSupabase();
   const items=await module.getPublishedPosts();
-  container.replaceChildren();
-  if(!items.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Ainda não há divulgações aprovadas. Seja o primeiro a participar!';container.append(empty);return;}
   const session=await module.getCurrentSession();
+  const followingIds=session?await module.getMyFollowingProfileIds():[];
+  let feedMode='all';
+  const allButton=document.getElementById('feed-filter-all'),followingButton=document.getElementById('feed-filter-following'),hint=document.getElementById('feed-filter-hint');
+  const setFeedMode=mode=>{feedMode=mode;allButton.classList.toggle('active',mode==='all');followingButton.classList.toggle('active',mode==='following');allButton.setAttribute('aria-pressed',String(mode==='all'));followingButton.setAttribute('aria-pressed',String(mode==='following'));hint.textContent=mode==='following'?'Publicações recentes dos perfis que você segue.':'Acompanhe as publicações da comunidade ou veja somente quem você segue.';renderFeed(mode==='following'?items.filter(item=>followingIds.includes(item.author_id)):items);};
+  followingButton.disabled=!session;if(!session){followingButton.title='Entre na sua conta para ver quem você segue.';hint.textContent='Entre na sua conta para acompanhar somente os perfis que você segue.';}
+  allButton.addEventListener('click',()=>setFeedMode('all'));
+  followingButton.addEventListener('click',()=>{if(session)setFeedMode('following');});
   const savedLogin=document.getElementById('saved-publications-login'),savedList=document.getElementById('saved-publications-list'),savedStatus=document.getElementById('saved-publications-status');
   let savedIds=new Set();
   if(session){savedLogin.hidden=true;savedList.hidden=false;try{savedIds=new Set((await module.getMySavedPosts()).map(post=>post.id));}catch(error){savedStatus.textContent='Não foi possível carregar sua coleção agora.';}}
-  const renderSaved=async()=>{if(!session)return;try{const saved=await module.getMySavedPosts();savedIds=new Set(saved.map(post=>post.id));savedList.replaceChildren();if(!saved.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Você ainda não salvou publicações. Use “Salvar” no mural.';savedList.append(empty);return;}for(const post of saved){const row=document.createElement('article');row.className='item';const title=document.createElement('strong');title.textContent='Divulgação da comunidade';const body=document.createElement('p');body.textContent=post.content;const date=document.createElement('small');date.className='muted';date.textContent=new Date(post.created_at).toLocaleDateString('pt-BR');row.append(title,body,date);savedList.append(row);}}catch(error){savedStatus.textContent='Falha ao atualizar sua coleção.';}};
-  for(const item of items){
+  const renderSaved=async()=>{if(!session)return;try{const saved=await module.getMySavedPosts();savedIds=new Set(saved.map(post=>post.id));savedList.replaceChildren();if(!saved.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Você ainda não salvou publicações. Use “Salvar” no mural.';savedList.append(empty);return;}for(const post of saved){const row=document.createElement('article');row.className='item';const title=document.createElement('strong');title.textContent='Divulgação da comunidade';if(post.content){const body=document.createElement('p');body.textContent=post.content;row.append(body);}for(const media of (post.media||[])){const url=media.url?safeHttpsUrl(media.url):null;if(!url)continue;if(media.media_type==='image'){const image=document.createElement('img');image.src=url;image.alt=media.alt_text||'Foto salva da comunidade';image.loading='lazy';image.decoding='async';image.style.cssText='display:block;width:100%;max-height:320px;object-fit:contain;border-radius:10px;margin:8px 0;background:#080808';row.append(image);}else if(media.media_type==='video'){const video=document.createElement('video');video.src=url;video.controls=true;video.playsInline=true;video.preload='metadata';video.setAttribute('aria-label','Vídeo salvo da comunidade');video.style.cssText='display:block;width:100%;max-height:320px;border-radius:10px;margin:8px 0;background:#080808';row.append(video);}}const date=document.createElement('small');date.className='muted';date.textContent=new Date(post.created_at).toLocaleDateString('pt-BR');row.append(date);savedList.append(row);}}catch(error){savedStatus.textContent='Falha ao atualizar sua coleção.';}};
+  const renderFeed=feedItems=>{container.replaceChildren();if(!feedItems.length){const empty=document.createElement('p');empty.className='muted';empty.textContent=feedMode==='following'?'Você ainda não segue perfis com publicações. Explore a comunidade e siga quem quiser acompanhar.':'Ainda não há publicações. Seja o primeiro a participar!';container.append(empty);return;}for(const item of feedItems){
    const card=document.createElement('article');card.className='item';
-   const heading=document.createElement('h3');heading.textContent='Divulgação da comunidade';
-   const body=document.createElement('p');body.textContent=item.content;
-   const date=document.createElement('small');date.className='muted';date.textContent=new Date(item.created_at).toLocaleDateString('pt-BR');
-   card.append(heading,body,date);
+   const author=document.createElement('div');author.className='post-author';author.style.cssText='display:flex;align-items:center;gap:9px;margin-bottom:8px';
+   const publicName=item.author?.display_name||'Usuário Uai';
+   const safeAvatarUrl=item.author?.avatar_url?safeHttpsUrl(item.author.avatar_url):null;
+   if(safeAvatarUrl){const avatar=document.createElement('img');avatar.src=safeAvatarUrl;avatar.alt='';avatar.loading='lazy';avatar.decoding='async';avatar.style.cssText='width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid #ed1c24';author.append(avatar);}
+   else{const fallback=document.createElement('span');fallback.textContent=Array.from(publicName.trim())[0]?.toLocaleUpperCase('pt-BR')||'C';fallback.setAttribute('aria-hidden','true');fallback.style.cssText='display:grid;place-items:center;width:38px;height:38px;flex:0 0 38px;border-radius:50%;background:#151515;color:#ed1c24;border:2px solid #ed1c24;font-weight:700';author.append(fallback);}
+   const heading=document.createElement('h3');heading.textContent=publicName;heading.style.margin='0';
+   const username=document.createElement('small');username.className='muted';username.textContent=item.author?.username?'@'+item.author.username:'Participante do Capital do Trem';
+   const accountType=document.createElement('small');accountType.className='muted';accountType.textContent=item.author?.account_type==='artist'?'Artista':'Usuário Uai';
+   const identity=document.createElement('div');
+   if(item.author?.username){const profileLink=document.createElement('a');profileLink.href='./perfil.html?u='+encodeURIComponent(item.author.username);profileLink.className='community-profile-open';profileLink.style.cssText='display:inline-flex;flex-direction:column;gap:1px;color:inherit;text-decoration:none';profileLink.append(heading,username);identity.append(profileLink,accountType);}
+   else identity.append(heading,username,accountType);
+   author.append(identity);
+   card.append(author);
+   if(item.content){const body=document.createElement('p');body.textContent=item.content;card.append(body);}
+   for(const media of (item.media||[])){
+    if(!media.url)continue;
+    if(media.media_type==='image'){const image=document.createElement('img');image.src=media.url;image.alt=media.alt_text||'Foto publicada na comunidade';image.loading='lazy';image.decoding='async';image.style.cssText='display:block;width:100%;max-height:560px;object-fit:contain;border-radius:12px;margin:10px 0;background:#080808';card.append(image);}
+    else if(media.media_type==='video'){const video=document.createElement('video');video.src=media.url;video.controls=true;video.playsInline=true;video.preload='metadata';video.setAttribute('aria-label','Vídeo publicado na comunidade');video.style.cssText='display:block;width:100%;max-height:560px;border-radius:12px;margin:10px 0;background:#080808';card.append(video);}
+   }
+   const date=document.createElement('small');date.className='muted';date.textContent=new Date(item.created_at).toLocaleDateString('pt-BR');card.append(date);
    const actions=document.createElement('div');actions.className='post-actions';
    const share=document.createElement('button');share.type='button';share.className='btn alt';share.textContent='↗ Compartilhar';share.addEventListener('click',async()=>{const data={title:'Capital do Trem • Comunidade',text:item.content,url:location.href};try{if(navigator.share)await navigator.share(data);else{await navigator.clipboard.writeText(data.text+' '+data.url);share.textContent='✓ Copiado';}}catch(error){if(error.name!=='AbortError')share.textContent='Não foi possível compartilhar';}});
    actions.append(share);
@@ -1614,7 +1700,8 @@ updateConnectionStatus();
    const sendPrivate=document.createElement('a');sendPrivate.className='btn alt';sendPrivate.textContent='💬 Koe Fala Tu';sendPrivate.href='./mensagens.html?share_text='+encodeURIComponent(('Divulgação da comunidade\\n'+item.content).slice(0,1400));actions.append(sendPrivate);
    if(session){const save=document.createElement('button');save.type='button';save.className='btn alt';const label=()=>{save.textContent=savedIds.has(item.id)?'🔖 Salvo':'＋ Salvar';};label();save.addEventListener('click',async()=>{save.disabled=true;try{const isSaved=await module.toggleSavedPost(item.id);if(isSaved)savedIds.add(item.id);else savedIds.delete(item.id);label();savedStatus.textContent=isSaved?'Adicionado à sua coleção.':'Removido dos itens salvos.';await renderSaved();}catch(error){savedStatus.textContent=error.message||'Não foi possível salvar.';}finally{save.disabled=false;}});actions.append(save);}
    card.append(actions);container.append(card);
-  }
+  }};
+  renderFeed(items);
   if(session)await renderSaved(); }catch(error){
   const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar o mural compartilhado agora. Tente novamente em instantes.';container.replaceChildren(message);
  }
@@ -1717,6 +1804,10 @@ async function getOfflineMusic(id){
 }
 async function saveOfflineMusic(id,blob,title){
  if(!id||!blob?.size)throw new Error('Arquivo de áudio vazio ou sem identificador');
+ if(navigator.storage?.persist){try{await navigator.storage.persist();}catch{}}
+ if(navigator.storage?.estimate){
+  try{const estimate=await navigator.storage.estimate();const remaining=Number(estimate.quota||0)-Number(estimate.usage||0);if(estimate.quota&&remaining<blob.size*1.05)throw new Error('Espaço insuficiente no aparelho para guardar esta música.');}catch(error){if(error?.message?.includes('Espaço insuficiente'))throw error;}
+ }
  const db=await openOfflineMusicDB();
  return new Promise((resolve,reject)=>{
   const tx=db.transaction('tracks','readwrite');
@@ -1726,6 +1817,72 @@ async function saveOfflineMusic(id,blob,title){
   tx.onabort=()=>{const error=tx.error;db.close();reject(error||new Error('Armazenamento offline interrompido'));};
  });
 }
+async function getAllOfflineMusic(){
+ const db=await openOfflineMusicDB();
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction('tracks','readonly'),request=tx.objectStore('tracks').getAll();
+  request.onsuccess=()=>{db.close();resolve((request.result||[]).filter(item=>item?.blob?.size).sort((a,b)=>(b.savedAt||0)-(a.savedAt||0)));};
+  request.onerror=()=>{db.close();reject(request.error||new Error('Não foi possível listar as músicas salvas'));};
+ });
+}
+async function deleteOfflineMusic(id){
+ const db=await openOfflineMusicDB();
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction('tracks','readwrite');tx.objectStore('tracks').delete(String(id));
+  tx.oncomplete=()=>{db.close();resolve(true);};
+  tx.onerror=()=>{const error=tx.error;db.close();reject(error||new Error('Não foi possível remover a música'));};
+  tx.onabort=()=>{const error=tx.error;db.close();reject(error||new Error('Remoção interrompida'));};
+ });
+}
+(async()=>{
+ const list=document.getElementById('offline-music-list');
+ const player=document.getElementById('offline-music-player');
+ const status=document.getElementById('offline-music-status');
+ if(!list||!player||!status)return;
+ let currentUrl='',currentTrackId=null;
+ player.addEventListener('play',()=>{try{if('mediaSession' in navigator)navigator.mediaSession.playbackState='playing';}catch{}});
+ player.addEventListener('pause',()=>{try{if('mediaSession' in navigator)navigator.mediaSession.playbackState='paused';}catch{}});
+ player.addEventListener('ended',()=>{try{if('mediaSession' in navigator)navigator.mediaSession.playbackState='none';}catch{}});
+ const render=async()=>{
+  const tracks=await getAllOfflineMusic();list.replaceChildren();
+  if(!tracks.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Nenhuma música guardada ainda. Use “Guardar para ouvir offline” no catálogo quando estiver conectado.';list.append(empty);}
+  for(const track of tracks){
+   const row=document.createElement('div');row.className='music-library-row';
+   const title=document.createElement('strong');title.textContent=track.title||'Música salva';
+   const actions=document.createElement('div');actions.className='social';
+   const play=document.createElement('button');play.type='button';play.className='btn alt';play.textContent='▶ Tocar';
+   play.addEventListener('click',()=>{
+    if(currentUrl)URL.revokeObjectURL(currentUrl);
+    currentUrl=URL.createObjectURL(track.blob);currentTrackId=track.id;player.src=currentUrl;player.load();
+    if('mediaSession' in navigator){
+     try{
+      if('MediaMetadata' in window)navigator.mediaSession.metadata=new MediaMetadata({title:track.title||'Música salva',artist:'Capital do Trem',album:'Playlist offline do Capital do Trem',artwork:[{src:'./marca.svg',sizes:'any',type:'image/svg+xml'}]});
+      navigator.mediaSession.setActionHandler('play',()=>player.play().catch(()=>{}));
+      navigator.mediaSession.setActionHandler('pause',()=>player.pause());
+      navigator.mediaSession.setActionHandler('seekbackward',details=>{player.currentTime=Math.max(0,player.currentTime-(details.seekOffset||10));});
+      navigator.mediaSession.setActionHandler('seekforward',details=>{player.currentTime=Math.min(player.duration||Infinity,player.currentTime+(details.seekOffset||10));});
+      navigator.mediaSession.setActionHandler('seekto',details=>{if(Number.isFinite(details.seekTime))player.currentTime=details.seekTime;});
+     }catch{}
+    }
+    player.play().then(()=>{status.textContent='Tocando '+(track.title||'música salva')+' sem depender da internet.';}).catch(()=>{status.textContent='Toque em reproduzir no player para iniciar a música.';});
+   });
+   const remove=document.createElement('button');remove.type='button';remove.className='btn alt';remove.textContent='Remover';
+   remove.setAttribute('aria-label','Remover '+(track.title||'música salva')+' do aparelho');
+   remove.addEventListener('click',async()=>{
+    remove.disabled=true;
+    try{
+     if(currentTrackId===track.id){player.pause();player.removeAttribute('src');player.load();currentTrackId=null;if(currentUrl)URL.revokeObjectURL(currentUrl);currentUrl='';}
+     await deleteOfflineMusic(track.id);status.textContent='Música removida do armazenamento deste aparelho.';await render();
+    }catch(error){remove.disabled=false;status.textContent=error?.message||'Não foi possível remover a música.';}
+   });
+   actions.append(play,remove);row.append(title,actions);list.append(row);
+  }
+  if(tracks.length)status.textContent=tracks.length+' música(s) disponível(is) neste aparelho, inclusive sem internet.';
+ };
+ try{await render();}
+ catch(error){list.replaceChildren();const unavailable=document.createElement('p');unavailable.className='muted';unavailable.textContent='Não foi possível abrir a playlist local neste aparelho.';list.append(unavailable);status.textContent=error?.message||'Falha ao consultar músicas offline.';}
+ window.addEventListener('pagehide',()=>{if(currentUrl)URL.revokeObjectURL(currentUrl);},{once:true});
+})();
 // Catálogo musical compartilhado com reprodução, download, curtidas e comentários.
 (async()=>{
  const container=document.getElementById('published-song-catalog');
@@ -1747,6 +1904,23 @@ async function saveOfflineMusic(id,blob,title){
    try{const library=await api.getMyMusicLibrary();savedSongIds=new Set(library.savedSongIds);recentSongIds=library.recentSongIds;}
    catch(error){libraryStatus.textContent='Não foi possível sincronizar sua biblioteca agora. As músicas continuam disponíveis para ouvir.';}
   }else{libraryLogin.hidden=false;}
+  const player=document.createElement('section');player.id='capital-song-player';player.setAttribute('role','dialog');player.setAttribute('aria-modal','true');player.setAttribute('aria-label','Reprodutor de música Capital do Trem');
+  player.innerHTML='<div class="player-top"><button class="player-back" type="button" aria-label="Voltar">← Voltar</button><strong>CAPITAL DO TREM</strong><span></span></div><img class="player-cover" alt="Capa da música"><h2 class="player-title"></h2><p class="player-artist"></p><p class="player-status" role="status" aria-live="polite" hidden></p><input class="player-progress" type="range" min="0" max="1000" value="0" aria-label="Progresso da música"><div class="player-times"><span class="player-current">0:00</span><span class="player-duration">0:00</span></div><div class="player-controls"><button class="player-previous" type="button" aria-label="Música anterior">|◀</button><button class="player-rewind" type="button" aria-label="Voltar 10 segundos">↶</button><button class="player-main" type="button" aria-label="Pausar">Ⅱ</button><button class="player-forward" type="button" aria-label="Adiantar 10 segundos">↷</button><button class="player-next" type="button" aria-label="Próxima música">▶|</button><button class="player-repeat" type="button" aria-label="Repetir música" aria-pressed="false">⟲</button></div>';
+  document.body.append(player);
+  const playerCover=player.querySelector('.player-cover'),playerTitle=player.querySelector('.player-title'),playerArtist=player.querySelector('.player-artist'),playerStatus=player.querySelector('.player-status'),playerProgress=player.querySelector('.player-progress'),playerCurrent=player.querySelector('.player-current'),playerDuration=player.querySelector('.player-duration'),playerMain=player.querySelector('.player-main'),playerRepeat=player.querySelector('.player-repeat');
+  let activeAudio=null,repeatSong=false,playerReturnFocus=null,activeSongIndex=-1;
+  const clock=value=>{const n=Number(value)||0;return Math.floor(n/60)+':'+String(Math.floor(n%60)).padStart(2,'0');};
+  const setPlayerStatus=(message)=>{playerStatus.textContent=message||'';playerStatus.hidden=!message;};const playActiveAudio=()=>{if(!activeAudio)return;setPlayerStatus('Carregando áudio…');activeAudio.play().then(()=>setPlayerStatus('')).catch(error=>{console.warn('Falha ao iniciar a reprodução da música.',error);setPlayerStatus(error?.name==='NotAllowedError'?'Toque em Reproduzir novamente para liberar o áudio.':'Não foi possível iniciar o áudio. Confira sua conexão e tente novamente.');updatePlayer();});};const updatePlayer=()=>{if(!activeAudio)return;const duration=Number.isFinite(activeAudio.duration)?activeAudio.duration:0;playerProgress.value=String(duration?Math.round(activeAudio.currentTime/duration*1000):0);playerCurrent.textContent=clock(activeAudio.currentTime);playerDuration.textContent=clock(duration);playerMain.textContent=activeAudio.paused?'▶':'Ⅱ';playerMain.setAttribute('aria-label',activeAudio.paused?'Reproduzir':'Pausar');};
+  const closePlayer=()=>{player.classList.remove('is-open');document.body.style.overflow='';if(playerReturnFocus?.isConnected)playerReturnFocus.focus();};
+  player.querySelector('.player-back').addEventListener('click',closePlayer);const playAdjacent=step=>{const next=activeSongIndex+step;if(next<0||next>=songs.length)return;const nextSong=songs[next],nextCard=songCards.get(nextSong.id),nextAudio=nextCard?.querySelector('audio'),nextCover=nextCard?.querySelector('.music-track-cover')?.src,nextButton=nextCard?.querySelector('.music-track-actions .btn.primary');if(nextAudio&&nextCover)openSongPlayer(nextSong,nextAudio,nextCover,nextButton);};player.querySelector('.player-previous').addEventListener('click',()=>playAdjacent(-1));player.querySelector('.player-next').addEventListener('click',()=>playAdjacent(1));playerMain.addEventListener('click',()=>{if(!activeAudio)return;if(activeAudio.paused)playActiveAudio();else activeAudio.pause();});
+  player.querySelector('.player-rewind').addEventListener('click',()=>{if(activeAudio)activeAudio.currentTime=Math.max(0,activeAudio.currentTime-10);});
+  player.querySelector('.player-forward').addEventListener('click',()=>{if(activeAudio)activeAudio.currentTime=Math.min(activeAudio.duration||Infinity,activeAudio.currentTime+10);});
+  playerRepeat.addEventListener('click',()=>{repeatSong=!repeatSong;if(activeAudio)activeAudio.loop=repeatSong;playerRepeat.setAttribute('aria-pressed',String(repeatSong));});
+  playerProgress.addEventListener('input',()=>{if(activeAudio&&Number.isFinite(activeAudio.duration))activeAudio.currentTime=Number(playerProgress.value)/1000*activeAudio.duration;});
+  player.addEventListener('click',event=>{if(event.target===player)closePlayer();});document.addEventListener('keydown',event=>{if(event.key==='Escape'&&player.classList.contains('is-open'))closePlayer();});
+  const makeSongCover=(song,index)=>{const title=String(song.title||'NOVA MÚSICA').slice(0,64).replace(/[&<>"]/g,' '),artist=String(song.artist_name||'CAPITAL DO TREM').slice(0,54).replace(/[&<>"]/g,' '),side=index%2===0?'left':'right',x=side==='left'?42:558,palettes=[['#ed1c24','#190509'],['#8d1018','#080808'],['#f04435','#211010'],['#6c0d17','#050505']],[red,dark]=palettes[index%palettes.length];const svg='<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="'+red+'"/><stop offset="1" stop-color="'+dark+'"/></linearGradient><pattern id="p" width="38" height="38" patternUnits="userSpaceOnUse"><path d="M0 38L38 0" stroke="#fff" stroke-opacity=".07" stroke-width="2"/></pattern></defs><rect width="600" height="600" fill="url(#g)"/><rect width="600" height="600" fill="url(#p)"/><circle cx="300" cy="260" r="180" fill="#000" fill-opacity=".22" stroke="#fff" stroke-opacity=".22" stroke-width="3"/><circle cx="300" cy="260" r="128" fill="#090909" stroke="'+red+'" stroke-width="12"/><path d="M210 260h180M300 170v180" stroke="#fff" stroke-opacity=".1" stroke-width="7"/><text x="300" y="450" fill="#fff" font-family="Arial,sans-serif" font-size="34" font-weight="900" text-anchor="middle">'+title+'</text><text x="300" y="492" fill="#eee" font-family="Arial,sans-serif" font-size="19" text-anchor="middle">'+artist+'</text><image href="'+new URL('./marca.svg',location.href).href+'" x="'+x+'" y="26" width="92" height="92"/><text x="300" y="558" fill="#fff" fill-opacity=".8" font-family="Arial,sans-serif" font-size="16" letter-spacing="5" text-anchor="middle">CAPITAL DO TREM</text></svg>';return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);};
+  const openSongPlayer=(song,audio,cover,button)=>{if(!audio)return;activeSongIndex=songs.findIndex(item=>item.id===song.id);playerReturnFocus=button||document.activeElement;activeAudio=audio;playerCover.src=cover;playerTitle.textContent=song.title||'Música';playerArtist.textContent=song.artist_name||'Capital do Trem';audio.loop=repeatSong;player.classList.add('is-open');document.body.style.overflow='hidden';if('mediaSession' in navigator){try{if('MediaMetadata' in window)navigator.mediaSession.metadata=new MediaMetadata({title:song.title,artist:song.artist_name||'Capital do Trem',album:'Capital do Trem',artwork:[{src:cover,sizes:'600x600',type:'image/svg+xml'}]});}catch{}}setPlayerStatus('');playActiveAudio();updatePlayer();};
+  player.addEventListener('timeupdate',updatePlayer);player.addEventListener('loadedmetadata',updatePlayer);player.addEventListener('play',updatePlayer);player.addEventListener('pause',updatePlayer);player.addEventListener('ended',updatePlayer);
   const renderLibraryList=(target,ids,emptyText)=>{
    if(!target)return;target.replaceChildren();
    const unique=[...new Set(ids)].filter(id=>songs.some(song=>song.id===id)).slice(0,12);
@@ -1758,7 +1932,7 @@ async function saveOfflineMusic(id,blob,title){
     const open=document.createElement('button');open.type='button';open.className='btn alt';open.textContent='Tocar';
     open.addEventListener('click',()=>{
      const card=songCards.get(id);const audio=card?.querySelector('audio');
-     if(card){card.scrollIntoView({behavior:'smooth',block:'center'});if(audio)window.setTimeout(()=>audio.play().catch(()=>{}),220);}
+     if(card){card.scrollIntoView({behavior:'smooth',block:'center'});if(audio)window.setTimeout(()=>openSongPlayer(song,audio,card.querySelector('.music-track-cover')?.src,open),220);}
     });
     row.append(label,open);target.append(row);
    }
@@ -1772,18 +1946,18 @@ async function saveOfflineMusic(id,blob,title){
   if(session)renderMusicLibrary();
   if(!songs.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='As músicas publicadas pela comunidade aparecerão aqui.';container.append(empty);return;}
   for(const song of songs){
-   const card=document.createElement('article');card.className='item';card.style.margin='10px 0';card.dataset.songId=song.id;songCards.set(song.id,card);card.dataset.searchText=[song.title,song.artist_name,song.description].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
-   const title=document.createElement('h3');title.textContent=song.title;
-   const artist=document.createElement('p');artist.className='muted';artist.textContent=song.artist_name;
-   card.append(title,artist);
-   if(song.producer_name){const producer=document.createElement('p');producer.className='muted';producer.textContent='🎚️ Produção: '+song.producer_name;card.append(producer);}
-   if(song.description){const desc=document.createElement('p');desc.textContent=song.description;card.append(desc);}
+   const card=document.createElement('article');card.className='music-track-card';card.dataset.songId=song.id;songCards.set(song.id,card);card.dataset.searchText=[song.title,song.artist_name,song.description].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
+   const cover=makeSongCover(song,songs.indexOf(song));const coverImage=document.createElement('img');coverImage.className='music-track-cover';coverImage.src=cover;coverImage.alt='Capa de '+song.title;coverImage.loading='lazy';coverImage.decoding='async';
+   const info=document.createElement('div');info.className='music-track-info';const title=document.createElement('h3');title.textContent=song.title;const artist=document.createElement('p');artist.className='muted';artist.textContent=song.artist_name;info.append(title,artist);card.append(coverImage,info);
+   
+   if(song.producer_name){const producer=document.createElement('p');producer.className='muted';producer.textContent='🎚️ Produção: '+song.producer_name;info.append(producer);}
+   if(song.description){const desc=document.createElement('p');desc.textContent=song.description;info.append(desc);}
    const audioUrl=safeHttpsUrl(song.audio_url);const downloadUrl=safeHttpsUrl(song.download_url)||audioUrl;
    if(audioUrl){
-    const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=audioUrl;audio.addEventListener('play',()=>{
+    const audio=document.createElement('audio');audio.controls=false;audio.className='music-track-audio';audio.preload='none';audio.src=audioUrl;audio.addEventListener('error',()=>{if(activeAudio===audio){const code=audio.error?.code;setPlayerStatus(code===2?'Falha de conexão ao carregar a música. Verifique a internet.':code===3?'O arquivo de áudio não pôde ser decodificado.':'Não foi possível carregar este áudio. Tente novamente mais tarde.');updatePlayer();}console.warn('Erro no elemento de áudio da faixa.',audio.error);});audio.addEventListener('playing',()=>{if(activeAudio===audio)setPlayerStatus('');});audio.addEventListener('waiting',()=>{if(activeAudio===audio)setPlayerStatus('Carregando áudio…');});audio.addEventListener('play',()=>{
       container.querySelectorAll('audio').forEach(other=>{if(other!==audio&&!other.paused)other.pause();});
       if(session){recentSongIds=[song.id,...recentSongIds.filter(id=>id!==song.id)].slice(0,30);renderMusicLibrary();api.recordSongPlay(song.id).catch(error=>console.warn('Histórico musical não sincronizado.',error));}
-     });audio.style.cssText='width:100%;margin:8px 0';audio.setAttribute('aria-label','Ouvir '+song.title);
+     });audio.setAttribute('aria-label','Ouvir '+song.title);
     let offlineTrack=null;
     try{offlineTrack=await getOfflineMusic(song.id);if(offlineTrack?.blob){audio.src=URL.createObjectURL(offlineTrack.blob);audio.dataset.offlineReady='true';}}catch(error){/* A reprodução online continua disponível se o armazenamento local falhar. */}
     if('mediaSession' in navigator){
@@ -1792,7 +1966,7 @@ async function saveOfflineMusic(id,blob,title){
       try{
        if('MediaMetadata' in window)navigator.mediaSession.metadata=new MediaMetadata({title:song.title,artist:song.artist_name||'Capital do Trem',album:'Capital do Trem',artwork:[{src:'./marca.svg',sizes:'any',type:'image/svg+xml'}]});
        navigator.mediaSession.playbackState='playing';
-       navigator.mediaSession.setActionHandler('play',()=>audio.play().catch(()=>{}));
+       navigator.mediaSession.setActionHandler('play',()=>{if(activeAudio===audio)playActiveAudio();else audio.play().catch(error=>console.warn('Falha ao retomar áudio pelo controle do aparelho.',error));});
        navigator.mediaSession.setActionHandler('pause',()=>audio.pause());
        navigator.mediaSession.setActionHandler('seekbackward',details=>{audio.currentTime=Math.max(0,audio.currentTime-(details.seekOffset||10));});
        navigator.mediaSession.setActionHandler('seekforward',details=>{audio.currentTime=Math.min(audio.duration||Infinity,audio.currentTime+(details.seekOffset||10));});
@@ -1802,9 +1976,9 @@ async function saveOfflineMusic(id,blob,title){
      audio.addEventListener('pause',updateMediaPlayback);
      audio.addEventListener('ended',()=>{try{navigator.mediaSession.playbackState='none';}catch{}});
     }
-    card.append(audio);
-   }else{const unavailable=document.createElement('p');unavailable.className='muted';unavailable.textContent='Áudio temporariamente indisponível.';card.append(unavailable);}
-   if(downloadUrl){const download=document.createElement('a');download.className='btn alt';download.href=downloadUrl;download.rel='noopener';download.textContent='⬇ Baixar música';download.setAttribute('aria-label','Baixar '+song.title);download.style.display='inline-block';download.style.margin='4px 0';card.append(download);}
+    info.append(audio);const playButton=document.createElement('button');playButton.type='button';playButton.className='btn primary';playButton.textContent='▶ Tocar música';playButton.addEventListener('click',()=>openSongPlayer(song,audio,cover,playButton));const trackActions=document.createElement('div');trackActions.className='music-track-actions';trackActions.append(playButton);info.append(trackActions);
+   }else{const unavailable=document.createElement('p');unavailable.className='muted';unavailable.textContent='Áudio temporariamente indisponível.';info.append(unavailable);}
+   if(downloadUrl){const download=document.createElement('a');download.className='btn alt';download.href=downloadUrl;download.rel='noopener';download.textContent='⬇ Baixar música';download.setAttribute('aria-label','Baixar '+song.title);download.style.display='inline-block';download.style.margin='4px 0';trackActions.append(download);}
    if(audioUrl&&song.id){
     const offlineButton=document.createElement('button');offlineButton.type='button';offlineButton.className='btn alt';offlineButton.style.margin='4px';offlineButton.textContent=offlineTrack?.blob?'✓ Salva para ouvir offline':'⇩ Guardar para ouvir offline';
     offlineButton.setAttribute('aria-label','Guardar '+song.title+' no aparelho para ouvir sem internet');
@@ -1822,10 +1996,10 @@ async function saveOfflineMusic(id,blob,title){
       offlineTrack={blob,title:song.title};
       audio.src=URL.createObjectURL(blob);audio.dataset.offlineReady='true';audio.load();
       offlineButton.textContent='✓ Salva para ouvir offline';offlineStatus.textContent='Música guardada neste aparelho. Agora pode tocar sem internet.';
-     }catch(error){offlineStatus.textContent='Não foi possível guardar offline. Verifique a conexão e tente novamente.';}
+     }catch(error){offlineStatus.textContent=error?.message||'Não foi possível guardar offline. Verifique a conexão e tente novamente.';}
      finally{offlineButton.disabled=false;}
     });
-    card.append(offlineButton,offlineStatus);
+    trackActions.append(offlineButton);info.append(offlineStatus);
    }
    const shareRow=document.createElement('div');shareRow.className='social';shareRow.style.marginTop='6px';
    const shareButton=document.createElement('button');shareButton.type='button';shareButton.className='btn alt';shareButton.textContent='↗ Compartilhar música';shareButton.setAttribute('aria-label','Compartilhar a música '+song.title);
@@ -1841,7 +2015,7 @@ async function saveOfflineMusic(id,blob,title){
     }catch(error){if(error?.name!=='AbortError')shareStatus.textContent='Não foi possível compartilhar agora.';}
     finally{shareButton.disabled=false;}
    });
-   shareRow.append(shareButton,shareStatus);card.append(shareRow);
+   shareRow.append(shareButton,shareStatus);info.append(shareRow);
    if(session){
     const saveButton=document.createElement('button');saveButton.type='button';saveButton.className='btn alt';saveButton.style.marginTop='7px';
     const paintSaved=()=>{saveButton.textContent=savedSongIds.has(song.id)?'♥ Salva na minha biblioteca':'♡ Salvar na minha biblioteca';};
@@ -1852,25 +2026,25 @@ async function saveOfflineMusic(id,blob,title){
      catch(error){if(libraryStatus)libraryStatus.textContent=error?.message||'Não foi possível atualizar sua biblioteca.';}
      finally{saveButton.disabled=false;}
     });
-    card.append(saveButton);
+    info.append(saveButton);
    }
    if(!session){
     const access=document.createElement('div');access.className='notice';access.style.marginTop='12px';
     const message=document.createElement('p');message.textContent='Entre na sua conta para curtir, comentar e acompanhar a conversa desta música.';
     const login=document.createElement('a');login.className='btn alt';login.href='./conta.html';login.textContent='Entrar ou criar conta';login.style.display='inline-block';login.style.marginTop='6px';
-    access.append(message,login);card.append(access);container.append(card);continue;
+    access.append(message,login);info.append(access);container.append(card);continue;
    }
    const social=document.createElement('div');social.className='social';social.style.alignItems='center';
    const like=document.createElement('button');like.className='btn alt';like.type='button';like.textContent='❤️ Curtir';
    const count=document.createElement('span');count.className='muted';count.textContent='Curtidas: …';
-   social.append(like,count);card.append(social);
+   social.append(like,count);info.append(social);
    const comments=document.createElement('div');comments.style.marginTop='10px';
    const heading=document.createElement('strong');heading.textContent='Comentários';comments.append(heading);
    const commentList=document.createElement('div');commentList.className='list';commentList.style.margin='8px 0';comments.append(commentList);
    const form=document.createElement('form');form.className='social';form.style.gap='8px';
    const input=document.createElement('input');input.type='text';input.maxLength=1000;input.placeholder='Escreva um comentário…';input.setAttribute('aria-label','Comentário sobre '+song.title);input.style.flex='1';input.style.minWidth='180px';input.style.margin='0';
    const submit=document.createElement('button');submit.type='submit';submit.textContent='Comentar';form.append(input,submit);comments.append(form);
-   const status=document.createElement('p');status.className='muted';status.setAttribute('role','status');comments.append(status);card.append(comments);
+   const status=document.createElement('p');status.className='muted';status.setAttribute('role','status');comments.append(status);info.append(comments);
    let liked=false;
    try{
     const state=await api.getSongSocial(song.id);liked=state.liked;count.textContent='Curtidas: '+state.likeCount;like.textContent=liked?'❤️ Curtido':'❤️ Curtir';
@@ -1882,7 +2056,7 @@ async function saveOfflineMusic(id,blob,title){
   }
   const filterSongs=()=>{const query=(searchInput?.value||'').trim().toLocaleLowerCase('pt-BR');let visible=0;container.querySelectorAll(':scope > article').forEach(card=>{const match=!query||card.dataset.searchText.includes(query);card.hidden=!match;if(match)visible++;});if(countLabel)countLabel.textContent=query?`${visible} de ${songs.length} música(s) encontrada(s)`:`${songs.length} música(s) no catálogo`;};
   searchInput?.addEventListener('input',filterSongs);filterSongs();
- }catch(error){container.replaceChildren();const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar o catálogo agora. Confira sua conexão e tente novamente. Se não houver músicas aprovadas, elas aparecerão aqui quando a equipe publicar os primeiros lançamentos.';container.append(message);}
+ }catch(error){container.replaceChildren();const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar as músicas: '+(error?.message||'Confira sua conexão e tente novamente.');container.append(message);}
 })();
 
 </script>
@@ -1900,7 +2074,7 @@ async function saveOfflineMusic(id,blob,title){
   // Sempre prioriza as configurações atuais do servidor; cache local é somente fallback offline.
   const branding=await brandingRequest.catch(()=>cachedBranding||{});
   const safeUrl=value=>typeof value==='string'&&value.startsWith('https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/')?value:'';
-  const profile=safeUrl(branding.profileImageUrl),opening=safeUrl(branding.openingImageUrl),openingVideo=safeUrl(branding.openingVideoUrl); 
+  const profile=safeUrl(branding.profileImageUrl),opening=safeUrl(branding.openingImageUrl),openingVideo=safeUrl(branding.openingVideoUrl)||'https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/31937786-c321-445f-ae1c-de018eca95c8/branding/opening-video-738faf34-9bbb-45b6-9a67-a4dc0fe265f5.mp4'; 
   // Uploads recebem caminhos únicos no Storage; não é necessário furar o cache a cada abertura.
   // Manter a URL estável permite reutilizar o arquivo já baixado e reduz espera/rede móvel.
   const currentOpeningImage=opening,currentOpeningVideo=openingVideo;
@@ -1913,12 +2087,12 @@ async function saveOfflineMusic(id,blob,title){
    intro.style.objectFit=branding.openingFit==='contain'?'contain':'cover';
    intro.closest('.intro-smoke__brand')?.classList.add('custom-opening-image');screen.classList.add('custom-opening-screen');
    const movingTrain=document.getElementById('opening-live-train');
-   const startOpeningTrain=()=>{if(!movingTrain||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;movingTrain.style.setProperty('animation','none','important');movingTrain.style.removeProperty('left');void movingTrain.offsetWidth;movingTrain.style.setProperty('animation','opening-train-cross-sky 5s linear 1 both','important');};
+   const startOpeningTrain=()=>{if(!movingTrain||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;movingTrain.style.setProperty('animation','none','important');movingTrain.style.removeProperty('left');void movingTrain.offsetWidth;movingTrain.style.setProperty('animation','opening-train-cross-sky 9.8s linear 1 both','important');};
    if(movingTrain)movingTrain.style.setProperty('animation','none','important');
    const bar=document.getElementById('opening-live-progress');let progress=3,started=false,finished=false;
    const paint=()=>{if(bar)bar.style.width=progress+'%';};
    const finish=()=>{if(finished)return;finished=true;progress=100;paint();screen.querySelector('video')?.pause();screen.classList.add('is-finished');window.setTimeout(()=>screen.remove(),600);};
-   const begin=()=>{if(started)return;started=true;startOpeningTrain();window.setTimeout(finish,7000);};
+   const begin=()=>{if(started)return;started=true;startOpeningTrain();window.setTimeout(finish,10000);};
    const loader=window.setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}else window.clearInterval(loader);},220);
    if(intro.complete&&intro.naturalWidth>0){intro.style.visibility='visible';document.documentElement.classList.remove('intro-brand-pending');begin();}
    else{intro.addEventListener('load',()=>{intro.style.visibility='visible';document.documentElement.classList.remove('intro-brand-pending');begin();},{once:true});intro.addEventListener('error',()=>{intro.src='./marca.svg';intro.style.objectFit='contain';intro.style.visibility='visible';document.documentElement.classList.remove('intro-brand-pending');begin();},{once:true});}
@@ -1951,11 +2125,16 @@ async function saveOfflineMusic(id,blob,title){
     document.documentElement.classList.remove('intro-brand-pending');
     const video=document.createElement('video');
     screen.querySelectorAll('video, .opening-video-background, .opening-video-fallback').forEach(oldMedia=>{try{oldMedia.pause?.();oldMedia.removeAttribute?.('src');oldMedia.load?.();}catch{}oldMedia.remove();});
-    video.className='opening-video-background';video.src=currentOpeningVideo;video.removeAttribute('poster');video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';video.style.opacity='1';video.style.transition='opacity .25s ease';const savedOpeningSound=(()=>{try{return localStorage.getItem('capitaldotrem_intro_sound_v1')!=='off';}catch{return true;}})();
+    video.className='opening-video-background';video.src=currentOpeningVideo;video.removeAttribute('poster');video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';video.style.opacity='0';video.style.transition='none';video.style.background='transparent';const savedOpeningSound=(()=>{try{return localStorage.getItem('capitaldotrem_intro_sound_v1')!=='off';}catch{return true;}})();
     video.autoplay=true;video.muted=!savedOpeningSound;video.defaultMuted=!savedOpeningSound;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));video.playsInline=true;video.loop=true;video.playbackRate=1;video.preload='auto';video.setAttribute('aria-hidden','true');
-    // Exibe somente o vídeo: não cria uma imagem de marca por cima da gravação.
-    video.style.zIndex='2';video.style.opacity='1';
-    screen.insertBefore(video,screen.firstChild);screen.classList.add('custom-opening-screen');
+    // Mantém a arte aprovada visível até o primeiro quadro real do vídeo, evitando flash preto.
+    video.style.zIndex='3';
+    const openingPoster=document.createElement('img');
+    openingPoster.className='opening-video-fallback';openingPoster.src=currentOpeningImage||'./marca.svg';openingPoster.alt='';
+    openingPoster.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:'+(branding.openingFit==='contain'?'contain':'cover')+';object-position:'+(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%;z-index:2;opacity:1;transition:none';
+    screen.insertBefore(openingPoster,screen.firstChild);screen.insertBefore(video,openingPoster.nextSibling);screen.classList.add('custom-opening-screen');
+    let openingFrameShown=false;
+    const revealOpeningFrame=()=>{if(openingFrameShown||finished)return;openingFrameShown=true;video.style.opacity='1';openingPoster.remove();};
     // A imagem é mostrada primeiro; o vídeo só aparece quando o navegador confirma reprodução real.
     // A carga é iniciada somente depois de registrar os eventos para não perder loadeddata.
     // O áudio fica habilitado por padrão. Se Android/iOS bloquear autoplay com som,
@@ -1970,9 +2149,9 @@ async function saveOfflineMusic(id,blob,title){
     screen.appendChild(audioButton);
     video.addEventListener('play',()=>{if(!video.muted)audioButton.remove();});
     // Mantém o próprio vídeo visível durante carregamento e retomadas, sem poster/logo sobreposto.
-    video.addEventListener('playing',()=>{video.style.opacity='1';});
+    video.addEventListener('playing',()=>{if(typeof video.requestVideoFrameCallback==='function'){video.requestVideoFrameCallback(()=>revealOpeningFrame());}else revealOpeningFrame();});
         const movingTrain=document.getElementById('opening-live-train');
-    const startOpeningTrain=()=>{if(!movingTrain||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;movingTrain.style.setProperty('animation','none','important');void movingTrain.offsetWidth;movingTrain.style.setProperty('animation','opening-train-cross-sky 5s linear 1 both','important');};
+    const startOpeningTrain=()=>{if(!movingTrain||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;movingTrain.style.setProperty('animation','none','important');void movingTrain.offsetWidth;movingTrain.style.setProperty('animation','opening-train-cross-sky 9.8s linear 1 both','important');};
     if(movingTrain)movingTrain.style.setProperty('animation','none','important');
     const bar=document.getElementById('opening-live-progress');
     let progress=3,finished=false,clockStarted=false,finishTimer=null,fallbackTimer=null;
@@ -1980,27 +2159,25 @@ async function saveOfflineMusic(id,blob,title){
     const finish=()=>{
      if(finished)return;
      finished=true;clearTimeout(finishTimer);clearTimeout(fallbackTimer);clearInterval(loader);
-     progress=100;paint();video.pause();screen.classList.add('is-finished');
+     progress=100;paint();video.pause();openingPoster.remove();screen.classList.add('is-finished');
      window.setTimeout(()=>screen.remove(),600);
     };
-    const beginOpeningClock=()=>{if(clockStarted||finished)return;clockStarted=true;startOpeningTrain();finishTimer=window.setTimeout(finish,7000);};
+    const beginOpeningClock=()=>{if(clockStarted||finished)return;clockStarted=true;startOpeningTrain();finishTimer=window.setTimeout(finish,10000);};
     const loader=window.setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}else window.clearInterval(loader);},220);
     const showOpeningFallback=()=>{
      if(finished||video.dataset.fallbackShown==='yes')return;
      video.dataset.fallbackShown='yes';clearTimeout(fallbackTimer);
      try{video.pause();video.removeAttribute('src');video.load();}catch{}
-     video.remove();
-     const fallback=document.createElement('img');
-     fallback.className='opening-video-fallback';fallback.src=currentOpeningImage||'./marca.svg';fallback.alt='';
-     fallback.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:'+(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%;z-index:2';
-     screen.insertBefore(fallback,screen.firstChild);
+     video.remove();openingPoster.style.opacity='1';
      audioButton.style.display='none';
+     // A imagem de segurança também recebe a apresentação completa de 10 segundos.
      beginOpeningClock();
+
     };
-    // Abertura e trem começam juntos; a rede não pode empurrar a duração para 20+ segundos.
-    beginOpeningClock();
-    video.addEventListener('playing',()=>{clearTimeout(fallbackTimer);if(savedOpeningSound&&!video.muted)audioButton.remove();});
+    // Os 10 segundos começam quando o vídeo aplicado pelo administrador realmente entra em reprodução. Se a mídia falhar ou demorar, a arte de segurança assume e inicia a mesma duração.
+    video.addEventListener('playing',()=>{if(finished)return;clearTimeout(fallbackTimer);beginOpeningClock();if(savedOpeningSound&&!video.muted)audioButton.remove();});
     video.addEventListener('loadeddata',async()=>{
+     if(finished)return;
      video.playbackRate=1;
      try{
       await video.play();
@@ -2011,14 +2188,14 @@ async function saveOfflineMusic(id,blob,title){
        audioButton.style.display='block';video.muted=true;video.defaultMuted=true;
       }
       try{await video.play();clearTimeout(fallbackTimer);}
-      catch(playError){console.warn('Não foi possível reproduzir o vídeo de abertura; usando a imagem de segurança.',playError);showOpeningFallback();}
+      catch(playError){console.warn('Não foi possível reproduzir o vídeo de abertura; mantendo a arte aprovada.',playError);showOpeningFallback();}
      }
     },{once:true});
     video.addEventListener('error',()=>{console.warn('Falha ao carregar o vídeo de abertura; usando a imagem de segurança.');showOpeningFallback();},{once:true});
-    // Se a rede não entregar um quadro em cinco segundos, a abertura usa a imagem aprovada em vez de ficar preta.
-    video.addEventListener('ended',finish,{once:true});
+    // Se não houver primeiro quadro em até 5 segundos, usa imediatamente a arte de segurança; nunca deixa a abertura vazia esperando a rede.
+    // A apresentação permanece por 10 segundos após o vídeo aplicado começar ou após o fallback aparecer.
+    fallbackTimer=window.setTimeout(()=>{if(!openingFrameShown)showOpeningFallback();},5000);
     video.load();
-    fallbackTimer=window.setTimeout(showOpeningFallback,5000);
    }
   }
  }catch(error){
@@ -2092,7 +2269,7 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
  position:absolute!important;z-index:30!important;left:-230px!important;top:50%!important;
  border:0!important;border-radius:0!important;background:transparent!important;
  box-shadow:none!important;transform:translateY(-58%)!important;
- animation:opening-train-cross-sky 5s linear 1 both!important;
+ animation:opening-train-cross-sky 9.8s linear 1 both!important;
 }
 /* Neutraliza estilos antigos de span que transformavam a locomotiva e a carga em barras vermelhas. */
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train,
@@ -2150,7 +2327,7 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
   gap:3px!important;
   white-space:nowrap!important;
   will-change:translate;
-  animation:opening-train-cross-sky 5s linear 1 both!important;
+  animation:opening-train-cross-sky 9.8s linear 1 both!important;
 }
 .intro-smoke.custom-opening-screen .opening-live-track > #opening-live-train .opening-wagon-rear{order:1!important}
 .intro-smoke.custom-opening-screen .opening-live-track > #opening-live-train .opening-wagon-dancers{order:2!important}
@@ -2263,6 +2440,26 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
 #home-story-album-button,#home-story-flip-button{min-width:54px;min-height:32px;height:32px;padding:4px 8px;font-size:10px;border-radius:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
 #home-story-album-button{left:12px}#home-story-flip-button{right:12px}
 @media(max-height:680px){.home-story-zoom{bottom:calc(env(safe-area-inset-bottom,0px) + 160px);width:min(48vw,210px)}.home-story-effects{bottom:calc(env(safe-area-inset-bottom,0px) + 44px)}.home-story-effect-list button{min-height:24px;padding:2px 7px}}
+
+/* Navegação ampliada: todas as áreas principais ficam identificadas e acessíveis. */
+#nav button span,#nav a span{display:inline-flex;align-items:center;justify-content:center;width:24px;min-width:24px;font-size:19px;line-height:1}
+#nav button,#nav a.nav-chat,#nav a.nav-profile{font-weight:800}
+@media(min-width:760px){
+ #nav button,#nav a.nav-chat,#nav a.nav-profile{display:flex;align-items:center;gap:10px;min-height:46px}
+ #nav button span,#nav a span{width:24px;min-width:24px}
+}
+@media(max-width:759px){
+ nav#nav{height:78px!important;justify-content:flex-start!important;overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x proximity!important;scrollbar-width:thin!important;scrollbar-color:#ed1c24 #111!important;gap:5px!important;padding:6px 9px calc(6px + env(safe-area-inset-bottom,0px))!important}
+ nav#nav button,nav#nav a.nav-chat,nav#nav a.nav-profile{display:flex!important;flex:0 0 72px!important;width:72px!important;min-width:72px!important;max-width:72px!important;min-height:62px!important;height:62px!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;padding:5px 3px!important;border-radius:12px!important;font-size:10px!important;line-height:1.1!important;white-space:normal!important;text-align:center!important;scroll-snap-align:start!important}
+ nav#nav button span,nav#nav a span{width:27px!important;min-width:27px!important;height:26px!important;font-size:21px!important}
+ .home-shortcuts.reference-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+ .home-shortcuts.reference-shortcuts button,.home-shortcuts.reference-shortcuts a{min-height:66px!important;justify-content:center!important;text-align:center!important;flex-direction:column!important;gap:5px!important;padding:8px 6px!important;font-size:11px!important;line-height:1.2!important;white-space:normal!important}
+ .home-shortcuts.reference-shortcuts span{width:28px!important;height:24px!important;min-width:28px!important;font-size:20px!important}
+}
+@media(min-width:760px){
+ .home-shortcuts.reference-shortcuts{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+}
+
 </style>
 <div id="home-story-composer" aria-hidden="true">
  <section id="home-story-composer-card" role="dialog" aria-modal="true" aria-labelledby="home-story-compose-title">
@@ -2330,6 +2527,7 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
   </form>
  </div>
 </section>
+<script type="module" src="./social-feed-composer.js"></script>
 <script type="module" src="./event-social-composer.js"></script>
 <script type="module" src="./home-story-composer.js"></script>
 <script type="module" src="./stories-ui.js"></script>

@@ -2,6 +2,8 @@ name: Gerar APK de teste do Capital do Trem
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
   push:
     branches: [main]
     paths:
@@ -74,14 +76,14 @@ jobs:
       - name: Criar projeto Android
         run: npx cap add android
 
-      - name: Preparar ícones com a imagem oficial do perfil
+      - name: Preparar ícones usando o arquivo oficial da marca Capital do Trem
         env:
-          PROFILE_ICON_URL: https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/31937786-c321-445f-ae1c-de018eca95c8/avatar/b338f7a8-8964-4063-9086-64a9bd603f4f.jpg
+          APP_ICON_URL: https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/31937786-c321-445f-ae1c-de018eca95c8/branding/official-logo-d2daa073-35ba-456e-90ee-f156c9a1d450.jpg
         run: |
           mkdir -p assets
-          curl --fail --location --retry 3 "$PROFILE_ICON_URL" --output /tmp/capital-do-trem-profile.jpg
+          curl --fail --location --retry 3 "$APP_ICON_URL" --output /tmp/capital-do-trem-app-icon.png
           python -m pip install --quiet Pillow
-          python scripts/prepare-app-icons.py /tmp/capital-do-trem-profile.jpg assets
+          python scripts/prepare-app-icons.py /tmp/capital-do-trem-app-icon.png assets
           npx --yes @capacitor/assets@3.0.0 generate --android --assetPath assets --iconBackgroundColor '#080809' --iconBackgroundColorDark '#080809'
 
       - name: Sincronizar Capacitor
@@ -101,3 +103,25 @@ jobs:
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
+
+      - name: Registrar diagnóstico da compilação
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+          COMMIT_SHA: ${{ github.sha }}
+          BRANCH_NAME: ${{ github.ref_name }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          {
+            echo '## Diagnóstico automático — APK Android'
+            echo "- Resultado da compilação: **${JOB_STATUS}**"
+            echo "- Branch: \`${BRANCH_NAME}\`"
+            echo "- Commit: \`${COMMIT_SHA}\`"
+            echo "- Execução: ${RUN_URL}"
+            if [ "$JOB_STATUS" = success ]; then
+              echo '- APK de teste: procure o artefato \`capital-do-trem-android-debug\` nesta execução.'
+            else
+              echo '- Ação necessária: abrir a execução, localizar a primeira etapa com falha e revisar os logs antes de corrigir.'
+            fi
+            echo '- Segurança: esta rotina não publica em produção nem altera arquivos visuais aprovados.'
+          } >> "$GITHUB_STEP_SUMMARY"

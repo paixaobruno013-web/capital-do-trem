@@ -23,6 +23,20 @@ jobs:
         run: npm run build:web
       - name: Conferir arquivos e ícones do PWA
         run: node scripts/check-pwa.mjs
+      - name: Empacotar prévia isolada para testes (somente pull request)
+        if: github.event_name == 'pull_request'
+        run: |
+          test -s www/index.html
+          cd www
+          zip -qr ../capital-do-trem-social-preview.zip .
+      - name: Disponibilizar pacote de prévia para QA (sem publicar em produção)
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: capital-do-trem-social-preview
+          path: capital-do-trem-social-preview.zip
+          if-no-files-found: error
+          retention-days: 7
       - name: Verificar sintaxe dos módulos de Stories
         run: |
           python3 -m py_compile scripts/configure-android-media.py scripts/prepare-ios-info.py
@@ -34,6 +48,7 @@ jobs:
         run: |
           node --check home-story-composer.js
           node --check event-social-composer.js
+          node --check social-feed-composer.js
           node --check scripts/check-creator-publishing.mjs
           node scripts/check-creator-publishing.mjs
       - name: Verificar sintaxe do módulo Supabase
@@ -50,6 +65,19 @@ jobs:
           node --check youtube-feed.js
           node scripts/check-social-saved-youtube.mjs
           test -s www/youtube-feed.js
+      - name: Verificar publicação social com fotos e vídeos
+        run: |
+          node --check scripts/check-social-feed-publishing.mjs
+          node scripts/check-social-feed-publishing.mjs
+          test -s www/social-feed-composer.js
+      - name: Verificar exclusão de publicações pelo titular
+        run: |
+          node --check scripts/check-social-owner-delete.mjs
+          node scripts/check-social-owner-delete.mjs
+      - name: Verificar armazenamento privado das mídias sociais
+        run: |
+          node --check scripts/check-social-private-media.mjs
+          node scripts/check-social-private-media.mjs
       - name: Verificar curtidas e comentários do mural
         run: |
           node --check scripts/check-post-social.mjs
@@ -192,3 +220,25 @@ jobs:
           test -s supabase/migrations/20261111174839_restrict_artist_music_to_artist_accounts.sql
           test -s www/manifest.webmanifest
           echo "Preparação web concluída: arquivos essenciais encontrados."
+
+      - name: Registrar diagnóstico automático dos testes web
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+          COMMIT_SHA: ${{ github.sha }}
+          BRANCH_NAME: ${{ github.ref_name }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          {
+            echo '## Diagnóstico automático — testes web'
+            echo "- Resultado dos testes: **${JOB_STATUS}**"
+            echo "- Branch: \`${BRANCH_NAME}\`"
+            echo "- Commit: \`${COMMIT_SHA}\`"
+            echo "- Execução: ${RUN_URL}"
+            if [ "$JOB_STATUS" = success ]; then
+              echo '- Verificações concluídas sem falhas reportadas pelo workflow.'
+            else
+              echo '- Ação necessária: revisar a primeira etapa com falha e seus logs; não aplicar correções sem validar o impacto.'
+            fi
+            echo '- Segurança: nenhuma publicação em produção é realizada por este diagnóstico.'
+          } >> "$GITHUB_STEP_SUMMARY"

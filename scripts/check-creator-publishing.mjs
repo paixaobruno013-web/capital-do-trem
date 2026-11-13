@@ -20,15 +20,16 @@ const [home, story, eventComposer, account, auth, prepare, eventPolicy, songPoli
 const homeVideosBlock = youtubeFeed.match(/const HOME_VIDEOS = \[([\s\S]*?)\n\];/);
 const shortsBlock = youtubeFeed.match(/const SHORTS = \[([\s\S]*?)\n\]\.map/);
 const checks = [
-  ['atalho + de Stories fica na tela inicial', home.includes('id="home-story-add"')],
+  ['atalho + de Stories fica na tela inicial com foto de perfil e sem câmera', home.includes('id="home-story-add"') && home.includes('home-story-add-profile-style') && home.includes('home-story-hint') === false && home.includes('home-stories-hint')],
   ['modal de Stories fica embutido na tela inicial', home.includes('id="home-story-composer"')],
   ['ao tocar no +, abre câmera sem navegar para outra página', story.includes('function openComposer()') && story.includes("modal.classList.add('is-open')") && story.includes('startCamera();') && story.includes('getUserMedia')],
   ['câmera oferece álbum de fotos e vídeos', home.includes('id="home-story-album"') && home.includes('accept="image/*,video/mp4,video/webm,video/quicktime,.mov"')],
   ['Story é publicado pelo modal da tela inicial', story.includes('createMyStory(') && home.includes('home-story-publish')],
-  ['eventos ativos aparecem acima dos nove vídeos na tela inicial', home.indexOf('id="home-event-feed"') >= 0 && home.indexOf('id="home-event-feed"') < home.indexOf('class="card home-youtube"') && home.includes(".sort((a,b)=>a.event_date.localeCompare(b.event_date)")],
+  ['vídeos do YouTube aparecem primeiro e eventos ativos entram na timeline logo depois', home.indexOf('class="card home-youtube"') >= 0 && home.indexOf('class="card home-youtube"') < home.indexOf('id="home-event-feed"') && home.indexOf('id="home-event-feed"') < home.indexOf('id="public-posts"') && home.includes(".sort((a,b)=>a.event_date.localeCompare(b.event_date)")],
   ['feed some quando não há eventos dentro da data', home.includes('if(!active.length){feed.hidden=true;return;}')],
   ['feed reavalia expiração a cada virada de data', home.includes('const scheduleHomeExpiryRefresh=()=>') && home.includes('scheduleHomeExpiryRefresh();')],
-  ['abertura do vídeo possui imagem de segurança se o vídeo falhar ou demorar', home.includes('const showOpeningFallback=()=>') && home.includes('fallbackTimer=window.setTimeout(showOpeningFallback,5000)') && home.includes('currentOpeningImage||\'./marca.svg\'')],
+  ['abertura do vídeo mantém a arte aprovada até o primeiro quadro, usa fallback e dura 10 segundos', home.includes('const showOpeningFallback=()=>') && home.includes('openingPoster') && home.includes('revealOpeningFrame') && home.includes('currentOpeningImage||\'./marca.svg\'') && home.includes('fallbackTimer=window.setTimeout(()=>{if(!openingFrameShown)showOpeningFallback();},5000)') && /video\.addEventListener\('playing',[\s\S]*?beginOpeningClock\(\)/.test(home) && /finishTimer=window\.setTimeout\(finish,10000\)/.test(home)],
+  ['abertura com imagem dura 10 segundos e trem de três vagões percorre em 9,8 segundos', /window\.setTimeout\(finish,10000\)/.test(home) && /opening-train-cross-sky 9\.8s/.test(home) && /opening-wagon-rear/.test(home) && /opening-wagon-dancers/.test(home) && /opening-wagon-front/.test(home)],
   ['agenda consulta eventos publicados de hoje em diante', auth.includes('export async function getPublishedEvents()') && auth.includes(".eq('status','published')") && auth.includes(".gte('event_date',today)")],
   ['evento oferece foto, corte, efeitos, GPS e música', ['event-social-photo','event-social-zoom','event-social-filter','event-social-gps','event-social-music'].every(id => home.includes('id="'+id+'"'))],
   ['evento salva imagem cortada com efeito e envia publicação', eventComposer.includes('makeCroppedImage') && eventComposer.includes('getCurrentPosition') && eventComposer.includes('submitMyEvent(')],

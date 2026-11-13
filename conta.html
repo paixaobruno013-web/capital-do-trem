@@ -85,6 +85,15 @@ audio{width:100%;}
 .story-compose-actions{display:flex;gap:9px;flex-wrap:wrap}
 .story-compose-actions button{flex:1;min-width:130px}
 .event-composer{overflow:hidden;border:1px solid #5a171b!important;background:linear-gradient(155deg,#171113,#090909 65%)!important;box-shadow:0 12px 40px #0008,0 0 24px #ed1c2410}.event-composer-heading{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:18px}.event-composer-kicker{font-size:10px;letter-spacing:1.8px;color:#ff6269;font-weight:900}.event-composer-heading h2{margin:5px 0;font-size:clamp(21px,5vw,28px)}.event-composer-badge{border:1px solid #ed1c24;border-radius:999px;padding:6px 10px;color:#ff747a;font-size:10px;font-weight:900;letter-spacing:1px}.event-form-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}.event-form-main input,.event-form-main textarea,.event-form-main select,.event-extra-card input,.event-extra-card select{width:100%;box-sizing:border-box}.event-form-two,.event-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.event-composer input:not([type=range]):not([type=file]),.event-composer textarea,.event-select{padding:12px;margin:6px 0 12px;border:1px solid #393235;border-radius:11px;background:#171416;color:#fff;font:inherit}.event-composer label{display:block;font-size:13px;font-weight:800;color:#f4e9ea}.event-photo-stage{position:relative;aspect-ratio:4/5;max-height:460px;overflow:hidden;border:1px solid #453337;border-radius:15px;background:radial-gradient(circle at 50% 45%,#2c171a,#080808 72%);display:grid;place-items:center}.event-photo-stage img{width:100%;height:100%;object-fit:cover;display:block;transition:filter .12s}.event-photo-stage #event-photo-placeholder{display:flex;flex-direction:column;align-items:center;gap:8px;color:#ddd;text-align:center}.event-photo-stage #event-photo-placeholder span{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:#ed1c24;color:white;font-size:34px;box-shadow:0 0 22px #ed1c2466}.event-photo-stage small{color:#999}.event-file-button{display:block;text-align:center;margin:10px 0;padding:12px;border-radius:11px;background:#252023;border:1px solid #ed1c24;color:#fff!important;cursor:pointer}.event-file-status{font-size:11px;color:#aaa;margin:4px 0 12px}.event-edit-grid{margin-bottom:8px}.event-edit-grid .event-select{margin-bottom:4px}.event-composer input[type=range]{width:100%;accent-color:#ed1c24;margin:8px 0 15px}.event-composer label span{float:right;color:#ff747a;font-variant-numeric:tabular-nums}.event-extra-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}.event-extra-card{border:1px solid #393235;border-radius:14px;padding:13px;background:#100e0f}.event-extra-card h3{margin:0 0 10px;font-size:15px}.event-extra-card .muted{font-size:11px}.event-gps-button{width:100%;padding:11px;border:1px solid #ed1c24;border-radius:10px;background:#241416;color:white;font-weight:800}.event-map-preview{display:inline-block;margin:5px 0;color:#ff858a}.event-publish-button{width:100%;min-height:52px;border:0;border-radius:13px;background:linear-gradient(110deg,#f32832,#a70c16);color:#fff;font-size:16px;font-weight:900;box-shadow:0 0 22px #ed1c243d}.event-composer .status{min-height:22px}@media(max-width:700px){.event-form-grid,.event-extra-grid{grid-template-columns:1fr}.event-photo-stage{max-height:390px}.event-form-media{order:-1}.event-composer{padding:13px!important}}@media(prefers-color-scheme:light){body.light .event-composer{background:linear-gradient(155deg,#fff5f5,#fff)!important}body.light .event-composer input:not([type=range]),body.light .event-composer textarea,body.light .event-select{background:#fff;color:#181818}body.light .event-composer label{color:#222}body.light .event-extra-card{background:#fff}}
+
+/* Boas-vindas em estilo grafite para quem está criando uma conta. */
+.registration-graffiti{position:relative;isolation:isolate;overflow:hidden;display:grid;place-items:center;gap:4px;margin:14px 0 16px;padding:19px 12px 14px;border:1px solid rgba(237,28,36,.78);border-radius:13px;background:radial-gradient(ellipse at 50% 0%,rgba(237,28,36,.23),transparent 66%),linear-gradient(145deg,#1a1011 0%,#050505 72%);box-shadow:0 0 9px rgba(237,28,36,.28),inset 0 0 18px rgba(237,28,36,.09);text-align:center}
+.registration-graffiti[hidden]{display:none!important}
+.registration-graffiti p{position:relative;z-index:1;margin:0;color:#fff;font-family:Impact,"Arial Black",system-ui,sans-serif;font-size:clamp(23px,6.4vw,35px);font-weight:1000;line-height:1.05;letter-spacing:1.2px;text-transform:uppercase;font-style:italic;-webkit-text-stroke:.45px #fff;text-shadow:2px 2px 0 #79070c,4px 4px 0 #ed1c24,0 0 13px rgba(237,28,36,.78);transform:rotate(-1.2deg)}
+.registration-graffiti p strong{display:inline-block;margin-top:5px;color:#ff343d;font-size:1.08em;-webkit-text-stroke:.7px #ffb4b7;text-shadow:2px 2px 0 #650006,4px 4px 0 #ed1c24,0 0 16px rgba(237,28,36,.9)}
+.registration-graffiti-tag{position:relative;z-index:1;margin-top:5px;color:#d5bfc0;font-size:9px;font-weight:900;letter-spacing:3px}
+.registration-graffiti-spray{position:absolute;top:-19px;right:13px;color:#ed1c24;font-size:66px;line-height:1;opacity:.28;transform:rotate(18deg);text-shadow:0 0 15px #ed1c24}
+body.light .registration-graffiti{background:radial-gradient(ellipse at 50% 0%,rgba(237,28,36,.17),transparent 66%),linear-gradient(145deg,#fff0f0,#171010);}
 </style>
 <style>
 .artist-song-studio{margin:18px 0;border:1px solid rgba(237,28,36,.42);background:radial-gradient(circle at 0 0,rgba(237,28,36,.15),transparent 48%),linear-gradient(145deg,#171719,#09090a);box-shadow:0 12px 34px #0005}
@@ -138,6 +147,7 @@ audio{width:100%;}
 <section class="card" id="profile-panel" hidden aria-labelledby="profile-title">
 <h2 id="profile-title">Sua área</h2>
 <p id="profile-welcome"></p>
+<a id="public-profile-link" class="btn alt" href="./perfil.html" hidden style="margin:8px 0 12px">👁️ Ver meu perfil público</a>
 <div id="admin-identity" class="admin-identity" hidden aria-label="Conta oficial verificada do administrador">
  <span class="admin-crown" aria-hidden="true">👑</span>
  <span class="admin-verified"><span class="admin-verified-mark" aria-hidden="true">✓</span> CONTA VERIFICADA</span>
@@ -177,7 +187,7 @@ audio{width:100%;}
  <span><strong>instalações registradas</strong><br><small class="muted">Pessoas que já abriram o Capital do Trem neste aparelho.</small></span>
 </div>
 <div id="artist-profile-area" hidden>
-<h3>🎤 Minha ficha artística</h3><p class="muted">Preencha estes dados se sua conta for de artista. A ficha artística será enviada para análise da equipe. Qualquer conta autenticada pode publicar eventos pela agenda; somente perfis Artista / DJ podem enviar músicas para análise antes da publicação no catálogo.</p>
+<h3>🎤 Minha ficha artística</h3><p class="muted">Preencha estes dados se sua conta for de artista. A ficha artística será enviada para análise da equipe. Qualquer conta autenticada pode publicar eventos pela agenda; perfis Artista / DJ com ficha artística podem publicar músicas diretamente no catálogo; faixas em análise continuam disponíveis para audição pública.</p>
 <form id="artist-profile-form">
 <label for="artist-name">Nome artístico</label><input id="artist-name" maxlength="100" required>
 <label for="artist-style">Estilo musical</label><input id="artist-style" maxlength="80" placeholder="Ex.: Funk consciente, rap, pagode">
@@ -252,6 +262,12 @@ audio{width:100%;}
 <section class="card" id="access-panel" aria-labelledby="access-title">
 <h2 id="access-title">Acesso à conta</h2>
 <div class="tabs account-actions" role="group" aria-label="Ação da conta">
+<div id="registration-graffiti" class="registration-graffiti" hidden aria-label="Seja bem-vindo, maquinista desse trem">
+<span class="registration-graffiti-spray" aria-hidden="true">✦</span>
+<p>SEJA BEM-VINDO,<br><strong>MAQUINISTA DESSE TREM!</strong></p>
+<span class="registration-graffiti-tag" aria-hidden="true">CAPITAL DO TREM • MG</span>
+</div>
+
 <button type="button" class="secondary" id="tab-login" aria-pressed="true" disabled>Entrar</button>
 <button type="button" class="secondary" id="tab-register" aria-pressed="false" disabled>Criar conta</button>
 <button type="button" class="secondary" id="tab-reset" aria-pressed="false" disabled>Esqueci a senha</button>
@@ -683,6 +699,8 @@ async function loadBasicProfile(){
   document.getElementById('basic-city').value=profile?.city||'';
   document.getElementById('basic-bio').value=profile?.bio||'';
   document.getElementById('basic-public').checked=profile?.is_public===true;
+  const publicProfileLink=document.getElementById('public-profile-link');
+  if(publicProfileLink){const visible=profile?.is_public===true&&!!profile?.username;publicProfileLink.hidden=!visible;publicProfileLink.style.display=visible?'inline-block':'none';publicProfileLink.href=profile?.username?'./perfil.html?u='+encodeURIComponent(profile.username):'./perfil.html';}
  }catch(error){artistProfileArea.hidden=true;basicProfileStatus.textContent='Não foi possível carregar seu perfil agora. Atualize a página e tente novamente.';}
 }
 basicProfileForm.addEventListener('submit',async event=>{
@@ -690,7 +708,7 @@ basicProfileForm.addEventListener('submit',async event=>{
  const button=document.getElementById('save-basic-profile');
  button.disabled=true;basicProfileStatus.textContent='Salvando seu perfil...';
  try{
-  await auth.saveMyBasicProfile({
+  const savedProfile=await auth.saveMyBasicProfile({
    display_name:document.getElementById('basic-display-name').value,
    username:document.getElementById('basic-username').value,
    account_type:document.getElementById('basic-account-type').value,
@@ -698,6 +716,8 @@ basicProfileForm.addEventListener('submit',async event=>{
    bio:document.getElementById('basic-bio').value,
    is_public:document.getElementById('basic-public').checked
   });
+  const publicProfileLink=document.getElementById('public-profile-link');
+  if(publicProfileLink){const visible=savedProfile?.is_public===true&&!!savedProfile?.username;publicProfileLink.hidden=!visible;publicProfileLink.style.display=visible?'inline-block':'none';publicProfileLink.href=savedProfile?.username?'./perfil.html?u='+encodeURIComponent(savedProfile.username):'./perfil.html';}
   artistProfileArea.hidden=document.getElementById('basic-account-type').value!=='artist';
   await loadAdminSongAccess();
   basicProfileStatus.textContent='Perfil salvo! '+(document.getElementById('basic-public').checked?'Ele poderá aparecer no diretório público.':'Ele ficará visível somente para você.');
@@ -835,6 +855,7 @@ let mode='login';
 const tabs={login:document.getElementById('tab-login'),register:document.getElementById('tab-register'),reset:document.getElementById('tab-reset')};
 function setMode(next){
  mode=next;
+ const welcome=document.getElementById('registration-graffiti');if(welcome)welcome.hidden=mode!=='register';
  Object.entries(tabs).forEach(([key,button])=>button.setAttribute('aria-pressed',String(key===mode)));
  const hideRole=mode==='reset'||mode==='recovery';
  document.getElementById('register-type').hidden=hideRole;

@@ -307,7 +307,13 @@ audio{width:100%;}
 </form>
 <h3>Stories publicados</h3><div id="admin-story-list"><p class="muted">Entre no painel para carregar os Stories.</p></div>
 </section>
-<section class="command-section"><h2>Publicações e aprovações</h2><p class="muted">Acompanhe artistas, músicas, eventos e divulgações enviados para análise.</p><p id="queue-status" class="status" role="status" aria-live="polite"></p><div id="queue"></div></section>
+<section class="command-section"><h2>Publicações e aprovações</h2><p class="muted">Acompanhe artistas, eventos e divulgações. Músicas são publicadas automaticamente e só podem ser restringidas após denúncia.</p><p id="queue-status" class="status" role="status" aria-live="polite"></p><div id="queue"></div></section>
+<section class="command-section" id="song-community-control">
+ <h2>🎵 Controle das músicas da comunidade</h2>
+ <p class="muted">As faixas são publicadas sem aprovação prévia. Se uma música fugir da identidade familiar, restrinja somente aquele arquivo ao perfil do artista. Para voltar ao catálogo, libere novamente.</p>
+ <p id="admin-song-status" class="status" role="status" aria-live="polite"></p>
+ <div id="admin-song-list"><p class="muted">Carregando faixas…</p></div>
+</section>
 <section class="command-section"><div class="actions" style="justify-content:space-between;align-items:center"><h2>Koe Fala Tu • Moderação do chat</h2><button id="refresh-chat" class="secondary" type="button">Atualizar mensagens</button></div><p class="muted">Revise mensagens recentes e remova conteúdos ofensivos, spam ou informações impróprias.</p><div id="chat-moderation"></div></section>
 </section>
 <section class="card"><h2>Segurança</h2><p class="muted">O painel verifica a permissão de administrador no banco de dados. As ações também são protegidas pelas políticas RLS do Supabase. Não use nem publique a chave service_role no navegador.</p></section>
@@ -350,6 +356,7 @@ async function enterDashboard(user){
  await loadBranding();
  await loadCasaPanelBranding();
  await loadQueue();
+ await loadAdminSongs();
  await loadChatModeration();
  await loadPrivateGallery();
 }
@@ -615,12 +622,42 @@ brandingSave.addEventListener('click',async()=>{
  catch(error){brandingStatus.textContent=error?.message||'Não foi possível salvar. Confira sua conexão e tente novamente.';}
  finally{brandingSave.disabled=false;}
 });
+async function loadAdminSongs(){
+ const area=document.getElementById('admin-song-list'),status=document.getElementById('admin-song-status');
+ area.replaceChildren(node('p','muted','Carregando músicas…'));
+ try{
+  const songs=await auth.getAdminSongs();
+  area.replaceChildren();
+  if(!songs.length){area.append(node('p','muted','Nenhuma música cadastrada.'));return;}
+  for(const song of songs){
+   const card=node('article','item');
+   card.append(node('h3','',song.title),node('p','muted',[song.artist_name,song.producer_name?'Produção: '+song.producer_name:''].filter(Boolean).join(' • ')));
+   const state=node('p','notice',song.status==='private'?'Restrita: somente o artista pode ouvir':song.status==='published'?'Disponível para toda a comunidade':'Status: '+song.status);
+   const actions=node('div','actions');
+   const restrict=node('button','secondary','Deixar somente no perfil do artista');
+   const publish=node('button','','Liberar para todos');
+   restrict.disabled=song.status==='private';publish.disabled=song.status==='published';
+   restrict.addEventListener('click',async()=>{
+    const note='Olá, artista! ❤️🚂\n\nAgradecemos por compartilhar sua música com a Capital do Trem. Pedimos desculpas, mas identificamos que este arquivo está fora da proposta e da identidade da nossa comunidade. A Capital do Trem é um espaço de música, respeito, convivência e família. Esse estilo de conteúdo não representa o que queremos construir aqui. Por isso, sua música ficará salva somente no seu perfil, disponível para você ouvir, mas temporariamente indisponível para o público e para as playlists de outros usuários. Se desejar, você poderá substituir o arquivo por uma música alinhada à nossa comunidade. Agradecemos sua compreensão. Trem não tem ré! 🚂❤️';
+    if(!window.confirm('Restringir esta faixa ao próprio artista? A música deixará o catálogo público.'))return;
+    try{await auth.moderateItem('songs',song.id,'private');await navigator.clipboard?.writeText(note);status.textContent='Faixa restrita. A mensagem de comunicação foi copiada quando o navegador permitiu.';await loadAdminSongs();}
+    catch(error){status.textContent=error?.message||'Não foi possível restringir esta faixa.';}
+   });
+   publish.addEventListener('click',async()=>{
+    if(!window.confirm('Liberar esta faixa para todo o público?'))return;
+    try{await auth.moderateItem('songs',song.id,'published');status.textContent='Faixa liberada para a comunidade.';await loadAdminSongs();}
+    catch(error){status.textContent=error?.message||'Não foi possível liberar esta faixa.';}
+   });
+   actions.append(restrict,publish);card.append(state,actions);area.append(card);
+  }
+ }catch(error){area.replaceChildren(node('p','muted','Não foi possível carregar as músicas.'));status.textContent=error?.message||'Falha ao consultar o catálogo.';}
+}
 async function loadQueue(){
  queue.replaceChildren();queueStatus.textContent='Carregando publicações pendentes...';
  try{
   const groups=await auth.getModerationQueue();
   let count=0;
-  for(const [kind,label] of [['artists','Artistas'],['events','Eventos e ações'],['posts','Divulgações'],['songs','Músicas']]){
+  for(const [kind,label] of [['artists','Artistas'],['events','Eventos e ações'],['posts','Divulgações']]){
    const heading=node('h2','',label);heading.id='section-'+kind;queue.append(heading);
    if(!groups[kind].length){queue.append(node('p','muted','Nenhum item aguardando análise.'));continue;}
    for(const item of groups[kind]){
@@ -628,7 +665,7 @@ async function loadQueue(){
     const card=node('article','item');
     const title=node('h3','',item.title);
     const detail=node('p','muted',item.detail);
-    const status=node('p','notice','Aguardando aprovação');
+    const status=node('p','notice',kind==='songs'?'Em análise • faixa já disponível para audição pública':'Aguardando aprovação');
     const actions=node('div','actions');
     const approve=node('button','', 'Aprovar');
     const reject=node('button','secondary','Rejeitar');

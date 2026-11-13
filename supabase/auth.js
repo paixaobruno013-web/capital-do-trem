@@ -153,8 +153,32 @@ export function watchAuthChanges(callback) {
 }
 
 
-// Envio de mídia: arquivos privados por pasta de usuário, com validação no cliente
-// e limites reforçados pelo bucket/políticas do Supabase.
+// Gera URLs para mídias sociais: novas mídias privadas usam links assinados;
+// mídias antigas no bucket público continuam acessíveis durante a transição.
+async function withPostMediaUrls(supabase, rows) {
+  const urls = new Map();
+  const groups = new Map();
+  for (const item of rows || []) {
+    const bucketId = item.bucket_id || 'capital-do-trem-media';
+    const key = bucketId + ':' + item.storage_path;
+    if (bucketId === 'capital-do-trem-social') {
+      if (!groups.has(bucketId)) groups.set(bucketId, new Set());
+      groups.get(bucketId).add(item.storage_path);
+    } else {
+      const { data } = supabase.storage.from(bucketId).getPublicUrl(item.storage_path);
+      urls.set(key, data?.publicUrl || null);
+    }
+  }
+  for (const [bucketId, pathSet] of groups) {
+    const { data, error } = await supabase.storage.from(bucketId).createSignedUrls([...pathSet], 60 * 60);
+    if (error) throw error;
+    for (const item of data || []) urls.set(bucketId + ':' + item.path, item.signedUrl || null);
+  }
+  return (rows || []).map(item => ({ ...item, url: urls.get((item.bucket_id || 'capital-do-trem-media') + ':' + item.storage_path) || null }));
+}
+
+// Envio de mídia de publicação pública, organizada na pasta do usuário.
+// Não usar esta função para fotos privadas ou anexos de conversa.
 export async function uploadMyMedia(file, category) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -421,25 +445,35 @@ export async function bootstrapFirstAdmin() {
 export async function getModerationQueue() {
   const supabase = initSupabase();
   if (!(await isCurrentUserAdmin())) throw new Error('Acesso administrativo não autorizado.');
-  const [artists, events, posts, songs] = await Promise.all([
+  const [artists, events, posts] = await Promise.all([
     supabase.from('artists').select('id, artist_name, style, city, bio, status, created_at').eq('status','pending').order('created_at',{ascending:true}),
     supabase.from('events').select('id, title, event_date, event_time, address, category, description, status, created_at').eq('status','pending').order('created_at',{ascending:true}),
-    supabase.from('posts').select('id, content, status, created_at').eq('status','pending').order('created_at',{ascending:true}),
-    supabase.from('songs').select('id,title,artist_name,producer_name,description,status,created_at').eq('status','pending').order('created_at',{ascending:true})
+    supabase.from('posts').select('id, content, status, created_at').eq('status','pending').order('created_at',{ascending:true})
   ]);
-  for (const result of [artists,events,posts,songs]) if (result.error) throw result.error;
+  for (const result of [artists,events,posts]) if (result.error) throw result.error;
   return {
     artists: (artists.data||[]).map(item=>({id:item.id,title:item.artist_name,detail:[item.style,item.city,item.bio].filter(Boolean).join(' • ')})),
     events: (events.data||[]).map(item=>({id:item.id,title:item.title,detail:[item.category,item.event_date,item.event_time,item.address,item.description].filter(Boolean).join(' • ')})),
     posts: (posts.data||[]).map(item=>({id:item.id,title:'Divulgação da comunidade',detail:item.content})),
-    songs: (songs.data||[]).map(item=>({id:item.id,title:item.title,detail:[item.artist_name,item.producer_name?'Produção: '+item.producer_name:'',item.description].filter(Boolean).join(' • ')}))
+    // Músicas não passam por fila de aprovação. O painel separado permite restringir uma faixa após denúncia.
+    songs: []
   };
+}
+
+export async function getAdminSongs() {
+  const supabase = initSupabase();
+  if (!(await isCurrentUserAdmin())) throw new Error('Acesso administrativo não autorizado.');
+  const { data, error } = await supabase.from('songs')
+    .select('id,user_id,title,artist_name,producer_name,status,created_at')
+    .order('created_at',{ascending:false}).limit(200);
+  if (error) throw error;
+  return data || [];
 }
 
 export async function moderateItem(table, id, status) {
   const allowedTables = ['artists','events','posts','songs'];
   if (!allowedTables.includes(table)) throw new Error('Tipo de publicação inválido.');
-  if (!['published','rejected'].includes(status)) throw new Error('Ação de moderação inválida.');
+  if (!['published','rejected','private'].includes(status)) throw new Error('Ação de moderação inválida.');
   const supabase = initSupabase();
   if (!(await isCurrentUserAdmin())) throw new Error('Acesso administrativo não autorizado.');
   const { error } = await supabase.from(table).update({status}).eq('id',id);
@@ -521,45 +555,70 @@ export async function getMySongs() {
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para consultar suas músicas.');
   const { data, error } = await supabase.from('songs')
-    .select('id,title,artist_name,producer_name,description,status,created_at')
+    .select('id,title,artist_name,producer_name,description,status,created_at,storage_path')
     .eq('user_id',user.id).order('created_at',{ascending:false});
   if (error) throw error;
-  return data || [];
+  const songs = data || [];
+  if (!songs.length) return [];
+  const paths = songs.map(song=>song.storage_path);
+  const { data: signed, error: signedError } = await supabase.storage.from('capital-do-trem-audio').createSignedUrls(paths,60*60);
+  if (signedError) throw signedError;
+  const byPath = new Map((signed||[]).map(item=>[item.path,item.signedUrl]));
+  return songs.map(song=>({...song,audio_url:byPath.get(song.storage_path)||null}));
 }
 
 export async function getPublishedSongs() {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('songs')
-    .select('id,title,artist_name,producer_name,description,storage_path')
+    .select('id,title,artist_name,producer_name,description,storage_path,status')
     .eq('status','published').order('created_at',{ascending:false}).limit(100);
   if (error) throw error;
   const items = data || [];
   if (!items.length) return [];
   const storage = supabase.storage.from('capital-do-trem-audio');
   const paths = items.map(song => song.storage_path);
-  // Gera os links em lote: duas chamadas de Storage em vez de duas chamadas por música.
-  const [{ data: signed, error: signedError }, { data: downloadable, error: downloadError }] = await Promise.all([
-    storage.createSignedUrls(paths, 60 * 60),
-    storage.createSignedUrls(paths, 60 * 60, { download: true })
-  ]);
-  if (signedError) throw signedError;
-  if (downloadError) throw downloadError;
-  const signedByPath = new Map((signed || []).map(item => [item.path, item.signedUrl]));
-  const downloadByPath = new Map((downloadable || []).map(item => [item.path, item.signedUrl]));
-  return items.map(song => {
-    const audioUrl = signedByPath.get(song.storage_path);
-    const downloadUrl = downloadByPath.get(song.storage_path);
-    if (!audioUrl || !downloadUrl) throw new Error('Não foi possível preparar os links de áudio de todas as músicas. Tente novamente.');
-    return {
-      id:song.id,
-      title:song.title,
-      artist_name:song.artist_name,
-      producer_name:song.producer_name || '',
-      description:song.description,
-      audio_url:audioUrl,
-      download_url:downloadUrl
-    };
-  });
+  let signedRows = [];
+  try {
+    const result = await storage.createSignedUrls(paths, 60 * 60);
+    if (result.error) throw result.error;
+    signedRows = result.data || [];
+  } catch (batchError) {
+    console.warn('Links em lote indisponíveis; tentando preparar cada música separadamente.', batchError);
+  }
+  const signedByPath = new Map(signedRows.filter(item => item?.path && item?.signedUrl && !item?.error).map(item => [item.path, item.signedUrl]));
+  const missing = items.filter(song => !signedByPath.has(song.storage_path));
+  if (missing.length) {
+    const fallbackRows = await Promise.all(missing.map(async song => {
+      try {
+        const result = await storage.createSignedUrl(song.storage_path, 60 * 60);
+        return result.error || !result.data?.signedUrl ? null : [song.storage_path, result.data.signedUrl];
+      } catch {
+        return null;
+      }
+    }));
+    for (const entry of fallbackRows) if (entry) signedByPath.set(entry[0], entry[1]);
+  }
+  let downloadByPath = new Map();
+  try {
+    const result = await storage.createSignedUrls(paths, 60 * 60, { download: true });
+    if (!result.error) downloadByPath = new Map((result.data || []).filter(item => item?.path && item?.signedUrl && !item?.error).map(item => [item.path, item.signedUrl]));
+  } catch (downloadError) {
+    console.warn('Links de download indisponíveis; mantendo a reprodução das músicas.', downloadError);
+  }
+  const available = items.filter(song => signedByPath.has(song.storage_path));
+  if (!available.length) {
+    throw new Error('As faixas estão cadastradas, mas o armazenamento não liberou os links de reprodução. Nenhuma música foi apagada; é necessário revisar o acesso ao bucket de áudio.');
+  }
+  return available.map(song => ({
+    id:song.id,
+    title:song.title,
+    artist_name:song.artist_name,
+    producer_name:song.producer_name || '',
+    description:song.description,
+    status:song.status,
+    audio_url:signedByPath.get(song.storage_path),
+    download_url:downloadByPath.get(song.storage_path) || signedByPath.get(song.storage_path)
+  }));
 }
 
 // Agenda pública: visitantes podem consultar eventos publicados diretamente.
@@ -592,42 +651,137 @@ export async function getPublishedEvents() {
 }
 
 // Publica uma divulgação imediatamente no mural da comunidade.
-export async function submitMyPost(content) {
+export async function submitMyPost(content, { allowEmpty = false } = {}) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
-  if (!user) throw new Error('Entre na sua conta para enviar uma divulgação.');
+  if (!user) throw new Error('Entre na sua conta para enviar uma publicação.');
   const cleanContent = String(content || '').trim();
-  if (cleanContent.length < 1 || cleanContent.length > 1500) {
-    throw new Error('A divulgação deve ter entre 1 e 1.500 caracteres.');
+  if (cleanContent.length > 1500 || (!allowEmpty && cleanContent.length < 1)) {
+    throw new Error('A legenda deve ter até 1.500 caracteres e não pode ficar vazia quando não houver mídia.');
   }
+  // A tabela exige ao menos um caractere; este marcador invisível representa
+  // legenda vazia até que as mídias sejam anexadas com sucesso.
+  const storedContent = allowEmpty && cleanContent.length === 0 ? '\u200b' : cleanContent;
   const { data, error } = await supabase.from('posts')
-    .insert({ author_id: user.id, content: cleanContent, status: 'published' })
+    .insert({ author_id: user.id, content: storedContent, status: 'published' })
     .select('id, content, status, created_at').single();
   if (error) throw error;
   return data;
 }
 
-// Mural público: visitantes recebem divulgações publicadas diretamente.
-export async function getPublishedPosts() {
+// Envio de mídia para uma publicação própria do feed social.
+export async function uploadMyPostMedia(file, postId, sortOrder = 0, altText = '') {
   const supabase = initSupabase();
-  const { data, error } = await supabase.from('posts')
-    .select('id, content, created_at')
-    .eq('status', 'published')
-    .order('created_at', { ascending: false })
-    .limit(50);
-  if (error) throw error;
-  return data || [];
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para publicar fotos e vídeos.');
+  if (!(file instanceof File)) throw new Error('Selecione uma foto ou vídeo.');
+  const allowed = {
+    'image/jpeg': { ext: 'jpg', type: 'image', max: 10 * 1024 * 1024 },
+    'image/png': { ext: 'png', type: 'image', max: 10 * 1024 * 1024 },
+    'image/webp': { ext: 'webp', type: 'image', max: 10 * 1024 * 1024 },
+    'video/mp4': { ext: 'mp4', type: 'video', max: 50 * 1024 * 1024 },
+    'video/webm': { ext: 'webm', type: 'video', max: 50 * 1024 * 1024 },
+    'video/quicktime': { ext: 'mov', type: 'video', max: 50 * 1024 * 1024 }
+  };
+  const rule = allowed[file.type];
+  if (!rule) throw new Error('Formato não aceito. Use JPG, PNG, WebP, MP4, WebM ou MOV.');
+  if (file.size < 1 || file.size > rule.max) throw new Error(rule.type === 'image' ? 'Cada foto deve ter até 10 MB.' : 'Cada vídeo deve ter até 50 MB.');
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(postId || ''))) throw new Error('Publicação inválida. Atualize a página e tente novamente.');
+  const { data: post, error: postError } = await supabase.from('posts').select('id, author_id, status').eq('id', postId).maybeSingle();
+  if (postError) throw postError;
+  if (!post || post.author_id !== user.id || post.status !== 'published') throw new Error('Só é possível anexar mídia à sua própria publicação publicada.');
+  const order = Number.isInteger(sortOrder) ? Math.max(0, Math.min(9, sortOrder)) : 0;
+  const safeAlt = String(altText || '').trim().slice(0, 200);
+  const bucketId = 'capital-do-trem-social';
+  const bucket = supabase.storage.from(bucketId);
+  const { data: existing, error: existingError } = await supabase.from('post_media')
+    .select('id, post_id, owner_id, bucket_id, media_type, mime_type, byte_size, sort_order, alt_text, storage_path')
+    .eq('post_id', postId).eq('sort_order', order).maybeSingle();
+  if (existingError) throw existingError;
+  if (existing) {
+    if (existing.owner_id !== user.id) throw new Error('Esta posição de mídia já pertence a outra conta.');
+    const [resolved] = await withPostMediaUrls(supabase, [existing]);
+    return resolved;
+  }
+  const path = user.id + '/posts/' + postId + '/media-' + order + '.' + rule.ext;
+  const { error: uploadError } = await bucket.upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: true });
+  if (uploadError) throw uploadError;
+  const { data, error } = await supabase.from('post_media').insert({
+    post_id: postId, owner_id: user.id, bucket_id: bucketId, storage_path: path,
+    media_type: rule.type, mime_type: file.type, byte_size: file.size,
+    sort_order: order, alt_text: safeAlt
+  }).select('id, post_id, bucket_id, media_type, mime_type, byte_size, sort_order, alt_text, storage_path').single();
+  if (error) { await bucket.remove([path]).catch(() => {}); throw error; }
+  const [resolved] = await withPostMediaUrls(supabase, [data]);
+  return resolved;
 }
 
-// Perfil básico para qualquer participante. A visibilidade pública é opcional.
+export async function deleteMyPost(postId) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para excluir uma publicação.');
+  const cleanId = String(postId || '');
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(cleanId)) throw new Error('Publicação inválida.');
+  const { data: media, error: mediaError } = await supabase.from('post_media').select('bucket_id, storage_path')
+    .eq('post_id', cleanId).eq('owner_id', user.id);
+  if (mediaError) throw mediaError;
+  const { data: deleted, error: deleteError } = await supabase.from('posts').delete()
+    .eq('id', cleanId).eq('author_id', user.id).select('id').maybeSingle();
+  if (deleteError) throw deleteError;
+  if (!deleted) throw new Error('Você só pode excluir suas próprias publicações.');
+  const grouped = new Map();
+  for (const item of media || []) {
+    const bucketId = item.bucket_id || 'capital-do-trem-media';
+    if (!grouped.has(bucketId)) grouped.set(bucketId, []);
+    if (item.storage_path) grouped.get(bucketId).push(item.storage_path);
+  }
+  for (const [bucketId, paths] of grouped) {
+    const { error } = await supabase.storage.from(bucketId).remove(paths);
+    if (error) console.warn('Publicação excluída; alguns arquivos de mídia precisam de limpeza.', error);
+  }
+  return true;
+}
+
+export async function getPublishedPosts() {
+  const supabase = initSupabase();
+  const { data: posts, error } = await supabase.from('posts').select('id, author_id, content, created_at')
+    .eq('status', 'published').order('created_at', { ascending: false }).limit(50);
+  if (error) throw error;
+  if (!posts?.length) return [];
+  const postIds = posts.map(post => post.id);
+  const authorIds = [...new Set(posts.map(post => post.author_id).filter(Boolean))];
+  const [mediaResult, profilesResult] = await Promise.all([
+    supabase.from('post_media').select('id, post_id, bucket_id, media_type, mime_type, sort_order, alt_text, storage_path')
+      .in('post_id', postIds).order('sort_order', { ascending: true }).order('created_at', { ascending: true }),
+    authorIds.length ? supabase.from('profiles').select('user_id, display_name, username, account_type, avatar_type, avatar_url')
+      .eq('is_public', true).in('user_id', authorIds) : Promise.resolve({ data: [], error: null })
+  ]);
+  const mediaTableNotReady = mediaResult.error && ['PGRST205', '42P01'].includes(mediaResult.error.code);
+  if (mediaResult.error && !mediaTableNotReady) throw mediaResult.error;
+  if (profilesResult.error) throw profilesResult.error;
+  const profileById = new Map((profilesResult.data || []).map(profile => [profile.user_id, profile]));
+  const mediaByPost = new Map();
+  const resolvedMedia = await withPostMediaUrls(supabase, mediaTableNotReady ? [] : (mediaResult.data || []));
+  for (const item of resolvedMedia) {
+    if (!mediaByPost.has(item.post_id)) mediaByPost.set(item.post_id, []);
+    mediaByPost.get(item.post_id).push(item);
+  }
+  return posts.map(post => ({
+    ...post, content: post.content === '\u200b' ? '' : post.content,
+    author: profileById.get(post.author_id) || null, media: mediaByPost.get(post.id) || []
+  })).filter(post => post.content.trim().length > 0 || post.media.some(media => media.url));
+}
+
 export async function getMyBasicProfile() {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para acessar seu perfil.');
   const { data, error } = await supabase.from('profiles')
-    .select('user_id, display_name, username, account_type, bio, city, is_public')
+    .select('user_id, display_name, username, account_type, bio, city, is_public, avatar_url')
     .eq('user_id', user.id).maybeSingle();
   if (error) throw error;
   if (data) return data;
@@ -678,8 +832,48 @@ export async function getPublicProfiles() {
   return data || [];
 }
 
+export async function getPublicProfileByUsername(username) {
+  const clean = String(username || '').trim().toLowerCase();
+  const supabase = initSupabase();
+  const fields = 'user_id,display_name,username,account_type,bio,city,avatar_type,avatar_url,avatar_data,cover_url,cover_path,is_public';
 
-// Vitrine pública: somente perfis de artistas aprovados pela equipe.
+  // A página Perfil também é a página do próprio usuário quando aberta sem ?u=.
+  if (!clean) {
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError) throw userError;
+    if (!user) return null;
+    const { data, error } = await supabase.from('profiles')
+      .select(fields).eq('user_id', user.id).maybeSingle();
+    if (error) throw error;
+    return data || null;
+  }
+
+  if (!/^[a-z0-9][a-z0-9_]{2,31}$/.test(clean)) return null;
+  const { data, error } = await supabase.from('profiles')
+    .select(fields)
+    .eq('username', clean).eq('is_public', true).maybeSingle();
+  if (error) throw error;
+  return data || null;
+}
+
+export async function getPublicProfileVideos(userId) {
+  const clean = String(userId || '');
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(clean)) throw new Error('Perfil inválido.');
+  const supabase = initSupabase();
+  const { data: posts, error: postsError } = await supabase.from('posts').select('id,content,created_at')
+    .eq('author_id', clean).eq('status', 'published').order('created_at', { ascending: false }).limit(100);
+  if (postsError) throw postsError;
+  if (!posts?.length) return [];
+  const { data: media, error: mediaError } = await supabase.from('post_media')
+    .select('id,post_id,bucket_id,media_type,mime_type,alt_text,storage_path,created_at')
+    .eq('media_type', 'video').in('post_id', posts.map(post => post.id))
+    .order('created_at', { ascending: false }).limit(100);
+  if (mediaError) throw mediaError;
+  const postById = new Map(posts.map(post => [post.id, post]));
+  const resolved = await withPostMediaUrls(supabase, media || []);
+  return resolved.map(item => ({ ...item, post: postById.get(item.post_id) || null })).filter(item => item.url && item.post);
+}
+
 export async function getPublishedArtists() {
   const supabase = initSupabase();
   const { data, error } = await supabase
@@ -1865,15 +2059,162 @@ export async function addPostComment(postId,content) {
 
 // Publicações salvas: coleção particular sincronizada pela conta.
 export async function getMySavedPosts() {
- const supabase=initSupabase();const {data:{user},error:userError}=await supabase.auth.getUser();if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para ver seus itens salvos.');
- const {data:saved,error:savedError}=await supabase.from('saved_posts').select('post_id,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(200);if(savedError)throw savedError;
- const ids=(saved||[]).map(row=>row.post_id);if(!ids.length)return [];
- const {data:posts,error:postsError}=await supabase.from('posts').select('id,content,created_at').in('id',ids).eq('status','published');if(postsError)throw postsError;
- const byId=new Map((posts||[]).map(post=>[post.id,post]));return ids.map(id=>byId.get(id)).filter(Boolean);
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para ver seus itens salvos.');
+  const { data: saved, error: savedError } = await supabase.from('saved_posts').select('post_id,created_at')
+    .eq('user_id', user.id).order('created_at', { ascending: false }).limit(200);
+  if (savedError) throw savedError;
+  const ids = (saved || []).map(row => row.post_id);
+  if (!ids.length) return [];
+  const { data: posts, error: postsError } = await supabase.from('posts').select('id,content,created_at')
+    .in('id', ids).eq('status', 'published');
+  if (postsError) throw postsError;
+  const { data: media, error: mediaError } = await supabase.from('post_media')
+    .select('id,post_id,bucket_id,media_type,mime_type,sort_order,alt_text,storage_path')
+    .in('post_id', ids).order('sort_order', { ascending: true });
+  if (mediaError) throw mediaError;
+  const resolved = await withPostMediaUrls(supabase, media || []);
+  const mediaByPost = new Map();
+  for (const item of resolved) {
+    if (!mediaByPost.has(item.post_id)) mediaByPost.set(item.post_id, []);
+    mediaByPost.get(item.post_id).push(item);
+  }
+  const byId = new Map((posts || []).map(post => [post.id, post]));
+  return ids.map(id => {
+    const post = byId.get(id);
+    if (!post) return null;
+    const attached = mediaByPost.get(id) || [];
+    return { ...post, content: post.content === '\u200b' ? '' : post.content, media: attached };
+  }).filter(post => post && (post.content.trim().length > 0 || post.media.some(item => item.url)));
 }
+
 export async function toggleSavedPost(postId) {
  const supabase=initSupabase();const {data:{user},error:userError}=await supabase.auth.getUser();if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para salvar publicações.');if(!postId)throw new Error('Publicação inválida.');
  const {data:existing,error:lookupError}=await supabase.from('saved_posts').select('post_id').eq('user_id',user.id).eq('post_id',postId).maybeSingle();if(lookupError)throw lookupError;
  if(existing){const {error}=await supabase.from('saved_posts').delete().eq('user_id',user.id).eq('post_id',postId);if(error)throw error;return false;}
  const {error}=await supabase.from('saved_posts').insert({user_id:user.id,post_id:postId});if(error)throw error;return true;
+}
+
+// Rede de seguidores dos perfis públicos.
+export async function uploadMyProfileCover(file) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para alterar a capa.');
+  if (!(file instanceof File)) throw new Error('Selecione uma imagem para a capa.');
+  const allowed = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+  if (!allowed[file.type]) throw new Error('Use uma imagem JPG, PNG ou WebP.');
+  if (file.size < 1 || file.size > 8 * 1024 * 1024) throw new Error('A capa deve ter até 8 MB.');
+  const path = user.id + '/cover/' + crypto.randomUUID() + '.' + allowed[file.type];
+  const bucket = supabase.storage.from('capital-do-trem-media');
+  const { error: uploadError } = await bucket.upload(path, file, { contentType:file.type, cacheControl:'3600', upsert:false });
+  if (uploadError) throw uploadError;
+  const { data: publicData } = bucket.getPublicUrl(path);
+  if (!publicData?.publicUrl) throw new Error('Não foi possível preparar a imagem da capa.');
+  const { data: previous, error: previousError } = await supabase.from('profiles').select('cover_path').eq('user_id',user.id).single();
+  if (previousError) { await bucket.remove([path]); throw previousError; }
+  const { error: saveError } = await supabase.from('profiles').update({cover_url:publicData.publicUrl,cover_path:path}).eq('user_id',user.id);
+  if (saveError) { await bucket.remove([path]); throw saveError; }
+  if (previous?.cover_path && previous.cover_path.startsWith(user.id + '/cover/') && previous.cover_path !== path) await bucket.remove([previous.cover_path]);
+  return { cover_url:publicData.publicUrl, cover_path:path };
+}
+
+export async function getPublicProfileSocial(userId) {
+  const supabase = initSupabase();
+  const [followers, following, { data: { user }, error: userError }] = await Promise.all([
+    supabase.from('profile_follows').select('follower_id', { count: 'exact', head: true }).eq('followed_id', userId),
+    supabase.from('profile_follows').select('followed_id', { count: 'exact', head: true }).eq('follower_id', userId),
+    supabase.auth.getUser()
+  ]);
+  if (userError) throw userError;
+  if (followers.error) throw followers.error;
+  if (following.error) throw following.error;
+  let isFollowing = false;
+  if (user && user.id !== userId) {
+    const { data, error } = await supabase.from('profile_follows')
+      .select('followed_id').eq('follower_id', user.id).eq('followed_id', userId).maybeSingle();
+    if (error) throw error;
+    isFollowing = !!data;
+  }
+  return { followers: followers.count || 0, following: following.count || 0, isFollowing, isOwner: user?.id === userId };
+}
+
+export async function toggleProfileFollow(userId) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para seguir este perfil.');
+  if (!userId || user.id === userId) throw new Error('Você não pode seguir seu próprio perfil.');
+  const { data: existing, error: lookupError } = await supabase.from('profile_follows')
+    .select('followed_id').eq('follower_id', user.id).eq('followed_id', userId).maybeSingle();
+  if (lookupError) throw lookupError;
+  if (existing) {
+    const { error } = await supabase.from('profile_follows').delete()
+      .eq('follower_id', user.id).eq('followed_id', userId);
+    if (error) throw error;
+    return false;
+  }
+  const { error } = await supabase.from('profile_follows').insert({ follower_id: user.id, followed_id: userId });
+  if (error) throw error;
+  return true;
+}
+
+export async function getPublicProfilePosts(userId) {
+  const clean = String(userId || '');
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(clean)) throw new Error('Perfil inválido.');
+  const supabase = initSupabase();
+  const { data: posts, error: postsError } = await supabase.from('posts').select('id,content,created_at')
+    .eq('author_id', clean).eq('status', 'published').order('created_at', { ascending: false }).limit(100);
+  if (postsError) throw postsError;
+  if (!posts?.length) return [];
+  const { data: media, error: mediaError } = await supabase.from('post_media')
+    .select('id,post_id,bucket_id,media_type,mime_type,alt_text,storage_path,sort_order')
+    .in('post_id', posts.map(post => post.id)).order('sort_order', { ascending: true });
+  if (mediaError) throw mediaError;
+  const resolved = await withPostMediaUrls(supabase, media || []);
+  const byPost = new Map();
+  for (const item of resolved) {
+    if (!byPost.has(item.post_id)) byPost.set(item.post_id, []);
+    byPost.get(item.post_id).push(item);
+  }
+  return posts.map(post => ({ ...post, media: (byPost.get(post.id) || []).filter(item => item.url) }));
+}
+
+export async function getMyFollowingProfileIds() {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) return [];
+  const { data, error } = await supabase.from('profile_follows')
+    .select('followed_id').eq('follower_id', user.id);
+  if (error) throw error;
+  return (data || []).map(row => row.followed_id);
+}
+export async function getPublicProfileLikedPosts(userId) {
+  const clean = String(userId || '');
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(clean)) throw new Error('Perfil inválido.');
+  const supabase = initSupabase();
+  const { data: likes, error: likesError } = await supabase.from('post_likes').select('post_id,created_at')
+    .eq('user_id', clean).order('created_at', { ascending: false }).limit(100);
+  if (likesError) throw likesError;
+  const ids = (likes || []).map(item => item.post_id);
+  if (!ids.length) return [];
+  const { data: posts, error: postsError } = await supabase.from('posts').select('id,author_id,content,created_at')
+    .in('id', ids).eq('status', 'published');
+  if (postsError) throw postsError;
+  const byId = new Map((posts || []).map(post => [post.id, post]));
+  const ordered = ids.map(id => byId.get(id)).filter(Boolean);
+  const { data: media, error: mediaError } = await supabase.from('post_media')
+    .select('id,post_id,bucket_id,media_type,mime_type,alt_text,storage_path,sort_order')
+    .in('post_id', ordered.map(post => post.id)).order('sort_order', { ascending: true });
+  if (mediaError) throw mediaError;
+  const resolved = await withPostMediaUrls(supabase, media || []);
+  const byPost = new Map();
+  for (const item of resolved) {
+    if (!byPost.has(item.post_id)) byPost.set(item.post_id, []);
+    byPost.get(item.post_id).push(item);
+  }
+  return ordered.map(post => ({ ...post, media: (byPost.get(post.id) || []).filter(item => item.url) }));
 }
