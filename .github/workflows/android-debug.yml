@@ -76,14 +76,14 @@ jobs:
       - name: Criar projeto Android
         run: npx cap add android
 
-      - name: Preparar ícones com a imagem oficial do perfil
+      - name: Preparar ícones usando a marca atual do aplicativo
         env:
-          PROFILE_ICON_URL: https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/31937786-c321-445f-ae1c-de018eca95c8/avatar/b338f7a8-8964-4063-9086-64a9bd603f4f.jpg
+          APP_ICON_URL: https://zmjxkfjzrbbxyvgkwirv.supabase.co/functions/v1/capital-do-trem-pwa-icon
         run: |
           mkdir -p assets
-          curl --fail --location --retry 3 "$PROFILE_ICON_URL" --output /tmp/capital-do-trem-profile.jpg
+          curl --fail --location --retry 3 "$APP_ICON_URL" --output /tmp/capital-do-trem-app-icon.png
           python -m pip install --quiet Pillow
-          python scripts/prepare-app-icons.py /tmp/capital-do-trem-profile.jpg assets
+          python scripts/prepare-app-icons.py /tmp/capital-do-trem-app-icon.png assets
           npx --yes @capacitor/assets@3.0.0 generate --android --assetPath assets --iconBackgroundColor '#080809' --iconBackgroundColorDark '#080809'
 
       - name: Sincronizar Capacitor
