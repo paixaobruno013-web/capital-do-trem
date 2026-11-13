@@ -1,4 +1,4 @@
--- PROPOSTA (não aplicada): feed público com fotos e vídeos.
+-- SQL aplicado no Supabase: feed público com fotos e vídeos.
 -- Revisar antes de executar no Supabase. A bucket capital-do-trem-media
 -- permanece pública como está; nenhum bucket/objeto é alterado por este SQL.
 
@@ -30,6 +30,10 @@ create table if not exists public.post_media (
     storage_path like owner_id::text || '/posts/%'
   ),
   constraint post_media_post_order_unique unique (post_id, sort_order),
+  constraint post_media_size_by_type check (
+    (media_type = 'image' and byte_size <= 10485760)
+    or (media_type = 'video' and byte_size <= 52428800)
+  ),
   constraint post_media_type_matches_mime check (
     (media_type = 'image' and mime_type like 'image/%')
     or (media_type = 'video' and mime_type like 'video/%')
@@ -38,6 +42,8 @@ create table if not exists public.post_media (
 
 create index if not exists post_media_post_order_idx
   on public.post_media(post_id, sort_order, created_at);
+create index if not exists post_media_owner_id_idx
+  on public.post_media(owner_id);
 
 alter table public.post_media enable row level security;
 
@@ -118,6 +124,7 @@ create policy post_media_delete_own_or_admin
 
 commit;
 
--- Após revisão/aplicação, testar anon, usuário comum, artista e admin.
+-- Migrações aplicadas: add_social_post_media, enforce_social_post_media_file_limits,
+-- index_social_post_media_owner. Testes de leitura anon e privilégios foram executados.
 -- Também validar upload/delete em storage.objects: a política existente
 -- media_upload_own_folder exige a pasta inicial igual ao UID do usuário.
