@@ -2,6 +2,38 @@ name: Preparar iOS — Capital do Trem
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'youtube-feed.js'
+      - 'event-social-composer.js'
+      - 'home-story-composer.js'
+      - 'offline.html'
+      - 'manifest.webmanifest'
+      - 'conta.html'
+      - 'admin.html'
+      - 'privacidade.html'
+      - 'bate-papo.html'
+      - 'chat-enhancements.js'
+      - 'avatar.html'
+      - 'mensagens.html'
+      - 'diagnostico.html'
+      - 'marca.svg'
+      - 'sw.js'
+      - 'update.js'
+      - 'supabase/**'
+      - 'scripts/**'
+      - 'assets/**'
+      - 'package.json'
+      - 'capacitor.config.ts'
+      - '.github/workflows/ios-build.yml'
+      - 'admin-media.js'
+      - 'emoji-picker.js'
+      - 'stories-ui.js'
+      - 'admin-stories.js'
+      - 'account-stories.js'
+      - 'supabase-config.js'
   push:
     branches: [main]
     paths:
