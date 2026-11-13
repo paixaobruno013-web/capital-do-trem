@@ -51,6 +51,11 @@ jobs:
           node --check youtube-feed.js
           node scripts/check-social-saved-youtube.mjs
           test -s www/youtube-feed.js
+      - name: Verificar publicação social com fotos e vídeos
+        run: |
+          node --check scripts/check-social-feed-publishing.mjs
+          node scripts/check-social-feed-publishing.mjs
+          test -s www/social-feed-composer.js
       - name: Verificar curtidas e comentários do mural
         run: |
           node --check scripts/check-post-social.mjs
