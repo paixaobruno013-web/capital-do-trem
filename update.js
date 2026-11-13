@@ -28,7 +28,7 @@
    alertTitle.style.color='#fff';
  alertTitle.style.cssText='display:block;color:#fff;font-size:28px;line-height:1.05;font-weight:950;letter-spacing:.08em;text-transform:uppercase';
  const alertDetail=document.createElement('span');
- alertDetail.textContent='VOCE TÁ OFFLINE';
+ alertDetail.textContent='VOCÊ TÁ OFFLINE';
    alertDetail.style.color='#fff';
  alertDetail.style.cssText='display:block;margin-top:7px;font-size:16px;line-height:1.2;font-weight:850;color:#fff;letter-spacing:.035em';
  alertText.append(alertTitle,alertDetail);
@@ -91,13 +91,13 @@
    (async()=>{
     try{
      const nativeHaptics=window.Capacitor?.Plugins?.Haptics;
-     if(nativeHaptics?.vibrate&&window.Capacitor?.isNativePlatform?.())await nativeHaptics.vibrate({duration:3000});
-     else if(typeof navigator.vibrate==='function')navigator.vibrate(3000);
+     if(nativeHaptics?.vibrate&&window.Capacitor?.isNativePlatform?.())await nativeHaptics.vibrate({duration:13000});
+     else if(typeof navigator.vibrate==='function')navigator.vibrate([1200,400,1200,400,1200,400,1200,400,1200,400,1200,400,1200,400,1200]);
     }catch(error){try{if(typeof navigator.vibrate==='function')navigator.vibrate(3000);}catch{}}
    })();
   }
   if(!playedThisOutage&&audioUnlocked){playedThisOutage=true;playTrainHorn();}
-  offlineAlertTimer=window.setTimeout(()=>{alertBox.style.display='none';offlineAlertActive=false;},5000);
+  offlineAlertTimer=window.setTimeout(()=>{alertBox.style.display='none';offlineAlertActive=false;try{navigator.vibrate?.(0);}catch{}},13000);
  }
  function showOnline(){
   const fallbackStatus=document.getElementById('connection-status');if(fallbackStatus)fallbackStatus.hidden=true;
@@ -106,7 +106,7 @@
   playedThisOutage=false;offlineFeedbackSent=false;offlineAlertActive=false;clearTimeout(offlineAlertTimer);
   try{if(typeof navigator.vibrate==='function')navigator.vibrate(0);}catch(error){}
   if(!alertBox.isConnected)return;
-  alertTitle.textContent='ONLINE';
+  alertTitle.textContent='CONEXÃO RESTABELECIDA';
    alertTitle.style.color='#48e08b';
   alertDetail.textContent='🚂 CONEXÃO RESTABELECIDA! A INTERNET VOLTOU.';
    alertDetail.style.color='#b9ffd5';
