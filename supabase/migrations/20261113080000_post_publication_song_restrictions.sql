@@ -77,6 +77,16 @@ begin
     raise exception 'Ação inválida.';
   end if;
 
+  if p_target_user_id is null or p_target_user_id = auth.uid() then
+    raise exception 'Participante inválido.';
+  end if;
+
+  if v_artist and not v_admin and exists (
+    select 1 from public.admin_users au where au.user_id = p_target_user_id
+  ) then
+    raise exception 'Artistas não podem remover administradores.';
+  end if;
+
   if p_action in ('release', 'block_app') and not v_admin then
     raise exception 'Somente administrador pode executar essa ação.';
   end if;
