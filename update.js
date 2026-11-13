@@ -37,7 +37,7 @@
  hornButton.style.cssText='min-height:44px;padding:9px 16px;border:1px solid #ed1c24;border-radius:10px;background:#ed1c24;color:#fff;font-weight:800;cursor:pointer';
  const preferenceKey='capitaldotrem_train_horn_v1';
  // Não depende de baixar bibliotecas pela internet: o alerta também precisa funcionar offline.
- let hornEnabled=true,audioContext=null,audioUnlocked=false,playedThisOutage=false,offlineFeedbackSent=false,reconnectTimer=null,offlineAlertTimer=null,offlineAlertActive=false;
+ let hornEnabled=true,audioContext=null,audioUnlocked=false,playedThisOutage=false,offlineFeedbackSent=false,reconnectTimer=null,offlineAlertTimer=null,offlineAlertActive=false,vibrationLoopTimer=null;
  try{hornEnabled=localStorage.getItem(preferenceKey)!=='off';}catch{}
  function updateHornButton(){hornButton.textContent=hornEnabled?'🔊 Corneta ligada':'🔇 Corneta desligada';hornButton.setAttribute('aria-pressed',String(hornEnabled));}
  function playTrainHorn(){
@@ -75,6 +75,7 @@
  document.addEventListener('keydown',unlockHorn,{once:true});
  function showOffline(){
   const fallbackStatus=document.getElementById('connection-status');if(fallbackStatus)fallbackStatus.hidden=true;
+  if(!alertBox.isConnected&&document.body)document.body.append(alertBox);
   document.documentElement.classList.add('app-offline');
   if(offlineAlertActive)return;
   offlineAlertActive=true;
@@ -88,23 +89,28 @@
    alertBox.style.borderColor='#ed1c24';alertBox.style.display='flex';
   if(!offlineFeedbackSent){
    offlineFeedbackSent=true;
-   (async()=>{
+   const startedAt=Date.now();
+   const pulse=async()=>{
+    if(Date.now()-startedAt>=13000)return;
     try{
      const nativeHaptics=window.Capacitor?.Plugins?.Haptics;
-     if(nativeHaptics?.vibrate&&window.Capacitor?.isNativePlatform?.())await nativeHaptics.vibrate({duration:13000});
-     else if(typeof navigator.vibrate==='function')navigator.vibrate([1200,400,1200,400,1200,400,1200,400,1200,400,1200,400,1200,400,1200]);
-    }catch(error){try{if(typeof navigator.vibrate==='function')navigator.vibrate(3000);}catch{}}
-   })();
+     if(nativeHaptics?.vibrate&&window.Capacitor?.isNativePlatform?.())await nativeHaptics.vibrate({duration:450});
+     else if(typeof navigator.vibrate==='function')navigator.vibrate(450);
+    }catch(error){/* O aviso visual continua mesmo se o aparelho bloquear vibração. */}
+    vibrationLoopTimer=window.setTimeout(pulse,1000);
+   };
+   pulse();
   }
   if(!playedThisOutage&&audioUnlocked){playedThisOutage=true;playTrainHorn();}
-  offlineAlertTimer=window.setTimeout(()=>{alertBox.style.display='none';offlineAlertActive=false;try{navigator.vibrate?.(0);}catch{}},13000);
+  offlineAlertTimer=window.setTimeout(()=>{alertBox.style.display='none';offlineAlertActive=false;try{navigator.vibrate?.(0);}catch{}clearTimeout(vibrationLoopTimer);},13000);
  }
  function showOnline(){
   const fallbackStatus=document.getElementById('connection-status');if(fallbackStatus)fallbackStatus.hidden=true;
   document.documentElement.classList.remove('app-offline');
   // Reinicia o ciclo mesmo se a conexão voltar antes de o alerta entrar no DOM.
   playedThisOutage=false;offlineFeedbackSent=false;offlineAlertActive=false;clearTimeout(offlineAlertTimer);
-  try{if(typeof navigator.vibrate==='function')navigator.vibrate(0);}catch(error){}
+  try{if(typeof navigator.vibrate==='function')navigator.vibrate(0);}catch(error){}clearTimeout(vibrationLoopTimer);
+  if(!alertBox.isConnected&&document.body)document.body.append(alertBox);
   if(!alertBox.isConnected)return;
   alertTitle.textContent='CONEXÃO RESTABELECIDA';
    alertTitle.style.color='#48e08b';
@@ -115,7 +121,7 @@
    alertBox.style.boxShadow='0 8px 30px #000b,0 0 20px #269b6577';
    alertBox.style.display='flex';
   clearTimeout(reconnectTimer);
-  reconnectTimer=window.setTimeout(()=>{alertBox.style.display='none';},5000);
+  reconnectTimer=window.setTimeout(()=>{alertBox.style.display='none';},13000);
  }
  hornButton.addEventListener('click',async()=>{
   hornEnabled=!hornEnabled;
@@ -125,7 +131,7 @@
  });
  alertBox.append(trainMark,alertText,hornButton);
  updateHornButton();
- const addTrainAlert=()=>{if(!alertBox.isConnected)document.body.append(alertBox);if(!navigator.onLine||document.documentElement.dataset.offlineFallback==='true')showOffline();};
+ const addTrainAlert=()=>{if(!alertBox.isConnected&&document.body)document.body.append(alertBox);if(!navigator.onLine||document.documentElement.dataset.offlineFallback==='true')showOffline();};
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addTrainAlert,{once:true});
  else addTrainAlert();
  window.addEventListener('offline',showOffline);
@@ -177,7 +183,7 @@
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)verifyRealConnection();});
  window.setTimeout(verifyRealConnection,500);
  // Eventos online/offline continuam imediatos; a sondagem periódica fica em 60 s para poupar bateria e dados móveis.
- window.setInterval(verifyRealConnection,60*1000);
+ window.setInterval(verifyRealConnection,10*1000);
  if(!supportsServiceWorkerUpdates||!('serviceWorker' in navigator))return;
  let registration=null,reloading=false;
  const banner=document.createElement('aside');
