@@ -1951,7 +1951,7 @@ async function deleteOfflineMusic(id){
    const card=document.createElement('article');card.className='music-track-card';card.dataset.songId=song.id;songCards.set(song.id,card);card.dataset.searchText=[song.title,song.artist_name,song.description].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
    const cover=makeSongCover(song,songs.indexOf(song));const coverImage=document.createElement('img');coverImage.className='music-track-cover';coverImage.src=cover;coverImage.alt='Capa de '+song.title;coverImage.loading='lazy';coverImage.decoding='async';
    const info=document.createElement('div');info.className='music-track-info';const title=document.createElement('h3');title.textContent=song.title;const artist=document.createElement('p');artist.className='muted';artist.textContent=song.artist_name;info.append(title,artist);card.append(coverImage,info);
-   if(song.status==='pending'){const review=document.createElement('small');review.className='music-review-status';review.textContent='Em análise • disponível para ouvir';review.style.cssText='display:inline-block;margin:2px 0 8px;padding:4px 9px;border:1px solid rgba(237,28,36,.55);border-radius:999px;color:#ff8589;font-size:11px;font-weight:800';info.append(review);}
+   
    if(song.producer_name){const producer=document.createElement('p');producer.className='muted';producer.textContent='🎚️ Produção: '+song.producer_name;info.append(producer);}
    if(song.description){const desc=document.createElement('p');desc.textContent=song.description;info.append(desc);}
    const audioUrl=safeHttpsUrl(song.audio_url);const downloadUrl=safeHttpsUrl(song.download_url)||audioUrl;
