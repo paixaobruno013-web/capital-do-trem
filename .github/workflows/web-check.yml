@@ -23,6 +23,20 @@ jobs:
         run: npm run build:web
       - name: Conferir arquivos e ícones do PWA
         run: node scripts/check-pwa.mjs
+      - name: Empacotar prévia isolada para testes (somente pull request)
+        if: github.event_name == 'pull_request'
+        run: |
+          test -s www/index.html
+          cd www
+          zip -qr ../capital-do-trem-social-preview.zip .
+      - name: Disponibilizar pacote de prévia para QA (sem publicar em produção)
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: capital-do-trem-social-preview
+          path: capital-do-trem-social-preview.zip
+          if-no-files-found: error
+          retention-days: 7
       - name: Verificar sintaxe dos módulos de Stories
         run: |
           python3 -m py_compile scripts/configure-android-media.py scripts/prepare-ios-info.py
