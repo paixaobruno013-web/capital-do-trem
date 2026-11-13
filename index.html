@@ -946,7 +946,6 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <body>
 <script>
 (function(){
- const INTRO_SESSION_KEY='capitaldotrem_intro_seen_session_v1';
  const FILE_PICKER_RETURN_KEY='capitaldotrem_file_picker_return_at_v1';
  let show=true;
  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)show=false;
@@ -955,8 +954,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
   const returnedAt=Number(localStorage.getItem(FILE_PICKER_RETURN_KEY)||0);
   if(returnedAt&&Date.now()-returnedAt<10*60*1000)show=false;
   if(returnedAt)localStorage.removeItem(FILE_PICKER_RETURN_KEY);
-  if(sessionStorage.getItem(INTRO_SESSION_KEY)==='1')show=false;
-  else sessionStorage.setItem(INTRO_SESSION_KEY,'1');
+  // A apresentação deve ocorrer em toda abertura real do aplicativo; só é pulada no retorno do seletor de arquivos.
  }catch(error){/* Mantém a navegação normal se o armazenamento estiver bloqueado. */}
  if(!show)document.documentElement.classList.add('intro-smoke-skip');
 })();
