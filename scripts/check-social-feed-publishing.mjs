@@ -22,6 +22,8 @@ const checks = [
   ['envio sequencial permite retomar o mesmo post sem duplicar', composer.includes('let pendingPostId = null') && composer.includes('let uploadedCount = 0') && composer.includes('Continuar envio') && composer.includes('for (; uploadedCount < pendingFiles.length')],
   ['upload exige usuário autenticado e publicação própria publicada', auth.includes('export async function uploadMyPostMedia') && auth.includes('post.author_id !== user.id || post.status !== \'published\'')],
   ['mídia é enviada para pasta individual no bucket público de mídia', auth.includes("user.id + '/posts/' + postId + '/'") && auth.includes("from('capital-do-trem-media')")],
+  ['retentativa reconhece mídia já gravada e não duplica a publicação', auth.includes(".eq('post_id', postId)") && auth.includes(".eq('sort_order', order)") && auth.includes('if (existing)')],
+  ['caminho estável permite retomar objeto enviado antes de falha de metadados', auth.includes("'/media-' + order + '.' + rule.ext") && auth.includes('upsert: true')],
   ['metadados são gravados em post_media e objeto removido se falhar', auth.includes("from('post_media').insert({") && auth.includes('await bucket.remove([path]).catch(() => {})')],
   ['feed consulta apenas posts publicados e anexa mídias', auth.includes('export async function getPublishedPosts()') && auth.includes(".eq('status', 'published')") && auth.includes("from('post_media')")],
   ['consulta de autores respeita perfis públicos', auth.includes(".eq('is_public', true)") && auth.includes('display_name, username, account_type, avatar_type, avatar_url')],
