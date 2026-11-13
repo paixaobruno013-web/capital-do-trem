@@ -89,7 +89,9 @@ Implementação de frontend preparada na branch de trabalho:
 - `scripts/prepare-web.mjs`: módulo incluído na cópia do pacote final PWA após o primeiro CI identificar essa ausência.
 - `.github/workflows/web-check.yml`: validação de sintaxe do novo módulo.
 
-**Essas alterações estão somente na branch/PR, não na versão pública.** O upload de mídia depende da criação da tabela e políticas propostas. O bucket `capital-do-trem-media` é público; portanto, as mídias publicadas nele ficam acessíveis por URL pública. O fluxo deve ser usado somente para conteúdo destinado à publicação pública. A publicação de texto atual continua usando a função existente.
+**Essas alterações estão somente na branch/PR, não na versão pública.** O upload de mídia depende da criação da tabela e políticas propostas. O bucket `capital-do-trem-media` é público; portanto, as mídias publicadas nele ficam acessíveis por URL pública. O fluxo deve ser usado somente para conteúdo destinado à publicação pública.
+
+Validação CI: o workflow `Verificar preparação do aplicativo` passou no commit `aaf79255600e38cbdde574f95c7c049718656706`, incluindo build web, cópia do novo módulo, verificação do pré-cache PWA, sintaxe dos módulos e verificações de regressão existentes. A publicação de texto atual continua usando a função existente.
 
 **A proposta ainda não foi aplicada nem testada no banco.** Antes da execução, precisa de revisão e testes de RLS com visitante, usuário comum, artista e administrador. O app também precisará de integração de upload/consulta; o SQL sozinho não ativa fotos e vídeos no feed.
 
