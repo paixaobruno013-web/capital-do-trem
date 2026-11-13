@@ -963,6 +963,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <div class="intro-smoke" id="intro-smoke" aria-hidden="true">
  <div class="intro-smoke__cloud"></div>
  <div class="intro-smoke__brand"><img src="marca.svg" alt="" style="visibility:hidden"><strong>CAPITAL DO TREM</strong><span>A MÚSICA DA NOSSA QUEBRADA!</span></div>
+ <div class="opening-slogan" aria-label="Aqui a música não para">AQUI A MÚSICA NÃO PARA!</div>
  <div class="opening-clean-zone" aria-hidden="true"></div>
  <div class="opening-live-loader" id="opening-live-loader" role="status" aria-live="polite"><div class="opening-live-spinner" aria-hidden="true"></div><strong>Carregando...</strong><div class="opening-live-track"><span id="opening-live-progress"></span><span class="opening-live-train" id="opening-live-train" aria-hidden="true"><span class="opening-wagon opening-wagon-speakers opening-wagon-rear" aria-label="Primeiro vagão: alto-falante"><span class="opening-wagon-load opening-speaker-backward">🔊</span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-dancers" aria-label="Segundo vagão: rapaz e moça dançando"><span class="opening-wagon-load"><span class="opening-dancer female" aria-label="moça dançando">💃<i class="arm arm-left"></i><i class="arm arm-right"></i></span><span class="opening-dancer male" aria-label="rapaz dançando">🕺<i class="arm arm-left"></i><i class="arm arm-right"></i></span></span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-speakers opening-wagon-front" aria-label="Terceiro vagão: alto-falante"><span class="opening-wagon-load opening-speaker-forward">🔊</span><span class="opening-wagon-deck"></span></span><span class="opening-locomotive" aria-label="Locomotiva à frente puxando os três vagões">🚂</span></span></div></div>
 </div>
@@ -2451,7 +2452,7 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
 @media(min-width:760px){
  .home-shortcuts.reference-shortcuts{grid-template-columns:repeat(5,minmax(0,1fr))!important}
 }
-</style>
+\n/* Frase oficial da abertura, restaurada sem alterar a arte de fundo. */\n.opening-slogan{display:none}\n.intro-smoke.custom-opening-screen .opening-slogan{display:block;position:absolute;z-index:6;left:5%;right:5%;bottom:24%;padding:8px 10px;text-align:center;color:#fff;font-size:clamp(18px,5.2vw,30px);font-weight:1000;letter-spacing:clamp(1px,.45vw,2.5px);line-height:1.15;text-shadow:0 2px 4px #000,0 0 8px #ed1c24,0 0 20px #ed1c24;pointer-events:none}\n@media(max-width:380px){.intro-smoke.custom-opening-screen .opening-slogan{font-size:17px;letter-spacing:.6px;bottom:25%}}\n</style>
 <div id="home-story-composer" aria-hidden="true">
  <section id="home-story-composer-card" role="dialog" aria-modal="true" aria-labelledby="home-story-compose-title">
   <div class="home-story-compose-head"><h3 id="home-story-compose-title">＋ Criar Story</h3><button id="home-story-close" type="button" aria-label="Fechar">×</button></div>
