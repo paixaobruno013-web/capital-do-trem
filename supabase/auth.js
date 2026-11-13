@@ -153,8 +153,8 @@ export function watchAuthChanges(callback) {
 }
 
 
-// Envio de mídia: arquivos privados por pasta de usuário, com validação no cliente
-// e limites reforçados pelo bucket/políticas do Supabase.
+// Envio de mídia de publicação pública, organizada na pasta do usuário.
+// Não usar esta função para fotos privadas ou anexos de conversa.
 export async function uploadMyMedia(file, category) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
