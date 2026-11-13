@@ -436,6 +436,16 @@ export async function getModerationQueue() {
   };
 }
 
+export async function getAdminSongs() {
+  const supabase = initSupabase();
+  if (!(await isCurrentUserAdmin())) throw new Error('Acesso administrativo não autorizado.');
+  const { data, error } = await supabase.from('songs')
+    .select('id,user_id,title,artist_name,producer_name,status,created_at')
+    .order('created_at',{ascending:false}).limit(200);
+  if (error) throw error;
+  return data || [];
+}
+
 export async function moderateItem(table, id, status) {
   const allowedTables = ['artists','events','posts','songs'];
   if (!allowedTables.includes(table)) throw new Error('Tipo de publicação inválido.');
