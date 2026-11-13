@@ -911,6 +911,27 @@ body.light header.header-has-custom-background::before{
 // Se o Android encerrar o processo enquanto a câmera nativa está aberta, retoma a conversa em vez de reiniciar na página inicial.
 try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(localStorage.getItem(key)||0);if(started&&Date.now()-started<3*60*1000){localStorage.removeItem(key);location.replace('./bate-papo.html?retorno-camera=1');}}catch(error){}
 </script>
+<style>
+.profile-menu-cluster{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:56px}
+.profile-overflow{position:relative;z-index:120}
+.profile-overflow summary{list-style:none;cursor:pointer;display:grid;place-items:center;width:34px;height:25px;border-radius:8px;color:var(--fg);font-size:24px;font-weight:900;line-height:1}
+.profile-overflow summary::-webkit-details-marker{display:none}
+.profile-overflow[open] summary{background:var(--panel2);color:var(--red)}
+.profile-overflow-panel{position:absolute;right:0;top:29px;z-index:500;display:grid;min-width:205px;padding:7px;border:1px solid var(--line);border-radius:12px;background:#090909;box-shadow:0 12px 34px #000a}
+.profile-overflow-panel a{display:block;padding:10px 12px;border-radius:8px;color:#fff;text-decoration:none;font-size:13px}
+.profile-overflow-panel a:hover,.profile-overflow-panel a:focus{background:#241012;color:#fff}
+.profile-avatar-link{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--fg);text-decoration:none;font-size:11px;font-weight:800}
+.profile-avatar-link:first-letter{font-size:25px}
+.profile-avatar-link{font-size:11px}
+.profile-avatar-link::before{content:"";position:absolute}
+.reference-trending>h2{margin:0 0 12px;font-size:20px}
+.saved-publications{margin-top:14px;padding-top:10px;border-top:1px solid var(--line)}
+.saved-publications summary{cursor:pointer;font-weight:800}
+.home-friends-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.home-music-entry{border-color:rgba(237,28,36,.45);background:linear-gradient(145deg,var(--panel2),var(--panel))}
+.home-youtube{order:2}
+@media(max-width:759px){header .header-action-groups{align-items:flex-end;flex-direction:row;justify-content:center;gap:12px;margin-top:8px}.header-action-row{width:auto}.profile-overflow-panel{right:-10px}}
+</style>
 </head>
 <body>
 <script>
@@ -937,45 +958,50 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
  <div class="opening-live-loader" id="opening-live-loader" role="status" aria-live="polite"><div class="opening-live-spinner" aria-hidden="true"></div><strong>Carregando...</strong><div class="opening-live-track"><span id="opening-live-progress"></span><span class="opening-live-train" id="opening-live-train" aria-hidden="true"><span class="opening-wagon opening-wagon-speakers opening-wagon-rear" aria-label="Primeiro vagão: alto-falante"><span class="opening-wagon-load opening-speaker-backward">🔊</span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-dancers" aria-label="Segundo vagão: rapaz e moça dançando"><span class="opening-wagon-load"><span class="opening-dancer female" aria-label="moça dançando">💃<i class="arm arm-left"></i><i class="arm arm-right"></i></span><span class="opening-dancer male" aria-label="rapaz dançando">🕺<i class="arm arm-left"></i><i class="arm arm-right"></i></span></span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-speakers opening-wagon-front" aria-label="Terceiro vagão: alto-falante"><span class="opening-wagon-load opening-speaker-forward">🔊</span><span class="opening-wagon-deck"></span></span><span class="opening-locomotive" aria-label="Locomotiva à frente puxando os três vagões">🚂</span></span></div></div>
 </div>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
-<header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem <span class="verified-badge" role="img" aria-label="Perfil oficial verificado">✓</span></h1><p class="tag">A música da nossa quebrada!</p><div class="header-action-groups"><div class="header-action-row"><a class="btn alt" href="./conta.html">👤 Minha conta</a><a class="btn alt" href="./mensagens.html">✉️ Minhas conversas</a><a class="btn alt" href="./avatar.html">🎭 Meu avatar</a><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button></div><div class="header-action-row"><a class="btn" href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ YouTube</a><a class="btn instagram-button" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">◎ Instagram</a></div><div class="header-action-row"><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som da abertura: ligado</button></div></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Abertura de 7 segundos com som ligado por padrão. Você pode desativar permanentemente neste aparelho.</p><div class="header-location-row"><button class="btn alt" id="quick-location" type="button">📍 Logo ali Uai - Localização</button></div></header>
+<header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem <span class="verified-badge" role="img" aria-label="Perfil oficial verificado">✓</span></h1><p class="tag">A música da nossa quebrada!</p><div class="header-action-groups"><div class="profile-menu-cluster"><details class="profile-overflow"><summary aria-label="Mais opções do perfil" title="Mais opções">⋮</summary><div class="profile-overflow-panel"><a href="./conta.html#access-panel">Criar conta / Entrar</a><a href="./conta.html#basic-profile-panel">Meu perfil</a><a href="./conta.html#sign-out">Sair da conta</a><a href="./apoiadores.html">Apoiadores</a><a href="./avatar.html">Meu avatar</a><a href="./diagnostico.html">Informações e ajuda</a><a href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">YouTube</a><a href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Instagram</a></div></details><a class="profile-avatar-link" href="./conta.html" aria-label="Abrir perfil individual">👤<span>Perfil</span></a></div><div class="header-action-row"><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som da abertura</button></div></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Abertura de 7 segundos com som ligado por padrão. Você pode desativar permanentemente neste aparelho.</p><div class="header-location-row"><button class="btn alt" id="quick-location" type="button">📍 Logo ali Uai - Localização</button></div></header>
 <main id="main-content" tabindex="-1">
 <p id="connection-status" class="connection-status" role="status" aria-live="polite" hidden></p>
-<section class="hero reference-banner"><h2>AQUI A MÚSICA<br><strong>NÃO PARA!</strong></h2><p>Conectando a quebrada!</p><div class="social"><button class="btn" data-go="musicas">▶ Ouvir músicas</button><button class="btn alt" data-go="comunidade">Comunidade</button></div></section>
+
 <nav id="nav" aria-label="Navegação principal">
 <button class="active" data-page="inicio" aria-controls="inicio" aria-current="page"><span aria-hidden="true">⌂</span>Início</button>
-<button data-page="social" aria-controls="social"><span aria-hidden="true">＋</span>Publicar</button>
-<button data-page="eventos" aria-controls="eventos"><span aria-hidden="true">▦</span>Eventos</button>
+<button data-page="divulgue" aria-controls="divulgue"><span aria-hidden="true">＋</span>Publicar</button>
+<a class="nav-chat" href="./bate-papo.html" aria-label="Abrir conversas e grupos"><span aria-hidden="true">☏</span>Conversas</a>
 <button data-page="musicas" aria-controls="musicas"><span aria-hidden="true">♫</span>Músicas</button>
-<button data-page="comunidade" aria-controls="comunidade"><span aria-hidden="true">♧</span>Comunidade</button>
-<button data-page="artistas" aria-controls="artistas"><span aria-hidden="true">♛</span>Artistas</button>
-<button data-page="parcerias" aria-controls="parcerias"><span aria-hidden="true">🤝</span>Apoiadores</button>
-<button data-page="divulgue" aria-controls="divulgue"><span aria-hidden="true">↗</span>Divulgações</button>
-<button data-page="duvidas" aria-controls="duvidas"><span aria-hidden="true">?</span>Ajuda</button>
-<a class="nav-chat" href="./bate-papo.html" aria-label="Abrir Koe Fala Tu"><span aria-hidden="true">☏</span>Koe Fala Tu</a>
 <a class="nav-profile" href="./conta.html" aria-label="Abrir meu perfil"><span aria-hidden="true">♙</span>Perfil</a>
 </nav>
-<section class="page active" id="inicio"><section class="home-stories card" aria-labelledby="home-stories-title"><div class="home-stories-heading"><h2 id="home-stories-title">Stories da quebrada</h2><button id="home-story-add" type="button" aria-label="Criar Story" title="Criar Story">＋</button></div><div id="home-stories-list" class="home-stories-list" aria-label="Stories recentes"><p class="muted">Carregando Stories…</p></div></section><section class="card home-event-feed" id="home-event-feed" aria-labelledby="home-event-feed-title" hidden>
-<div class="home-event-feed-heading"><div><span>AGENDA DA COMUNIDADE</span><h2 id="home-event-feed-title">📅 Eventos próximos</h2></div><a href="#eventos" data-go="eventos">Ver agenda</a></div>
-<div id="home-event-feed-list" class="home-event-feed-list" aria-live="polite"></div>
+<section class="page active" id="inicio">
+<section class="home-stories card" aria-labelledby="home-stories-title">
+ <div class="home-stories-heading"><h2 id="home-stories-title">Stories da quebrada</h2><button id="home-story-add" type="button" aria-label="Abrir câmera e criar Story" title="Câmera / Criar Story">📷</button></div>
+ <div id="home-stories-list" class="home-stories-list" aria-label="Stories recentes"><p class="muted">Carregando Stories…</p></div>
 </section>
-<section class="card home-friends" id="home-friends" aria-labelledby="home-friends-title"><div class="home-friends-row"><div><h2 id="home-friends-title">🤝 Friends — Fazer amizades</h2><p class="muted">Conheça a comunidade e encontre novas amizades no Capital do Trem.</p></div><a class="btn" href="./bate-papo.html#fazer-amigos">Entrar no Friends</a></div><div class="home-friends-actions"><a class="btn alt" href="./bate-papo.html#fazer-amigos">Ver pessoas da comunidade</a><a class="btn alt" href="#eventos" data-go="eventos">Eventos da galera</a></div></section>
 <section class="card home-youtube" aria-labelledby="home-youtube-title">
-<h2 id="home-youtube-title">▶ Vídeos da Capital do Trem</h2>
-<p class="muted">Os seis vídeos originais do projeto. Quando houver evento dentro da data, sua divulgação aparece aqui acima desta seleção.</p>
-<p id="youtube-feed-status" class="muted" role="status" aria-live="polite">Carregando vídeos…</p>
-<div class="home-youtube-grid" aria-live="polite"></div>
+ <h2 id="home-youtube-title">▶ Vídeos do Capital do Trem</h2>
+ <p id="youtube-feed-status" class="muted" role="status" aria-live="polite">Carregando vídeos…</p>
+ <div class="home-youtube-grid" aria-live="polite"></div>
 </section>
-<div class="home-shortcuts reference-shortcuts" aria-label="Acessos rápidos do Capital do Trem">
-<button type="button" data-go="social"><span aria-hidden="true">＋</span>Publicar foto ou vídeo</button>
-<button type="button" data-go="eventos"><span aria-hidden="true">▦</span>Eventos</button>
-<button type="button" data-go="musicas"><span aria-hidden="true">♫</span>Músicas</button>
-<button type="button" data-go="comunidade"><span aria-hidden="true">♧</span>Comunidade</button>
-<button type="button" data-go="artistas"><span aria-hidden="true">♛</span>Artistas</button>
-<button type="button" data-go="divulgue"><span aria-hidden="true">↗</span>Lançamentos e divulgações</button>
-<a href="./bate-papo.html"><span aria-hidden="true">☏</span>Koe Fala Tu</a>
-<a href="./conta.html"><span aria-hidden="true">♙</span>Minha conta</a>
-<a href="./apoiadores.html"><span aria-hidden="true">🤝</span>Apoiadores</a>
-</div><div class="grid"><article class="card"><h3>🎧 Música independente</h3><p class="muted">Espaço para lançamentos, artistas e sons da cena.</p></article><article class="card"><h3>📅 Cultura e eventos</h3><p class="muted">Divulgação de encontros, bailes e atividades culturais.</p></article><article class="card"><h3>🤝 Comunidade</h3><p class="muted">Ações sociais, parcerias e informação para fortalecer a comunidade.</p></article></div><div class="card reference-trending"><h3>🔥 Em Alta na Comunidade</h3><p class="muted">Novidades, lançamentos e recados da comunidade em um mural visual para compartilhar.</p><div id="public-posts" class="list" aria-live="polite"><p class="muted">Carregando publicações da comunidade…</p></div><section class="saved-publications card" aria-labelledby="saved-publications-title"><h3 id="saved-publications-title">🔖 Publicações salvas</h3><p class="muted">Sua coleção particular, como os itens salvos do Instagram. Só você pode ver o que guardou.</p><div id="saved-publications-login" class="muted">Entre na sua conta para acessar seus itens salvos.</div><div id="saved-publications-list" class="list" aria-live="polite" hidden></div><p id="saved-publications-status" class="muted" role="status" aria-live="polite"></p></section></div><div class="card reference-extra-links"><h3>Mais do Capital do Trem</h3><p><a href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">YouTube</a> · <a href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Instagram</a> · <a href="./conta.html">Minha conta</a> · <a href="./mensagens.html">Minhas conversas</a> · <a href="./apoiadores.html">🤝 Apoiadores</a></p></div><div class="card"><h3>📣 Mural da comunidade</h3><p class="muted">Publicações aprovadas pela equipe do Capital do Trem.</p><p class="muted">As publicações da comunidade aparecem na área “Em Alta na Comunidade” acima.</p></div><div class="notice">O mural mostra somente divulgações aprovadas pela equipe. Para enviar uma publicação, entre na sua conta e use a área de divulgação. <a href="./conta.html">Acessar minha conta</a>.</div></section>
+<section class="card home-event-feed" id="home-event-feed" aria-labelledby="home-event-feed-title" hidden>
+ <div class="home-event-feed-heading"><div><span>EVENTOS DA GALERA</span><h2 id="home-event-feed-title">📅 Eventos na timeline</h2></div><a href="#eventos" data-go="eventos">Ver eventos</a></div>
+ <div id="home-event-feed-list" class="home-event-feed-list" aria-live="polite"></div>
+</section>
+<section class="card reference-trending" aria-labelledby="home-timeline-title">
+ <h2 id="home-timeline-title">📰 Timeline da comunidade</h2>
+ <div id="public-posts" class="list" aria-live="polite"><p class="muted">Carregando fotos, vídeos e publicações…</p></div>
+ <details class="saved-publications">
+  <summary>🔖 Minhas publicações salvas</summary>
+  <p class="muted">Sua coleção particular de publicações guardadas.</p>
+  <div id="saved-publications-login" class="muted">Entre na sua conta para acessar seus itens salvos.</div>
+  <div id="saved-publications-list" class="list" aria-live="polite" hidden></div>
+  <p id="saved-publications-status" class="muted" role="status" aria-live="polite"></p>
+ </details>
+</section>
+<section class="card home-friends" id="home-friends" aria-labelledby="home-friends-title">
+ <div class="home-friends-row"><div><h2 id="home-friends-title">💬 Conversas, amizades e grupos</h2><p class="muted">Chame seus amigos, conheça gente nova e participe das conversas da comunidade.</p></div><a class="btn" href="./bate-papo.html">Abrir Koe Fala Tu</a></div>
+ <div class="home-friends-actions"><a class="btn alt" href="./mensagens.html">Conversas privadas</a><a class="btn alt" href="./bate-papo.html#fazer-amigos">Fazer amizades</a><a class="btn alt" href="./bate-papo.html">Grupos</a></div>
+</section>
+<section class="card home-music-entry">
+ <h2>🎵 Música é a nossa identidade</h2><p class="muted">Explore os sons, artistas e lançamentos do Capital do Trem.</p><button class="btn" type="button" data-go="musicas">Entrar na área de músicas</button>
+</section>
+</section>
 <section class="page" id="musicas"><div class="card"><h2>🎵 Central de músicas</h2><p class="muted">Um espaço para ouvir os sons dentro do Capital do Trem, sem precisar abrir o YouTube.</p><p class="muted">Músicas publicadas pela comunidade, com reprodução, download, curtidas e comentários.</p><div class="music-discovery-head"><a class="btn alt" href="https://www.youtube.com/@capitaldotrem" target="_blank" rel="noopener">▶ Videoclipes e canal</a><span class="muted">Novos sons da cena independente</span></div><section class="card music-library" id="music-library" aria-labelledby="music-library-title">
 <h3 id="music-library-title">🎼 Minha biblioteca</h3>
 <p class="muted">Suas músicas salvas e as últimas que você ouviu. A biblioteca acompanha sua conta nos seus aparelhos.</p>
@@ -1043,7 +1069,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <button class="btn" id="artist-copy" type="button">Copiar apresentação</button><button class="btn alt" id="share-artist" type="button">Compartilhar apresentação</button><button class="btn alt" id="artist-clear" type="button">Limpar campos</button>
 <p id="artist-status" class="muted" aria-live="polite"></p></div>
 </section>
-<section class="page" id="parcerias"><div class="card"><h2>🏆 Parcerias</h2><p>Comerciantes, marcas, produtores e apoiadores podem fortalecer o movimento.</p><a class="btn instagram-button" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Fale com a equipe pelo Instagram</a></div></section>
+
 <section class="page" id="divulgue"><div class="card"><h2>📣 Envie sua publicação</h2><p class="muted">Compartilhe texto, fotos e vídeos com a comunidade Capital do Trem.</p><div id="social-post-login"><p>Entre na sua conta para publicar.</p><a class="btn" href="./conta.html">Entrar ou criar conta</a></div><form id="social-post-form" hidden><label for="social-post-content">O que você quer compartilhar?</label><textarea id="social-post-content" maxlength="1500" placeholder="Conte sua novidade, lançamento, parceria ou iniciativa…"></textarea><label for="social-post-files">Fotos e vídeos (até 10 arquivos)</label><input id="social-post-files" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" multiple><p class="muted">Fotos até 10 MB cada. Vídeos até 50 MB cada. Até 10 arquivos e 100 MB no total. Formatos: JPG, PNG, WebP, MP4, WebM ou MOV. Você também pode publicar somente uma foto ou vídeo, sem legenda.</p><button class="btn" id="social-post-submit" type="submit" style="width:100%">Publicar no Capital do Trem</button><p id="social-post-status" class="muted" role="status" aria-live="polite"></p></form></div></section>
 <section class="page" id="duvidas">
 <div class="card"><h2>❓ Dúvidas frequentes</h2><p class="muted">Informações rápidas para quem está chegando ao Capital do Trem.</p></div>
