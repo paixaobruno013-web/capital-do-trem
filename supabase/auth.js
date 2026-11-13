@@ -445,18 +445,18 @@ export async function bootstrapFirstAdmin() {
 export async function getModerationQueue() {
   const supabase = initSupabase();
   if (!(await isCurrentUserAdmin())) throw new Error('Acesso administrativo não autorizado.');
-  const [artists, events, posts, songs] = await Promise.all([
+  const [artists, events, posts] = await Promise.all([
     supabase.from('artists').select('id, artist_name, style, city, bio, status, created_at').eq('status','pending').order('created_at',{ascending:true}),
     supabase.from('events').select('id, title, event_date, event_time, address, category, description, status, created_at').eq('status','pending').order('created_at',{ascending:true}),
-    supabase.from('posts').select('id, content, status, created_at').eq('status','pending').order('created_at',{ascending:true}),
-    supabase.from('songs').select('id,title,artist_name,producer_name,description,status,created_at').eq('status','pending').order('created_at',{ascending:true})
+    supabase.from('posts').select('id, content, status, created_at').eq('status','pending').order('created_at',{ascending:true})
   ]);
-  for (const result of [artists,events,posts,songs]) if (result.error) throw result.error;
+  for (const result of [artists,events,posts]) if (result.error) throw result.error;
   return {
     artists: (artists.data||[]).map(item=>({id:item.id,title:item.artist_name,detail:[item.style,item.city,item.bio].filter(Boolean).join(' • ')})),
     events: (events.data||[]).map(item=>({id:item.id,title:item.title,detail:[item.category,item.event_date,item.event_time,item.address,item.description].filter(Boolean).join(' • ')})),
     posts: (posts.data||[]).map(item=>({id:item.id,title:'Divulgação da comunidade',detail:item.content})),
-    songs: (songs.data||[]).map(item=>({id:item.id,title:item.title,detail:[item.artist_name,item.producer_name?'Produção: '+item.producer_name:'',item.description].filter(Boolean).join(' • ')}))
+    // Músicas não passam por fila de aprovação. O painel separado permite restringir uma faixa após denúncia.
+    songs: []
   };
 }
 
