@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [home, composer, auth, worker, prepare, migration, limits, ownerIndex, account, profilePage, publicMusicPolicy, followsMigration] = await Promise.all([
+const [home, composer, auth, worker, prepare, migration, limits, ownerIndex, account, profilePage, publicMusicPolicy, followsMigration, storiesUi] = await Promise.all([
   read('index.html'),
   read('social-feed-composer.js'),
   read('supabase/auth.js'),
@@ -13,7 +13,8 @@ const [home, composer, auth, worker, prepare, migration, limits, ownerIndex, acc
   read('conta.html'),
   read('perfil.html'),
   read('supabase/migrations/20261113030638_public_music_while_pending.sql'),
-  read('supabase/migrations/20261113011000_add_public_profile_follows.sql')
+  read('supabase/migrations/20261113011000_add_public_profile_follows.sql'),
+  read('stories-ui.js')
 ]);
 
 const checks = [
