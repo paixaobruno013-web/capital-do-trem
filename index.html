@@ -1943,7 +1943,7 @@ async function saveOfflineMusic(id,blob,title){
     const access=document.createElement('div');access.className='notice';access.style.marginTop='12px';
     const message=document.createElement('p');message.textContent='Entre na sua conta para curtir, comentar e acompanhar a conversa desta música.';
     const login=document.createElement('a');login.className='btn alt';login.href='./conta.html';login.textContent='Entrar ou criar conta';login.style.display='inline-block';login.style.marginTop='6px';
-    access.append(message,login);info.append(access);info.append(social);info.append(comments);container.append(card);continue;
+    access.append(message,login);info.append(access);container.append(card);continue;
    }
    const social=document.createElement('div');social.className='social';social.style.alignItems='center';
    const like=document.createElement('button');like.className='btn alt';like.type='button';like.textContent='❤️ Curtir';
