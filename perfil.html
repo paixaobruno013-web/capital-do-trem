@@ -111,10 +111,10 @@ document.getElementById('story-viewer').addEventListener('click',e=>{if(e.target
   renderPosts(grid,postsCount,'posts');renderPosts(videoGrid,postsCount,'videos');
   const tabs=[...document.querySelectorAll('.profile-tab')];
   for(const tab of tabs)tab.addEventListener('click',async()=>{tabs.forEach(item=>item.setAttribute('aria-selected',String(item===tab)));const mode=tab.dataset.tab;document.querySelectorAll('.profile-content-panel').forEach(panel=>panel.hidden=panel.id!==mode+'-panel');if(mode==='likes'){likesGrid.replaceChildren(el('p','Carregando curtidas...','post empty'));try{renderPosts(likesGrid,await api.getPublicProfileLikedPosts(profile.user_id),'likes');}catch(error){likesGrid.replaceChildren(el('p','Não foi possível carregar as curtidas públicas.','post empty'));}}else if(mode==='videos')renderPosts(videoGrid,postsCount,'videos');else renderPosts(grid,postsCount,'posts');});
-  const {getActiveUserStories}=await import('./supabase/auth.js');
+  const {getActiveUserStories,getMyFollowingProfileIds}=await import('./supabase/auth.js');
   try{
-   const all=await getActiveUserStories();
-   const visibleStories=all.filter(story=>story.author_id===profile.user_id);
+   const [all,followingIds]=await Promise.all([getActiveUserStories(),getMyFollowingProfileIds()]);
+   const visibleStories=all.filter(story=>story.author_id===profile.user_id||followingIds.includes(story.author_id));
    const groups=new Map();
    for(const story of visibleStories){if(!groups.has(story.author_id))groups.set(story.author_id,[]);groups.get(story.author_id).push(story);}
    for(const [author,items] of groups){
