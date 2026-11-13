@@ -41,7 +41,10 @@ const profileChecks = [
   ['capa personalizável e seletor de imagem', profileHtml.includes('id="profile-cover"') && profileHtml.includes('id="cover-file"') && auth.includes('uploadMyProfileCover')],
   ['atalho para trocar a foto de perfil', profileHtml.includes('avatar-add')],
   ['abas com áreas independentes de publicações, vídeos e curtidas', ['id="profile-posts"','id="profile-videos"','id="profile-likes"'].every(value => profileHtml.includes(value)) && profileHtml.includes('profile-content-panel')],
-  ['contadores de publicações, seguidores e seguindo', profileHtml.includes("'publicações'") && profileHtml.includes("'seguidores'") && profileHtml.includes("'seguindo'")]
+  ['contadores de publicações, seguidores e seguindo', profileHtml.includes("'publicações'") && profileHtml.includes("'seguidores'") && profileHtml.includes("'seguindo'")],
+  ['JavaScript do perfil sem sequências de quebra de linha inválidas', !profileHtml.includes(';\\n  if')],
+  ['Stories exibem a história do perfil visitado', profileHtml.includes('story.author_id===profile.user_id')],
+  ['aba Curtidas também mostra publicações somente de texto', profileHtml.includes("(mode==='posts'||mode==='likes')&&!mediaItems.length")]
 ];
 const musicChecks = [
   ['player imersivo com capa ampliada', index.includes('player-cover') && index.includes('94vw')],
