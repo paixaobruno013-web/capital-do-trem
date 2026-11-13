@@ -33,7 +33,7 @@ main{max-width:760px;margin:auto;padding-bottom:60px}
 .story-ring{width:66px;height:66px;margin:auto;border-radius:50%;padding:3px;border:2px solid var(--red);display:grid;place-items:center}
 .story-ring img,.story-ring .initial{width:100%;height:100%;border-radius:50%;object-fit:cover;background:#202020;display:grid;place-items:center;font-weight:900}
 .story-name{display:block;margin-top:5px;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.story.add .story-ring{border:2px dashed #ed1c24}.story.add .plus{font-size:34px;line-height:1;color:#ff343c}
+.story.add .story-ring{position:relative;border:0;padding:0}.story-add-avatar{width:66px;height:66px;border-radius:50%;background:#222;display:grid;place-items:center;overflow:hidden;font-size:25px;font-weight:900}.story-add-avatar img{width:100%;height:100%;object-fit:cover}.story.add .plus{position:absolute;right:-1px;bottom:-1px;width:25px;height:25px;border-radius:50%;background:var(--red);border:2px solid var(--bg);font-size:20px;line-height:1;color:#fff;display:grid;place-items:center}
 .posts{padding:16px 10px}.post-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}
 .post{aspect-ratio:1/1;position:relative;background:#171717;overflow:hidden;border:1px solid #242424}
 .post img,.post video{width:100%;height:100%;object-fit:cover;display:block;background:#000}
@@ -53,7 +53,7 @@ body.light{color-scheme:light;--bg:#f5f5f5;--panel:#fff;--line:#ddd;--fg:#171717
 <main>
 <div class="cover" role="img" aria-label="Favela e helicóptero"></div>
 <section class="profile-identity" id="profile-card" aria-live="polite"><p class="muted">Carregando perfil...</p></section>
-<section class="stories"><h2 class="section-title">STORIES</h2><div class="story-rail" id="profile-stories"><a class="story add" href="./conta.html"><span class="story-ring"><span class="plus">+</span></span><span class="story-name">Seu Story</span></a></div></section>
+<section class="stories"><h2 class="section-title">STORIES</h2><div class="story-rail" id="profile-stories"><a class="story add" href="./conta.html"><span class="story-ring story-add-ring"><span class="story-add-avatar" id="add-story-avatar">U</span><span class="plus">+</span></span><span class="story-name">Seu Story</span></a></div></section>
 <section class="posts"><h2 class="section-title">PUBLICAÇÕES</h2><div class="post-grid" id="profile-posts"><p class="post empty">Carregando publicações...</p></div></section>
 <a class="back" href="./index.html#comunidade">← Voltar à comunidade</a>
 </main>
@@ -77,6 +77,7 @@ document.getElementById('story-viewer').addEventListener('click',e=>{if(e.target
   const avatarUrl=profile.avatar_type==='photo'?safeUrl(profile.avatar_url):null;
   if(avatarUrl){const img=document.createElement('img');img.src=avatarUrl;img.alt='Foto de '+(profile.display_name||'participante');avatar.append(img);}
   else avatar.textContent=profile.avatar_type==='character'?'🎭':Array.from((profile.display_name||'U').trim())[0]?.toLocaleUpperCase('pt-BR')||'U';
+  const addStoryAvatar=document.getElementById('add-story-avatar');if(addStoryAvatar){if(avatarUrl){const addImg=document.createElement('img');addImg.src=avatarUrl;addImg.alt='';addStoryAvatar.replaceChildren(addImg);}else addStoryAvatar.textContent=profile.avatar_type==='character'?'🎭':Array.from((profile.display_name||'U').trim())[0]?.toLocaleUpperCase('pt-BR')||'U';}
   const identity=document.createElement('div');identity.className='identity-row';identity.append(avatar);
   const actions=document.createElement('div');actions.className='profile-actions';
   const social=await api.getPublicProfileSocial(profile.user_id);
