@@ -592,14 +592,14 @@ export async function getPublishedEvents() {
 }
 
 // Publica uma divulgação imediatamente no mural da comunidade.
-export async function submitMyPost(content) {
+export async function submitMyPost(content, { allowEmpty = false } = {}) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
-  if (!user) throw new Error('Entre na sua conta para enviar uma divulgação.');
+  if (!user) throw new Error('Entre na sua conta para enviar uma publicação.');
   const cleanContent = String(content || '').trim();
-  if (cleanContent.length < 1 || cleanContent.length > 1500) {
-    throw new Error('A divulgação deve ter entre 1 e 1.500 caracteres.');
+  if (cleanContent.length > 1500 || (!allowEmpty && cleanContent.length < 1)) {
+    throw new Error('A legenda deve ter até 1.500 caracteres e não pode ficar vazia quando não houver mídia.');
   }
   const { data, error } = await supabase.from('posts')
     .insert({ author_id: user.id, content: cleanContent, status: 'published' })
@@ -685,16 +685,17 @@ export async function getPublishedPosts() {
       .order('created_at', { ascending: true }),
     authorIds.length
       ? supabase.from('profiles')
-          .select('user_id, display_name, username, account_type, avatar_type, avatar_url, avatar_data')
+          .select('user_id, display_name, username, account_type, avatar_type, avatar_url')
           .eq('is_public', true)
           .in('user_id', authorIds)
       : Promise.resolve({ data: [], error: null })
   ]);
-  if (mediaResult.error) throw mediaResult.error;
+  const mediaTableNotReady = mediaResult.error && ['PGRST205', '42P01'].includes(mediaResult.error.code);
+  if (mediaResult.error && !mediaTableNotReady) throw mediaResult.error;
   if (profilesResult.error) throw profilesResult.error;
   const profileById = new Map((profilesResult.data || []).map(profile => [profile.user_id, profile]));
   const mediaByPost = new Map();
-  for (const media of mediaResult.data || []) {
+  for (const media of mediaTableNotReady ? [] : (mediaResult.data || [])) {
     const { data: publicData } = supabase.storage.from('capital-do-trem-media').getPublicUrl(media.storage_path);
     const item = { ...media, url: publicData?.publicUrl || null };
     if (!mediaByPost.has(media.post_id)) mediaByPost.set(media.post_id, []);
