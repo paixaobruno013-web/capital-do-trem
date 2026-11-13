@@ -131,3 +131,20 @@ Validação CI: o workflow `Verificar preparação do aplicativo` passou nos com
 - As 31 músicas atualmente cadastradas como publicadas não devem ser liberadas para distribuição pública/download sem confirmação dos direitos de uso e distribuição.
 - Não divulgar credenciais privilegiadas no frontend; somente chave publicável pode permanecer no cliente.
 - A PWA instalada pelo Safari/Chrome não equivale a um IPA ou APK de produção assinado.
+
+
+## Direção de interface aprovada — painel social simplificado
+
+A navegação do painel inicial foi reorganizada para priorizar a experiência social, sem alterar a identidade visual oficial nem a abertura:
+
+1. Stories da comunidade no topo, com acesso de câmera para criar Story.
+2. Vídeos do canal Capital do Trem.
+3. Eventos da comunidade na timeline.
+4. Publicações de fotos, vídeos e textos em uma timeline única.
+5. Conversas privadas, amizades e grupos pelo Koe Fala Tu.
+6. Entrada direta para a área de músicas.
+7. Perfil individual e menu de três pontos com acesso a criar conta/entrar, perfil, sair, Apoiadores, avatar, informações e ajuda.
+
+O painel principal deixa de apresentar o cartão comercial “Parcerias” e os blocos institucionais redundantes. Apoiadores continua acessível pelo menu secundário. A navegação inferior prioriza Início, Publicar, Conversas, Músicas e Perfil.
+
+**Pendências funcionais que não devem ser confundidas com a reorganização visual:** a galeria horizontal de vídeos que cada pessoa escolhe deixar pública no próprio perfil ainda precisa de contrato de dados, controles de visibilidade, integração com os perfis e testes de autorização. Não deve reutilizar a coleção privada de publicações salvas nem tornar arquivos privados públicos. A visualização pública horizontal será implementada como recurso separado, com consentimento explícito do titular.
