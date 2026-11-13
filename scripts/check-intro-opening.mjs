@@ -34,3 +34,13 @@ const checks = [
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO ') + name);
 if (checks.some(([, ok]) => !ok)) process.exit(1);
 console.log('Abertura: ' + checks.length + ' verificações aprovadas.');
+
+// Social profile and full-screen music player regression checks.
+const profileHtml = readFileSync(new URL('../perfil.html', import.meta.url), 'utf8');
+const homeHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+for (const expected of ['id="profile-cover"', 'id="cover-file"', 'data-tab="posts"', 'data-tab="videos"', 'data-tab="likes"', 'id="profile-posts"', 'id="profile-videos"', 'id="profile-likes"', 'avatar-add']) {
+  assert(profileHtml.includes(expected), 'Perfil deve incluir: ' + expected);
+}
+for (const expected of ['player-previous', 'player-next', 'player-rewind', 'player-forward', 'player-repeat', 'player-cover']) {
+  assert(homeHtml.includes(expected), 'Player deve incluir: ' + expected);
+}
