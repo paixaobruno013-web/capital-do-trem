@@ -81,8 +81,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
  .connection-status{margin:0 0 12px;padding:11px 13px;border:1px solid var(--red);border-radius:10px;background:var(--panel2);color:var(--fg)}.connection-status[hidden]{display:none}
  .skip-link{position:absolute;left:12px;top:-60px;z-index:1000;background:var(--red);color:#fff;padding:12px 16px;border-radius:9px;font-weight:800;text-decoration:none}.skip-link:focus{top:12px}
 /* Abertura cinematográfica: fumaça leve atravessando a marca. */
-.intro-smoke{position:fixed;inset:0;z-index:9998;display:grid;place-items:center;overflow:hidden;background:#000;pointer-events:none;animation:intro-screen-out 7s ease-in-out forwards}
-.intro-smoke__brand{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;opacity:0;animation:intro-brand-in 6.5s ease-out forwards}
+.intro-smoke{position:fixed;inset:0;z-index:9998;display:grid;place-items:center;overflow:hidden;background:#000;pointer-events:none;animation:intro-screen-out 10s ease-in-out forwards}
+.intro-smoke__brand{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;opacity:0;animation:intro-brand-in 9.8s ease-out forwards}
 html.intro-brand-pending .intro-smoke__brand{opacity:0!important;visibility:hidden!important}
 .intro-smoke__brand img{width:clamp(92px,24vw,150px);height:auto;max-height:150px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(255,255,255,.18))}
 .intro-smoke__brand.custom-opening-image{width:100%;height:100%;justify-content:center;gap:0}
@@ -583,7 +583,7 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
  border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
  transform:translate(-50%,-58%)!important;font-size:27px!important;line-height:1!important;
  white-space:nowrap!important;filter:drop-shadow(0 1px 3px #000)!important;
- animation:opening-train-travel 5s linear 1 forwards!important;
+ animation:opening-train-travel 9.8s linear 1 forwards!important;
 }
 @keyframes opening-train-travel{
  from{left:-140px}
@@ -795,7 +795,7 @@ html.auth-check-pending body{visibility:hidden}
   transform:translateY(-58%)!important;font-size:clamp(27px,7vw,36px)!important;
   line-height:1!important;white-space:nowrap!important;
   filter:drop-shadow(0 2px 4px #000) drop-shadow(0 0 7px rgba(255,20,28,.7))!important;
-  animation:opening-train-cross-sky 5s linear 1 both!important;
+  animation:opening-train-cross-sky 9.8s linear 1 both!important;
 }
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train .opening-locomotive{
   transform:none!important;
@@ -812,7 +812,7 @@ html.auth-check-pending body{visibility:hidden}
 /* Abertura: duração total de 10s; locomotiva à frente puxando os três vagões por 9,8s. */
 .intro-smoke.custom-opening-screen{animation:none!important;opacity:1!important}
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train{
-  animation:opening-train-cross-sky 5s linear 1 both!important;
+  animation:opening-train-cross-sky 9.8s linear 1 both!important;
 }
 @keyframes opening-train-cross-sky{
   from{left:-190px}
@@ -853,13 +853,13 @@ body.light header.header-has-custom-background::before{
 .intro-smoke.custom-opening-screen .opening-live-spinner,.intro-smoke.custom-opening-screen .opening-live-loader>strong,.intro-smoke.custom-opening-screen #opening-live-progress{display:none!important}
 .intro-smoke.custom-opening-screen .opening-live-track{position:absolute!important;left:0!important;right:0!important;top:50%!important;bottom:auto!important;width:100%!important;height:44px!important;border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}
 .intro-smoke.custom-opening-screen .opening-live-track:before{content:"";position:absolute;left:0;right:0;bottom:5px;height:2px;background:linear-gradient(90deg,transparent,#ed1c24 15%,#aaa 50%,#ed1c24 85%,transparent);opacity:.8}
-.intro-smoke.custom-opening-screen .opening-live-track #opening-live-train{position:absolute!important;z-index:3!important;top:50%!important;left:-230px!important;display:flex!important;flex-flow:row nowrap!important;align-items:flex-end!important;justify-content:flex-start!important;gap:3px!important;width:max-content!important;height:42px!important;max-width:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;transform:translateY(-58%)!important;font-size:clamp(27px,7vw,36px)!important;line-height:1!important;white-space:nowrap!important;filter:drop-shadow(0 2px 4px #000) drop-shadow(0 0 7px rgba(255,20,28,.7))!important;animation:opening-train-cross-sky 5s linear 1 both!important}
+.intro-smoke.custom-opening-screen .opening-live-track #opening-live-train{position:absolute!important;z-index:3!important;top:50%!important;left:-230px!important;display:flex!important;flex-flow:row nowrap!important;align-items:flex-end!important;justify-content:flex-start!important;gap:3px!important;width:max-content!important;height:42px!important;max-width:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;transform:translateY(-58%)!important;font-size:clamp(27px,7vw,36px)!important;line-height:1!important;white-space:nowrap!important;filter:drop-shadow(0 2px 4px #000) drop-shadow(0 0 7px rgba(255,20,28,.7))!important;animation:opening-train-cross-sky 9.8s linear 1 both!important}
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train .opening-locomotive{order:4!important;transform:scaleX(-1)!important;font-size:36px!important;line-height:1!important}
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train .opening-wagon-rear{order:1!important}
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train .opening-wagon-dancers{order:2!important}
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train .opening-wagon-front{order:3!important}
 @keyframes opening-train-cross-sky{from{left:-230px}to{left:calc(100vw + 230px)}}
-@media(prefers-reduced-motion:reduce){.intro-smoke.custom-opening-screen .opening-live-track #opening-live-train{animation:opening-train-cross-sky 5s linear 1 both!important}}
+@media(prefers-reduced-motion:reduce){.intro-smoke.custom-opening-screen .opening-live-track #opening-live-train{animation:opening-train-cross-sky 9.8s linear 1 both!important}}
 .post-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.saved-publications{margin-top:14px;border-color:#ed1c2455}.saved-publications .item{border-left:3px solid #ed1c24}
 
 /* Botão Logo Ali: formato horizontal com contorno LED vermelho */
@@ -1913,12 +1913,12 @@ async function saveOfflineMusic(id,blob,title){
    intro.style.objectFit=branding.openingFit==='contain'?'contain':'cover';
    intro.closest('.intro-smoke__brand')?.classList.add('custom-opening-image');screen.classList.add('custom-opening-screen');
    const movingTrain=document.getElementById('opening-live-train');
-   const startOpeningTrain=()=>{if(!movingTrain||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;movingTrain.style.setProperty('animation','none','important');movingTrain.style.removeProperty('left');void movingTrain.offsetWidth;movingTrain.style.setProperty('animation','opening-train-cross-sky 5s linear 1 both','important');};
+   const startOpeningTrain=()=>{if(!movingTrain||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;movingTrain.style.setProperty('animation','none','important');movingTrain.style.removeProperty('left');void movingTrain.offsetWidth;movingTrain.style.setProperty('animation','opening-train-cross-sky 9.8s linear 1 both','important');};
    if(movingTrain)movingTrain.style.setProperty('animation','none','important');
    const bar=document.getElementById('opening-live-progress');let progress=3,started=false,finished=false;
    const paint=()=>{if(bar)bar.style.width=progress+'%';};
    const finish=()=>{if(finished)return;finished=true;progress=100;paint();screen.querySelector('video')?.pause();screen.classList.add('is-finished');window.setTimeout(()=>screen.remove(),600);};
-   const begin=()=>{if(started)return;started=true;startOpeningTrain();window.setTimeout(finish,7000);};
+   const begin=()=>{if(started)return;started=true;startOpeningTrain();window.setTimeout(finish,10000);};
    const loader=window.setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}else window.clearInterval(loader);},220);
    if(intro.complete&&intro.naturalWidth>0){intro.style.visibility='visible';document.documentElement.classList.remove('intro-brand-pending');begin();}
    else{intro.addEventListener('load',()=>{intro.style.visibility='visible';document.documentElement.classList.remove('intro-brand-pending');begin();},{once:true});intro.addEventListener('error',()=>{intro.src='./marca.svg';intro.style.objectFit='contain';intro.style.visibility='visible';document.documentElement.classList.remove('intro-brand-pending');begin();},{once:true});}
@@ -1972,7 +1972,7 @@ async function saveOfflineMusic(id,blob,title){
     // Mantém o próprio vídeo visível durante carregamento e retomadas, sem poster/logo sobreposto.
     video.addEventListener('playing',()=>{video.style.opacity='1';});
         const movingTrain=document.getElementById('opening-live-train');
-    const startOpeningTrain=()=>{if(!movingTrain||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;movingTrain.style.setProperty('animation','none','important');void movingTrain.offsetWidth;movingTrain.style.setProperty('animation','opening-train-cross-sky 5s linear 1 both','important');};
+    const startOpeningTrain=()=>{if(!movingTrain||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;movingTrain.style.setProperty('animation','none','important');void movingTrain.offsetWidth;movingTrain.style.setProperty('animation','opening-train-cross-sky 9.8s linear 1 both','important');};
     if(movingTrain)movingTrain.style.setProperty('animation','none','important');
     const bar=document.getElementById('opening-live-progress');
     let progress=3,finished=false,clockStarted=false,finishTimer=null,fallbackTimer=null;
@@ -1983,7 +1983,7 @@ async function saveOfflineMusic(id,blob,title){
      progress=100;paint();video.pause();screen.classList.add('is-finished');
      window.setTimeout(()=>screen.remove(),600);
     };
-    const beginOpeningClock=()=>{if(clockStarted||finished)return;clockStarted=true;startOpeningTrain();finishTimer=window.setTimeout(finish,7000);};
+    const beginOpeningClock=()=>{if(clockStarted||finished)return;clockStarted=true;startOpeningTrain();finishTimer=window.setTimeout(finish,10000);};
     const loader=window.setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}else window.clearInterval(loader);},220);
     const showOpeningFallback=()=>{
      if(finished||video.dataset.fallbackShown==='yes')return;
@@ -2092,7 +2092,7 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
  position:absolute!important;z-index:30!important;left:-230px!important;top:50%!important;
  border:0!important;border-radius:0!important;background:transparent!important;
  box-shadow:none!important;transform:translateY(-58%)!important;
- animation:opening-train-cross-sky 5s linear 1 both!important;
+ animation:opening-train-cross-sky 9.8s linear 1 both!important;
 }
 /* Neutraliza estilos antigos de span que transformavam a locomotiva e a carga em barras vermelhas. */
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train,
@@ -2150,7 +2150,7 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
   gap:3px!important;
   white-space:nowrap!important;
   will-change:translate;
-  animation:opening-train-cross-sky 5s linear 1 both!important;
+  animation:opening-train-cross-sky 9.8s linear 1 both!important;
 }
 .intro-smoke.custom-opening-screen .opening-live-track > #opening-live-train .opening-wagon-rear{order:1!important}
 .intro-smoke.custom-opening-screen .opening-live-track > #opening-live-train .opening-wagon-dancers{order:2!important}
