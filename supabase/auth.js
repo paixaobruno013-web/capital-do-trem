@@ -530,8 +530,8 @@ export async function getMySongs() {
 export async function getPublishedSongs() {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('songs')
-    .select('id,title,artist_name,producer_name,description,storage_path')
-    .eq('status','published').order('created_at',{ascending:false}).limit(100);
+    .select('id,title,artist_name,producer_name,description,storage_path,status')
+    .in('status',['pending','published']).order('created_at',{ascending:false}).limit(100);
   if (error) throw error;
   const items = data || [];
   if (!items.length) return [];
@@ -556,6 +556,7 @@ export async function getPublishedSongs() {
       artist_name:song.artist_name,
       producer_name:song.producer_name || '',
       description:song.description,
+      status:song.status,
       audio_url:audioUrl,
       download_url:downloadUrl
     };
@@ -785,6 +786,42 @@ export async function getPublicProfiles() {
     .limit(100);
   if (error) throw error;
   return data || [];
+}
+
+export async function getPublicProfileByUsername(username) {
+  const clean = String(username || '').trim().toLowerCase();
+  if (!/^[a-z0-9][a-z0-9_]{2,31}$/.test(clean)) return null;
+  const supabase = initSupabase();
+  const { data, error } = await supabase.from('profiles')
+    .select('user_id,display_name,username,account_type,bio,city,avatar_type,avatar_url,avatar_data,is_public')
+    .eq('username', clean).eq('is_public', true).maybeSingle();
+  if (error) throw error;
+  return data || null;
+}
+
+export async function getPublicProfileVideos(userId) {
+  const clean = String(userId || '');
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(clean)) {
+    throw new Error('Perfil inválido.');
+  }
+  const supabase = initSupabase();
+  const { data: posts, error: postsError } = await supabase.from('posts')
+    .select('id,content,created_at').eq('author_id', clean).eq('status', 'published')
+    .order('created_at', { ascending: false }).limit(100);
+  if (postsError) throw postsError;
+  if (!posts?.length) return [];
+  const postIds = posts.map(post => post.id);
+  const { data: media, error: mediaError } = await supabase.from('post_media')
+    .select('id,post_id,media_type,mime_type,alt_text,storage_path,created_at')
+    .eq('media_type', 'video').in('post_id', postIds)
+    .order('created_at', { ascending: false }).limit(100);
+  if (mediaError) throw mediaError;
+  const postById = new Map(posts.map(post => [post.id, post]));
+  const bucket = supabase.storage.from('capital-do-trem-media');
+  return (media || []).map(item => {
+    const { data: publicData } = bucket.getPublicUrl(item.storage_path);
+    return { ...item, url: publicData?.publicUrl || null, post: postById.get(item.post_id) || null };
+  }).filter(item => item.url && item.post);
 }
 
 
