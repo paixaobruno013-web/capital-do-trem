@@ -935,6 +935,12 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <style id="capital-music-player-styles">
 #published-song-catalog{display:grid;gap:14px}.music-track-card{display:grid;grid-template-columns:minmax(104px,132px) minmax(0,1fr);gap:13px;align-items:start;background:#101010;border:1px solid #292929;border-radius:14px;padding:12px;min-width:0}.music-track-cover{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px;background:#080808;display:block}.music-track-info{min-width:0}.music-track-info h3{margin:0 0 4px;overflow-wrap:anywhere}.music-track-info p{margin:3px 0}.music-track-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.music-track-actions button,.music-track-actions a{min-height:40px;font-size:13px}.music-track-audio{display:none!important}
 #capital-song-player{position:fixed;inset:0;z-index:99999;background:#050505;color:#fff;display:none;overflow:auto;padding:env(safe-area-inset-top) 18px env(safe-area-inset-bottom);font-family:system-ui,sans-serif}#capital-song-player.is-open{display:flex;flex-direction:column}#capital-song-player .player-top{display:flex;align-items:center;justify-content:space-between;min-height:58px}#capital-song-player .player-back{border:0;background:transparent;color:#fff;font-size:16px;padding:10px}#capital-song-player .player-cover{width:min(84vw,440px);aspect-ratio:1/1;object-fit:cover;border-radius:12px;align-self:center;margin:clamp(14px,5vh,44px) auto 24px;box-shadow:0 12px 40px #000}#capital-song-player .player-title{text-align:center;font-size:23px;font-weight:900;margin:0}#capital-song-player .player-artist{text-align:center;color:#aaa;margin:5px 0 22px}#capital-song-player .player-progress{width:100%;accent-color:#ed1c24}#capital-song-player .player-times{display:flex;justify-content:space-between;color:#aaa;font-size:12px}#capital-song-player .player-controls{display:flex;align-items:center;justify-content:center;gap:clamp(10px,5vw,28px);margin:25px 0}#capital-song-player .player-controls button{width:54px;height:54px;border-radius:50%;border:1px solid #333;background:#171717;color:#fff;font-size:20px}#capital-song-player .player-controls .player-main{width:70px;height:70px;background:#ed1c24;border-color:#ed1c24;font-size:26px}#capital-song-player .player-controls button[aria-pressed=true]{color:#ff454c;border-color:#ed1c24}@media(max-width:390px){.music-track-card{grid-template-columns:94px minmax(0,1fr);gap:10px;padding:9px}.music-track-actions{gap:5px}.music-track-actions button,.music-track-actions a{padding:8px;font-size:12px}}
+</style><style id="home-story-add-profile-style">
+.home-stories-hint{font-size:11px;color:var(--muted,#aaa)}
+.home-story-item.home-story-add-item .home-story-ring{background:linear-gradient(135deg,#ed1c24,#080808);position:relative}
+.home-story-item.home-story-add-item .home-story-avatar{border-color:#080808}
+.home-story-add-plus{position:absolute;right:-2px;bottom:-2px;width:25px;height:25px;border-radius:50%;display:grid;place-items:center;background:#ed1c24;color:#fff;border:2px solid #080808;font-size:20px;line-height:1;font-weight:900;box-shadow:0 0 10px #ed1c2480}
+.home-story-add-item .home-story-name{font-weight:800;color:var(--fg)}
 </style></head>
 <body>
 <script>
@@ -974,7 +980,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 </nav>
 <section class="page active" id="inicio">
 <section class="home-stories card" aria-labelledby="home-stories-title">
- <div class="home-stories-heading"><h2 id="home-stories-title">Stories da quebrada</h2><button id="home-story-add" type="button" aria-label="Abrir câmera e criar Story" title="Câmera / Criar Story">📷</button></div>
+ <div class="home-stories-heading"><h2 id="home-stories-title">Stories da quebrada</h2><span class="home-stories-hint">Compartilhe seu momento</span></div>
  <div id="home-stories-list" class="home-stories-list" aria-label="Stories recentes"><p class="muted">Carregando Stories…</p></div>
 </section>
 <section class="card home-youtube" aria-labelledby="home-youtube-title">
@@ -2036,11 +2042,16 @@ async function saveOfflineMusic(id,blob,title){
     document.documentElement.classList.remove('intro-brand-pending');
     const video=document.createElement('video');
     screen.querySelectorAll('video, .opening-video-background, .opening-video-fallback').forEach(oldMedia=>{try{oldMedia.pause?.();oldMedia.removeAttribute?.('src');oldMedia.load?.();}catch{}oldMedia.remove();});
-    video.className='opening-video-background';video.src=currentOpeningVideo;video.removeAttribute('poster');video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';video.style.opacity='1';video.style.transition='opacity .25s ease';const savedOpeningSound=(()=>{try{return localStorage.getItem('capitaldotrem_intro_sound_v1')!=='off';}catch{return true;}})();
+    video.className='opening-video-background';video.src=currentOpeningVideo;video.removeAttribute('poster');video.style.objectPosition=(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%';video.style.objectFit=branding.openingFit==='contain'?'contain':'cover';video.style.opacity='0';video.style.transition='opacity .32s ease';video.style.background='transparent';const savedOpeningSound=(()=>{try{return localStorage.getItem('capitaldotrem_intro_sound_v1')!=='off';}catch{return true;}})();
     video.autoplay=true;video.muted=!savedOpeningSound;video.defaultMuted=!savedOpeningSound;video.volume=Math.max(0,Math.min(1,Number(branding.openingVideoVolume??0.7)));video.playsInline=true;video.loop=true;video.playbackRate=1;video.preload='auto';video.setAttribute('aria-hidden','true');
-    // Exibe somente o vídeo: não cria uma imagem de marca por cima da gravação.
-    video.style.zIndex='2';video.style.opacity='1';
-    screen.insertBefore(video,screen.firstChild);screen.classList.add('custom-opening-screen');
+    // Mantém a arte aprovada visível até o primeiro quadro real do vídeo, evitando flash preto.
+    video.style.zIndex='3';
+    const openingPoster=document.createElement('img');
+    openingPoster.className='opening-video-fallback';openingPoster.src=currentOpeningImage||'./marca.svg';openingPoster.alt='';
+    openingPoster.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:'+(branding.openingFit==='contain'?'contain':'cover')+';object-position:'+(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%;z-index:2;opacity:1;transition:opacity .32s ease';
+    screen.insertBefore(openingPoster,screen.firstChild);screen.insertBefore(video,openingPoster.nextSibling);screen.classList.add('custom-opening-screen');
+    let openingFrameShown=false;
+    const revealOpeningFrame=()=>{if(openingFrameShown||finished)return;openingFrameShown=true;video.style.opacity='1';openingPoster.style.opacity='0';window.setTimeout(()=>openingPoster.remove(),380);};
     // A imagem é mostrada primeiro; o vídeo só aparece quando o navegador confirma reprodução real.
     // A carga é iniciada somente depois de registrar os eventos para não perder loadeddata.
     // O áudio fica habilitado por padrão. Se Android/iOS bloquear autoplay com som,
@@ -2055,7 +2066,7 @@ async function saveOfflineMusic(id,blob,title){
     screen.appendChild(audioButton);
     video.addEventListener('play',()=>{if(!video.muted)audioButton.remove();});
     // Mantém o próprio vídeo visível durante carregamento e retomadas, sem poster/logo sobreposto.
-    video.addEventListener('playing',()=>{video.style.opacity='1';});
+    video.addEventListener('playing',()=>{if(typeof video.requestVideoFrameCallback==='function'){video.requestVideoFrameCallback(()=>revealOpeningFrame());}else revealOpeningFrame();});
         const movingTrain=document.getElementById('opening-live-train');
     const startOpeningTrain=()=>{if(!movingTrain||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;movingTrain.style.setProperty('animation','none','important');void movingTrain.offsetWidth;movingTrain.style.setProperty('animation','opening-train-cross-sky 5s linear 1 both','important');};
     if(movingTrain)movingTrain.style.setProperty('animation','none','important');
@@ -2065,7 +2076,7 @@ async function saveOfflineMusic(id,blob,title){
     const finish=()=>{
      if(finished)return;
      finished=true;clearTimeout(finishTimer);clearTimeout(fallbackTimer);clearInterval(loader);
-     progress=100;paint();video.pause();screen.classList.add('is-finished');
+     progress=100;paint();video.pause();openingPoster.remove();screen.classList.add('is-finished');
      window.setTimeout(()=>screen.remove(),600);
     };
     const beginOpeningClock=()=>{if(clockStarted||finished)return;clockStarted=true;startOpeningTrain();finishTimer=window.setTimeout(finish,7000);};
@@ -2074,11 +2085,7 @@ async function saveOfflineMusic(id,blob,title){
      if(finished||video.dataset.fallbackShown==='yes')return;
      video.dataset.fallbackShown='yes';clearTimeout(fallbackTimer);
      try{video.pause();video.removeAttribute('src');video.load();}catch{}
-     video.remove();
-     const fallback=document.createElement('img');
-     fallback.className='opening-video-fallback';fallback.src=currentOpeningImage||'./marca.svg';fallback.alt='';
-     fallback.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:'+(Number(branding.openingX??50))+'% '+(Number(branding.openingY??50))+'%;z-index:2';
-     screen.insertBefore(fallback,screen.firstChild);
+     video.remove();openingPoster.style.opacity='1';
      audioButton.style.display='none';
      beginOpeningClock();
     };
@@ -2096,14 +2103,14 @@ async function saveOfflineMusic(id,blob,title){
        audioButton.style.display='block';video.muted=true;video.defaultMuted=true;
       }
       try{await video.play();clearTimeout(fallbackTimer);}
-      catch(playError){console.warn('Não foi possível reproduzir o vídeo de abertura; usando a imagem de segurança.',playError);showOpeningFallback();}
+      catch(playError){console.warn('Não foi possível reproduzir o vídeo de abertura; mantendo a arte aprovada.',playError);showOpeningFallback();}
      }
     },{once:true});
     video.addEventListener('error',()=>{console.warn('Falha ao carregar o vídeo de abertura; usando a imagem de segurança.');showOpeningFallback();},{once:true});
     // Se a rede não entregar um quadro em cinco segundos, a abertura usa a imagem aprovada em vez de ficar preta.
     video.addEventListener('ended',finish,{once:true});
     video.load();
-    fallbackTimer=window.setTimeout(showOpeningFallback,5000);
+    fallbackTimer=window.setTimeout(()=>{if(!openingFrameShown)showOpeningFallback();},5000);
    }
   }
  }catch(error){
