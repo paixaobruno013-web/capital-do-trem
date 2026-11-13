@@ -20,7 +20,7 @@ const [room, enhancements, emoji, privateChat, worker, stories, home, auth, admi
 
 const checks = [
   ['chat geral possui formulário e campo de mensagem', /id="composer"/.test(room) && /id="message"/.test(room)],
-  ['moderação do chat exige perfil de artista aprovado e reserva bloqueio global ao administrador', moderationMigration.includes("a.status = 'published'") && moderationMigration.includes("if p_action in ('release', 'block_app') and not v_admin then") && moderationMigration.includes('private.is_admin()') && !moderationMigration.includes('moderator.group_id')],
+  ['moderação do chat exige perfil de artista aprovado e reserva bloqueio global ao administrador', moderationMigration.includes("a.status = 'published'") && moderationMigration.includes("if p_action in ('release', 'block_app') and not v_admin then") && moderationMigration.includes('private.is_admin()') && !moderationMigration.includes('moderator.group_id') && moderationMigration.includes('p_target_user_id = auth.uid()') && moderationMigration.includes('public.admin_users au')],
   ['chat geral possui área do seletor de emojis', /id="emoji-tray"[^>]*data-emoji-picker/.test(room)],
   ['botão de emojis é inserido no formulário', /emojiButton\.type\s*=\s*['"]button['"][\s\S]*?emojiButton\.id\s*=\s*['"]emoji-toggle['"]/.test(enhancements) && /form\.insertBefore\(tools,input\)/.test(enhancements)],
   ['botão de gravação de áudio é criado e inserido', /recordButton\.id\s*=\s*['"]record-audio['"]/.test(enhancements) && /tools\.append\(emojiButton,recordButton\)/.test(enhancements)],
