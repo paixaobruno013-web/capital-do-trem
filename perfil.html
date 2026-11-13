@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>Perfil • Capital do Trem</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<style>
+:root{color-scheme:dark;--bg:#050505;--panel:#111;--line:#303030;--fg:#f7f7f7;--muted:#aaa;--red:#ed1c24}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+header{padding:20px max(16px,env(safe-area-inset-left));border-bottom:1px solid var(--line);background:#090909}
+.header-row{max-width:1080px;margin:auto;display:flex;align-items:center;gap:14px}
+.brand-mark{width:48px;height:48px;border-radius:50%;border:2px solid var(--red);display:grid;place-items:center;color:var(--red);font-weight:950;box-shadow:0 0 14px #ed1c2444}
+.brand{font-weight:950;letter-spacing:1px}.brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:2px}
+main{max-width:1080px;margin:auto;padding:18px 14px 48px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin:0 0 16px}
+.profile-head{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.avatar{width:92px;height:92px;flex:0 0 92px;border-radius:50%;border:3px solid var(--red);background:#171717;display:grid;place-items:center;overflow:hidden;font-size:30px;font-weight:900;box-shadow:0 0 18px #ed1c2444}
+.avatar img{width:100%;height:100%;object-fit:cover}
+h1{font-size:clamp(23px,5vw,34px);margin:0;overflow-wrap:anywhere}
+.handle,.muted{color:var(--muted)}.handle{margin:2px 0 7px}
+.role{display:inline-block;border:1px solid #ed1c2466;border-radius:999px;padding:3px 9px;font-size:12px;color:#ff7378}
+.bio{white-space:pre-wrap;overflow-wrap:anywhere}
+.back{display:inline-flex;margin-top:14px;color:#fff;text-decoration:none;border:1px solid #ed1c2477;border-radius:10px;padding:9px 13px}
+.video-rail{display:flex;gap:13px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;padding:4px 2px 12px;scrollbar-width:thin}
+.video-card{flex:0 0 min(78vw,330px);max-width:330px;scroll-snap-align:start;border:1px solid var(--line);border-radius:13px;background:#080808;padding:9px}
+.video-card video{display:block;width:100%;aspect-ratio:9/16;max-height:420px;object-fit:contain;background:#000;border-radius:9px}
+.video-card p{margin:8px 2px 2px;font-size:13px;overflow-wrap:anywhere}
+.empty{padding:18px;border:1px dashed var(--line);border-radius:12px;color:var(--muted)}
+@media(min-width:700px){.video-card{flex-basis:260px}}
+body.light{color-scheme:light;--bg:#f5f5f5;--panel:#fff;--line:#ddd;--fg:#171717;--muted:#666}
+body.light header{background:#fff}body.light .back{color:#111}body.light .video-card{background:#fafafa}
+</style>
+</head>
+<body>
+<header><div class="header-row"><div class="brand-mark">CT</div><div class="brand">CAPITAL DO TREM<small>PERFIL DA COMUNIDADE</small></div></div></header>
+<main>
+<section class="card" id="profile-card" aria-live="polite"><p class="muted">Carregando perfil...</p></section>
+<section class="card" aria-labelledby="videos-title"><h2 id="videos-title">▶ Vídeos públicos</h2><p class="muted">Vídeos publicados por este perfil. Arraste para o lado para assistir aos próximos.</p><div id="profile-videos" class="video-rail"><p class="muted">Carregando vídeos...</p></div></section>
+<a class="back" href="./index.html#comunidade">← Voltar à comunidade</a>
+</main>
+<script type="module">
+const card=document.getElementById('profile-card'),rail=document.getElementById('profile-videos');
+const safeUrl=value=>typeof value==='string'&&value.startsWith('https://')?value:null;
+const text=(tag,value,className='')=>{const el=document.createElement(tag);el.textContent=value||'';if(className)el.className=className;return el;};
+(async()=>{
+ try{
+  const username=new URLSearchParams(location.search).get('u')||'';
+  const api=await import('./supabase/auth.js');api.initSupabase();
+  const profile=await api.getPublicProfileByUsername(username);
+  if(!profile){card.replaceChildren(text('h1','Perfil não encontrado'),text('p','Este perfil não existe ou não está público.','muted'));rail.replaceChildren(text('p','Nenhum vídeo público disponível.','empty'));return;}
+  const head=document.createElement('div');head.className='profile-head';
+  const avatar=document.createElement('div');avatar.className='avatar';
+  const avatarUrl=profile.avatar_type==='photo'?safeUrl(profile.avatar_url):null;
+  if(avatarUrl){const image=document.createElement('img');image.src=avatarUrl;image.alt='Foto de '+(profile.display_name||'participante');avatar.append(image);}
+  else avatar.textContent=profile.avatar_type==='character'?'🎭':Array.from((profile.display_name||'U').trim())[0]?.toLocaleUpperCase('pt-BR')||'U';
+  const identity=document.createElement('div');identity.append(text('h1',profile.display_name||'Participante do Capital do Trem'),text('p','@'+profile.username,'handle'),text('span',profile.account_type==='artist'?'Artista / DJ':'Usuário Uai','role'));
+  head.append(avatar,identity);card.replaceChildren(head);
+  if(profile.city)card.append(text('p','📍 '+profile.city,'muted'));
+  if(profile.bio)card.append(text('p',profile.bio,'bio'));
+  const videos=await api.getPublicProfileVideos(profile.user_id);rail.replaceChildren();
+  if(!videos.length){rail.append(text('p','Este perfil ainda não publicou vídeos.','empty'));return;}
+  for(const item of videos){
+   const videoUrl=safeUrl(item.url);if(!videoUrl)continue;
+   const tile=document.createElement('article');tile.className='video-card';
+   const video=document.createElement('video');video.src=videoUrl;video.controls=true;video.playsInline=true;video.preload='metadata';video.setAttribute('aria-label','Vídeo público de '+profile.display_name);
+   tile.append(video);
+   const caption=(item.post?.content||'').replace(/^\u200b$/,'').trim();
+   if(caption)tile.append(text('p',caption));
+   tile.append(text('small',new Date(item.created_at).toLocaleDateString('pt-BR'),'muted'));
+   rail.append(tile);
+  }
+ }catch(error){card.replaceChildren(text('h1','Não foi possível carregar o perfil'),text('p','Verifique sua conexão e tente novamente.','muted'));rail.replaceChildren(text('p','Os vídeos não puderam ser carregados agora.','empty'));}
+})();
+</script>
+</body></html>
