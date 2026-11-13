@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [home, composer, auth, worker, prepare, migration, limits, ownerIndex, account] = await Promise.all([
+const [home, composer, auth, worker, prepare, migration, limits, ownerIndex, account, profilePage, publicMusicPolicy] = await Promise.all([
   read('index.html'),
   read('social-feed-composer.js'),
   read('supabase/auth.js'),
@@ -10,10 +10,17 @@ const [home, composer, auth, worker, prepare, migration, limits, ownerIndex, acc
   read('supabase/migrations/20261113004636_add_social_post_media.sql'),
   read('supabase/migrations/20261113004651_enforce_social_post_media_file_limits.sql'),
   read('supabase/migrations/20261113004658_index_social_post_media_owner.sql'),
-  read('conta.html')
+  read('conta.html'),
+  read('perfil.html'),
+  read('supabase/migrations/20261113030500_public_music_while_pending.sql')
 ]);
 
 const checks = [
+  ['músicas em análise continuam públicas para audição e as rejeitadas não entram no catálogo', auth.includes(".in('status',['pending','published'])") && auth.includes("status:song.status") && publicMusicPolicy.includes("status in ('pending', 'published')") && publicMusicPolicy.includes("s.status in ('pending', 'published')") && !publicMusicPolicy.includes("status in ('pending', 'published', 'rejected')")],
+  ['perfil público individual mostra vídeos em trilho horizontal e só consulta perfis públicos', profilePage.includes('getPublicProfileByUsername') && profilePage.includes('getPublicProfileVideos') && profilePage.includes('video-rail') && auth.includes("eq('is_public', true)") && auth.includes("eq('media_type', 'video')")],
+  ['feed e diretório abrem o perfil público de cada usuário', home.includes('./perfil.html?u=') && home.includes('community-profile-open')],
+  ['perfil público é incluído no pacote web e no cache do aplicativo', prepare.includes("'perfil.html'") && worker.includes("'./perfil.html'") && /capital-do-trem-v292/.test(worker)],
+  ['perfil individual permite ao titular abrir sua página pública', account.includes('id="public-profile-link"') && account.includes("profile.html?u=")],
   ['cadastro exibe a mensagem grafitada de boas-vindas somente ao escolher Criar conta', account.includes('id="registration-graffiti"') && account.includes('SEJA BEM-VINDO,') && account.includes('MAQUINISTA DESSE TREM!') && account.includes("welcome.hidden=mode!=='register'")],
   ['faixa de boas-vindas usa visual preto/vermelho responsivo e respeita o modo claro', account.includes('.registration-graffiti{') && account.includes('font-family:Impact') && account.includes('body.light .registration-graffiti')],
   ['navegação principal prioriza Início, Publicar, Conversas, Músicas e Perfil', home.includes('data-page="inicio"') && home.includes('data-page="divulgue"') && home.includes('data-page="musicas"') && home.includes('nav-chat') && home.includes('nav-profile')],
