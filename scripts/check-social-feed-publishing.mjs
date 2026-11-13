@@ -20,7 +20,7 @@ const checks = [
   ['perfil público individual mostra vídeos em trilho horizontal e só consulta perfis públicos', profilePage.includes('getPublicProfileByUsername') && profilePage.includes('getPublicProfileVideos') && profilePage.includes('video-rail') && auth.includes("eq('is_public', true)") && auth.includes("eq('media_type', 'video')")],
   ['feed e diretório abrem o perfil público de cada usuário', home.includes('./perfil.html?u=') && home.includes('community-profile-open')],
   ['perfil público é incluído no pacote web e no cache do aplicativo', prepare.includes("'perfil.html'") && worker.includes("'./perfil.html'") && /capital-do-trem-v292/.test(worker)],
-  ['perfil individual permite ao titular abrir sua página pública', account.includes('id="public-profile-link"') && account.includes("profile.html?u=")],
+  ['perfil individual permite ao titular abrir sua página pública', account.includes('id="public-profile-link"') && account.includes("perfil.html?u=")],
   ['cadastro exibe a mensagem grafitada de boas-vindas somente ao escolher Criar conta', account.includes('id="registration-graffiti"') && account.includes('SEJA BEM-VINDO,') && account.includes('MAQUINISTA DESSE TREM!') && account.includes("welcome.hidden=mode!=='register'")],
   ['faixa de boas-vindas usa visual preto/vermelho responsivo e respeita o modo claro', account.includes('.registration-graffiti{') && account.includes('font-family:Impact') && account.includes('body.light .registration-graffiti')],
   ['navegação principal prioriza Início, Publicar, Conversas, Músicas e Perfil', home.includes('data-page="inicio"') && home.includes('data-page="divulgue"') && home.includes('data-page="musicas"') && home.includes('nav-chat') && home.includes('nav-profile')],
