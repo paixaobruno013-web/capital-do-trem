@@ -148,3 +148,16 @@ A navegação do painel inicial foi reorganizada para priorizar a experiência s
 O painel principal deixa de apresentar o cartão comercial “Parcerias” e os blocos institucionais redundantes. Apoiadores continua acessível pelo menu secundário. A navegação inferior prioriza Início, Publicar, Conversas, Músicas e Perfil.
 
 **Pendências funcionais que não devem ser confundidas com a reorganização visual:** a galeria horizontal de vídeos que cada pessoa escolhe deixar pública no próprio perfil ainda precisa de contrato de dados, controles de visibilidade, integração com os perfis e testes de autorização. Não deve reutilizar a coleção privada de publicações salvas nem tornar arquivos privados públicos. A visualização pública horizontal será implementada como recurso separado, com consentimento explícito do titular.
+
+
+## Publicação musical durante análise e perfis com vídeos
+
+- O catálogo público passa a consultar faixas com status `pending` ou `published`; faixas rejeitadas permanecem fora do catálogo.
+- A política RLS de `public.songs` e a política de leitura do bucket privado `capital-do-trem-audio` permitem audição/download assinado enquanto a faixa estiver em análise ou publicada. Upload, propriedade e moderação continuam restritos pelas políticas existentes.
+- O painel administrativo identifica músicas pendentes como “Em análise • faixa já disponível para audição pública”.
+- A base verificada em 13/11/2026 contém 31 faixas, todas `published`, 31 arquivos de áudio correspondentes e nenhuma faixa pendente/rejeitada no momento da consulta.
+- Foi criada a página `perfil.html?u=<username>` para perfis que optaram por visibilidade pública. Ela exibe vídeos de publicações próprias em uma galeria horizontal, com controles nativos de reprodução. Vídeos privados de chat/álbum e coleções privadas de salvos não são expostos.
+- O diretório da comunidade e os nomes dos autores na timeline abrem o perfil público individual.
+- A página de perfil foi adicionada ao pacote web/Android e ao cache do PWA.
+
+A migração `20261113030500_public_music_while_pending.sql` está versionada na branch do PR. Ela ainda não foi aplicada ao banco de produção, pois a publicação do PR/produção continua separada da implementação e validação.
