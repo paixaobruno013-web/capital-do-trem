@@ -1948,14 +1948,14 @@ async function saveOfflineMusic(id,blob,title){
    const social=document.createElement('div');social.className='social';social.style.alignItems='center';
    const like=document.createElement('button');like.className='btn alt';like.type='button';like.textContent='❤️ Curtir';
    const count=document.createElement('span');count.className='muted';count.textContent='Curtidas: …';
-   social.append(like,count);card.append(social);
+   social.append(like,count);info.append(social);
    const comments=document.createElement('div');comments.style.marginTop='10px';
    const heading=document.createElement('strong');heading.textContent='Comentários';comments.append(heading);
    const commentList=document.createElement('div');commentList.className='list';commentList.style.margin='8px 0';comments.append(commentList);
    const form=document.createElement('form');form.className='social';form.style.gap='8px';
    const input=document.createElement('input');input.type='text';input.maxLength=1000;input.placeholder='Escreva um comentário…';input.setAttribute('aria-label','Comentário sobre '+song.title);input.style.flex='1';input.style.minWidth='180px';input.style.margin='0';
    const submit=document.createElement('button');submit.type='submit';submit.textContent='Comentar';form.append(input,submit);comments.append(form);
-   const status=document.createElement('p');status.className='muted';status.setAttribute('role','status');comments.append(status);card.append(comments);
+   const status=document.createElement('p');status.className='muted';status.setAttribute('role','status');comments.append(status);info.append(comments);
    let liked=false;
    try{
     const state=await api.getSongSocial(song.id);liked=state.liked;count.textContent='Curtidas: '+state.likeCount;like.textContent=liked?'❤️ Curtido':'❤️ Curtir';
