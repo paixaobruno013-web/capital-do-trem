@@ -1,77 +1,128 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#000000">
-<title>Perfil • Capital do Trem</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000"><title>Perfil • Capital do Trem</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <style>
-:root{color-scheme:dark;--bg:#050505;--panel:#111;--line:#303030;--fg:#f7f7f7;--muted:#aaa;--red:#ed1c24}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
-header{padding:20px max(16px,env(safe-area-inset-left));border-bottom:1px solid var(--line);background:#090909}
-.header-row{max-width:1080px;margin:auto;display:flex;align-items:center;gap:14px}
-.brand-mark{width:48px;height:48px;border-radius:50%;border:2px solid var(--red);display:grid;place-items:center;color:var(--red);font-weight:950;box-shadow:0 0 14px #ed1c2444}
-.brand{font-weight:950;letter-spacing:1px}.brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:2px}
-main{max-width:1080px;margin:auto;padding:18px 14px 48px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin:0 0 16px}
-.profile-head{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.avatar{width:92px;height:92px;flex:0 0 92px;border-radius:50%;border:3px solid var(--red);background:#171717;display:grid;place-items:center;overflow:hidden;font-size:30px;font-weight:900;box-shadow:0 0 18px #ed1c2444}
+:root{color-scheme:dark;--bg:#050505;--panel:#101010;--line:#292929;--fg:#f7f7f7;--muted:#aaa;--red:#ed1c24}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+a,button{font:inherit}button{cursor:pointer}
+header{height:58px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:#080808}
+.brand{font-weight:950;letter-spacing:1.4px}.brand small{display:block;color:var(--muted);font-size:9px;letter-spacing:2px}
+.header-actions{display:flex;gap:8px}.icon-button{width:40px;height:40px;border:1px solid #3a3a3a;border-radius:50%;background:#111;color:#fff;display:grid;place-items:center;text-decoration:none}
+main{max-width:760px;margin:auto;padding-bottom:60px}
+.cover{height:190px;position:relative;background:#171717 url('./assets/favela-header.webp') center 48%/cover no-repeat;border-bottom:2px solid var(--red)}
+.cover:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#000b,transparent 65%)}
+.profile-identity{position:relative;padding:0 16px 16px;background:var(--bg)}
+.identity-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:-58px;position:relative;z-index:2}
+.avatar{width:116px;height:116px;flex:0 0 116px;border:4px solid #050505;outline:2px solid var(--red);border-radius:50%;overflow:hidden;background:#151515;display:grid;place-items:center;font-size:40px;font-weight:900;box-shadow:0 0 16px #ed1c2470}
 .avatar img{width:100%;height:100%;object-fit:cover}
-h1{font-size:clamp(23px,5vw,34px);margin:0;overflow-wrap:anywhere}
-.handle,.muted{color:var(--muted)}.handle{margin:2px 0 7px}
-.role{display:inline-block;border:1px solid #ed1c2466;border-radius:999px;padding:3px 9px;font-size:12px;color:#ff7378}
-.bio{white-space:pre-wrap;overflow-wrap:anywhere}
-.back{display:inline-flex;margin-top:14px;color:#fff;text-decoration:none;border:1px solid #ed1c2477;border-radius:10px;padding:9px 13px}
-.video-rail{display:flex;gap:13px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;padding:4px 2px 12px;scrollbar-width:thin}
-.video-card{flex:0 0 min(78vw,330px);max-width:330px;scroll-snap-align:start;border:1px solid var(--line);border-radius:13px;background:#080808;padding:9px}
-.video-card video{display:block;width:100%;aspect-ratio:9/16;max-height:420px;object-fit:contain;background:#000;border-radius:9px}
-.video-card p{margin:8px 2px 2px;font-size:13px;overflow-wrap:anywhere}
-.empty{padding:18px;border:1px dashed var(--line);border-radius:12px;color:var(--muted)}
-@media(min-width:700px){.video-card{flex-basis:260px}}
-body.light{color-scheme:light;--bg:#f5f5f5;--panel:#fff;--line:#ddd;--fg:#171717;--muted:#666}
-body.light header{background:#fff}body.light .back{color:#111}body.light .video-card{background:#fafafa}
+.profile-actions{display:flex;gap:8px;padding-bottom:5px}
+.action{min-height:40px;padding:8px 13px;border-radius:10px;border:1px solid var(--red);background:var(--red);color:white;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:7px;text-decoration:none}
+.action.secondary{background:#151515;border-color:#444;color:#fff}.action svg{width:20px;height:20px}
+.name{font-size:24px;line-height:1.2;margin:12px 0 2px;overflow-wrap:anywhere}.handle{color:var(--muted);margin:0 0 8px}
+.role{display:inline-block;color:#ff777c;border:1px solid #ed1c2466;border-radius:999px;padding:2px 9px;font-size:12px}
+.bio{white-space:pre-wrap;overflow-wrap:anywhere;margin:10px 0 0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0 4px;padding:13px 6px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);text-align:center}
+.stat strong{display:block;font-size:19px;font-weight:950}.stat span{font-size:12px;color:var(--muted)}
+.stories{padding:15px 14px 10px;border-bottom:1px solid var(--line)}
+.section-title{font-size:14px;font-weight:900;margin:0 0 12px;letter-spacing:.3px}
+.story-rail{display:flex;gap:14px;overflow-x:auto;padding:2px 1px 9px;scrollbar-width:thin}
+.story{flex:0 0 72px;text-align:center;color:var(--fg);text-decoration:none;background:none;border:0;padding:0}
+.story-ring{width:66px;height:66px;margin:auto;border-radius:50%;padding:3px;border:2px solid var(--red);display:grid;place-items:center}
+.story-ring img,.story-ring .initial{width:100%;height:100%;border-radius:50%;object-fit:cover;background:#202020;display:grid;place-items:center;font-weight:900}
+.story-name{display:block;margin-top:5px;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.story.add .story-ring{border:2px dashed #ed1c24}.story.add .plus{font-size:34px;line-height:1;color:#ff343c}
+.posts{padding:16px 10px}.post-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}
+.post{aspect-ratio:1/1;position:relative;background:#171717;overflow:hidden;border:1px solid #242424}
+.post img,.post video{width:100%;height:100%;object-fit:cover;display:block;background:#000}
+.post.empty{grid-column:1/-1;aspect-ratio:auto;padding:22px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
+.post-caption{position:absolute;inset:auto 0 0;padding:18px 7px 6px;font-size:11px;color:white;background:linear-gradient(transparent,#000b);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.muted{color:var(--muted)}.back{display:inline-block;margin:8px 14px 22px;color:#fff;text-decoration:none;border:1px solid #ed1c2477;border-radius:10px;padding:8px 12px}
+#story-viewer{position:fixed;inset:0;z-index:30;background:#000e;display:none;align-items:center;justify-content:center;padding:18px}
+#story-viewer.open{display:flex}.story-stage{width:min(100%,430px);height:min(82vh,760px);background:#111;border:1px solid #444;border-radius:16px;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.story-stage img,.story-stage video{width:100%;height:100%;object-fit:contain;min-height:0;background:#000}
+.story-caption{padding:10px 14px;color:#fff}.story-close{position:absolute;right:10px;top:10px;z-index:2;border:0;border-radius:50%;width:38px;height:38px;background:#000b;color:white;font-size:23px}
+@media(max-width:420px){.cover{height:165px}.avatar{width:102px;height:102px;flex-basis:102px}.identity-row{margin-top:-51px}.profile-actions{gap:5px}.action{padding:7px 9px;font-size:12px}.name{font-size:22px}}
+body.light{color-scheme:light;--bg:#f5f5f5;--panel:#fff;--line:#ddd;--fg:#171717;--muted:#666}body.light header{background:#fff}body.light .action.secondary{background:#fff;color:#111}body.light .avatar{border-color:#f5f5f5}
 </style>
 </head>
 <body>
-<header><div class="header-row"><div class="brand-mark">CT</div><div class="brand">CAPITAL DO TREM<small>PERFIL DA COMUNIDADE</small></div></div></header>
+<header><div class="brand">CAPITAL DO TREM<small>PERFIL DA COMUNIDADE</small></div><div class="header-actions"><a class="icon-button" href="./index.html" aria-label="Início">⌂</a><a class="icon-button" href="./conta.html" aria-label="Minha conta">⋯</a></div></header>
 <main>
-<section class="card" id="profile-card" aria-live="polite"><p class="muted">Carregando perfil...</p></section>
-<section class="card" aria-labelledby="videos-title"><h2 id="videos-title">▶ Vídeos públicos</h2><p class="muted">Vídeos publicados por este perfil. Arraste para o lado para assistir aos próximos.</p><div id="profile-videos" class="video-rail"><p class="muted">Carregando vídeos...</p></div></section>
+<div class="cover" role="img" aria-label="Favela e helicóptero"></div>
+<section class="profile-identity" id="profile-card" aria-live="polite"><p class="muted">Carregando perfil...</p></section>
+<section class="stories"><h2 class="section-title">STORIES</h2><div class="story-rail" id="profile-stories"><a class="story add" href="./conta.html"><span class="story-ring"><span class="plus">+</span></span><span class="story-name">Seu Story</span></a></div></section>
+<section class="posts"><h2 class="section-title">PUBLICAÇÕES</h2><div class="post-grid" id="profile-posts"><p class="post empty">Carregando publicações...</p></div></section>
 <a class="back" href="./index.html#comunidade">← Voltar à comunidade</a>
 </main>
+<div id="story-viewer" role="dialog" aria-modal="true" aria-label="Visualizador de Stories"><div class="story-stage"><button class="story-close" id="story-close" aria-label="Fechar">×</button><div id="story-media" style="flex:1;min-height:0;display:grid;place-items:center"></div><div class="story-caption" id="story-caption"></div></div></div>
 <script type="module">
-const card=document.getElementById('profile-card'),rail=document.getElementById('profile-videos');
-const safeUrl=value=>typeof value==='string'&&value.startsWith('https://')?value:null;
-const text=(tag,value,className='')=>{const el=document.createElement(tag);el.textContent=value||'';if(className)el.className=className;return el;};
+const card=document.getElementById('profile-card'),grid=document.getElementById('profile-posts'),storyRail=document.getElementById('profile-stories');
+const safeUrl=v=>typeof v==='string'&&v.startsWith('https://')?v:null;
+const el=(tag,value,cls='')=>{const n=document.createElement(tag);n.textContent=value||'';if(cls)n.className=cls;return n;};
+const fmt=n=>new Intl.NumberFormat('pt-BR').format(n||0);
+let storyItems=[];
+function showStory(index){const story=storyItems[index];if(!story)return;const viewer=document.getElementById('story-viewer'),media=document.getElementById('story-media');media.replaceChildren();const node=document.createElement(story.media_type==='video'?'video':'img');node.src=story.media_url; if(node.tagName==='VIDEO'){node.controls=true;node.autoplay=true;node.playsInline=true;}else node.alt='Story da comunidade';media.append(node);document.getElementById('story-caption').textContent=(story.display_name||'Usuário Uai')+(story.caption?' — '+story.caption:'');viewer.classList.add('open');}
+document.getElementById('story-close').addEventListener('click',()=>document.getElementById('story-viewer').classList.remove('open'));
+document.getElementById('story-viewer').addEventListener('click',e=>{if(e.target.id==='story-viewer')e.currentTarget.classList.remove('open');});
 (async()=>{
  try{
   const username=new URLSearchParams(location.search).get('u')||'';
   const api=await import('./supabase/auth.js');api.initSupabase();
   const profile=await api.getPublicProfileByUsername(username);
-  if(!profile){card.replaceChildren(text('h1','Perfil não encontrado'),text('p','Este perfil não existe ou não está público.','muted'));rail.replaceChildren(text('p','Nenhum vídeo público disponível.','empty'));return;}
-  const head=document.createElement('div');head.className='profile-head';
+  if(!profile){card.replaceChildren(el('h1','Perfil não encontrado'),el('p','Este perfil não existe ou não está público.','muted'));grid.replaceChildren(el('p','Nenhuma publicação disponível.','post empty'));return;}
   const avatar=document.createElement('div');avatar.className='avatar';
   const avatarUrl=profile.avatar_type==='photo'?safeUrl(profile.avatar_url):null;
-  if(avatarUrl){const image=document.createElement('img');image.src=avatarUrl;image.alt='Foto de '+(profile.display_name||'participante');avatar.append(image);}
+  if(avatarUrl){const img=document.createElement('img');img.src=avatarUrl;img.alt='Foto de '+(profile.display_name||'participante');avatar.append(img);}
   else avatar.textContent=profile.avatar_type==='character'?'🎭':Array.from((profile.display_name||'U').trim())[0]?.toLocaleUpperCase('pt-BR')||'U';
-  const identity=document.createElement('div');identity.append(text('h1',profile.display_name||'Participante do Capital do Trem'),text('p','@'+profile.username,'handle'),text('span',profile.account_type==='artist'?'Artista / DJ':'Usuário Uai','role'));
-  head.append(avatar,identity);card.replaceChildren(head);
-  if(profile.city)card.append(text('p','📍 '+profile.city,'muted'));
-  if(profile.bio)card.append(text('p',profile.bio,'bio'));
-  const videos=await api.getPublicProfileVideos(profile.user_id);rail.replaceChildren();
-  if(!videos.length){rail.append(text('p','Este perfil ainda não publicou vídeos.','empty'));return;}
-  for(const item of videos){
-   const videoUrl=safeUrl(item.url);if(!videoUrl)continue;
-   const tile=document.createElement('article');tile.className='video-card';
-   const video=document.createElement('video');video.src=videoUrl;video.controls=true;video.playsInline=true;video.preload='metadata';video.setAttribute('aria-label','Vídeo público de '+profile.display_name);
-   tile.append(video);
-   const caption=(item.post?.content||'').replace(/^\u200b$/,'').trim();
-   if(caption)tile.append(text('p',caption));
-   tile.append(text('small',new Date(item.created_at).toLocaleDateString('pt-BR'),'muted'));
-   rail.append(tile);
+  const identity=document.createElement('div');identity.className='identity-row';identity.append(avatar);
+  const actions=document.createElement('div');actions.className='profile-actions';
+  const social=await api.getPublicProfileSocial(profile.user_id);
+  if(!social.isOwner){
+   const follow=document.createElement('button');follow.className='action';follow.textContent=social.isFollowing?'Seguindo':'Seguir';
+   follow.addEventListener('click',async()=>{follow.disabled=true;try{const active=await api.toggleProfileFollow(profile.user_id);follow.textContent=active?'Seguindo':'Seguir';const refreshed=await api.getPublicProfileSocial(profile.user_id);document.getElementById('followers-count').textContent=fmt(refreshed.followers);}catch(error){alert(error.message||'Não foi possível atualizar.');}finally{follow.disabled=false;}});
+   const chat=document.createElement('a');chat.className='action secondary';chat.href='./bate-papo.html?u='+encodeURIComponent(profile.username);chat.setAttribute('aria-label','Conversar');chat.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 8.7 3.9a8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/></svg> Conversar';
+   actions.append(follow,chat);
+  }else{const edit=document.createElement('a');edit.className='action';edit.href='./conta.html';edit.textContent='Editar perfil';actions.append(edit);}
+  identity.append(actions);
+  const name=el('h1',profile.display_name||'Participante do Capital do Trem','name');
+  const handle=el('p','@'+profile.username,'handle');
+  const role=el('span',profile.account_type==='artist'?'Artista / DJ':'Usuário Uai','role');
+  const stats=document.createElement('div');stats.className='stats';
+  const postsCount=await api.getPublicProfilePosts(profile.user_id);
+  const stat=(value,label,id)=>{const box=document.createElement('div');box.className='stat';const strong=el('strong',fmt(value));if(id)strong.id=id;box.append(strong,el('span',label));return box;};
+  stats.append(stat(postsCount.length,'publicações'),stat(social.followers,'seguidores','followers-count'),stat(social.following,'seguindo'));
+  card.replaceChildren(identity,name,handle,role,stats);
+  if(profile.city)card.append(el('p','📍 '+profile.city,'muted'));
+  if(profile.bio)card.append(el('p',profile.bio,'bio'));
+  grid.replaceChildren();
+  if(!postsCount.length)grid.append(el('p','Este perfil ainda não publicou nada.','post empty'));
+  for(const post of postsCount){
+   if(!post.media.length&&!String(post.content||'').replace(/^\u200b$/,'').trim()){continue;}
+   if(!post.media.length){const tile=el('article',String(post.content||'').replace(/^\u200b$/,'').trim(),'post empty');grid.append(tile);continue;}
+   for(const item of post.media){
+    const tile=document.createElement('article');tile.className='post';
+    const url=safeUrl(item.url);if(!url)continue;
+    const media=document.createElement(item.media_type==='video'?'video':'img');media.src=url;
+    if(media.tagName==='VIDEO'){media.controls=true;media.playsInline=true;media.preload='metadata';}else{media.alt=item.alt_text||'Publicação de '+profile.display_name;media.loading='lazy';}
+    tile.append(media);
+    const caption=String(post.content||'').replace(/^\u200b$/,'').trim();if(caption)tile.append(el('span',caption,'post-caption'));
+    grid.append(tile);
+   }
   }
- }catch(error){card.replaceChildren(text('h1','Não foi possível carregar o perfil'),text('p','Verifique sua conexão e tente novamente.','muted'));rail.replaceChildren(text('p','Os vídeos não puderam ser carregados agora.','empty'));}
+  const {getActiveUserStories}=await import('./supabase/auth.js');
+  try{
+   const all=await getActiveUserStories(),groups=new Map();
+   for(const story of all){if(!groups.has(story.author_id))groups.set(story.author_id,[]);groups.get(story.author_id).push(story);}
+   for(const [author,items] of groups){
+    const latest=items[items.length-1];const button=document.createElement('button');button.className='story';button.type='button';
+    const ring=document.createElement('span');ring.className='story-ring';const img=document.createElement('img');img.src=safeUrl(latest.avatar_url)||'./marca.svg';img.alt='';ring.append(img);
+    button.append(ring,el('span',latest.display_name||'Usuário Uai','story-name'));button.addEventListener('click',()=>{storyItems=items;showStory(0);});storyRail.append(button);
+   }
+  }catch(error){console.info('Stories indisponíveis',error);}
+ }catch(error){card.replaceChildren(el('h1','Não foi possível carregar o perfil'),el('p','Verifique sua conexão e tente novamente.','muted'));grid.replaceChildren(el('p','As publicações não puderam ser carregadas agora.','post empty'));}
 })();
 </script>
 </body></html>
