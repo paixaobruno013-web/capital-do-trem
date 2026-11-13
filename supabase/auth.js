@@ -701,6 +701,31 @@ export async function uploadMyPostMedia(file, postId, sortOrder = 0, altText = '
   return { ...data, url: publicData?.publicUrl || null };
 }
 
+// Exclui somente uma publicação do usuário autenticado e tenta remover os arquivos associados.
+export async function deleteMyPost(postId) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para excluir uma publicação.');
+  const cleanId = String(postId || '');
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(cleanId)) {
+    throw new Error('Publicação inválida.');
+  }
+  const { data: media, error: mediaError } = await supabase.from('post_media')
+    .select('storage_path').eq('post_id', cleanId).eq('owner_id', user.id);
+  if (mediaError) throw mediaError;
+  const { data: deleted, error: deleteError } = await supabase.from('posts')
+    .delete().eq('id', cleanId).eq('author_id', user.id).select('id').maybeSingle();
+  if (deleteError) throw deleteError;
+  if (!deleted) throw new Error('Você só pode excluir suas próprias publicações.');
+  const paths = (media || []).map(item => item.storage_path).filter(Boolean);
+  if (paths.length) {
+    const { error: storageError } = await supabase.storage.from('capital-do-trem-media').remove(paths);
+    if (storageError) console.warn('Publicação excluída; alguns arquivos de mídia precisam de limpeza.', storageError);
+  }
+  return true;
+}
+
 // Mural público: visitantes recebem publicações e metadados das mídias públicas.
 
 export async function getPublishedPosts() {
