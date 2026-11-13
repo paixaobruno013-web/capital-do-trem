@@ -7,6 +7,8 @@ const [index, admin, auth] = await Promise.all([
 const update = await readFile(new URL('../update.js', import.meta.url), 'utf8');
 const pickerGuard = await readFile(new URL('../file-picker-guard.js', import.meta.url), 'utf8');
 const checks = [
+  ['alerta offline aguarda o DOM e aparece mesmo se a conexão cair durante a abertura da página', /document.addEventListener\('DOMContentLoaded',showOffline,\{once:true\}\)/.test(update) && /if\(!alertBox.isConnected\)/.test(update)],
+  ['alerta offline dura 13 segundos e a verificação automática ocorre a cada 10 segundos', /offlineAlertTimer=window.setTimeout\(\(\)=>\{alertBox.style.display='none';offlineAlertActive=false;[\s\S]*?\},13000\)/.test(update) && /window.setInterval\(verifyRealConnection,10\*1000\)/.test(update)],
   ['retorno do seletor restaura a rota antes da abertura', /const FILE_PICKER_RETURN_KEY/.test(index) && /FILE_PICKER_RETURN_URL_KEY/.test(index) && /intro-smoke-skip/.test(index) && /file-picker-guard\.js/.test(index)],
   ['Minha conta carrega a proteção do seletor', /file-picker-guard\.js/.test(await readFile(new URL('../conta.html', import.meta.url), 'utf8'))],
   ['proteção persiste somente campos não sensíveis e nunca tenta restaurar arquivos', /DRAFT_PREFIX/.test(await readFile(new URL('../file-picker-guard.js', import.meta.url), 'utf8')) && /'file','password','hidden'/.test(await readFile(new URL('../file-picker-guard.js', import.meta.url), 'utf8'))],
