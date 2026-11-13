@@ -1,13 +1,12 @@
 import { readFile } from 'node:fs/promises';
 
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [home, composer, auth, worker, prepare, schema, migration, limits, ownerIndex] = await Promise.all([
+const [home, composer, auth, worker, prepare, migration, limits, ownerIndex] = await Promise.all([
   read('index.html'),
   read('social-feed-composer.js'),
   read('supabase/auth.js'),
   read('sw.js'),
   read('scripts/prepare-web.mjs'),
-  read('supabase/schema.sql'),
   read('supabase/migrations/20261113004636_add_social_post_media.sql'),
   read('supabase/migrations/20261113004651_enforce_social_post_media_file_limits.sql'),
   read('supabase/migrations/20261113004658_index_social_post_media_owner.sql')
@@ -35,7 +34,7 @@ const checks = [
   ['migração restringe inclusão à conta proprietária e pasta própria', migration.includes('post_media_insert_own') && migration.includes('owner_id = (select auth.uid())') && migration.includes("storage_path like (select auth.uid())::text || '/posts/%'")],
   ['migração impede mídia acima de 10 itens por post', migration.includes('unique (post_id, sort_order)') && migration.includes('sort_order between 0 and 9')],
   ['migração limita tamanho de foto/vídeo e indexa proprietário', limits.includes('byte_size <= 10485760') && limits.includes('byte_size <= 52428800') && ownerIndex.includes('post_media_owner_id_idx')],
-  ['schema base não recria nem substitui as políticas antigas de posts/perfis', !migration.includes('drop policy') && !migration.includes('alter table public.posts') && !migration.includes('alter table public.profiles'))
+  ['schema base não recria nem substitui as políticas antigas de posts/perfis', !migration.includes('drop policy') && !migration.includes('alter table public.posts') && !migration.includes('alter table public.profiles')]
 ];
 
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO') + ' ' + name);
