@@ -2172,13 +2172,14 @@ async function deleteOfflineMusic(id){
      try{video.pause();video.removeAttribute('src');video.load();}catch{}
      video.remove();openingPoster.style.opacity='1';
      audioButton.style.display='none';
-     // O relógio só começa quando o vídeo realmente entra em reprodução; o fallback inicia a abertura se a mídia falhar.
+     // A imagem de segurança também recebe a apresentação completa de 7 segundos.
+     beginOpeningClock();
 
     };
-    // Abertura e trem começam juntos; a rede não pode empurrar a duração para 20+ segundos.
-    beginOpeningClock();
-    video.addEventListener('playing',()=>{clearTimeout(fallbackTimer);beginOpeningClock();if(savedOpeningSound&&!video.muted)audioButton.remove();});
+    // Os 7 segundos começam quando há vídeo real em reprodução. Se a mídia falhar ou demorar, a arte de segurança assume e inicia a mesma duração.
+    video.addEventListener('playing',()=>{if(finished)return;clearTimeout(fallbackTimer);beginOpeningClock();if(savedOpeningSound&&!video.muted)audioButton.remove();});
     video.addEventListener('loadeddata',async()=>{
+     if(finished)return;
      video.playbackRate=1;
      try{
       await video.play();
@@ -2193,10 +2194,10 @@ async function deleteOfflineMusic(id){
      }
     },{once:true});
     video.addEventListener('error',()=>{console.warn('Falha ao carregar o vídeo de abertura; usando a imagem de segurança.');showOpeningFallback();},{once:true});
-    // Se a rede não entregar um quadro em cinco segundos, a abertura usa a imagem aprovada em vez de ficar preta.
-    // O relógio de 7 segundos é a única condição de encerramento da abertura.
+    // Se não houver primeiro quadro em até 5 segundos, usa imediatamente a arte de segurança; nunca deixa a abertura vazia esperando a rede.
+    // A apresentação permanece por 7 segundos após o vídeo começar ou após o fallback aparecer.
+    fallbackTimer=window.setTimeout(()=>{if(!openingFrameShown)showOpeningFallback();},5000);
     video.load();
-    fallbackTimer=window.setTimeout(()=>{if(!openingFrameShown)showOpeningFallback();},12000);
    }
   }
  }catch(error){
