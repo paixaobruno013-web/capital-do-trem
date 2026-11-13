@@ -834,10 +834,23 @@ export async function getPublicProfiles() {
 
 export async function getPublicProfileByUsername(username) {
   const clean = String(username || '').trim().toLowerCase();
-  if (!/^[a-z0-9][a-z0-9_]{2,31}$/.test(clean)) return null;
   const supabase = initSupabase();
+  const fields = 'user_id,display_name,username,account_type,bio,city,avatar_type,avatar_url,avatar_data,cover_url,cover_path,is_public';
+
+  // A página Perfil também é a página do próprio usuário quando aberta sem ?u=.
+  if (!clean) {
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError) throw userError;
+    if (!user) return null;
+    const { data, error } = await supabase.from('profiles')
+      .select(fields).eq('user_id', user.id).maybeSingle();
+    if (error) throw error;
+    return data || null;
+  }
+
+  if (!/^[a-z0-9][a-z0-9_]{2,31}$/.test(clean)) return null;
   const { data, error } = await supabase.from('profiles')
-    .select('user_id,display_name,username,account_type,bio,city,avatar_type,avatar_url,avatar_data,cover_url,cover_path,is_public')
+    .select(fields)
     .eq('username', clean).eq('is_public', true).maybeSingle();
   if (error) throw error;
   return data || null;
