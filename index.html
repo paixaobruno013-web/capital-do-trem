@@ -1022,6 +1022,13 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 </div>
 </div>
 <p id="music-library-status" class="muted" role="status" aria-live="polite"></p>
+<section class="card" id="offline-music-library" aria-labelledby="offline-music-title">
+<h4 id="offline-music-title">🚂 Playlist salva neste aparelho</h4>
+<p class="muted">Estas músicas ficam guardadas no celular e podem tocar mesmo sem internet.</p>
+<div id="offline-music-list" class="list"><p class="muted">Procurando músicas salvas neste aparelho…</p></div>
+<audio id="offline-music-player" controls preload="metadata" style="width:100%;margin:10px 0" aria-label="Reprodutor da playlist offline"></audio>
+<p id="offline-music-status" class="muted" role="status" aria-live="polite">As músicas guardadas aparecem aqui, mesmo sem entrar na conta.</p>
+</section>
 </section>
 <label for="song-catalog-search" class="muted" style="display:block;margin:14px 0 5px;font-weight:700">🔎 Buscar por música ou artista</label><input id="song-catalog-search" type="search" inputmode="search" autocomplete="off" placeholder="Digite o nome da música ou do artista…" aria-controls="published-song-catalog" style="margin:0 0 8px"><p id="song-catalog-count" class="muted" role="status" aria-live="polite" style="margin:0 0 10px">Carregando músicas…</p><div id="published-song-catalog" class="list" aria-live="polite"><p class="muted">Carregando catálogo compartilhado…</p></div></div><div class="card"><h3>🎧 Player do Capital do Trem</h3><label for="audio">Escolha uma música autorizada que esteja no seu aparelho</label><input id="audio" type="file" accept="audio/*"><audio id="player" controls preload="metadata" style="width:100%;margin:12px 0"></audio><div class="social" style="align-items:center"><button class="btn" id="download-audio" type="button" disabled>⬇ Baixar música</button><span id="audio-status" class="muted" role="status" aria-live="polite">Selecione um áudio para ouvir e baixar nesta demonstração.</span></div><p class="muted">O player oferece controles de reprodução e pode continuar tocando com a tela bloqueada, conforme o suporte do navegador e as configurações de economia de bateria do celular. O download salva o arquivo selecionado neste aparelho.</p><p class="muted">Só compartilhe ou baixe músicas que você tenha autorização para distribuir.</p></div></section>
 <section class="page" id="eventos">
@@ -1800,6 +1807,41 @@ async function saveOfflineMusic(id,blob,title){
   tx.onabort=()=>{const error=tx.error;db.close();reject(error||new Error('Armazenamento offline interrompido'));};
  });
 }
+async function getAllOfflineMusic(){
+ const db=await openOfflineMusicDB();
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction('tracks','readonly'),request=tx.objectStore('tracks').getAll();
+  request.onsuccess=()=>{db.close();resolve((request.result||[]).filter(item=>item?.blob?.size).sort((a,b)=>(b.savedAt||0)-(a.savedAt||0)));};
+  request.onerror=()=>{db.close();reject(request.error||new Error('Não foi possível listar as músicas salvas'));};
+ });
+}
+(async()=>{
+ const list=document.getElementById('offline-music-list');
+ const player=document.getElementById('offline-music-player');
+ const status=document.getElementById('offline-music-status');
+ if(!list||!player||!status)return;
+ let currentUrl='';
+ try{
+  const tracks=await getAllOfflineMusic();
+  list.replaceChildren();
+  if(!tracks.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Nenhuma música guardada ainda. Use “Guardar para ouvir offline” no catálogo quando estiver conectado.';list.append(empty);return;}
+  for(const track of tracks){
+   const row=document.createElement('div');row.className='music-library-row';
+   const title=document.createElement('strong');title.textContent=track.title||'Música salva';
+   const play=document.createElement('button');play.type='button';play.className='btn alt';play.textContent='▶ Tocar';
+   play.addEventListener('click',()=>{
+    if(currentUrl)URL.revokeObjectURL(currentUrl);
+    currentUrl=URL.createObjectURL(track.blob);player.src=currentUrl;player.load();
+    player.play().then(()=>{status.textContent='Tocando '+(track.title||'música salva')+' sem depender da internet.';}).catch(()=>{status.textContent='Toque em reproduzir no player para iniciar a música.';});
+   });
+   row.append(title,play);list.append(row);
+  }
+  status.textContent=tracks.length+' música(s) disponível(is) neste aparelho, inclusive sem internet.';
+ }catch(error){
+  list.replaceChildren();const unavailable=document.createElement('p');unavailable.className='muted';unavailable.textContent='Não foi possível abrir a playlist local neste aparelho.';list.append(unavailable);status.textContent=error?.message||'Falha ao consultar músicas offline.';
+ }
+ window.addEventListener('pagehide',()=>{if(currentUrl)URL.revokeObjectURL(currentUrl);},{once:true});
+})();
 // Catálogo musical compartilhado com reprodução, download, curtidas e comentários.
 (async()=>{
  const container=document.getElementById('published-song-catalog');
