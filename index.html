@@ -1549,7 +1549,8 @@ updateConnectionStatus();
    const status=document.createElement('span');status.className='community-online-dot'+(onlineIds.has(profile.user_id)?' is-online':'');status.setAttribute('role','img');status.setAttribute('aria-label',onlineIds.has(profile.user_id)?'Online':'Offline');status.title=onlineIds.has(profile.user_id)?'Online':'Offline';
    const statusText=document.createElement('span');statusText.className='community-online-label';statusText.textContent=onlineIds.has(profile.user_id)?'Online':'Offline';
    meta.append(status,statusText);onlineNodes.set(profile.user_id,{dot:status,label:statusText});
-   copy.append(name,handle,meta);
+   if(profile.username){const profileLink=document.createElement('a');profileLink.href='./perfil.html?u='+encodeURIComponent(profile.username);profileLink.className='community-profile-open';profileLink.style.cssText='display:inline-flex;flex-direction:column;gap:1px;color:inherit;text-decoration:none';profileLink.append(name,handle);copy.append(profileLink,meta);}
+   else copy.append(name,handle,meta);
    if(profile.city){const city=document.createElement('p');city.className='muted community-profile-city';city.textContent=profile.city;copy.append(city);}
    if(profile.bio){const bio=document.createElement('p');bio.className='community-profile-bio';bio.textContent=profile.bio;copy.append(bio);}
    card.append(avatar,copy);container.append(card);
@@ -1649,7 +1650,10 @@ updateConnectionStatus();
    const heading=document.createElement('h3');heading.textContent=publicName;heading.style.margin='0';
    const username=document.createElement('small');username.className='muted';username.textContent=item.author?.username?'@'+item.author.username:'Participante do Capital do Trem';
    const accountType=document.createElement('small');accountType.className='muted';accountType.textContent=item.author?.account_type==='artist'?'Artista':'Usuário Uai';
-   const identity=document.createElement('div');identity.append(heading,username,accountType);author.append(identity);
+   const identity=document.createElement('div');
+   if(item.author?.username){const profileLink=document.createElement('a');profileLink.href='./perfil.html?u='+encodeURIComponent(item.author.username);profileLink.className='community-profile-open';profileLink.style.cssText='display:inline-flex;flex-direction:column;gap:1px;color:inherit;text-decoration:none';profileLink.append(heading,username);identity.append(profileLink,accountType);}
+   else identity.append(heading,username,accountType);
+   author.append(identity);
    card.append(author);
    if(item.content){const body=document.createElement('p');body.textContent=item.content;card.append(body);}
    for(const media of (item.media||[])){
@@ -1837,6 +1841,7 @@ async function saveOfflineMusic(id,blob,title){
    const title=document.createElement('h3');title.textContent=song.title;
    const artist=document.createElement('p');artist.className='muted';artist.textContent=song.artist_name;
    card.append(title,artist);
+   if(song.status==='pending'){const review=document.createElement('small');review.className='music-review-status';review.textContent='Em análise • disponível para ouvir';review.style.cssText='display:inline-block;margin:2px 0 8px;padding:4px 9px;border:1px solid rgba(237,28,36,.55);border-radius:999px;color:#ff8589;font-size:11px;font-weight:800';card.append(review);}
    if(song.producer_name){const producer=document.createElement('p');producer.className='muted';producer.textContent='🎚️ Produção: '+song.producer_name;card.append(producer);}
    if(song.description){const desc=document.createElement('p');desc.textContent=song.description;card.append(desc);}
    const audioUrl=safeHttpsUrl(song.audio_url);const downloadUrl=safeHttpsUrl(song.download_url)||audioUrl;
