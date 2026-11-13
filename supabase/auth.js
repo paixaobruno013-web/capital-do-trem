@@ -601,8 +601,11 @@ export async function submitMyPost(content, { allowEmpty = false } = {}) {
   if (cleanContent.length > 1500 || (!allowEmpty && cleanContent.length < 1)) {
     throw new Error('A legenda deve ter até 1.500 caracteres e não pode ficar vazia quando não houver mídia.');
   }
+  // A tabela exige ao menos um caractere; este marcador invisível representa
+  // legenda vazia até que as mídias sejam anexadas com sucesso.
+  const storedContent = allowEmpty && cleanContent.length === 0 ? '\u200b' : cleanContent;
   const { data, error } = await supabase.from('posts')
-    .insert({ author_id: user.id, content: cleanContent, status: 'published' })
+    .insert({ author_id: user.id, content: storedContent, status: 'published' })
     .select('id, content, status, created_at').single();
   if (error) throw error;
   return data;
@@ -720,9 +723,10 @@ export async function getPublishedPosts() {
   }
   return posts.map(post => ({
     ...post,
+    content: post.content === '\u200b' ? '' : post.content,
     author: profileById.get(post.author_id) || null,
     media: mediaByPost.get(post.id) || []
-  }));
+  })).filter(post => post.content.trim().length > 0 || post.media.some(media => media.url));
 }
 
 // Perfil básico para qualquer participante. A visibilidade pública é opcional.
@@ -1974,7 +1978,9 @@ export async function getMySavedPosts() {
  const {data:saved,error:savedError}=await supabase.from('saved_posts').select('post_id,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(200);if(savedError)throw savedError;
  const ids=(saved||[]).map(row=>row.post_id);if(!ids.length)return [];
  const {data:posts,error:postsError}=await supabase.from('posts').select('id,content,created_at').in('id',ids).eq('status','published');if(postsError)throw postsError;
- const byId=new Map((posts||[]).map(post=>[post.id,post]));return ids.map(id=>byId.get(id)).filter(Boolean);
+ const {data:media,error:mediaError}=await supabase.from('post_media').select('id,post_id,media_type,mime_type,sort_order,alt_text,storage_path').in('post_id',ids).order('sort_order',{ascending:true});if(mediaError)throw mediaError;
+ const mediaByPost=new Map();for(const item of media||[]){const {data:publicData}=supabase.storage.from('capital-do-trem-media').getPublicUrl(item.storage_path);const value={...item,url:publicData?.publicUrl||null};if(!mediaByPost.has(item.post_id))mediaByPost.set(item.post_id,[]);mediaByPost.get(item.post_id).push(value);}
+ const byId=new Map((posts||[]).map(post=>[post.id,post]));return ids.map(id=>{const post=byId.get(id);if(!post)return null;const attached=mediaByPost.get(id)||[];return {...post,content:post.content==='\u200b'?'':post.content,media:attached};}).filter(post=>post&&(post.content.trim().length>0||post.media.some(item=>item.url)));
 }
 export async function toggleSavedPost(postId) {
  const supabase=initSupabase();const {data:{user},error:userError}=await supabase.auth.getUser();if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para salvar publicações.');if(!postId)throw new Error('Publicação inválida.');
