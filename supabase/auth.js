@@ -2091,3 +2091,13 @@ export async function getPublicProfilePosts(userId) {
   }
   return posts.map(post => ({ ...post, media: (byPost.get(post.id) || []).filter(item => item.url) }));
 }
+export async function getMyFollowingProfileIds() {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) return [];
+  const { data, error } = await supabase.from('profile_follows')
+    .select('followed_id').eq('follower_id', user.id);
+  if (error) throw error;
+  return (data || []).map(row => row.followed_id);
+}
