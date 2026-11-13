@@ -1843,7 +1843,7 @@ async function saveOfflineMusic(id,blob,title){
     const open=document.createElement('button');open.type='button';open.className='btn alt';open.textContent='Tocar';
     open.addEventListener('click',()=>{
      const card=songCards.get(id);const audio=card?.querySelector('audio');
-     if(card){card.scrollIntoView({behavior:'smooth',block:'center'});if(audio)window.setTimeout(()=>audio.play().catch(()=>{}),220);}
+     if(card){card.scrollIntoView({behavior:'smooth',block:'center'});if(audio)window.setTimeout(()=>openSongPlayer(song,audio,card.querySelector('.music-track-cover')?.src,open),220);}
     });
     row.append(label,open);target.append(row);
    }
