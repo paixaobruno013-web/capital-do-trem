@@ -12,7 +12,7 @@ const [home, composer, auth, worker, prepare, migration, limits, ownerIndex, acc
   read('supabase/migrations/20261113004658_index_social_post_media_owner.sql'),
   read('conta.html'),
   read('perfil.html'),
-  read('supabase/migrations/20261113030500_public_music_while_pending.sql')
+  read('supabase/migrations/20261113030638_public_music_while_pending.sql')
 ]);
 
 const checks = [
