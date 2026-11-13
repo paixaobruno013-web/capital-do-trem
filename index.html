@@ -1977,7 +1977,7 @@ async function deleteOfflineMusic(id){
       offlineTrack={blob,title:song.title};
       audio.src=URL.createObjectURL(blob);audio.dataset.offlineReady='true';audio.load();
       offlineButton.textContent='✓ Salva para ouvir offline';offlineStatus.textContent='Música guardada neste aparelho. Agora pode tocar sem internet.';
-     }catch(error){offlineStatus.textContent='Não foi possível guardar offline. Verifique a conexão e tente novamente.';}
+     }catch(error){offlineStatus.textContent=error?.message||'Não foi possível guardar offline. Verifique a conexão e tente novamente.';}
      finally{offlineButton.disabled=false;}
     });
     trackActions.append(offlineButton);info.append(offlineStatus);
