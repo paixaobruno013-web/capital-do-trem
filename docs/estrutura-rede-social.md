@@ -9,9 +9,9 @@ Este documento é o mapa técnico inicial. Não autoriza alterações visuais na
 ## Diagnóstico confirmado no código atual
 
 - A página inicial já contém a área `#public-posts`, uma coleção de publicações salvas e uma seção de agenda.
-- O mural atual consulta `posts` e exibe texto, data, curtidas, comentários, compartilhamento, envio para conversas e salvamento.
-- A função `getPublishedPosts()` consulta somente `id, content, created_at`; o modelo de leitura atual do mural não traz mídia nem dados de perfil do autor.
-- `submitMyPost()` atualmente grava somente `author_id`, `content` e `status` em `posts`.
+- O mural consulta `posts` publicados e mantém texto, data, curtidas, comentários, compartilhamento, envio para conversas e salvamento; a nova camada também associa fotos e vídeos via `post_media`.
+- `getPublishedPosts()` consulta posts publicados, metadados de mídia e perfis públicos dos autores; o feed renderiza imagens e vídeos.
+- `submitMyPost()` grava `author_id`, `content` e `status`; `uploadMyPostMedia()` associa até 10 arquivos ao post.
 - Curtidas e comentários de publicações usam `post_likes` e `post_comments`; itens salvos usam `saved_posts`.
 - Stories de usuários já aceitam foto/vídeo, expiração e trilha musical, com interface em `stories-ui.js` e criação em `home-story-composer.js`.
 - Eventos têm fluxo e compositor próprios (`event-social-composer.js`); músicas têm catálogo e interações próprias.
@@ -63,7 +63,7 @@ Consulta somente de leitura das políticas e dos buckets:
 - `capital-do-trem-chat` e `capital-do-trem-private-gallery`: buckets privados configurados para anexos de chat e galeria.
 - `brand-assets`: público, limitado a imagens de marca.
 
-**Ponto de atenção antes de ampliar a publicação:** o bucket `capital-do-trem-media` é público. Isso significa que os arquivos nele armazenados podem ser acessados por URL pública, mesmo que uma consulta de tabela tenha regras RLS. Antes de reutilizá-lo para novas publicações, precisamos separar conteúdo realmente público de arquivos privados e confirmar a finalidade dos 47 objetos já existentes. Não mudar a visibilidade do bucket nem mover/apagar objetos nesta etapa.
+**Atenção permanente:** o bucket `capital-do-trem-media` é público. Isso significa que os arquivos nele armazenados podem ser acessados por URL pública, mesmo que uma consulta de tabela tenha regras RLS. O compositor novo deve ser usado somente para conteúdo destinado à publicação pública. A migração não mudou a visibilidade do bucket nem moveu/apagou objetos existentes.
 
 As políticas de posts permitem leitura de publicações com status publicado; inserção autenticada com status publicado; edição/exclusão pelo autor apenas enquanto pendente ou por administrador. Curtidas e comentários estão limitados a publicações publicadas e ações de escrita autenticadas. Perfis são lidos publicamente somente quando `is_public=true`. Stories ativos são legíveis por visitante; inserção exige autoria, pasta do usuário e expiração máxima de 24 horas.
 
@@ -73,7 +73,7 @@ O bucket privado de áudio permanece privado. Os 31 objetos de áudio coincidem 
 
 ## Descoberta adicional: leitura pública bloqueada por política restritiva
 
-A inspeção detalhada de `pg_policy` e das permissões confirmou que `require_registered_user` é uma política **RESTRICTIVE** aplicada somente ao papel `authenticated`; ela não se aplica ao visitante `anon`. As políticas permissivas já permitem SELECT de posts publicados e perfis com `is_public=true`, e os grants de SELECT para `anon` existem. Portanto, a proposta foi corrigida para **não alterar** as políticas existentes de `posts` e `profiles`.
+A inspeção detalhada de `pg_policy` e das permissões confirmou que `require_registered_user` é uma política **RESTRICTIVE** aplicada somente ao papel `authenticated`; ela não se aplica ao visitante `anon`. As políticas permissivas já permitem SELECT de posts publicados e perfis com `is_public=true`, e os grants de SELECT para `anon` existem. Por isso, as migrações aplicadas **não alteraram** as políticas existentes de `posts` e `profiles`.
 
 A migração SQL aplicada está documentada em `docs/sql/20261112_social_feed_media_candidate.sql` e versionada em `supabase/migrations/`:
 - adicionar `post_media` para relacionar mídia ao post, com tipo, MIME, tamanho, ordem e caminho;
@@ -84,7 +84,7 @@ A migração SQL aplicada está documentada em `docs/sql/20261112_social_feed_me
 Migrações aplicadas no projeto conectado: `add_social_post_media`, `enforce_social_post_media_file_limits` e `index_social_post_media_owner`. A tabela foi criada vazia, com RLS ativado, leitura pública condicionada a posts publicados, escrita autenticada restrita ao dono, limite de 10 itens por publicação (ordens 0–9), fotos até 10 MiB e vídeos até 50 MiB. Foram concedidos apenas SELECT a `anon` e SELECT/INSERT/UPDATE/DELETE a `authenticated`, sempre sujeitos a RLS. O índice de `owner_id` foi incluído após alerta de performance.
 
 Implementação de frontend preparada na branch de trabalho:
-- `supabase/auth.js`: novo envio de mídia para posts próprios publicados e leitura de posts com mídias e perfil público do autor.
+- `supabase/auth.js`: envio de mídia para posts próprios publicados e leitura de posts com mídias e perfil público do autor; a retomada é idempotente por posição para não duplicar metadados se a resposta do servidor se perder.
 - `social-feed-composer.js`: formulário de publicação com legenda opcional quando há mídia, até 10 fotos/vídeos, limite de 100 MB por publicação e retomada do envio sem criar outra publicação.
 - `index.html`: feed mostra nome, @username e avatar público (com inicial padrão quando não há foto), renderiza fotos/vídeos; a página Divulgue recebe o formulário.
 - `sw.js`: cache atualizado para v290 e novo módulo incluído nos arquivos complementares.
@@ -93,7 +93,7 @@ Implementação de frontend preparada na branch de trabalho:
 
 **O código de frontend continua somente na branch/PR, não na versão pública.** A tabela e as políticas de metadados já existem no Supabase. O bucket `capital-do-trem-media` é público; portanto, as mídias publicadas nele ficam acessíveis por URL pública. O fluxo deve ser usado somente para conteúdo destinado à publicação pública.
 
-Validação CI: o workflow `Verificar preparação do aplicativo` passou no commit `aaf79255600e38cbdde574f95c7c049718656706`, incluindo build web, cópia do novo módulo, verificação do pré-cache PWA, sintaxe dos módulos e verificações de regressão existentes. A publicação de texto atual continua usando a função existente.
+Validação CI: o workflow `Verificar preparação do aplicativo` passou nos commits `f37b28662e78286d20e3af3b663c7bf8dfe1bdcb` e `96ed66d8364afaf21743235ac46c8504244166fc`, incluindo build web, cópia do novo módulo, pré-cache PWA, sintaxe dos módulos e regressões existentes. Foi acrescentado `scripts/check-social-feed-publishing.mjs` para validar o contrato do compositor, limites, políticas, feed, PWA e retomada idempotente; a execução mais recente está sendo validada.
 
 **Verificação pós-migração:** `post_media` existe, RLS está habilitado, as quatro políticas esperadas foram criadas, os privilégios de leitura/escrita foram confirmados e uma consulta executada como `anon` retornou zero linhas (tabela nova, sem mídia cadastrada). As restrições de MIME, tamanho por tipo, caminho por proprietário e máximo de 10 mídias foram confirmadas. Ainda falta teste ponta a ponta de upload com contas reais de usuário/artista/admin e teste em Android/Safari iOS. O código de frontend segue no PR, sem merge/deploy.
 
@@ -107,10 +107,10 @@ Validação CI: o workflow `Verificar preparação do aplicativo` passou no comm
 
 ## Etapas de implementação
 
-1. **Inventário e segurança (atual):** mapear páginas, módulos, tabelas, buckets, políticas RLS, triggers e fluxos existentes.
-2. **Contrato de dados:** definir compatibilidade do feed e mídia; preparar migração aditiva e reversível, se necessária.
-3. **Serviços de aplicação:** centralizar consulta paginada do feed, criação de publicação, upload e interações; evitar lógica duplicada em HTML inline.
-4. **Feed visual:** cards de mídia responsivos, autor identificável, ações acessíveis e estados de carregamento/erro/vazio.
+1. **Inventário e segurança (concluído para a primeira entrega):** mapear páginas, módulos, tabelas, buckets, políticas RLS, triggers e fluxos existentes.
+2. **Contrato de dados (concluído):** tabela de mídia adicionada por migrações aditivas e RLS verificado.
+3. **Serviços de aplicação (em validação):** criação, consulta e upload implementados; falta teste ponta a ponta autenticado.
+4. **Feed visual (primeira versão implementada):** mídia responsiva, autor/perfil, ações e estados básicos; falta teste em aparelhos reais.
 5. **Perfis e navegação:** conectar feed e perfis, preservando contas artista/usuário uai.
 6. **Validação:** testes de visitante, usuário autenticado, artista e administrador; Android e Safari iOS; offline/retorno de conexão; regressão de Stories, músicas, eventos e abertura.
 7. **Publicação:** somente após testes e revisão; atualização PWA separada de qualquer APK nativo.
