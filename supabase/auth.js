@@ -737,7 +737,7 @@ export async function getMyBasicProfile() {
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para acessar seu perfil.');
   const { data, error } = await supabase.from('profiles')
-    .select('user_id, display_name, username, account_type, bio, city, is_public')
+    .select('user_id, display_name, username, account_type, bio, city, is_public, avatar_url')
     .eq('user_id', user.id).maybeSingle();
   if (error) throw error;
   if (data) return data;
