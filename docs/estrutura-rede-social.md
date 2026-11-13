@@ -82,6 +82,15 @@ Foi preparada uma proposta SQL em `docs/sql/20261112_social_feed_media_candidate
 - limita inclusão de mídia à publicação do próprio usuário e ao caminho da pasta dele;
 - mantém o bucket atual e não altera arquivos existentes.
 
+Implementação de frontend preparada na branch de trabalho:
+- `supabase/auth.js`: novo envio de mídia para posts próprios publicados e leitura de posts com mídias e perfil público do autor.
+- `social-feed-composer.js`: formulário de publicação com texto, até 10 fotos/vídeos e feedback de envio.
+- `index.html`: feed mostra nome/avatar público do autor e renderiza fotos/vídeos; a página Divulgue recebe o formulário.
+- `sw.js`: cache atualizado para v290 e novo módulo incluído nos arquivos complementares.
+- `.github/workflows/web-check.yml`: validação de sintaxe do novo módulo.
+
+**Essas alterações estão somente na branch/PR, não na versão pública.** O upload de mídia depende da criação da tabela e políticas propostas. A publicação de texto atual continua usando a função existente.
+
 **A proposta ainda não foi aplicada nem testada no banco.** Antes da execução, precisa de revisão e testes de RLS com visitante, usuário comum, artista e administrador. O app também precisará de integração de upload/consulta; o SQL sozinho não ativa fotos e vídeos no feed.
 
 ## Modelo de dados a avaliar (não executar sem inspeção do schema e RLS)
