@@ -80,9 +80,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @media(min-width:650px){.hero{padding:34px}.hero p{max-width:650px}}
  .connection-status{margin:0 0 12px;padding:11px 13px;border:1px solid var(--red);border-radius:10px;background:var(--panel2);color:var(--fg)}.connection-status[hidden]{display:none}
  .skip-link{position:absolute;left:12px;top:-60px;z-index:1000;background:var(--red);color:#fff;padding:12px 16px;border-radius:9px;font-weight:800;text-decoration:none}.skip-link:focus{top:12px}
-/* Abertura cinematográfica: fumaça leve atravessando a marca. */
-.intro-smoke{position:fixed;inset:0;z-index:9998;display:grid;place-items:center;overflow:hidden;background:#000;pointer-events:none;animation:intro-screen-out 7s ease-in-out forwards}
-.intro-smoke__brand{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;opacity:0;animation:intro-brand-in 6.5s ease-out forwards}
+/* Abertura cinematográfica de 10 segundos: fumaça leve atravessando a marca. */
+.intro-smoke{position:fixed;inset:0;z-index:9998;display:grid;place-items:center;overflow:hidden;background:#000;pointer-events:none;animation:intro-screen-out 10s ease-in-out forwards}
+.intro-smoke__brand{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;opacity:0;animation:intro-brand-in 9.5s ease-out forwards}
 html.intro-brand-pending .intro-smoke__brand{opacity:0!important;visibility:hidden!important}
 .intro-smoke__brand img{width:clamp(92px,24vw,150px);height:auto;max-height:150px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(255,255,255,.18))}
 .intro-smoke__brand.custom-opening-image{width:100%;height:100%;justify-content:center;gap:0}
@@ -795,7 +795,7 @@ html.auth-check-pending body{visibility:hidden}
   transform:translateY(-58%)!important;font-size:clamp(27px,7vw,36px)!important;
   line-height:1!important;white-space:nowrap!important;
   filter:drop-shadow(0 2px 4px #000) drop-shadow(0 0 7px rgba(255,20,28,.7))!important;
-  animation:opening-train-cross-sky 5s linear 1 both!important;
+  animation:opening-train-cross-sky 9.8s linear 1 both!important;
 }
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train .opening-locomotive{
   transform:none!important;
@@ -812,7 +812,7 @@ html.auth-check-pending body{visibility:hidden}
 /* Abertura: duração total de 7s; locomotiva atravessa a tela em 5s. */
 .intro-smoke.custom-opening-screen{animation:none!important;opacity:1!important}
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train{
-  animation:opening-train-cross-sky 5s linear 1 both!important;
+  animation:opening-train-cross-sky 9.8s linear 1 both!important;
 }
 @keyframes opening-train-cross-sky{
   from{left:-190px}
@@ -967,7 +967,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
  <div class="opening-live-loader" id="opening-live-loader" role="status" aria-live="polite"><div class="opening-live-spinner" aria-hidden="true"></div><strong>Carregando...</strong><div class="opening-live-track"><span id="opening-live-progress"></span><span class="opening-live-train" id="opening-live-train" aria-hidden="true"><span class="opening-wagon opening-wagon-speakers opening-wagon-rear" aria-label="Primeiro vagão: alto-falante"><span class="opening-wagon-load opening-speaker-backward">🔊</span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-dancers" aria-label="Segundo vagão: rapaz e moça dançando"><span class="opening-wagon-load"><span class="opening-dancer female" aria-label="moça dançando">💃<i class="arm arm-left"></i><i class="arm arm-right"></i></span><span class="opening-dancer male" aria-label="rapaz dançando">🕺<i class="arm arm-left"></i><i class="arm arm-right"></i></span></span><span class="opening-wagon-deck"></span></span><span class="opening-wagon opening-wagon-speakers opening-wagon-front" aria-label="Terceiro vagão: alto-falante"><span class="opening-wagon-load opening-speaker-forward">🔊</span><span class="opening-wagon-deck"></span></span><span class="opening-locomotive" aria-label="Locomotiva à frente puxando os três vagões">🚂</span></span></div></div>
 </div>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
-<header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem <span class="verified-badge" role="img" aria-label="Perfil oficial verificado">✓</span></h1><p class="tag">A música da nossa quebrada!</p><div class="header-action-groups"><div class="profile-menu-cluster"><details class="profile-overflow"><summary aria-label="Mais opções do perfil" title="Mais opções">⋮</summary><div class="profile-overflow-panel"><a href="./conta.html#access-panel">Criar conta / Entrar</a><a href="./conta.html#basic-profile-panel">Meu perfil</a><a href="./conta.html#sign-out">Sair da conta</a><a href="./index.html#eventos">Eventos</a><a href="./index.html#comunidade">Comunidade e perfis</a><a href="./index.html#artistas">Artistas</a><a href="./index.html#divulgue">Publicar e divulgar</a><a href="./apoiadores.html">Apoiadores</a><a href="./avatar.html">Meu avatar</a><a href="./diagnostico.html">Informações e ajuda</a><a href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">YouTube</a><a href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Instagram</a></div></details><a class="profile-avatar-link" href="./conta.html" aria-label="Abrir perfil individual">👤<span>Perfil</span></a></div><div class="header-action-row"><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som da abertura</button></div></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Abertura de 7 segundos com som ligado por padrão. Você pode desativar permanentemente neste aparelho.</p><div class="header-location-row"><button class="btn alt" id="quick-location" type="button">📍 Logo ali Uai - Localização</button></div></header>
+<header><button class="theme" id="theme">☀️ Claro</button><img class="logo" id="site-logo" src="marca.svg" alt="Marca Capital do Trem"><h1 class="brand">Capital do Trem <span class="verified-badge" role="img" aria-label="Perfil oficial verificado">✓</span></h1><p class="tag">A música da nossa quebrada!</p><div class="header-action-groups"><div class="profile-menu-cluster"><details class="profile-overflow"><summary aria-label="Mais opções do perfil" title="Mais opções">⋮</summary><div class="profile-overflow-panel"><a href="./conta.html#access-panel">Criar conta / Entrar</a><a href="./conta.html#basic-profile-panel">Meu perfil</a><a href="./conta.html#sign-out">Sair da conta</a><a href="./index.html#eventos">Eventos</a><a href="./index.html#comunidade">Comunidade e perfis</a><a href="./index.html#artistas">Artistas</a><a href="./index.html#divulgue">Publicar e divulgar</a><a href="./apoiadores.html">Apoiadores</a><a href="./avatar.html">Meu avatar</a><a href="./diagnostico.html">Informações e ajuda</a><a href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">YouTube</a><a href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Instagram</a></div></details><a class="profile-avatar-link" href="./conta.html" aria-label="Abrir perfil individual">👤<span>Perfil</span></a></div><div class="header-action-row"><button class="btn alt" id="instalar-app" type="button">＋ Instalar aplicativo</button><button class="btn alt" id="compartilhar-site" type="button">↗ Compartilhar</button><button class="btn alt" id="intro-sound-toggle" type="button" aria-pressed="true">🔊 Som da abertura</button></div></div><p id="intro-sound-status" class="muted" role="status" aria-live="polite" style="font-size:12px;margin:8px 0 0">Abertura de 10 segundos com som ligado por padrão. Você pode desativar permanentemente neste aparelho.</p><div class="header-location-row"><button class="btn alt" id="quick-location" type="button">📍 Logo ali Uai - Localização</button></div></header>
 <main id="main-content" tabindex="-1">
 <p id="connection-status" class="connection-status" role="status" aria-live="polite" hidden></p>
 
@@ -2009,7 +2009,7 @@ async function saveOfflineMusic(id,blob,title){
    const bar=document.getElementById('opening-live-progress');let progress=3,started=false,finished=false;
    const paint=()=>{if(bar)bar.style.width=progress+'%';};
    const finish=()=>{if(finished)return;finished=true;progress=100;paint();screen.querySelector('video')?.pause();screen.classList.add('is-finished');window.setTimeout(()=>screen.remove(),600);};
-   const begin=()=>{if(started)return;started=true;startOpeningTrain();window.setTimeout(finish,7000);};
+   const begin=()=>{if(started)return;started=true;startOpeningTrain();window.setTimeout(finish,10000);};
    const loader=window.setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}else window.clearInterval(loader);},220);
    if(intro.complete&&intro.naturalWidth>0){intro.style.visibility='visible';document.documentElement.classList.remove('intro-brand-pending');begin();}
    else{intro.addEventListener('load',()=>{intro.style.visibility='visible';document.documentElement.classList.remove('intro-brand-pending');begin();},{once:true});intro.addEventListener('error',()=>{intro.src='./marca.svg';intro.style.objectFit='contain';intro.style.visibility='visible';document.documentElement.classList.remove('intro-brand-pending');begin();},{once:true});}
@@ -2079,7 +2079,7 @@ async function saveOfflineMusic(id,blob,title){
      progress=100;paint();video.pause();openingPoster.remove();screen.classList.add('is-finished');
      window.setTimeout(()=>screen.remove(),600);
     };
-    const beginOpeningClock=()=>{if(clockStarted||finished)return;clockStarted=true;startOpeningTrain();finishTimer=window.setTimeout(finish,7000);};
+    const beginOpeningClock=()=>{if(clockStarted||finished)return;clockStarted=true;startOpeningTrain();finishTimer=window.setTimeout(finish,10000);};
     const loader=window.setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}else window.clearInterval(loader);},220);
     const showOpeningFallback=()=>{
      if(finished||video.dataset.fallbackShown==='yes')return;
@@ -2108,7 +2108,7 @@ async function saveOfflineMusic(id,blob,title){
     },{once:true});
     video.addEventListener('error',()=>{console.warn('Falha ao carregar o vídeo de abertura; usando a imagem de segurança.');showOpeningFallback();},{once:true});
     // Se a rede não entregar um quadro em cinco segundos, a abertura usa a imagem aprovada em vez de ficar preta.
-    // O relógio de 7 segundos é a única condição de encerramento da abertura.
+    // O relógio de 10 segundos é a única condição de encerramento da abertura.
     video.load();
     fallbackTimer=window.setTimeout(()=>{if(!openingFrameShown)showOpeningFallback();},5000);
    }
