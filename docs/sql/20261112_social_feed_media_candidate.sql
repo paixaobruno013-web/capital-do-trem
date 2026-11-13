@@ -59,6 +59,11 @@ create index if not exists post_media_post_order_idx
 
 alter table public.post_media enable row level security;
 
+-- Expor a tabela à Data API; RLS abaixo controla as linhas.
+revoke all on table public.post_media from anon, authenticated;
+grant select on table public.post_media to anon, authenticated;
+grant insert, update, delete on table public.post_media to authenticated;
+
 drop policy if exists post_media_read_published_or_owner_admin on public.post_media;
 create policy post_media_read_published_or_owner_admin
   on public.post_media for select to anon, authenticated
@@ -105,6 +110,11 @@ create policy post_media_update_own_or_admin
     (
       owner_id = (select auth.uid())
       and storage_path like (select auth.uid())::text || '/posts/%'
+      and exists (
+        select 1 from public.posts p
+        where p.id = post_media.post_id
+          and p.author_id = (select auth.uid())
+      )
     )
     or (select private.is_admin())
   );
