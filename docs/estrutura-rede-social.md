@@ -52,7 +52,7 @@ Inspeção somente de leitura realizada no projeto conectado:
 
 O banco retornou zero linhas em `posts`, `post_likes`, `post_comments` e `saved_posts` no momento da consulta. Isso é uma fotografia da consulta, não uma garantia sobre dados futuros.
 
-O advisor de segurança também sinalizou alertas de políticas que podem permitir acesso de usuários anônimos em algumas tabelas e a proteção contra senhas vazadas desativada. Esses alertas precisam ser revisados política por política antes de abrir mais conteúdo ao público. Nenhuma política foi alterada nesta etapa.
+O advisor de segurança também sinalizou alertas de políticas que podem permitir acesso de usuários anônimos em algumas tabelas e a proteção contra senhas vazadas desativada. Esses alertas precisam ser revisados política por política antes de abrir mais conteúdo ao público.
 
 ## Segurança e Storage — segunda inspeção
 
@@ -73,14 +73,13 @@ O bucket privado de áudio permanece privado. Os 31 objetos de áudio coincidem 
 
 ## Descoberta adicional: leitura pública bloqueada por política restritiva
 
-A inspeção de `pg_policy` confirmou que `require_registered_user` em `posts` e `profiles` é uma política **RESTRICTIVE** para todas as operações. A função `private.is_registered_user()` exige `auth.uid()` e rejeita sessão anônima. Na prática, isso pode bloquear visitante sem login mesmo quando uma política permissiva permite ler posts publicados ou perfis públicos.
+A inspeção detalhada de `pg_policy` e das permissões confirmou que `require_registered_user` é uma política **RESTRICTIVE** aplicada somente ao papel `authenticated`; ela não se aplica ao visitante `anon`. As políticas permissivas já permitem SELECT de posts publicados e perfis com `is_public=true`, e os grants de SELECT para `anon` existem. Portanto, a proposta foi corrigida para **não alterar** as políticas existentes de `posts` e `profiles`.
 
-Foi preparada uma proposta SQL em `docs/sql/20261112_social_feed_media_candidate.sql` que:
-- move a exigência de usuário registrado para operações de escrita em posts/perfis;
-- adiciona `post_media` para relacionar mídia ao post, com tipo, MIME, tamanho, ordem e caminho;
-- permite ler metadados apenas quando a publicação é pública, própria ou acessível ao administrador;
-- limita inclusão de mídia à publicação do próprio usuário e ao caminho da pasta dele;
-- mantém o bucket atual e não altera arquivos existentes.
+A proposta SQL em `docs/sql/20261112_social_feed_media_candidate.sql` agora se limita a:
+- adicionar `post_media` para relacionar mídia ao post, com tipo, MIME, tamanho, ordem e caminho;
+- permitir leitura de metadados apenas quando a publicação é pública, própria ou acessível ao administrador;
+- limitar inclusão de mídia à publicação do próprio usuário e ao caminho da pasta dele;
+- manter o bucket atual e não alterar arquivos existentes.
 
 Implementação de frontend preparada na branch de trabalho:
 - `supabase/auth.js`: novo envio de mídia para posts próprios publicados e leitura de posts com mídias e perfil público do autor.
