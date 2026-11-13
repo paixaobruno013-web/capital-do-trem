@@ -76,9 +76,9 @@ jobs:
       - name: Criar projeto Android
         run: npx cap add android
 
-      - name: Preparar ícones usando a marca atual do aplicativo
+      - name: Preparar ícones usando o arquivo oficial da marca Capital do Trem
         env:
-          APP_ICON_URL: https://zmjxkfjzrbbxyvgkwirv.supabase.co/functions/v1/capital-do-trem-pwa-icon
+          APP_ICON_URL: https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/31937786-c321-445f-ae1c-de018eca95c8/branding/official-logo-d2daa073-35ba-456e-90ee-f156c9a1d450.jpg
         run: |
           mkdir -p assets
           curl --fail --location --retry 3 "$APP_ICON_URL" --output /tmp/capital-do-trem-app-icon.png
