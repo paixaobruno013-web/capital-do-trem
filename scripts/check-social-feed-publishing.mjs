@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [home, composer, auth, worker, prepare, migration, limits, ownerIndex] = await Promise.all([
+const [home, composer, auth, worker, prepare, migration, limits, ownerIndex, account] = await Promise.all([
   read('index.html'),
   read('social-feed-composer.js'),
   read('supabase/auth.js'),
@@ -9,10 +9,13 @@ const [home, composer, auth, worker, prepare, migration, limits, ownerIndex] = a
   read('scripts/prepare-web.mjs'),
   read('supabase/migrations/20261113004636_add_social_post_media.sql'),
   read('supabase/migrations/20261113004651_enforce_social_post_media_file_limits.sql'),
-  read('supabase/migrations/20261113004658_index_social_post_media_owner.sql')
+  read('supabase/migrations/20261113004658_index_social_post_media_owner.sql'),
+  read('conta.html')
 ]);
 
 const checks = [
+  ['cadastro exibe a mensagem grafitada de boas-vindas somente ao escolher Criar conta', account.includes('id="registration-graffiti"') && account.includes('SEJA BEM-VINDO,') && account.includes('MAQUINISTA DESSE TREM!') && account.includes("welcome.hidden=mode!=='register'")],
+  ['faixa de boas-vindas usa visual preto/vermelho responsivo e respeita o modo claro', account.includes('.registration-graffiti{') && account.includes('font-family:Impact') && account.includes('body.light .registration-graffiti')],
   ['navegação principal mostra os acessos de Início, Publicar, Eventos, Músicas e Comunidade', ['inicio','social','eventos','musicas','comunidade'].every(id => home.includes('data-page="'+id+'"'))],
   ['navegação inclui Artistas, Apoiadores, Divulgações, Ajuda, Koe Fala Tu e Perfil sem criar atalho separado para Fazer Amigos', ['artistas','parcerias','divulgue','duvidas'].every(id => home.includes('data-page="'+id+'"')) && home.includes('Koe Fala Tu') && home.includes('nav-profile') && !home.includes('data-page="amigos"') && home.includes('id="amigos"')],
   ['atalhos da página inicial deixam visíveis as áreas mais procuradas', home.includes('aria-label="Acessos rápidos do Capital do Trem"') && ['Publicar foto ou vídeo','Eventos','Músicas','Comunidade','Artistas','Lançamentos e divulgações','Koe Fala Tu','Minha conta','Apoiadores'].every(label => home.includes(label))],
