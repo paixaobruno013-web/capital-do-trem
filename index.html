@@ -1022,7 +1022,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <p id="artist-status" class="muted" aria-live="polite"></p></div>
 </section>
 <section class="page" id="parcerias"><div class="card"><h2>🏆 Parcerias</h2><p>Comerciantes, marcas, produtores e apoiadores podem fortalecer o movimento.</p><a class="btn instagram-button" href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Fale com a equipe pelo Instagram</a></div></section>
-<section class="page" id="divulgue"><div class="card"><h2>📣 Envie sua divulgação</h2><p class="muted">As divulgações são publicadas diretamente no mural da comunidade, sem fila de aprovação.</p><p>Entre na sua conta para enviar lançamento, notícia, parceria ou iniciativa da comunidade.</p><a class="btn" href="./conta.html">Entrar ou criar conta para divulgar</a></div></section>
+<section class="page" id="divulgue"><div class="card"><h2>📣 Envie sua publicação</h2><p class="muted">Compartilhe texto, fotos e vídeos com a comunidade Capital do Trem.</p><div id="social-post-login"><p>Entre na sua conta para publicar.</p><a class="btn" href="./conta.html">Entrar ou criar conta</a></div><form id="social-post-form" hidden><label for="social-post-content">O que você quer compartilhar?</label><textarea id="social-post-content" maxlength="1500" required placeholder="Conte sua novidade, lançamento, parceria ou iniciativa…"></textarea><label for="social-post-files">Fotos e vídeos (até 10 arquivos)</label><input id="social-post-files" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" multiple><p class="muted">Fotos até 10 MB cada. Vídeos até 50 MB cada. Formatos: JPG, PNG, WebP, MP4, WebM ou MOV.</p><button class="btn" id="social-post-submit" type="submit" style="width:100%">Publicar no Capital do Trem</button><p id="social-post-status" class="muted" role="status" aria-live="polite"></p></form></div></section>
 <section class="page" id="duvidas">
 <div class="card"><h2>❓ Dúvidas frequentes</h2><p class="muted">Informações rápidas para quem está chegando ao Capital do Trem.</p></div>
 <div class="card"><h3>📍 O que é o “Logo Ali”?</h3><p>É uma forma simples de procurar shows, eventos e ações sociais próximos de você. Toque no botão e autorize o GPS se desejar. O site usa a localização para abrir o Google Maps; não guarda suas coordenadas.</p></div>
@@ -1593,10 +1593,19 @@ updateConnectionStatus();
   const renderSaved=async()=>{if(!session)return;try{const saved=await module.getMySavedPosts();savedIds=new Set(saved.map(post=>post.id));savedList.replaceChildren();if(!saved.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Você ainda não salvou publicações. Use “Salvar” no mural.';savedList.append(empty);return;}for(const post of saved){const row=document.createElement('article');row.className='item';const title=document.createElement('strong');title.textContent='Divulgação da comunidade';const body=document.createElement('p');body.textContent=post.content;const date=document.createElement('small');date.className='muted';date.textContent=new Date(post.created_at).toLocaleDateString('pt-BR');row.append(title,body,date);savedList.append(row);}}catch(error){savedStatus.textContent='Falha ao atualizar sua coleção.';}};
   for(const item of items){
    const card=document.createElement('article');card.className='item';
-   const heading=document.createElement('h3');heading.textContent='Divulgação da comunidade';
+   const author=document.createElement('div');author.className='post-author';author.style.cssText='display:flex;align-items:center;gap:9px;margin-bottom:8px';
+   if(item.author?.avatar_url){const avatar=document.createElement('img');avatar.src=item.author.avatar_url;avatar.alt='';avatar.loading='lazy';avatar.decoding='async';avatar.style.cssText='width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid #ed1c24';author.append(avatar);}
+   const heading=document.createElement('h3');heading.textContent=item.author?.display_name||'Usuário Uai';heading.style.margin='0';
+   const username=document.createElement('small');username.className='muted';username.textContent=item.author?.username?'@'+item.author.username:'Participante do Capital do Trem';
+   const identity=document.createElement('div');identity.append(heading,username);author.append(identity);
    const body=document.createElement('p');body.textContent=item.content;
-   const date=document.createElement('small');date.className='muted';date.textContent=new Date(item.created_at).toLocaleDateString('pt-BR');
-   card.append(heading,body,date);
+   card.append(author,body);
+   for(const media of (item.media||[])){
+    if(!media.url)continue;
+    if(media.media_type==='image'){const image=document.createElement('img');image.src=media.url;image.alt=media.alt_text||'Foto publicada na comunidade';image.loading='lazy';image.decoding='async';image.style.cssText='display:block;width:100%;max-height:560px;object-fit:contain;border-radius:12px;margin:10px 0;background:#080808';card.append(image);}
+    else if(media.media_type==='video'){const video=document.createElement('video');video.src=media.url;video.controls=true;video.playsInline=true;video.preload='metadata';video.setAttribute('aria-label','Vídeo publicado na comunidade');video.style.cssText='display:block;width:100%;max-height:560px;border-radius:12px;margin:10px 0;background:#080808';card.append(video);}
+   }
+   const date=document.createElement('small');date.className='muted';date.textContent=new Date(item.created_at).toLocaleDateString('pt-BR');card.append(date);
    const actions=document.createElement('div');actions.className='post-actions';
    const share=document.createElement('button');share.type='button';share.className='btn alt';share.textContent='↗ Compartilhar';share.addEventListener('click',async()=>{const data={title:'Capital do Trem • Comunidade',text:item.content,url:location.href};try{if(navigator.share)await navigator.share(data);else{await navigator.clipboard.writeText(data.text+' '+data.url);share.textContent='✓ Copiado';}}catch(error){if(error.name!=='AbortError')share.textContent='Não foi possível compartilhar';}});
    actions.append(share);
@@ -2330,6 +2339,7 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
   </form>
  </div>
 </section>
+<script type="module" src="./social-feed-composer.js"></script>
 <script type="module" src="./event-social-composer.js"></script>
 <script type="module" src="./home-story-composer.js"></script>
 <script type="module" src="./stories-ui.js"></script>
