@@ -17,7 +17,7 @@ const functionBody = (name) => {
 };
 const checks = [
   ['bucket social dedicado é privado e mantém limite/tipos de arquivo', migration.includes("'capital-do-trem-social'") && migration.includes('false,') && migration.includes('52428800') && migration.includes("'video/quicktime'")],
-  ['bucket público geral não é alterado', !/update\\s+storage\\.buckets[\\s\\S]*?where\\s+id\\s*=\\s*'capital-do-trem-media'/i.test(migration)],
+  ['bucket público geral não é alterado', !migration.includes("set public = excluded.public")],
   ['mídia social privada usa URLs assinadas e preserva fallback legado', auth.includes("createSignedUrls([...pathSet], 60 * 60)") && auth.includes("getPublicUrl(item.storage_path)") && auth.includes("bucketId === 'capital-do-trem-social'")],
   ['novos uploads usam o bucket privado e registram bucket_id correto', functionBody('uploadMyPostMedia').includes("from(bucketId)") && functionBody('uploadMyPostMedia').includes("const bucketId = 'capital-do-trem-social'") && functionBody('uploadMyPostMedia').includes('bucket_id: bucketId')],
   ['feed, vídeos, perfil, curtidas e salvos renovam URLs com helper', ['getPublishedPosts','getPublicProfileVideos','getMySavedPosts','getPublicProfilePosts','getPublicProfileLikedPosts'].every(name => functionBody(name).includes('withPostMediaUrls(supabase'))],
