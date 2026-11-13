@@ -1577,7 +1577,7 @@ updateConnectionStatus();
   }
  }catch(error){const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar a vitrine de artistas agora. Tente novamente em instantes.';container.replaceChildren(message);}
 })();
-// Mural público: somente divulgações aprovadas pela equipe.
+// Mural público: publicações da comunidade Capital do Trem.
 (async()=>{
  const container=document.getElementById('public-posts');
  try{
@@ -1585,7 +1585,7 @@ updateConnectionStatus();
   module.initSupabase();
   const items=await module.getPublishedPosts();
   container.replaceChildren();
-  if(!items.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Ainda não há divulgações aprovadas. Seja o primeiro a participar!';container.append(empty);return;}
+  if(!items.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Ainda não há publicações. Seja o primeiro a participar!';container.append(empty);return;}
   const session=await module.getCurrentSession();
   const savedLogin=document.getElementById('saved-publications-login'),savedList=document.getElementById('saved-publications-list'),savedStatus=document.getElementById('saved-publications-status');
   let savedIds=new Set();
@@ -1600,9 +1600,10 @@ updateConnectionStatus();
    else{const fallback=document.createElement('span');fallback.textContent=Array.from(publicName.trim())[0]?.toLocaleUpperCase('pt-BR')||'C';fallback.setAttribute('aria-hidden','true');fallback.style.cssText='display:grid;place-items:center;width:38px;height:38px;flex:0 0 38px;border-radius:50%;background:#151515;color:#ed1c24;border:2px solid #ed1c24;font-weight:700';author.append(fallback);}
    const heading=document.createElement('h3');heading.textContent=publicName;heading.style.margin='0';
    const username=document.createElement('small');username.className='muted';username.textContent=item.author?.username?'@'+item.author.username:'Participante do Capital do Trem';
-   const identity=document.createElement('div');identity.append(heading,username);author.append(identity);
-   const body=document.createElement('p');body.textContent=item.content;
-   card.append(author,body);
+   const accountType=document.createElement('small');accountType.className='muted';accountType.textContent=item.author?.account_type==='artist'?'Artista':'Usuário Uai';
+   const identity=document.createElement('div');identity.append(heading,username,accountType);author.append(identity);
+   card.append(author);
+   if(item.content){const body=document.createElement('p');body.textContent=item.content;card.append(body);}
    for(const media of (item.media||[])){
     if(!media.url)continue;
     if(media.media_type==='image'){const image=document.createElement('img');image.src=media.url;image.alt=media.alt_text||'Foto publicada na comunidade';image.loading='lazy';image.decoding='async';image.style.cssText='display:block;width:100%;max-height:560px;object-fit:contain;border-radius:12px;margin:10px 0;background:#080808';card.append(image);}
