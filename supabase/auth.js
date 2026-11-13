@@ -439,7 +439,7 @@ export async function getModerationQueue() {
 export async function moderateItem(table, id, status) {
   const allowedTables = ['artists','events','posts','songs'];
   if (!allowedTables.includes(table)) throw new Error('Tipo de publicação inválido.');
-  if (!['published','rejected'].includes(status)) throw new Error('Ação de moderação inválida.');
+  if (!['published','rejected','private'].includes(status)) throw new Error('Ação de moderação inválida.');
   const supabase = initSupabase();
   if (!(await isCurrentUserAdmin())) throw new Error('Acesso administrativo não autorizado.');
   const { error } = await supabase.from(table).update({status}).eq('id',id);
@@ -521,17 +521,23 @@ export async function getMySongs() {
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para consultar suas músicas.');
   const { data, error } = await supabase.from('songs')
-    .select('id,title,artist_name,producer_name,description,status,created_at')
+    .select('id,title,artist_name,producer_name,description,status,created_at,storage_path')
     .eq('user_id',user.id).order('created_at',{ascending:false});
   if (error) throw error;
-  return data || [];
+  const songs = data || [];
+  if (!songs.length) return [];
+  const paths = songs.map(song=>song.storage_path);
+  const { data: signed, error: signedError } = await supabase.storage.from('capital-do-trem-audio').createSignedUrls(paths,60*60);
+  if (signedError) throw signedError;
+  const byPath = new Map((signed||[]).map(item=>[item.path,item.signedUrl]));
+  return songs.map(song=>({...song,audio_url:byPath.get(song.storage_path)||null}));
 }
 
 export async function getPublishedSongs() {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('songs')
     .select('id,title,artist_name,producer_name,description,storage_path,status')
-    .in('status',['pending','published']).order('created_at',{ascending:false}).limit(100);
+    .eq('status','published').order('created_at',{ascending:false}).limit(100);
   if (error) throw error;
   const items = data || [];
   if (!items.length) return [];
