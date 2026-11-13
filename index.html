@@ -2058,7 +2058,7 @@ async function deleteOfflineMusic(id){
   }
   const filterSongs=()=>{const query=(searchInput?.value||'').trim().toLocaleLowerCase('pt-BR');let visible=0;container.querySelectorAll(':scope > article').forEach(card=>{const match=!query||card.dataset.searchText.includes(query);card.hidden=!match;if(match)visible++;});if(countLabel)countLabel.textContent=query?`${visible} de ${songs.length} música(s) encontrada(s)`:`${songs.length} música(s) no catálogo`;};
   searchInput?.addEventListener('input',filterSongs);filterSongs();
- }catch(error){container.replaceChildren();const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar o catálogo agora. Confira sua conexão e tente novamente. Se não houver músicas aprovadas, elas aparecerão aqui quando a equipe publicar os primeiros lançamentos.';container.append(message);}
+ }catch(error){container.replaceChildren();const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar as músicas: '+(error?.message||'Confira sua conexão e tente novamente.');container.append(message);}
 })();
 
 </script>
