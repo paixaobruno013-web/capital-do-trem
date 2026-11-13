@@ -245,17 +245,9 @@ function updateCounter(){counter.textContent=`${input.value.length}/1000 caracte
 input.addEventListener('input',updateCounter);
 let unsubscribe=null,seen=new Set(),currentUserId=null;
 const MAX_VISIBLE_MESSAGES=100;
-function emojiAssetUrl(value){const code=Array.from(value).map(ch=>ch.codePointAt(0).toString(16)).filter(code=>code!=='fe0f').join('-');return 'https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/'+code+'.svg'}
 function appendEmojiText(target,value){
- const source=String(value||'');
- if(typeof Intl.Segmenter!=='function'){target.append(document.createTextNode(source));return;}
- const segments=new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(source);
- for(const part of segments){
-  const chunk=part.segment;
-  if(/[\p{Extended_Pictographic}\p{Regional_Indicator}]/u.test(chunk)||chunk.includes('\u20e3')){
-   const img=document.createElement('img');img.className='cdt-emoji-image';img.src=emojiAssetUrl(chunk);img.alt=chunk;img.setAttribute('role','img');img.loading='lazy';img.addEventListener('error',()=>img.replaceWith(document.createTextNode(chunk)),{once:true});target.append(img);
-  }else target.append(document.createTextNode(chunk));
- }
+ // Preserva a sequência Unicode completa: emojis compostos, tons de pele, bandeiras e famílias.
+ target.append(document.createTextNode(String(value||'')));
 }
 function addMessage(m){
  if(!m||!m.id||seen.has(m.id))return;
