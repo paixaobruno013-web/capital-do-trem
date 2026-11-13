@@ -16,7 +16,7 @@ const [home, composer, auth, worker, prepare, schema, migration, limits, ownerIn
 const checks = [
   ['compositor de publicação está presente na página Divulgue', home.includes('id="social-post-form"') && home.includes('id="social-post-files"') && home.includes('id="social-post-submit"')],
   ['compositor só libera o formulário após autenticação', composer.includes('getCurrentSession()') && composer.includes('watchAuthChanges') && composer.includes('form.hidden = !signedIn')],
-  ['legenda é opcional apenas quando existe mídia', composer.includes('if (!pendingContent && !pendingFiles.length)') && auth.includes('allowEmpty = false') && auth.includes('allowEmpty && cleanContent.length < 1') === false],
+  ['legenda é opcional apenas quando existe mídia', composer.includes('if (!pendingContent && !pendingFiles.length)') && auth.includes('allowEmpty = false') && auth.includes('(!allowEmpty && cleanContent.length < 1)')],
   ['limite de 10 arquivos e 100 MB é validado antes do envio', composer.includes('pendingFiles.length > 10') && composer.includes('totalBytes > 100 * 1024 * 1024')],
   ['limites individuais e MIME são validados no compositor e backend', composer.includes('10 * 1024 * 1024') && composer.includes('50 * 1024 * 1024') && auth.includes("'video/quicktime': { ext: 'mov'")],
   ['envio sequencial permite retomar o mesmo post sem duplicar', composer.includes('let pendingPostId = null') && composer.includes('let uploadedCount = 0') && composer.includes('Continuar envio') && composer.includes('for (; uploadedCount < pendingFiles.length')],
