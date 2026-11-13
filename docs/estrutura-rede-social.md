@@ -160,4 +160,4 @@ O painel principal deixa de apresentar o cartão comercial “Parcerias” e os 
 - O diretório da comunidade e os nomes dos autores na timeline abrem o perfil público individual.
 - A página de perfil foi adicionada ao pacote web/Android e ao cache do PWA.
 
-A migração `20261113030500_public_music_while_pending.sql` está versionada na branch do PR. Ela ainda não foi aplicada ao banco de produção, pois a publicação do PR/produção continua separada da implementação e validação.
+A migração `20261113030638_public_music_while_pending.sql` foi aplicada e verificada no Supabase de produção. A política permite leitura pública de músicas `pending` e `published` e mantém `rejected` fora do catálogo. O bucket continua privado; a reprodução usa URLs assinadas. A branch do PR contém a mesma migração com a versão alinhada ao histórico do banco.
