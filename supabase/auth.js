@@ -809,7 +809,7 @@ export async function getPublicProfileByUsername(username) {
   if (!/^[a-z0-9][a-z0-9_]{2,31}$/.test(clean)) return null;
   const supabase = initSupabase();
   const { data, error } = await supabase.from('profiles')
-    .select('user_id,display_name,username,account_type,bio,city,avatar_type,avatar_url,avatar_data,is_public')
+    .select('user_id,display_name,username,account_type,bio,city,avatar_type,avatar_url,avatar_data,cover_url,cover_path,is_public')
     .eq('username', clean).eq('is_public', true).maybeSingle();
   if (error) throw error;
   return data || null;
@@ -2043,6 +2043,29 @@ export async function toggleSavedPost(postId) {
 }
 
 // Rede de seguidores dos perfis públicos.
+export async function uploadMyProfileCover(file) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para alterar a capa.');
+  if (!(file instanceof File)) throw new Error('Selecione uma imagem para a capa.');
+  const allowed = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+  if (!allowed[file.type]) throw new Error('Use uma imagem JPG, PNG ou WebP.');
+  if (file.size < 1 || file.size > 8 * 1024 * 1024) throw new Error('A capa deve ter até 8 MB.');
+  const path = user.id + '/cover/' + crypto.randomUUID() + '.' + allowed[file.type];
+  const bucket = supabase.storage.from('capital-do-trem-media');
+  const { error: uploadError } = await bucket.upload(path, file, { contentType:file.type, cacheControl:'3600', upsert:false });
+  if (uploadError) throw uploadError;
+  const { data: publicData } = bucket.getPublicUrl(path);
+  if (!publicData?.publicUrl) throw new Error('Não foi possível preparar a imagem da capa.');
+  const { data: previous, error: previousError } = await supabase.from('profiles').select('cover_path').eq('user_id',user.id).single();
+  if (previousError) { await bucket.remove([path]); throw previousError; }
+  const { error: saveError } = await supabase.from('profiles').update({cover_url:publicData.publicUrl,cover_path:path}).eq('user_id',user.id);
+  if (saveError) { await bucket.remove([path]); throw saveError; }
+  if (previous?.cover_path && previous.cover_path.startsWith(user.id + '/cover/') && previous.cover_path !== path) await bucket.remove([previous.cover_path]);
+  return { cover_url:publicData.publicUrl, cover_path:path };
+}
+
 export async function getPublicProfileSocial(userId) {
   const supabase = initSupabase();
   const [followers, following, { data: { user }, error: userError }] = await Promise.all([
