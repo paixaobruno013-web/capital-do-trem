@@ -75,11 +75,13 @@ O bucket privado de áudio permanece privado. Os 31 objetos de áudio coincidem 
 
 A inspeção detalhada de `pg_policy` e das permissões confirmou que `require_registered_user` é uma política **RESTRICTIVE** aplicada somente ao papel `authenticated`; ela não se aplica ao visitante `anon`. As políticas permissivas já permitem SELECT de posts publicados e perfis com `is_public=true`, e os grants de SELECT para `anon` existem. Portanto, a proposta foi corrigida para **não alterar** as políticas existentes de `posts` e `profiles`.
 
-A proposta SQL em `docs/sql/20261112_social_feed_media_candidate.sql` agora se limita a:
+A migração SQL em `docs/sql/20261112_social_feed_media_candidate.sql` foi aplicada ao Supabase e se limita a:
 - adicionar `post_media` para relacionar mídia ao post, com tipo, MIME, tamanho, ordem e caminho;
 - permitir leitura de metadados apenas quando a publicação é pública, própria ou acessível ao administrador;
 - limitar inclusão de mídia à publicação do próprio usuário e ao caminho da pasta dele;
 - manter o bucket atual e não alterar arquivos existentes.
+
+Migrações aplicadas no projeto conectado: `add_social_post_media`, `enforce_social_post_media_file_limits` e `index_social_post_media_owner`. A tabela foi criada vazia, com RLS ativado, leitura pública condicionada a posts publicados, escrita autenticada restrita ao dono, limite de 10 itens por publicação (ordens 0–9), fotos até 10 MiB e vídeos até 50 MiB. Foram concedidos apenas SELECT a `anon` e SELECT/INSERT/UPDATE/DELETE a `authenticated`, sempre sujeitos a RLS. O índice de `owner_id` foi incluído após alerta de performance.
 
 Implementação de frontend preparada na branch de trabalho:
 - `supabase/auth.js`: novo envio de mídia para posts próprios publicados e leitura de posts com mídias e perfil público do autor.
@@ -89,11 +91,11 @@ Implementação de frontend preparada na branch de trabalho:
 - `scripts/prepare-web.mjs`: módulo incluído na cópia do pacote final PWA após o primeiro CI identificar essa ausência.
 - `.github/workflows/web-check.yml`: validação de sintaxe do novo módulo.
 
-**Essas alterações estão somente na branch/PR, não na versão pública.** O upload de mídia depende da criação da tabela e políticas propostas. O bucket `capital-do-trem-media` é público; portanto, as mídias publicadas nele ficam acessíveis por URL pública. O fluxo deve ser usado somente para conteúdo destinado à publicação pública.
+**O código de frontend continua somente na branch/PR, não na versão pública.** A tabela e as políticas de metadados já existem no Supabase. O bucket `capital-do-trem-media` é público; portanto, as mídias publicadas nele ficam acessíveis por URL pública. O fluxo deve ser usado somente para conteúdo destinado à publicação pública.
 
 Validação CI: o workflow `Verificar preparação do aplicativo` passou no commit `aaf79255600e38cbdde574f95c7c049718656706`, incluindo build web, cópia do novo módulo, verificação do pré-cache PWA, sintaxe dos módulos e verificações de regressão existentes. A publicação de texto atual continua usando a função existente.
 
-**A proposta ainda não foi aplicada nem testada no banco.** Antes da execução, precisa de revisão e testes de RLS com visitante, usuário comum, artista e administrador. O app também precisará de integração de upload/consulta; o SQL sozinho não ativa fotos e vídeos no feed.
+**Verificação pós-migração:** `post_media` existe, RLS está habilitado, as quatro políticas esperadas foram criadas, os privilégios de leitura/escrita foram confirmados e uma consulta executada como `anon` retornou zero linhas (tabela nova, sem mídia cadastrada). As restrições de MIME, tamanho por tipo, caminho por proprietário e máximo de 10 mídias foram confirmadas. Ainda falta teste ponta a ponta de upload com contas reais de usuário/artista/admin e teste em Android/Safari iOS. O código de frontend segue no PR, sem merge/deploy.
 
 ## Modelo de dados a avaliar (não executar sem inspeção do schema e RLS)
 
