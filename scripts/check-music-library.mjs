@@ -8,6 +8,7 @@ const checks = [
   [index.includes('id="music-library"'), 'Painel da biblioteca musical ausente.'],
   [indexHtml.includes('id="offline-music-list"') && indexHtml.includes('getAllOfflineMusic') && indexHtml.includes("objectStore('tracks').getAll()"), 'Playlist local não lista arquivos salvos sem depender do catálogo remoto.'],
   [indexHtml.includes('id="offline-music-player"') && indexHtml.includes('URL.createObjectURL(track.blob)'), 'Playlist local não possui player independente para áudio salvo.'],
+  [indexHtml.includes("navigator.mediaSession.setActionHandler('play',()=>player.play()") && indexHtml.includes("navigator.mediaSession.setActionHandler('pause',()=>player.pause())"), 'Playlist offline não oferece comandos de reprodução na tela bloqueada.'],
   [indexHtml.includes('async function deleteOfflineMusic(id)') && indexHtml.includes("objectStore('tracks').delete(String(id))"), 'Playlist local não permite remover arquivos e liberar espaço.'],
   [indexHtml.includes('navigator.storage?.persist') && indexHtml.includes('navigator.storage?.estimate') && indexHtml.includes('Espaço insuficiente no aparelho'), 'Armazenamento offline não protege os dados nem verifica espaço disponível.'],
   [offlinePolicy.includes("status = 'published'") && offlinePolicy.includes("or user_id = (select auth.uid())") && offlinePolicy.includes("or (select private.is_admin())") && offlinePolicy.includes("s.status = 'published'"), 'Faixas privadas não estão isoladas do catálogo público ou o proprietário perdeu acesso.'],
