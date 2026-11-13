@@ -71,6 +71,19 @@ O advisor de segurança sinalizou políticas que permitem acesso anônimo em alg
 
 O bucket privado de áudio permanece privado. Os 31 objetos de áudio coincidem com os 31 registros de músicas, mas isso não confirma, por si só, autorização de distribuição pública.
 
+## Descoberta adicional: leitura pública bloqueada por política restritiva
+
+A inspeção de `pg_policy` confirmou que `require_registered_user` em `posts` e `profiles` é uma política **RESTRICTIVE** para todas as operações. A função `private.is_registered_user()` exige `auth.uid()` e rejeita sessão anônima. Na prática, isso pode bloquear visitante sem login mesmo quando uma política permissiva permite ler posts publicados ou perfis públicos.
+
+Foi preparada uma proposta SQL em `docs/sql/20261112_social_feed_media_candidate.sql` que:
+- move a exigência de usuário registrado para operações de escrita em posts/perfis;
+- adiciona `post_media` para relacionar mídia ao post, com tipo, MIME, tamanho, ordem e caminho;
+- permite ler metadados apenas quando a publicação é pública, própria ou acessível ao administrador;
+- limita inclusão de mídia à publicação do próprio usuário e ao caminho da pasta dele;
+- mantém o bucket atual e não altera arquivos existentes.
+
+**A proposta ainda não foi aplicada nem testada no banco.** Antes da execução, precisa de revisão e testes de RLS com visitante, usuário comum, artista e administrador. O app também precisará de integração de upload/consulta; o SQL sozinho não ativa fotos e vídeos no feed.
+
 ## Modelo de dados a avaliar (não executar sem inspeção do schema e RLS)
 
 - `posts`: manter compatibilidade com os campos atuais e avaliar campos opcionais `post_type`, `visibility`, `updated_at`.
