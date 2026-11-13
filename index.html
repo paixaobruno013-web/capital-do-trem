@@ -809,7 +809,7 @@ html.auth-check-pending body{visibility:hidden}
 }
 
 
-/* Abertura: duração total de 10s; locomotiva à frente puxando os três vagões por 9,8s. */
+/* Abertura: duração total de 7s; locomotiva atravessa a tela em 5s. */
 .intro-smoke.custom-opening-screen{animation:none!important;opacity:1!important}
 .intro-smoke.custom-opening-screen .opening-live-track #opening-live-train{
   animation:opening-train-cross-sky 5s linear 1 both!important;
@@ -2108,7 +2108,7 @@ async function saveOfflineMusic(id,blob,title){
     },{once:true});
     video.addEventListener('error',()=>{console.warn('Falha ao carregar o vídeo de abertura; usando a imagem de segurança.');showOpeningFallback();},{once:true});
     // Se a rede não entregar um quadro em cinco segundos, a abertura usa a imagem aprovada em vez de ficar preta.
-    video.addEventListener('ended',finish,{once:true});
+    // O relógio de 7 segundos é a única condição de encerramento da abertura.
     video.load();
     fallbackTimer=window.setTimeout(()=>{if(!openingFrameShown)showOpeningFallback();},5000);
    }
