@@ -38,6 +38,22 @@ Manter catálogo musical, eventos, apoiadores e Koe Fala Tu como áreas integrad
 ### 6. Segurança e moderação
 Validar autenticação, RLS, propriedade dos registros, limites de tamanho/tipo de arquivo, URLs de mídia e ações de denúncia. Conteúdo público só deve ser servido por consultas e políticas explicitamente públicas.
 
+## Schema atual confirmado no Supabase
+
+Inspeção somente de leitura realizada no projeto conectado:
+
+- `profiles`: já contém username, tipo de conta, bio, cidade, visibilidade pública e campos de avatar.
+- `posts`: atualmente contém apenas `id`, `author_id`, `content`, `status` e `created_at`; não há campos de mídia ou tipo de publicação.
+- `post_likes`, `post_comments` e `saved_posts`: já existem e têm RLS habilitado.
+- `user_stories` e `admin_stories`: já armazenam mídia, tipo, legenda, expiração e campos de música.
+- `songs`: 31 registros no momento da inspeção; RLS habilitado.
+- `events`: tabela existente com cartaz, localização, data e vínculo opcional com música.
+- `video_likes` e `video_comments`: tabelas separadas para interações em vídeos do YouTube; não devem ser confundidas com as publicações do feed.
+
+O banco retornou zero linhas em `posts`, `post_likes`, `post_comments` e `saved_posts` no momento da consulta. Isso é uma fotografia da consulta, não uma garantia sobre dados futuros.
+
+O advisor de segurança também sinalizou alertas de políticas que podem permitir acesso de usuários anônimos em algumas tabelas e a proteção contra senhas vazadas desativada. Esses alertas precisam ser revisados política por política antes de abrir mais conteúdo ao público. Nenhuma política foi alterada nesta etapa.
+
 ## Modelo de dados a avaliar (não executar sem inspeção do schema e RLS)
 
 - `posts`: manter compatibilidade com os campos atuais e avaliar campos opcionais `post_type`, `visibility`, `updated_at`.
