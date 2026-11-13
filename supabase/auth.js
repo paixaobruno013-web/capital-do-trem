@@ -639,10 +639,27 @@ export async function uploadMyPostMedia(file, postId, sortOrder = 0, altText = '
   }
   const order = Number.isInteger(sortOrder) ? Math.max(0, Math.min(9, sortOrder)) : 0;
   const safeAlt = String(altText || '').trim().slice(0, 200);
-  const path = user.id + '/posts/' + postId + '/' + crypto.randomUUID() + '.' + rule.ext;
   const bucket = supabase.storage.from('capital-do-trem-media');
+
+  // Torna cada posição idempotente: se o servidor concluiu o INSERT mas a resposta
+  // se perdeu, a tentativa seguinte reconhece a mídia já vinculada e não duplica.
+  const { data: existing, error: existingError } = await supabase.from('post_media')
+    .select('id, post_id, owner_id, media_type, mime_type, byte_size, sort_order, alt_text, storage_path')
+    .eq('post_id', postId)
+    .eq('sort_order', order)
+    .maybeSingle();
+  if (existingError) throw existingError;
+  if (existing) {
+    if (existing.owner_id !== user.id) throw new Error('Esta posição de mídia já pertence a outra conta.');
+    const { data: existingPublic } = bucket.getPublicUrl(existing.storage_path);
+    return { ...existing, url: existingPublic?.publicUrl || null };
+  }
+
+  // Caminho estável por posição permite retomar caso o objeto tenha sido enviado,
+  // mas a resposta ou a gravação dos metadados tenha falhado.
+  const path = user.id + '/posts/' + postId + '/media-' + order + '.' + rule.ext;
   const { error: uploadError } = await bucket.upload(path, file, {
-    contentType: file.type, cacheControl: '3600', upsert: false
+    contentType: file.type, cacheControl: '3600', upsert: true
   });
   if (uploadError) throw uploadError;
   const { data, error } = await supabase.from('post_media').insert({
