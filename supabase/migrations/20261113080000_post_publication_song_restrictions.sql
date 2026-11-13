@@ -1,4 +1,6 @@
 -- Moderação posterior por faixa: publicação imediata, com opção de restrição privada pelo administrador.
+update public.songs set status = 'published' where status = 'pending';
+
 alter table public.songs drop constraint if exists songs_status_check;
 alter table public.songs add constraint songs_status_check
   check (status in ('pending','published','rejected','private'));
