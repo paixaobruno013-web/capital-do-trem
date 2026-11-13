@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [home, composer, auth, worker, prepare, migration, limits, ownerIndex, account, profilePage, publicMusicPolicy, followsMigration, storiesUi] = await Promise.all([
+const [home, composer, auth, worker, prepare, migration, limits, ownerIndex, account, profilePage, publicMusicPolicy, followsMigration, storiesUi, finalMusicPolicy, adminPage] = await Promise.all([
   read('index.html'),
   read('social-feed-composer.js'),
   read('supabase/auth.js'),
@@ -14,7 +14,9 @@ const [home, composer, auth, worker, prepare, migration, limits, ownerIndex, acc
   read('perfil.html'),
   read('supabase/migrations/20261113030638_public_music_while_pending.sql'),
   read('supabase/migrations/20261113011000_add_public_profile_follows.sql'),
-  read('stories-ui.js')
+  read('stories-ui.js'),
+  read('supabase/migrations/20261113080000_post_publication_song_restrictions.sql'),
+  read('admin.html')
 ]);
 
 const checks = [
@@ -25,7 +27,7 @@ const checks = [
   ['player musical abre em tela cheia com voltar, pausar, adiantar e repetir', home.includes('capital-song-player') && home.includes('player-back') && home.includes('player-main') && home.includes('player-forward') && home.includes('player-repeat') && home.includes('player-progress')],
   ['biblioteca salva e recentes abrem o mesmo player imersivo', home.includes('openSongPlayer(song,audio,card.querySelector') && home.includes("playButton.addEventListener('click',()=>openSongPlayer")],
 
-  ['músicas em análise continuam públicas para audição e as rejeitadas não entram no catálogo', auth.includes(".eq('status','published')") && auth.includes("status:song.status") && publicMusicPolicy.includes("status in ('pending', 'published')") && publicMusicPolicy.includes("s.status in ('pending', 'published')") && !publicMusicPolicy.includes("status in ('pending', 'published', 'rejected')")],
+  ['músicas são publicadas imediatamente; restrição posterior oculta somente a faixa do catálogo público', auth.includes("storage_path:path,mime_type:canonicalMime,file_size:file.size,status:'published'") && auth.includes(".eq('status','published')") && finalMusicPolicy.includes("status = 'published'") && finalMusicPolicy.includes("or user_id = (select auth.uid())") && finalMusicPolicy.includes("s.status = 'published'") && finalMusicPolicy.includes("status in ('pending','published','rejected','private')") && adminPage.includes("moderateItem('songs',song.id,'private')") && adminPage.includes("moderateItem('songs',song.id,'published')")],
   ['perfil público usa capa da favela, avatar sobreposto, estatísticas e grade de publicações', profilePage.includes('favela-header.webp') && profilePage.includes("avatar.className='avatar'") && profilePage.includes('followers-count') && profilePage.includes('data-tab="posts"') && profilePage.includes('getPublicProfilePosts')],
   ['contadores ficam sobre a capa e perfil oferece abas de publicações, vídeos e curtidas', profilePage.includes('cover-stats') && profilePage.includes('data-tab="posts"') && profilePage.includes('data-tab="videos"') && profilePage.includes('data-tab="likes"') && auth.includes('getPublicProfileLikedPosts')],
   ['seguir/deixar de seguir atualiza contagem e o perfil tem botão de conversa com ícone de nuvem', auth.includes('getPublicProfileSocial') && auth.includes('toggleProfileFollow') && profilePage.includes('toggleProfileFollow') && profilePage.includes('<path d="M21 11.5')],
