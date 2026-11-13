@@ -23,6 +23,7 @@ const files = [
   'stories-ui.js',
   'home-story-composer.js',
   'event-social-composer.js',
+  'social-feed-composer.js',
   'account-stories.js',
   'admin-stories.js',
   'avatar.html',
