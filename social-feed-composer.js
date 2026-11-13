@@ -54,7 +54,7 @@ if (form && login && contentField && filesField && submitButton && status) {
       const post = await submitMyPost(text);
       for (let index = 0; index < files.length; index += 1) {
         status.textContent = 'Publicação criada. Enviando mídia ' + (index + 1) + ' de ' + files.length + '…';
-        await uploadMyPostMedia(files[index], post.id, index, files[index].name);
+        await uploadMyPostMedia(files[index], post.id, index, '');
       }
       status.textContent = 'Publicação concluída! Atualizando o mural…';
       form.reset();
