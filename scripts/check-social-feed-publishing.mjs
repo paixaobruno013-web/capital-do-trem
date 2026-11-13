@@ -57,6 +57,7 @@ const checks = [
   ['caminho estável permite retomar objeto enviado antes de falha de metadados', auth.includes("'/media-' + order + '.' + rule.ext") && auth.includes('upsert: true')],
   ['metadados são gravados em post_media e objeto removido se falhar', auth.includes("from('post_media').insert({") && auth.includes('await bucket.remove([path]).catch(() => {})')],
   ['feed consulta apenas posts publicados e anexa mídias', auth.includes('export async function getPublishedPosts()') && auth.includes(".eq('status', 'published')") && auth.includes("from('post_media')")],
+  ['feed social oferece filtros Todos e Seguindo e limita o segundo aos autores acompanhados', home.includes('id="feed-filter-all"') && home.includes('id="feed-filter-following"') && home.includes('aria-pressed="true"') && home.includes('getMyFollowingProfileIds()') && home.includes('followingIds.includes(item.author_id)') && home.includes('Publicações recentes dos perfis que você segue.')],
   ['consulta de autores respeita perfis públicos', auth.includes(".eq('is_public', true)") && auth.includes('display_name, username, account_type, avatar_type, avatar_url')],
   ['fallback de leitura existe se a tabela ainda não estiver exposta', auth.includes("['PGRST205', '42P01']")],
   ['mural renderiza imagens e vídeos com carregamento econômico', home.includes("media.media_type==='image'") && home.includes("media.media_type==='video'") && home.includes("video.preload='metadata'") && home.includes('image.loading=\'lazy\'')],
