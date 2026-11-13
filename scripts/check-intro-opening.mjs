@@ -38,7 +38,7 @@ console.log('Abertura: ' + checks.length + ' verificações aprovadas.');
 // Social profile and full-screen music player regression checks.
 const profileHtml = await readFile(new URL('../perfil.html', import.meta.url), 'utf8');
 const profileChecks = [
-  ['capa personalizável e seletor de imagem', profileHtml.includes('id="profile-cover"') && profileHtml.includes('id="cover-file"') && profileHtml.includes('uploadMyProfileCover')],
+  ['capa personalizável e seletor de imagem', profileHtml.includes('id="profile-cover"') && profileHtml.includes('id="cover-file"') && auth.includes('uploadMyProfileCover')],
   ['atalho para trocar a foto de perfil', profileHtml.includes('avatar-add')],
   ['abas com áreas independentes de publicações, vídeos e curtidas', ['id="profile-posts"','id="profile-videos"','id="profile-likes"'].every(value => profileHtml.includes(value)) && profileHtml.includes('profile-content-panel')],
   ['contadores de publicações, seguidores e seguindo', profileHtml.includes("'publicações'") && profileHtml.includes("'seguidores'") && profileHtml.includes("'seguindo'")]
