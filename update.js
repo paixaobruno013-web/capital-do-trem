@@ -74,8 +74,11 @@
  document.addEventListener('pointerdown',unlockHorn,{once:true,passive:true});
  document.addEventListener('keydown',unlockHorn,{once:true});
  function showOffline(){
+  if(!alertBox.isConnected){
+   if(document.body)document.body.append(alertBox);
+   else{document.addEventListener('DOMContentLoaded',showOffline,{once:true});return;}
+  }
   const fallbackStatus=document.getElementById('connection-status');if(fallbackStatus)fallbackStatus.hidden=true;
-  if(!alertBox.isConnected&&document.body)document.body.append(alertBox);
   document.documentElement.classList.add('app-offline');
   if(offlineAlertActive)return;
   offlineAlertActive=true;
