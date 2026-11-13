@@ -1834,6 +1834,9 @@ async function deleteOfflineMusic(id){
  const status=document.getElementById('offline-music-status');
  if(!list||!player||!status)return;
  let currentUrl='',currentTrackId=null;
+ player.addEventListener('play',()=>{try{if('mediaSession' in navigator)navigator.mediaSession.playbackState='playing';}catch{}});
+ player.addEventListener('pause',()=>{try{if('mediaSession' in navigator)navigator.mediaSession.playbackState='paused';}catch{}});
+ player.addEventListener('ended',()=>{try{if('mediaSession' in navigator)navigator.mediaSession.playbackState='none';}catch{}});
  const render=async()=>{
   const tracks=await getAllOfflineMusic();list.replaceChildren();
   if(!tracks.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Nenhuma música guardada ainda. Use “Guardar para ouvir offline” no catálogo quando estiver conectado.';list.append(empty);}
@@ -1845,6 +1848,16 @@ async function deleteOfflineMusic(id){
    play.addEventListener('click',()=>{
     if(currentUrl)URL.revokeObjectURL(currentUrl);
     currentUrl=URL.createObjectURL(track.blob);currentTrackId=track.id;player.src=currentUrl;player.load();
+    if('mediaSession' in navigator){
+     try{
+      if('MediaMetadata' in window)navigator.mediaSession.metadata=new MediaMetadata({title:track.title||'Música salva',artist:'Capital do Trem',album:'Playlist offline do Capital do Trem',artwork:[{src:'./marca.svg',sizes:'any',type:'image/svg+xml'}]});
+      navigator.mediaSession.setActionHandler('play',()=>player.play().catch(()=>{}));
+      navigator.mediaSession.setActionHandler('pause',()=>player.pause());
+      navigator.mediaSession.setActionHandler('seekbackward',details=>{player.currentTime=Math.max(0,player.currentTime-(details.seekOffset||10));});
+      navigator.mediaSession.setActionHandler('seekforward',details=>{player.currentTime=Math.min(player.duration||Infinity,player.currentTime+(details.seekOffset||10));});
+      navigator.mediaSession.setActionHandler('seekto',details=>{if(Number.isFinite(details.seekTime))player.currentTime=details.seekTime;});
+     }catch{}
+    }
     player.play().then(()=>{status.textContent='Tocando '+(track.title||'música salva')+' sem depender da internet.';}).catch(()=>{status.textContent='Toque em reproduzir no player para iniciar a música.';});
    });
    const remove=document.createElement('button');remove.type='button';remove.className='btn alt';remove.textContent='Remover';
