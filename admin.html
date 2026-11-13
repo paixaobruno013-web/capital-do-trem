@@ -307,7 +307,7 @@ audio{width:100%;}
 </form>
 <h3>Stories publicados</h3><div id="admin-story-list"><p class="muted">Entre no painel para carregar os Stories.</p></div>
 </section>
-<section class="command-section"><h2>Publicações e aprovações</h2><p class="muted">Acompanhe artistas, músicas, eventos e divulgações enviados para análise.</p><p id="queue-status" class="status" role="status" aria-live="polite"></p><div id="queue"></div></section>
+<section class="command-section"><h2>Publicações e aprovações</h2><p class="muted">Acompanhe artistas, eventos e divulgações. Músicas são publicadas automaticamente e só podem ser restringidas após denúncia.</p><p id="queue-status" class="status" role="status" aria-live="polite"></p><div id="queue"></div></section>
 <section class="command-section" id="song-community-control">
  <h2>🎵 Controle das músicas da comunidade</h2>
  <p class="muted">As faixas são publicadas sem aprovação prévia. Se uma música fugir da identidade familiar, restrinja somente aquele arquivo ao perfil do artista. Para voltar ao catálogo, libere novamente.</p>
@@ -657,7 +657,7 @@ async function loadQueue(){
  try{
   const groups=await auth.getModerationQueue();
   let count=0;
-  for(const [kind,label] of [['artists','Artistas'],['events','Eventos e ações'],['posts','Divulgações'],['songs','Músicas']]){
+  for(const [kind,label] of [['artists','Artistas'],['events','Eventos e ações'],['posts','Divulgações']]){
    const heading=node('h2','',label);heading.id='section-'+kind;queue.append(heading);
    if(!groups[kind].length){queue.append(node('p','muted','Nenhum item aguardando análise.'));continue;}
    for(const item of groups[kind]){
