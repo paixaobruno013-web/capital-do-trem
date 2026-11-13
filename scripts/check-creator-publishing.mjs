@@ -25,7 +25,7 @@ const checks = [
   ['ao tocar no +, abre câmera sem navegar para outra página', story.includes('function openComposer()') && story.includes("modal.classList.add('is-open')") && story.includes('startCamera();') && story.includes('getUserMedia')],
   ['câmera oferece álbum de fotos e vídeos', home.includes('id="home-story-album"') && home.includes('accept="image/*,video/mp4,video/webm,video/quicktime,.mov"')],
   ['Story é publicado pelo modal da tela inicial', story.includes('createMyStory(') && home.includes('home-story-publish')],
-  ['eventos ativos aparecem acima dos nove vídeos na tela inicial', home.indexOf('id="home-event-feed"') >= 0 && home.indexOf('id="home-event-feed"') < home.indexOf('class="card home-youtube"') && home.includes(".sort((a,b)=>a.event_date.localeCompare(b.event_date)")],
+  ['vídeos do YouTube aparecem primeiro e eventos ativos entram na timeline logo depois', home.indexOf('class="card home-youtube"') >= 0 && home.indexOf('class="card home-youtube"') < home.indexOf('id="home-event-feed"') && home.indexOf('id="home-event-feed"') < home.indexOf('id="public-posts"') && home.includes(".sort((a,b)=>a.event_date.localeCompare(b.event_date)")],
   ['feed some quando não há eventos dentro da data', home.includes('if(!active.length){feed.hidden=true;return;}')],
   ['feed reavalia expiração a cada virada de data', home.includes('const scheduleHomeExpiryRefresh=()=>') && home.includes('scheduleHomeExpiryRefresh();')],
   ['abertura do vídeo possui imagem de segurança se o vídeo falhar ou demorar', home.includes('const showOpeningFallback=()=>') && home.includes('fallbackTimer=window.setTimeout(showOpeningFallback,5000)') && home.includes('currentOpeningImage||\'./marca.svg\'')],
