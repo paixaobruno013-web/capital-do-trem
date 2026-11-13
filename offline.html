@@ -28,7 +28,7 @@ a.secondary{background:transparent;border-color:var(--line)}
 <div class="brand">⚠️ ALERTA • CAPITAL DO TREM</div>
 <div class="symbol" aria-hidden="true"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 5 96 91H4L50 5Z" fill="#16090a" stroke="#ed1c24" stroke-width="4" stroke-linejoin="round"/><g stroke="#fff" stroke-linejoin="round"><path d="M31 57V25q0-8 8-8h22q8 0 8 8v32l-7 9H38z" fill="#e9e9e9" stroke-width="2.4"/><path d="M36 27q0-4 5-4h18q5 0 5 4v15H36z" fill="#171717" stroke-width="2"/><path d="M41 27h18v11H41z" fill="#9ec9d8" stroke="none"/><path d="M24 58h13v12H24zm39 0h13v12H63z" fill="#ed1c24" stroke-width="2"/><path d="M30 53h40v7H30zM38 66h24l6 8H32z" fill="#ed1c24" stroke-width="2"/><path d="M43 44h14v10H43z" fill="#303030" stroke-width="2"/><path d="M47 46h6v6h-6z" fill="#f4d36b" stroke="none"/><path d="M35 79h30" fill="none" stroke="#fff" stroke-width="3"/><path d="M40 12h20l-4-7H44z" fill="#ed1c24" stroke-width="2"/></g><circle cx="30" cy="63" r="3" fill="#fff"/><circle cx="70" cy="63" r="3" fill="#fff"/></svg></div>
 <h1>VOCÊ TÁ OFFLINE</h1>
-<p>A conexão com a internet caiu. Confira seus dados móveis ou Wi-Fi e tente novamente. Quando a conexão voltar, você poderá continuar de onde parou.</p>
+<p>A conexão caiu. O alerta ficará na tela por 13 segundos. Depois, abra sua playlist salva neste aparelho para continuar ouvindo músicas offline.</p>
 <p id="connection" role="status" aria-live="polite">Aguardando conexão com a internet.</p>
 <div class="actions">
 <button id="retry" type="button">Tentar novamente</button>
@@ -37,10 +37,10 @@ a.secondary{background:transparent;border-color:var(--line)}
 </main>
 <script>
 const status=document.getElementById('connection');
-function update(){status.textContent=navigator.onLine?'Conexão detectada. Toque em “Tentar novamente”.':'Aguardando conexão com a internet.';}
-window.addEventListener('online',update);window.addEventListener('offline',update);
+function update(){status.textContent=navigator.onLine?'Conexão restabelecida! Você já pode voltar ao aplicativo.':'ALERTA — VOCÊ TÁ OFFLINE. A playlist salva neste aparelho continua disponível.';}
+window.addEventListener('online',()=>{update();try{navigator.vibrate?.(0);}catch{};});window.addEventListener('offline',update);
 document.getElementById('retry').addEventListener('click',()=>{status.textContent='Tentando carregar novamente…';location.reload();});
-update();try{if(!navigator.onLine&&navigator.vibrate)navigator.vibrate(3000);}catch{}
+update();try{if(!navigator.onLine&&navigator.vibrate)navigator.vibrate([1200,400,1200,400,1200,400,1200,400,1200,400,1200,400,1200,400,1200]);}catch{}
 </script>
 <script src="./update.js" defer></script></body>
 </html>
