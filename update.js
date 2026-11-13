@@ -37,7 +37,7 @@
  hornButton.style.cssText='min-height:44px;padding:9px 16px;border:1px solid #ed1c24;border-radius:10px;background:#ed1c24;color:#fff;font-weight:800;cursor:pointer';
  const preferenceKey='capitaldotrem_train_horn_v1';
  // Não depende de baixar bibliotecas pela internet: o alerta também precisa funcionar offline.
- let hornEnabled=true,audioContext=null,audioUnlocked=false,playedThisOutage=false,offlineFeedbackSent=false,reconnectTimer=null;
+ let hornEnabled=true,audioContext=null,audioUnlocked=false,playedThisOutage=false,offlineFeedbackSent=false,reconnectTimer=null,offlineAlertTimer=null,offlineAlertActive=false;
  try{hornEnabled=localStorage.getItem(preferenceKey)!=='off';}catch{}
  function updateHornButton(){hornButton.textContent=hornEnabled?'🔊 Corneta ligada':'🔇 Corneta desligada';hornButton.setAttribute('aria-pressed',String(hornEnabled));}
  function playTrainHorn(){
@@ -75,7 +75,10 @@
  document.addEventListener('keydown',unlockHorn,{once:true});
  function showOffline(){
   const fallbackStatus=document.getElementById('connection-status');if(fallbackStatus)fallbackStatus.hidden=true;
-  clearTimeout(reconnectTimer);document.documentElement.classList.add('app-offline');
+  document.documentElement.classList.add('app-offline');
+  if(offlineAlertActive)return;
+  offlineAlertActive=true;
+  clearTimeout(reconnectTimer);clearTimeout(offlineAlertTimer);
   alertTitle.textContent='ALERTA';
   alertTitle.style.color='#fff';
   alertDetail.textContent='VOCE TÁ OFFLINE';
@@ -94,12 +97,13 @@
    })();
   }
   if(!playedThisOutage&&audioUnlocked){playedThisOutage=true;playTrainHorn();}
+  offlineAlertTimer=window.setTimeout(()=>{alertBox.style.display='none';offlineAlertActive=false;},5000);
  }
  function showOnline(){
   const fallbackStatus=document.getElementById('connection-status');if(fallbackStatus)fallbackStatus.hidden=true;
   document.documentElement.classList.remove('app-offline');
   // Reinicia o ciclo mesmo se a conexão voltar antes de o alerta entrar no DOM.
-  playedThisOutage=false;offlineFeedbackSent=false;
+  playedThisOutage=false;offlineFeedbackSent=false;offlineAlertActive=false;clearTimeout(offlineAlertTimer);
   try{if(typeof navigator.vibrate==='function')navigator.vibrate(0);}catch(error){}
   if(!alertBox.isConnected)return;
   alertTitle.textContent='ONLINE';
@@ -111,7 +115,7 @@
    alertBox.style.boxShadow='0 8px 30px #000b,0 0 20px #269b6577';
    alertBox.style.display='flex';
   clearTimeout(reconnectTimer);
-  reconnectTimer=window.setTimeout(()=>{alertBox.style.display='none';},5500);
+  reconnectTimer=window.setTimeout(()=>{alertBox.style.display='none';},5000);
  }
  hornButton.addEventListener('click',async()=>{
   hornEnabled=!hornEnabled;
