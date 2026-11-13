@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [home, composer, auth, worker, prepare, migration, limits, ownerIndex, account, profilePage, publicMusicPolicy] = await Promise.all([
+const [home, composer, auth, worker, prepare, migration, limits, ownerIndex, account, profilePage, publicMusicPolicy, followsMigration] = await Promise.all([
   read('index.html'),
   read('social-feed-composer.js'),
   read('supabase/auth.js'),
@@ -12,14 +12,17 @@ const [home, composer, auth, worker, prepare, migration, limits, ownerIndex, acc
   read('supabase/migrations/20261113004658_index_social_post_media_owner.sql'),
   read('conta.html'),
   read('perfil.html'),
-  read('supabase/migrations/20261113030638_public_music_while_pending.sql')
+  read('supabase/migrations/20261113030638_public_music_while_pending.sql'),
+  read('supabase/migrations/20261113011000_add_public_profile_follows.sql')
 ]);
 
 const checks = [
   ['músicas em análise continuam públicas para audição e as rejeitadas não entram no catálogo', auth.includes(".in('status',['pending','published'])") && auth.includes("status:song.status") && publicMusicPolicy.includes("status in ('pending', 'published')") && publicMusicPolicy.includes("s.status in ('pending', 'published')") && !publicMusicPolicy.includes("status in ('pending', 'published', 'rejected')")],
-  ['perfil público individual mostra vídeos em trilho horizontal e só consulta perfis públicos', profilePage.includes('getPublicProfileByUsername') && profilePage.includes('getPublicProfileVideos') && profilePage.includes('video-rail') && auth.includes("eq('is_public', true)") && auth.includes("eq('media_type', 'video')")],
-  ['feed e diretório abrem o perfil público de cada usuário', home.includes('./perfil.html?u=') && home.includes('community-profile-open')],
-  ['perfil público é incluído no pacote web e no cache do aplicativo', prepare.includes("'perfil.html'") && worker.includes("'./perfil.html'") && /capital-do-trem-v292/.test(worker)],
+  ['perfil público usa capa da favela, avatar sobreposto, estatísticas e grade de publicações', profilePage.includes('favela-header.webp') && profilePage.includes('class="avatar"') && profilePage.includes('followers-count') && profilePage.includes('PUBLICAÇÕES') && profilePage.includes('getPublicProfilePosts')],
+  ['seguir/deixar de seguir atualiza contagem e o perfil tem botão de conversa com ícone de nuvem', auth.includes('getPublicProfileSocial') && auth.includes('toggleProfileFollow') && profilePage.includes('toggleProfileFollow') && profilePage.includes('<path d="M21 11.5')],
+  ['Stories exibem botão de adicionar e círculos dos perfis seguidos', profilePage.includes('Seu Story') && profilePage.includes('getMyFollowingProfileIds') && profilePage.includes('getActiveUserStories')],
+  ['banco protege seguidores com RLS, bloqueia auto-seguir e permite seguir apenas perfil público', followsMigration.includes('enable row level security') && followsMigration.includes('follower_id <>') && followsMigration.includes('p.is_public = true')],  ['feed e diretório abrem o perfil público de cada usuário', home.includes('./perfil.html?u=') && home.includes('community-profile-open')],
+  ['perfil público é incluído no pacote web e no cache do aplicativo', prepare.includes("'perfil.html'") && worker.includes("'./perfil.html'") && /capital-do-trem-v293/.test(worker)],
   ['perfil individual permite ao titular abrir sua página pública', account.includes('id="public-profile-link"') && account.includes("perfil.html?u=")],
   ['cadastro exibe a mensagem grafitada de boas-vindas somente ao escolher Criar conta', account.includes('id="registration-graffiti"') && account.includes('SEJA BEM-VINDO,') && account.includes('MAQUINISTA DESSE TREM!') && account.includes("welcome.hidden=mode!=='register'")],
   ['faixa de boas-vindas usa visual preto/vermelho responsivo e respeita o modo claro', account.includes('.registration-graffiti{') && account.includes('font-family:Impact') && account.includes('body.light .registration-graffiti')],
