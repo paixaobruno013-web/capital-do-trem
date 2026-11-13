@@ -932,7 +932,10 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 .home-youtube{order:2}
 @media(max-width:759px){header .header-action-groups{align-items:flex-end;flex-direction:row;justify-content:center;gap:12px;margin-top:8px}.header-action-row{width:auto}.profile-overflow-panel{right:-10px}}
 </style>
-</head>
+<style id="capital-music-player-styles">
+#published-song-catalog{display:grid;gap:14px}.music-track-card{display:grid;grid-template-columns:minmax(104px,132px) minmax(0,1fr);gap:13px;align-items:start;background:#101010;border:1px solid #292929;border-radius:14px;padding:12px;min-width:0}.music-track-cover{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px;background:#080808;display:block}.music-track-info{min-width:0}.music-track-info h3{margin:0 0 4px;overflow-wrap:anywhere}.music-track-info p{margin:3px 0}.music-track-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.music-track-actions button,.music-track-actions a{min-height:40px;font-size:13px}.music-track-audio{display:none!important}
+#capital-song-player{position:fixed;inset:0;z-index:99999;background:#050505;color:#fff;display:none;overflow:auto;padding:env(safe-area-inset-top) 18px env(safe-area-inset-bottom);font-family:system-ui,sans-serif}#capital-song-player.is-open{display:flex;flex-direction:column}#capital-song-player .player-top{display:flex;align-items:center;justify-content:space-between;min-height:58px}#capital-song-player .player-back{border:0;background:transparent;color:#fff;font-size:16px;padding:10px}#capital-song-player .player-cover{width:min(84vw,440px);aspect-ratio:1/1;object-fit:cover;border-radius:12px;align-self:center;margin:clamp(14px,5vh,44px) auto 24px;box-shadow:0 12px 40px #000}#capital-song-player .player-title{text-align:center;font-size:23px;font-weight:900;margin:0}#capital-song-player .player-artist{text-align:center;color:#aaa;margin:5px 0 22px}#capital-song-player .player-progress{width:100%;accent-color:#ed1c24}#capital-song-player .player-times{display:flex;justify-content:space-between;color:#aaa;font-size:12px}#capital-song-player .player-controls{display:flex;align-items:center;justify-content:center;gap:clamp(10px,5vw,28px);margin:25px 0}#capital-song-player .player-controls button{width:54px;height:54px;border-radius:50%;border:1px solid #333;background:#171717;color:#fff;font-size:20px}#capital-song-player .player-controls .player-main{width:70px;height:70px;background:#ed1c24;border-color:#ed1c24;font-size:26px}#capital-song-player .player-controls button[aria-pressed=true]{color:#ff454c;border-color:#ed1c24}@media(max-width:390px){.music-track-card{grid-template-columns:94px minmax(0,1fr);gap:10px;padding:9px}.music-track-actions{gap:5px}.music-track-actions button,.music-track-actions a{padding:8px;font-size:12px}}
+</style></head>
 <body>
 <script>
 (function(){
@@ -1812,6 +1815,23 @@ async function saveOfflineMusic(id,blob,title){
    try{const library=await api.getMyMusicLibrary();savedSongIds=new Set(library.savedSongIds);recentSongIds=library.recentSongIds;}
    catch(error){libraryStatus.textContent='Não foi possível sincronizar sua biblioteca agora. As músicas continuam disponíveis para ouvir.';}
   }else{libraryLogin.hidden=false;}
+  const player=document.createElement('section');player.id='capital-song-player';player.setAttribute('role','dialog');player.setAttribute('aria-modal','true');player.setAttribute('aria-label','Reprodutor de música Capital do Trem');
+  player.innerHTML='<div class="player-top"><button class="player-back" type="button" aria-label="Voltar">← Voltar</button><strong>CAPITAL DO TREM</strong><span></span></div><img class="player-cover" alt="Capa da música"><h2 class="player-title"></h2><p class="player-artist"></p><input class="player-progress" type="range" min="0" max="1000" value="0" aria-label="Progresso da música"><div class="player-times"><span class="player-current">0:00</span><span class="player-duration">0:00</span></div><div class="player-controls"><button class="player-rewind" type="button" aria-label="Voltar 10 segundos">↶</button><button class="player-main" type="button" aria-label="Pausar">Ⅱ</button><button class="player-forward" type="button" aria-label="Adiantar 10 segundos">↷</button><button class="player-repeat" type="button" aria-label="Repetir música" aria-pressed="false">⟲</button></div>';
+  document.body.append(player);
+  const playerCover=player.querySelector('.player-cover'),playerTitle=player.querySelector('.player-title'),playerArtist=player.querySelector('.player-artist'),playerProgress=player.querySelector('.player-progress'),playerCurrent=player.querySelector('.player-current'),playerDuration=player.querySelector('.player-duration'),playerMain=player.querySelector('.player-main'),playerRepeat=player.querySelector('.player-repeat');
+  let activeAudio=null,repeatSong=false,playerReturnFocus=null;
+  const clock=value=>{const n=Number(value)||0;return Math.floor(n/60)+':'+String(Math.floor(n%60)).padStart(2,'0');};
+  const updatePlayer=()=>{if(!activeAudio)return;const duration=Number.isFinite(activeAudio.duration)?activeAudio.duration:0;playerProgress.value=String(duration?Math.round(activeAudio.currentTime/duration*1000):0);playerCurrent.textContent=clock(activeAudio.currentTime);playerDuration.textContent=clock(duration);playerMain.textContent=activeAudio.paused?'▶':'Ⅱ';playerMain.setAttribute('aria-label',activeAudio.paused?'Reproduzir':'Pausar');};
+  const closePlayer=()=>{player.classList.remove('is-open');document.body.style.overflow='';if(playerReturnFocus?.isConnected)playerReturnFocus.focus();};
+  player.querySelector('.player-back').addEventListener('click',closePlayer);playerMain.addEventListener('click',()=>{if(!activeAudio)return;if(activeAudio.paused)activeAudio.play().catch(()=>{});else activeAudio.pause();});
+  player.querySelector('.player-rewind').addEventListener('click',()=>{if(activeAudio)activeAudio.currentTime=Math.max(0,activeAudio.currentTime-10);});
+  player.querySelector('.player-forward').addEventListener('click',()=>{if(activeAudio)activeAudio.currentTime=Math.min(activeAudio.duration||Infinity,activeAudio.currentTime+10);});
+  playerRepeat.addEventListener('click',()=>{repeatSong=!repeatSong;if(activeAudio)activeAudio.loop=repeatSong;playerRepeat.setAttribute('aria-pressed',String(repeatSong));});
+  playerProgress.addEventListener('input',()=>{if(activeAudio&&Number.isFinite(activeAudio.duration))activeAudio.currentTime=Number(playerProgress.value)/1000*activeAudio.duration;});
+  player.addEventListener('click',event=>{if(event.target===player)closePlayer();});document.addEventListener('keydown',event=>{if(event.key==='Escape'&&player.classList.contains('is-open'))closePlayer();});
+  const makeSongCover=(song,index)=>{const title=String(song.title||'NOVA MÚSICA').slice(0,64).replace(/[&<>"]/g,' '),artist=String(song.artist_name||'CAPITAL DO TREM').slice(0,54).replace(/[&<>"]/g,' '),side=index%2===0?'left':'right',x=side==='left'?42:558,palettes=[['#ed1c24','#190509'],['#8d1018','#080808'],['#f04435','#211010'],['#6c0d17','#050505']],[red,dark]=palettes[index%palettes.length];const svg='<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="'+red+'"/><stop offset="1" stop-color="'+dark+'"/></linearGradient><pattern id="p" width="38" height="38" patternUnits="userSpaceOnUse"><path d="M0 38L38 0" stroke="#fff" stroke-opacity=".07" stroke-width="2"/></pattern></defs><rect width="600" height="600" fill="url(#g)"/><rect width="600" height="600" fill="url(#p)"/><circle cx="300" cy="260" r="180" fill="#000" fill-opacity=".22" stroke="#fff" stroke-opacity=".22" stroke-width="3"/><circle cx="300" cy="260" r="128" fill="#090909" stroke="'+red+'" stroke-width="12"/><path d="M210 260h180M300 170v180" stroke="#fff" stroke-opacity=".1" stroke-width="7"/><text x="300" y="450" fill="#fff" font-family="Arial,sans-serif" font-size="34" font-weight="900" text-anchor="middle">'+title+'</text><text x="300" y="492" fill="#eee" font-family="Arial,sans-serif" font-size="19" text-anchor="middle">'+artist+'</text><image href="'+new URL('./marca.svg',location.href).href+'" x="'+x+'" y="26" width="92" height="92"/><text x="300" y="558" fill="#fff" fill-opacity=".8" font-family="Arial,sans-serif" font-size="16" letter-spacing="5" text-anchor="middle">CAPITAL DO TREM</text></svg>';return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);};
+  const openSongPlayer=(song,audio,cover,button)=>{if(!audio)return;playerReturnFocus=button||document.activeElement;activeAudio=audio;playerCover.src=cover;playerTitle.textContent=song.title||'Música';playerArtist.textContent=song.artist_name||'Capital do Trem';audio.loop=repeatSong;player.classList.add('is-open');document.body.style.overflow='hidden';if('mediaSession' in navigator){try{if('MediaMetadata' in window)navigator.mediaSession.metadata=new MediaMetadata({title:song.title,artist:song.artist_name||'Capital do Trem',album:'Capital do Trem',artwork:[{src:cover,sizes:'600x600',type:'image/svg+xml'}]});}catch{}}audio.play().catch(()=>{});updatePlayer();};
+  player.addEventListener('timeupdate',updatePlayer);player.addEventListener('loadedmetadata',updatePlayer);player.addEventListener('play',updatePlayer);player.addEventListener('pause',updatePlayer);player.addEventListener('ended',updatePlayer);
   const renderLibraryList=(target,ids,emptyText)=>{
    if(!target)return;target.replaceChildren();
    const unique=[...new Set(ids)].filter(id=>songs.some(song=>song.id===id)).slice(0,12);
@@ -1837,19 +1857,18 @@ async function saveOfflineMusic(id,blob,title){
   if(session)renderMusicLibrary();
   if(!songs.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='As músicas publicadas pela comunidade aparecerão aqui.';container.append(empty);return;}
   for(const song of songs){
-   const card=document.createElement('article');card.className='item';card.style.margin='10px 0';card.dataset.songId=song.id;songCards.set(song.id,card);card.dataset.searchText=[song.title,song.artist_name,song.description].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
-   const title=document.createElement('h3');title.textContent=song.title;
-   const artist=document.createElement('p');artist.className='muted';artist.textContent=song.artist_name;
-   card.append(title,artist);
-   if(song.status==='pending'){const review=document.createElement('small');review.className='music-review-status';review.textContent='Em análise • disponível para ouvir';review.style.cssText='display:inline-block;margin:2px 0 8px;padding:4px 9px;border:1px solid rgba(237,28,36,.55);border-radius:999px;color:#ff8589;font-size:11px;font-weight:800';card.append(review);}
-   if(song.producer_name){const producer=document.createElement('p');producer.className='muted';producer.textContent='🎚️ Produção: '+song.producer_name;card.append(producer);}
-   if(song.description){const desc=document.createElement('p');desc.textContent=song.description;card.append(desc);}
+   const card=document.createElement('article');card.className='music-track-card';card.dataset.songId=song.id;songCards.set(song.id,card);card.dataset.searchText=[song.title,song.artist_name,song.description].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
+   const cover=makeSongCover(song,songs.indexOf(song));const coverImage=document.createElement('img');coverImage.className='music-track-cover';coverImage.src=cover;coverImage.alt='Capa de '+song.title;coverImage.loading='lazy';coverImage.decoding='async';
+   const info=document.createElement('div');info.className='music-track-info';const title=document.createElement('h3');title.textContent=song.title;const artist=document.createElement('p');artist.className='muted';artist.textContent=song.artist_name;info.append(title,artist);card.append(coverImage,info);
+   if(song.status==='pending'){const review=document.createElement('small');review.className='music-review-status';review.textContent='Em análise • disponível para ouvir';review.style.cssText='display:inline-block;margin:2px 0 8px;padding:4px 9px;border:1px solid rgba(237,28,36,.55);border-radius:999px;color:#ff8589;font-size:11px;font-weight:800';info.append(review);}
+   if(song.producer_name){const producer=document.createElement('p');producer.className='muted';producer.textContent='🎚️ Produção: '+song.producer_name;info.append(producer);}
+   if(song.description){const desc=document.createElement('p');desc.textContent=song.description;info.append(desc);}
    const audioUrl=safeHttpsUrl(song.audio_url);const downloadUrl=safeHttpsUrl(song.download_url)||audioUrl;
    if(audioUrl){
-    const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=audioUrl;audio.addEventListener('play',()=>{
+    const audio=document.createElement('audio');audio.controls=false;audio.className='music-track-audio';audio.preload='none';audio.src=audioUrl;audio.addEventListener('play',()=>{
       container.querySelectorAll('audio').forEach(other=>{if(other!==audio&&!other.paused)other.pause();});
       if(session){recentSongIds=[song.id,...recentSongIds.filter(id=>id!==song.id)].slice(0,30);renderMusicLibrary();api.recordSongPlay(song.id).catch(error=>console.warn('Histórico musical não sincronizado.',error));}
-     });audio.style.cssText='width:100%;margin:8px 0';audio.setAttribute('aria-label','Ouvir '+song.title);
+     });audio.setAttribute('aria-label','Ouvir '+song.title);
     let offlineTrack=null;
     try{offlineTrack=await getOfflineMusic(song.id);if(offlineTrack?.blob){audio.src=URL.createObjectURL(offlineTrack.blob);audio.dataset.offlineReady='true';}}catch(error){/* A reprodução online continua disponível se o armazenamento local falhar. */}
     if('mediaSession' in navigator){
@@ -1868,9 +1887,9 @@ async function saveOfflineMusic(id,blob,title){
      audio.addEventListener('pause',updateMediaPlayback);
      audio.addEventListener('ended',()=>{try{navigator.mediaSession.playbackState='none';}catch{}});
     }
-    card.append(audio);
-   }else{const unavailable=document.createElement('p');unavailable.className='muted';unavailable.textContent='Áudio temporariamente indisponível.';card.append(unavailable);}
-   if(downloadUrl){const download=document.createElement('a');download.className='btn alt';download.href=downloadUrl;download.rel='noopener';download.textContent='⬇ Baixar música';download.setAttribute('aria-label','Baixar '+song.title);download.style.display='inline-block';download.style.margin='4px 0';card.append(download);}
+    info.append(audio);const playButton=document.createElement('button');playButton.type='button';playButton.className='btn primary';playButton.textContent='▶ Tocar música';playButton.addEventListener('click',()=>openSongPlayer(song,audio,cover,playButton));const trackActions=document.createElement('div');trackActions.className='music-track-actions';trackActions.append(playButton);info.append(trackActions);
+   }else{const unavailable=document.createElement('p');unavailable.className='muted';unavailable.textContent='Áudio temporariamente indisponível.';info.append(unavailable);}
+   if(downloadUrl){const download=document.createElement('a');download.className='btn alt';download.href=downloadUrl;download.rel='noopener';download.textContent='⬇ Baixar música';download.setAttribute('aria-label','Baixar '+song.title);download.style.display='inline-block';download.style.margin='4px 0';trackActions.append(download);}
    if(audioUrl&&song.id){
     const offlineButton=document.createElement('button');offlineButton.type='button';offlineButton.className='btn alt';offlineButton.style.margin='4px';offlineButton.textContent=offlineTrack?.blob?'✓ Salva para ouvir offline':'⇩ Guardar para ouvir offline';
     offlineButton.setAttribute('aria-label','Guardar '+song.title+' no aparelho para ouvir sem internet');
@@ -1891,7 +1910,7 @@ async function saveOfflineMusic(id,blob,title){
      }catch(error){offlineStatus.textContent='Não foi possível guardar offline. Verifique a conexão e tente novamente.';}
      finally{offlineButton.disabled=false;}
     });
-    card.append(offlineButton,offlineStatus);
+    trackActions.append(offlineButton);info.append(offlineStatus);
    }
    const shareRow=document.createElement('div');shareRow.className='social';shareRow.style.marginTop='6px';
    const shareButton=document.createElement('button');shareButton.type='button';shareButton.className='btn alt';shareButton.textContent='↗ Compartilhar música';shareButton.setAttribute('aria-label','Compartilhar a música '+song.title);
@@ -1907,7 +1926,7 @@ async function saveOfflineMusic(id,blob,title){
     }catch(error){if(error?.name!=='AbortError')shareStatus.textContent='Não foi possível compartilhar agora.';}
     finally{shareButton.disabled=false;}
    });
-   shareRow.append(shareButton,shareStatus);card.append(shareRow);
+   shareRow.append(shareButton,shareStatus);info.append(shareRow);
    if(session){
     const saveButton=document.createElement('button');saveButton.type='button';saveButton.className='btn alt';saveButton.style.marginTop='7px';
     const paintSaved=()=>{saveButton.textContent=savedSongIds.has(song.id)?'♥ Salva na minha biblioteca':'♡ Salvar na minha biblioteca';};
@@ -1918,13 +1937,13 @@ async function saveOfflineMusic(id,blob,title){
      catch(error){if(libraryStatus)libraryStatus.textContent=error?.message||'Não foi possível atualizar sua biblioteca.';}
      finally{saveButton.disabled=false;}
     });
-    card.append(saveButton);
+    info.append(saveButton);
    }
    if(!session){
     const access=document.createElement('div');access.className='notice';access.style.marginTop='12px';
     const message=document.createElement('p');message.textContent='Entre na sua conta para curtir, comentar e acompanhar a conversa desta música.';
     const login=document.createElement('a');login.className='btn alt';login.href='./conta.html';login.textContent='Entrar ou criar conta';login.style.display='inline-block';login.style.marginTop='6px';
-    access.append(message,login);card.append(access);container.append(card);continue;
+    access.append(message,login);info.append(access);info.append(social);info.append(comments);container.append(card);continue;
    }
    const social=document.createElement('div');social.className='social';social.style.alignItems='center';
    const like=document.createElement('button');like.className='btn alt';like.type='button';like.textContent='❤️ Curtir';
