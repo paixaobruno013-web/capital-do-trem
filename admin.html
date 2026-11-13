@@ -628,7 +628,7 @@ async function loadQueue(){
     const card=node('article','item');
     const title=node('h3','',item.title);
     const detail=node('p','muted',item.detail);
-    const status=node('p','notice','Aguardando aprovação');
+    const status=node('p','notice',kind==='songs'?'Em análise • faixa já disponível para audição pública':'Aguardando aprovação');
     const actions=node('div','actions');
     const approve=node('button','', 'Aprovar');
     const reject=node('button','secondary','Rejeitar');
