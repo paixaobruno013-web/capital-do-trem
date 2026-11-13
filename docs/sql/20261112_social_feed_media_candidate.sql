@@ -29,6 +29,7 @@ create table if not exists public.post_media (
   constraint post_media_path_owner check (
     storage_path like owner_id::text || '/posts/%'
   ),
+  constraint post_media_post_order_unique unique (post_id, sort_order),
   constraint post_media_type_matches_mime check (
     (media_type = 'image' and mime_type like 'image/%')
     or (media_type = 'video' and mime_type like 'video/%')
