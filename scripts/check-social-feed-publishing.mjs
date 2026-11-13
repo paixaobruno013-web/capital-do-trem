@@ -21,7 +21,7 @@ const [home, composer, auth, worker, prepare, migration, limits, ownerIndex, acc
 
 const checks = [
   ['stories começam com círculo da foto do usuário e botão +, sem ícone de câmera visível', storiesUi.includes('home-story-add-item') && storiesUi.includes('home-story-add-plus') && storiesUi.includes('getMyBasicProfile') && home.includes('id="home-story-add"') && home.includes('home-stories-hint') && !home.includes('>📷</button>')],
-  ['abertura mantém arte aprovada até o primeiro quadro real do vídeo, evitando flash preto', home.includes('openingPoster') && home.includes('revealOpeningFrame') && home.includes("video.style.opacity='0'") && home.includes('requestVideoFrameCallback') && worker.includes('capital-do-trem-v302')],
+  ['abertura mantém arte aprovada até o primeiro quadro real do vídeo, evitando flash preto', home.includes('openingPoster') && home.includes('revealOpeningFrame') && home.includes("video.style.opacity='0'") && home.includes('requestVideoFrameCallback') && worker.includes('capital-do-trem-v303')],
 
   ['catálogo musical organiza cada faixa em cartão vertical com capa individual, título e artista', home.includes('music-track-card') && home.includes('music-track-cover') && home.includes('makeSongCover') && home.includes('CAPITAL DO TREM') && home.includes("index%2===0?'left':'right'")],
   ['player musical abre em tela cheia com voltar, pausar, adiantar e repetir', home.includes('capital-song-player') && home.includes('player-back') && home.includes('player-main') && home.includes('player-forward') && home.includes('player-repeat') && home.includes('player-progress')],
@@ -33,7 +33,7 @@ const checks = [
   ['seguir/deixar de seguir atualiza contagem e o perfil tem botão de conversa com ícone de nuvem', auth.includes('getPublicProfileSocial') && auth.includes('toggleProfileFollow') && profilePage.includes('toggleProfileFollow') && profilePage.includes('<path d="M21 11.5')],
   ['Stories exibem botão de adicionar e círculos dos perfis seguidos', profilePage.includes('Seu Story') && profilePage.includes('getMyFollowingProfileIds') && profilePage.includes('getActiveUserStories')],
   ['banco protege seguidores com RLS, bloqueia auto-seguir e permite seguir apenas perfil público', followsMigration.includes('enable row level security') && followsMigration.includes('follower_id <>') && followsMigration.includes('p.is_public = true')],  ['feed e diretório abrem o perfil público de cada usuário', home.includes('./perfil.html?u=') && home.includes('community-profile-open')],
-  ['perfil público é incluído no pacote web e no cache do aplicativo', prepare.includes("'perfil.html'") && worker.includes("'./perfil.html'") && /capital-do-trem-v302/.test(worker)],
+  ['perfil público é incluído no pacote web e no cache do aplicativo', prepare.includes("'perfil.html'") && worker.includes("'./perfil.html'") && /capital-do-trem-v303/.test(worker)],
   ['perfil individual permite ao titular abrir sua página pública', account.includes('id="public-profile-link"') && account.includes("perfil.html?u=")],
   ['cadastro exibe a mensagem grafitada de boas-vindas somente ao escolher Criar conta', account.includes('id="registration-graffiti"') && account.includes('SEJA BEM-VINDO,') && account.includes('MAQUINISTA DESSE TREM!') && account.includes("welcome.hidden=mode!=='register'")],
   ['faixa de boas-vindas usa visual preto/vermelho responsivo e respeita o modo claro', account.includes('.registration-graffiti{') && account.includes('font-family:Impact') && account.includes('body.light .registration-graffiti')],
