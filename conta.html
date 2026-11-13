@@ -147,6 +147,7 @@ body.light .registration-graffiti{background:radial-gradient(ellipse at 50% 0%,r
 <section class="card" id="profile-panel" hidden aria-labelledby="profile-title">
 <h2 id="profile-title">Sua área</h2>
 <p id="profile-welcome"></p>
+<a id="public-profile-link" class="btn alt" href="./perfil.html" hidden style="display:inline-block;margin:8px 0 12px">👁️ Ver meu perfil público</a>
 <div id="admin-identity" class="admin-identity" hidden aria-label="Conta oficial verificada do administrador">
  <span class="admin-crown" aria-hidden="true">👑</span>
  <span class="admin-verified"><span class="admin-verified-mark" aria-hidden="true">✓</span> CONTA VERIFICADA</span>
@@ -186,7 +187,7 @@ body.light .registration-graffiti{background:radial-gradient(ellipse at 50% 0%,r
  <span><strong>instalações registradas</strong><br><small class="muted">Pessoas que já abriram o Capital do Trem neste aparelho.</small></span>
 </div>
 <div id="artist-profile-area" hidden>
-<h3>🎤 Minha ficha artística</h3><p class="muted">Preencha estes dados se sua conta for de artista. A ficha artística será enviada para análise da equipe. Qualquer conta autenticada pode publicar eventos pela agenda; somente perfis Artista / DJ podem enviar músicas para análise antes da publicação no catálogo.</p>
+<h3>🎤 Minha ficha artística</h3><p class="muted">Preencha estes dados se sua conta for de artista. A ficha artística será enviada para análise da equipe. Qualquer conta autenticada pode publicar eventos pela agenda; perfis Artista / DJ com ficha artística podem publicar músicas diretamente no catálogo; faixas em análise continuam disponíveis para audição pública.</p>
 <form id="artist-profile-form">
 <label for="artist-name">Nome artístico</label><input id="artist-name" maxlength="100" required>
 <label for="artist-style">Estilo musical</label><input id="artist-style" maxlength="80" placeholder="Ex.: Funk consciente, rap, pagode">
@@ -698,6 +699,8 @@ async function loadBasicProfile(){
   document.getElementById('basic-city').value=profile?.city||'';
   document.getElementById('basic-bio').value=profile?.bio||'';
   document.getElementById('basic-public').checked=profile?.is_public===true;
+  const publicProfileLink=document.getElementById('public-profile-link');
+  if(publicProfileLink){publicProfileLink.hidden=profile?.is_public!==true||!profile?.username;publicProfileLink.href=profile?.username?'./perfil.html?u='+encodeURIComponent(profile.username):'./perfil.html';}
  }catch(error){artistProfileArea.hidden=true;basicProfileStatus.textContent='Não foi possível carregar seu perfil agora. Atualize a página e tente novamente.';}
 }
 basicProfileForm.addEventListener('submit',async event=>{
@@ -705,7 +708,7 @@ basicProfileForm.addEventListener('submit',async event=>{
  const button=document.getElementById('save-basic-profile');
  button.disabled=true;basicProfileStatus.textContent='Salvando seu perfil...';
  try{
-  await auth.saveMyBasicProfile({
+  const savedProfile=await auth.saveMyBasicProfile({
    display_name:document.getElementById('basic-display-name').value,
    username:document.getElementById('basic-username').value,
    account_type:document.getElementById('basic-account-type').value,
@@ -713,6 +716,8 @@ basicProfileForm.addEventListener('submit',async event=>{
    bio:document.getElementById('basic-bio').value,
    is_public:document.getElementById('basic-public').checked
   });
+  const publicProfileLink=document.getElementById('public-profile-link');
+  if(publicProfileLink){publicProfileLink.hidden=savedProfile?.is_public!==true||!savedProfile?.username;publicProfileLink.href=savedProfile?.username?'./perfil.html?u='+encodeURIComponent(savedProfile.username):'./perfil.html';}
   artistProfileArea.hidden=document.getElementById('basic-account-type').value!=='artist';
   await loadAdminSongAccess();
   basicProfileStatus.textContent='Perfil salvo! '+(document.getElementById('basic-public').checked?'Ele poderá aparecer no diretório público.':'Ele ficará visível somente para você.');
