@@ -75,7 +75,7 @@ O bucket privado de áudio permanece privado. Os 31 objetos de áudio coincidem 
 
 A inspeção detalhada de `pg_policy` e das permissões confirmou que `require_registered_user` é uma política **RESTRICTIVE** aplicada somente ao papel `authenticated`; ela não se aplica ao visitante `anon`. As políticas permissivas já permitem SELECT de posts publicados e perfis com `is_public=true`, e os grants de SELECT para `anon` existem. Portanto, a proposta foi corrigida para **não alterar** as políticas existentes de `posts` e `profiles`.
 
-A migração SQL em `docs/sql/20261112_social_feed_media_candidate.sql` foi aplicada ao Supabase e se limita a:
+A migração SQL aplicada está documentada em `docs/sql/20261112_social_feed_media_candidate.sql` e versionada em `supabase/migrations/`:
 - adicionar `post_media` para relacionar mídia ao post, com tipo, MIME, tamanho, ordem e caminho;
 - permitir leitura de metadados apenas quando a publicação é pública, própria ou acessível ao administrador;
 - limitar inclusão de mídia à publicação do próprio usuário e ao caminho da pasta dele;
@@ -97,10 +97,10 @@ Validação CI: o workflow `Verificar preparação do aplicativo` passou no comm
 
 **Verificação pós-migração:** `post_media` existe, RLS está habilitado, as quatro políticas esperadas foram criadas, os privilégios de leitura/escrita foram confirmados e uma consulta executada como `anon` retornou zero linhas (tabela nova, sem mídia cadastrada). As restrições de MIME, tamanho por tipo, caminho por proprietário e máximo de 10 mídias foram confirmadas. Ainda falta teste ponta a ponta de upload com contas reais de usuário/artista/admin e teste em Android/Safari iOS. O código de frontend segue no PR, sem merge/deploy.
 
-## Modelo de dados a avaliar (não executar sem inspeção do schema e RLS)
+## Modelo de dados atualizado
 
 - `posts`: manter compatibilidade com os campos atuais e avaliar campos opcionais `post_type`, `visibility`, `updated_at`.
-- `post_media`: relação de mídia com publicação (caminho no Storage, tipo, ordem, dimensões/duração e metadados seguros).
+- `post_media`: tabela criada no Supabase para relacionar mídia com publicação (caminho no Storage, tipo, MIME, tamanho, ordem e metadados seguros); migrações versionadas em `supabase/migrations/`.
 - `profiles`: reutilizar identidade pública existente; não duplicar dados do autor nas publicações sem necessidade.
 - `post_likes`, `post_comments`, `saved_posts`: manter relações existentes e confirmar índices, constraints e RLS.
 - Avaliar denúncia/bloqueio e contagem agregada somente após mapear tabelas e políticas existentes.
