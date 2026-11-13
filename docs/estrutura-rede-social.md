@@ -54,6 +54,23 @@ O banco retornou zero linhas em `posts`, `post_likes`, `post_comments` e `saved_
 
 O advisor de segurança também sinalizou alertas de políticas que podem permitir acesso de usuários anônimos em algumas tabelas e a proteção contra senhas vazadas desativada. Esses alertas precisam ser revisados política por política antes de abrir mais conteúdo ao público. Nenhuma política foi alterada nesta etapa.
 
+## Segurança e Storage — segunda inspeção
+
+Consulta somente de leitura das políticas e dos buckets:
+
+- `capital-do-trem-audio`: privado, limite de 50 MiB, formatos de áudio; 31 arquivos MP3 no momento da consulta.
+- `capital-do-trem-media`: público, limite de 50 MiB, formatos de imagem/áudio/vídeo; 47 arquivos (24 JPEG, 10 PNG, 1 WebP, 11 MP4 e 1 WebM).
+- `capital-do-trem-chat` e `capital-do-trem-private-gallery`: buckets privados configurados para anexos de chat e galeria.
+- `brand-assets`: público, limitado a imagens de marca.
+
+**Ponto de atenção antes de ampliar a publicação:** o bucket `capital-do-trem-media` é público. Isso significa que os arquivos nele armazenados podem ser acessados por URL pública, mesmo que uma consulta de tabela tenha regras RLS. Antes de reutilizá-lo para novas publicações, precisamos separar conteúdo realmente público de arquivos privados e confirmar a finalidade dos 47 objetos já existentes. Não mudar a visibilidade do bucket nem mover/apagar objetos nesta etapa.
+
+As políticas de posts permitem leitura de publicações com status publicado; inserção autenticada com status publicado; edição/exclusão pelo autor apenas enquanto pendente ou por administrador. Curtidas e comentários estão limitados a publicações publicadas e ações de escrita autenticadas. Perfis são lidos publicamente somente quando `is_public=true`. Stories ativos são legíveis por visitante; inserção exige autoria, pasta do usuário e expiração máxima de 24 horas.
+
+O advisor de segurança sinalizou políticas que permitem acesso anônimo em algumas tabelas. Parte delas corresponde a leitura pública intencional de conteúdo publicado, mas a presença de políticas amplas combinadas por OR precisa ser revisada por tabela. A política `require_registered_user` aparece para papéis autenticados em várias tabelas e não substitui a revisão individual de todas as condições. Nenhuma política foi alterada.
+
+O bucket privado de áudio permanece privado. Os 31 objetos de áudio coincidem com os 31 registros de músicas, mas isso não confirma, por si só, autorização de distribuição pública.
+
 ## Modelo de dados a avaliar (não executar sem inspeção do schema e RLS)
 
 - `posts`: manter compatibilidade com os campos atuais e avaliar campos opcionais `post_type`, `visibility`, `updated_at`.
