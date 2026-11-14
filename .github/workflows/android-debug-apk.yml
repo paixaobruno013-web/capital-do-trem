@@ -6,6 +6,8 @@ on:
     branches: [main]
     paths:
       - 'youtube-feed.js'
+      - 'rede.js'
+      - 'supabase/auth.js'
       - 'index.html'
       - 'sw.js'
       - 'package.json'
