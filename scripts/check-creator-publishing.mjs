@@ -28,7 +28,7 @@ const checks = [
   ['eventos ativos aparecem acima dos nove vídeos na tela inicial', home.indexOf('id="home-event-feed"') >= 0 && home.indexOf('id="home-event-feed"') < home.indexOf('class="card home-youtube"') && home.includes(".sort((a,b)=>a.event_date.localeCompare(b.event_date)")],
   ['feed some quando não há eventos dentro da data', home.includes('if(!active.length){feed.hidden=true;return;}')],
   ['feed reavalia expiração a cada virada de data', home.includes('const scheduleHomeExpiryRefresh=()=>') && home.includes('scheduleHomeExpiryRefresh();')],
-  ['abertura do vídeo possui imagem de segurança se o vídeo falhar ou demorar', home.includes('const showOpeningFallback=()=>') && home.includes('fallbackTimer=window.setTimeout(showOpeningFallback,5000)') && home.includes('currentOpeningImage||\'./marca.svg\'')],
+  ['abertura do vídeo possui imagem de segurança se o vídeo falhar ou demorar', home.includes('const showOpeningFallback=()=>') && home.includes('fallbackTimer=window.setTimeout(showOpeningFallback,12000)') && home.includes('currentOpeningImage||\'./marca.svg\'')],
   ['agenda consulta eventos publicados de hoje em diante', auth.includes('export async function getPublishedEvents()') && auth.includes(".eq('status','published')") && auth.includes(".gte('event_date',today)")],
   ['evento oferece foto, corte, efeitos, GPS e música', ['event-social-photo','event-social-zoom','event-social-filter','event-social-gps','event-social-music'].every(id => home.includes('id="'+id+'"'))],
   ['evento salva imagem cortada com efeito e envia publicação', eventComposer.includes('makeCroppedImage') && eventComposer.includes('getCurrentPosition') && eventComposer.includes('submitMyEvent(')],
