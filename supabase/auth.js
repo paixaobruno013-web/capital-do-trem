@@ -627,7 +627,7 @@ export async function getMyBasicProfile() {
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para acessar seu perfil.');
   const { data, error } = await supabase.from('profiles')
-    .select('user_id, display_name, username, account_type, bio, city, is_public')
+    .select('user_id, display_name, username, account_type, bio, city, is_public, avatar_type, avatar_url, avatar_path, avatar_data, cover_url, cover_path')
     .eq('user_id', user.id).maybeSingle();
   if (error) throw error;
   if (data) return data;
@@ -662,7 +662,7 @@ export async function saveMyBasicProfile(profile) {
   };
   const { data, error } = await supabase.from('profiles')
     .upsert(payload, { onConflict: 'user_id' })
-    .select('user_id, display_name, username, account_type, bio, city, is_public').single();
+    .select('user_id, display_name, username, account_type, bio, city, is_public, avatar_type, avatar_url, avatar_path, avatar_data, cover_url, cover_path').single();
   if (error) throw error;
   return data;
 }
