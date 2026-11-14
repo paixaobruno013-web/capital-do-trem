@@ -10,6 +10,8 @@ const checks=[
 [js.includes('getPublicProfiles')&&js.includes('toggleFollow'),'Busca lista perfis públicos e permite seguir'],
 [js.includes("select('user_id,display_name,username')")&&js.includes("person?.username?'@'+person.username:''"),'Mural de mídias identifica nome e usuário do autor'],
 [(js.match(/media-search'\)\.addEventListener/g)||[]).length===1,'Busca de mídias possui apenas um listener'],
+[js.includes("if(view==='videos')")&&js.includes('profile-post-card')&&js.includes('profile-post-caption'),'Perfil exibe publicações de texto e legendas junto às mídias'],
+[html.includes('.profile-post-card')&&html.includes('.profile-post-caption'),'Cartões de publicações do perfil têm estilo próprio'],
 [js.includes('capital-do-trem-social')&&js.includes("bucket_id:'capital-do-trem-social'")&&js.includes('50*1024*1024')&&js.includes('10*1024*1024'),'Upload social usa bucket privado e limites por tipo'],
 [js.includes('createSignedUrls')&&js.includes('resolveMediaUrls')&&js.includes('bucket_id'),'Feed, perfil e mural geram URLs assinadas do bucket correto'],
 [html.includes('./bate-papo.html')&&html.includes('./index.html#eventos'),'Atalhos para chat e eventos permanecem disponíveis']
