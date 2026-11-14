@@ -8,6 +8,8 @@ const files = [
   'estudio.html',
   'offline.html',
   'conta.html',
+  'rede.html',
+  'rede.js',
   'admin.html',
   'file-picker-guard.js',
   'admin-media.js',
