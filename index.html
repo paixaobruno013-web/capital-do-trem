@@ -1970,7 +1970,7 @@ async function saveOfflineMusic(id,blob,title){
     screen.appendChild(audioButton);
     video.addEventListener('play',()=>{if(!video.muted)audioButton.remove();});
     // Mantém o próprio vídeo visível durante carregamento e retomadas, sem poster/logo sobreposto.
-    video.addEventListener('playing',()=>{video.style.opacity='1';});
+    video.addEventListener('playing',()=>{video.style.opacity='1';clearTimeout(fallbackTimer);beginOpeningClock();});
         const movingTrain=document.getElementById('opening-live-train');
     const startOpeningTrain=()=>{if(!movingTrain||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;movingTrain.style.setProperty('animation','none','important');void movingTrain.offsetWidth;movingTrain.style.setProperty('animation','opening-train-cross-sky 9.8s linear 1 both','important');};
     if(movingTrain)movingTrain.style.setProperty('animation','none','important');
@@ -1997,8 +1997,7 @@ async function saveOfflineMusic(id,blob,title){
      audioButton.style.display='none';
      beginOpeningClock();
     };
-    // Abertura e trem começam juntos; a rede não pode empurrar a duração para 20+ segundos.
-    beginOpeningClock();
+    // O relógio de 10 segundos e o trem começam quando o vídeo realmente toca; se falhar, começam com o fallback.
     video.addEventListener('playing',()=>{clearTimeout(fallbackTimer);if(savedOpeningSound&&!video.muted)audioButton.remove();});
     video.addEventListener('loadeddata',async()=>{
      video.playbackRate=1;
@@ -2015,10 +2014,10 @@ async function saveOfflineMusic(id,blob,title){
      }
     },{once:true});
     video.addEventListener('error',()=>{console.warn('Falha ao carregar o vídeo de abertura; usando a imagem de segurança.');showOpeningFallback();},{once:true});
-    // Se a rede não entregar um quadro em cinco segundos, a abertura usa a imagem aprovada em vez de ficar preta.
+    // Dá até 12 segundos para o vídeo entregar o primeiro quadro; se falhar, usa a imagem de segurança.
     video.addEventListener('ended',finish,{once:true});
     video.load();
-    fallbackTimer=window.setTimeout(showOpeningFallback,5000);
+    fallbackTimer=window.setTimeout(showOpeningFallback,12000);
    }
   }
  }catch(error){
