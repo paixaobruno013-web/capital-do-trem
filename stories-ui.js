@@ -23,6 +23,25 @@ let lastTrigger = null;
 let activeStoryAudio = null;
 let activeStoryMusicTimer = null;
 
+function characterStoryAvatar(data) {
+  const allowed = {
+    gender: ['male', 'female'],
+    skin: ['#8d5524', '#f1c27d', '#c68642', '#5a3825', '#e0ac69'],
+    hair: ['#171313', '#5b321d', '#d6a84b', '#a52a2a', '#777777'],
+    shirt: ['#ed1c24', '#111111', '#eeeeee', '#2465a8', '#21834a', '#7a42a6']
+  };
+  const defaults = { gender: 'male', skin: '#8d5524', hair: '#171313', shirt: '#ed1c24' };
+  const clean = {};
+  for (const [key, values] of Object.entries(allowed)) clean[key] = values.includes(data?.[key]) ? data[key] : defaults[key];
+  const hair = clean.gender === 'female'
+    ? '<path d="M25 58 Q20 9 60 10 Q100 9 95 60 L88 90 Q82 54 60 48 Q38 54 32 90Z" fill="' + clean.hair + '"/>'
+    : '<path d="M29 48 Q27 12 60 12 Q94 12 91 49 Q76 30 60 34 Q42 31 29 48Z" fill="' + clean.hair + '"/>';
+  const femaleHair = clean.gender === 'female'
+    ? '<path d="M45 54 Q30 78 42 111 M115 54 Q130 78 118 111" fill="none" stroke="' + clean.hair + '" stroke-width="9" stroke-linecap="round"/>'
+    : '';
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><rect width="160" height="160" rx="80" fill="#171717"/><path d="M17 160 Q20 105 80 105 Q140 105 143 160" fill="' + clean.shirt + '"/><path d="M52 99 L52 119 Q80 139 108 119 L108 99" fill="' + clean.skin + '"/><ellipse cx="80" cy="67" rx="34" ry="42" fill="' + clean.skin + '"/>' + hair + femaleHair + '<ellipse cx="66" cy="68" rx="3.5" ry="4" fill="#211"/><ellipse cx="94" cy="68" rx="3.5" ry="4" fill="#211"/><path d="M70 88 Q80 95 90 88" fill="none" stroke="#542d24" stroke-width="3" stroke-linecap="round"/></svg>';
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
 function seenIds() {
   try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]')); }
   catch { return new Set(); }
@@ -53,7 +72,7 @@ function renderHomeStoryTray() {
     const active = items.filter(s => new Date(s.expires_at).getTime() > Date.now());
     if (!active.length) continue;
     const latest = active[active.length - 1];
-    entries.push({ id: authorId, name: latest.display_name || 'Usuário Uai', stories: active, avatar: latest.avatar_url || '', latest });
+    entries.push({ id: authorId, name: latest.display_name || 'Usuário Uai', stories: active, avatar: latest.avatar_url || '', avatarType: latest.avatar_type || 'photo', avatarData: latest.avatar_data || null, latest });
   }
   tray.replaceChildren();
   if (!entries.length) {
@@ -72,13 +91,13 @@ function renderHomeStoryTray() {
     ring.className = 'home-story-ring' + (entry.stories.every(s => seen.has(s.id)) ? ' seen' : '');
     const avatar = document.createElement('span');
     avatar.className = 'home-story-avatar';
-    const imageUrl = entry.official ? '' : entry.avatar;
-    if (imageUrl && /^https:\/\//i.test(imageUrl)) {
+    const imageUrl = entry.official ? '' : (entry.avatarType === 'character' && entry.avatarData ? characterStoryAvatar(entry.avatarData) : entry.avatar);
+    if (imageUrl && (/^https:\/\//i.test(imageUrl) || /^data:image\/svg\+xml/i.test(imageUrl))) {
       const image = document.createElement('img');
       image.src = imageUrl;
       image.alt = '';
       image.loading = 'lazy';
-      image.referrerPolicy = 'no-referrer';
+      if (/^https:\/\//i.test(imageUrl)) image.referrerPolicy = 'no-referrer';
       avatar.append(image);
     } else {
       avatar.textContent = entry.official ? 'CT' : (entry.name.trim().charAt(0).toUpperCase() || 'U');
@@ -219,6 +238,23 @@ async function refreshStories({ notify = false, previousAdmin = new Set(), previ
     const [admins, users] = await Promise.all([getActiveAdminStories(), getActiveUserStories()]);
     officialStories = admins;
     userStories = users;
+    const authorIds = [...new Set(users.map(story => story.author_id).filter(Boolean))];
+    if (authorIds.length) {
+      try {
+        const supabase = initSupabase();
+        const { data: profiles, error: profilesError } = await supabase.from('profiles')
+          .select('user_id,avatar_type,avatar_url,avatar_data')
+          .eq('is_public', true).in('user_id', authorIds);
+        if (profilesError) throw profilesError;
+        const profileById = new Map((profiles || []).map(item => [item.user_id, item]));
+        userStories = users.map(story => {
+          const person = profileById.get(story.author_id);
+          return person ? { ...story, avatar_type: person.avatar_type, avatar_url: person.avatar_url, avatar_data: person.avatar_data } : story;
+        });
+      } catch (profileError) {
+        console.info('Avatares públicos dos Stories indisponíveis:', profileError?.message || profileError);
+      }
+    }
     updateOfficialRing();
     updateUserProfileRings();
     renderHomeStoryTray();

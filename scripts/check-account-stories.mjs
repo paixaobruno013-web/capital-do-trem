@@ -6,6 +6,7 @@ const script = fs.readFileSync('account-stories.js', 'utf8');
 const auth = fs.readFileSync('supabase/auth.js', 'utf8');
 const storyViewer = fs.readFileSync('stories-ui.js', 'utf8');
 const adminStories = fs.readFileSync('admin-stories.js', 'utf8');
+const storiesUi = fs.readFileSync('stories-ui.js', 'utf8');
 
 
 assert.match(page, /class="story-profile-actions"/);
@@ -35,6 +36,10 @@ assert.match(script, /Colocar música no Story/);
 assert.match(script, /musicPreview\.controls = true/);
 assert.match(auth, /export async function createMyStory\(\{ file, caption = '', musicSongId = ''/);
 assert.match(storyViewer, /story\.music_url/);
+assert.match(storiesUi, /function characterStoryAvatar\(data\)/);
+assert.match(storiesUi, /avatar_type,avatar_url,avatar_data/);
+assert.match(storiesUi, /entry\.avatarType === 'character'/);
+assert.match(storiesUi, /profilesError/);
 assert.match(storyViewer, /Música do Story/);
 assert.match(storyViewer, /activeStoryAudio\.pause\(\)/);
 assert.match(adminStories, /mountStoryMusicPicker\(\)/);
