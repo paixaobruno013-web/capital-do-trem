@@ -7,7 +7,7 @@ const files = [
   'index.html',
   'estudio.html',
   'offline.html',
-  'conta.html',
+  'conta.html',\n  'rede.html',\n  'rede.js',
   'admin.html',
   'file-picker-guard.js',
   'admin-media.js',
