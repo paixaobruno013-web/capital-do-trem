@@ -54,6 +54,8 @@ jobs:
         run: |
           node --check scripts/check-post-social.mjs
           node scripts/check-post-social.mjs
+      - name: Verificar rede social, perfis e mídias privadas
+        run: node scripts/check-rede-social.mjs
       - name: Verificar controles e regressões do chat
         run: node scripts/check-chat-controls.mjs
       - name: Verificar anexos seguros e envio moderno do chat
