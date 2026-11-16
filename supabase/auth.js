@@ -941,6 +941,54 @@ export async function deleteChatMessage(messageId) {
 }
 
 
+// Salas de bate-papo por assunto: cada participante entra na sala antes de ler ou enviar mensagens.
+export async function getDiscussionTopics(){
+ const supabase=initSupabase();
+ const {data:{user},error:userError}=await supabase.auth.getUser();if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para descobrir assuntos.');
+ const {data:topics,error}=await supabase.from('discussion_topics').select('id,creator_id,title,description,created_at').order('created_at',{ascending:false}).limit(100);
+ if(error)throw error;if(!topics?.length)return [];
+ const ids=topics.map(t=>t.id);
+ const {data:members,error:membersError}=await supabase.from('discussion_topic_members').select('topic_id,user_id').in('topic_id',ids);
+ if(membersError)throw membersError;
+ const counts=new Map(),joined=new Set();
+ for(const member of members||[]){counts.set(member.topic_id,(counts.get(member.topic_id)||0)+1);if(member.user_id===user.id)joined.add(member.topic_id)}
+ return topics.map(topic=>({...topic,member_count:counts.get(topic.id)||0,is_member:joined.has(topic.id)}));
+}
+export async function createDiscussionTopic(title,description=''){
+ const supabase=initSupabase();const {data:{user},error:userError}=await supabase.auth.getUser();if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para criar um assunto.');
+ const cleanTitle=String(title||'').trim(),cleanDescription=String(description||'').trim();
+ if(cleanTitle.length<3||cleanTitle.length>80)throw new Error('O assunto precisa ter de 3 a 80 caracteres.');
+ if(cleanDescription.length>400)throw new Error('A descrição pode ter até 400 caracteres.');
+ const {data,error}=await supabase.from('discussion_topics').insert({creator_id:user.id,title:cleanTitle,description:cleanDescription}).select('id,creator_id,title,description,created_at').single();
+ if(error)throw error;return data;
+}
+export async function joinDiscussionTopic(topicId){
+ const supabase=initSupabase();const {data:{user},error:userError}=await supabase.auth.getUser();if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para participar.');
+ const {data,error}=await supabase.from('discussion_topic_members').upsert({topic_id:topicId,user_id:user.id},{onConflict:'topic_id,user_id'}).select('topic_id,user_id').single();
+ if(error)throw error;return data;
+}
+export async function getDiscussionMessages(topicId,limit=60){
+ const supabase=initSupabase();const {data,error}=await supabase.from('discussion_topic_messages').select('id,topic_id,author_id,content,created_at').eq('topic_id',topicId).order('created_at',{ascending:false}).limit(Math.min(Math.max(Number(limit)||60,1),100));
+ if(error)throw error;const messages=(data||[]).reverse();const ids=[...new Set(messages.map(m=>m.author_id))];
+ if(!ids.length)return [];
+ const {data:profiles,error:profileError}=await supabase.from('profiles').select('user_id,display_name,username,avatar_type,avatar_url,avatar_data').in('user_id',ids);
+ if(profileError)throw profileError;const byId=new Map((profiles||[]).map(p=>[p.user_id,p]));
+ return messages.map(m=>({...m,author:byId.get(m.author_id)||{display_name:'Maquinista'}}));
+}
+export async function sendDiscussionMessage(topicId,content){
+ const supabase=initSupabase();const {data:{user},error:userError}=await supabase.auth.getUser();if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para enviar mensagens.');
+ const clean=String(content||'').trim();if(!clean||clean.length>1000)throw new Error('A mensagem deve ter de 1 a 1.000 caracteres.');
+ const {data,error}=await supabase.from('discussion_topic_messages').insert({topic_id:topicId,author_id:user.id,content:clean}).select('id,topic_id,author_id,content,created_at').single();
+ if(error)throw error;return data;
+}
+export function subscribeDiscussionMessages(topicId,onMessage,onStatus){
+ const supabase=initSupabase();const channel=supabase.channel('discussion-topic-'+topicId).on('postgres_changes',{event:'INSERT',schema:'public',table:'discussion_topic_messages',filter:'topic_id=eq.'+topicId},async payload=>{
+  if(typeof onMessage!=='function')return;
+  try{const {data,error}=await supabase.from('profiles').select('user_id,display_name,username,avatar_type,avatar_url,avatar_data').eq('user_id',payload.new.author_id).maybeSingle();if(error)throw error;onMessage({...payload.new,author:data||{display_name:'Maquinista'}})}catch{onMessage({...payload.new,author:{display_name:'Maquinista'}})}
+ }).subscribe(status=>{if(typeof onStatus==='function')onStatus(status)});
+ return ()=>supabase.removeChannel(channel);
+}
+
 // Conversas privadas: pedidos de contato, aceite, mensagens e bloqueios.
 export async function getPrivateConversationData() {
   const supabase = initSupabase();
