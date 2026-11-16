@@ -2020,7 +2020,7 @@ alter table public.discussion_topic_members enable row level security;
 alter table public.discussion_topic_messages enable row level security;
 revoke all on public.discussion_topics,public.discussion_topic_members,public.discussion_topic_messages from anon,authenticated;
 grant select,insert,update,delete on public.discussion_topics to authenticated;
-grant select,insert,delete on public.discussion_topic_members to authenticated;
+grant select,insert,update,delete on public.discussion_topic_members to authenticated;
 grant select,insert on public.discussion_topic_messages to authenticated;
 drop policy if exists discussion_topics_read_signed_in on public.discussion_topics;
 create policy discussion_topics_read_signed_in on public.discussion_topics for select to authenticated using(true);
@@ -2034,6 +2034,8 @@ drop policy if exists discussion_topic_members_read_signed_in on public.discussi
 create policy discussion_topic_members_read_signed_in on public.discussion_topic_members for select to authenticated using(true);
 drop policy if exists discussion_topic_members_join_self on public.discussion_topic_members;
 create policy discussion_topic_members_join_self on public.discussion_topic_members for insert to authenticated with check(user_id=(select auth.uid()) and exists(select 1 from public.discussion_topics t where t.id=topic_id));
+drop policy if exists discussion_topic_members_update_self on public.discussion_topic_members;
+create policy discussion_topic_members_update_self on public.discussion_topic_members for update to authenticated using(user_id=(select auth.uid())) with check(user_id=(select auth.uid()));
 drop policy if exists discussion_topic_members_leave_self on public.discussion_topic_members;
 create policy discussion_topic_members_leave_self on public.discussion_topic_members for delete to authenticated using(user_id=(select auth.uid()));
 drop policy if exists discussion_topic_messages_read_members on public.discussion_topic_messages;
