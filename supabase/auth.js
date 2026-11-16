@@ -454,10 +454,10 @@ export async function isCurrentUserArtistOrAdmin() {
   if (userError) throw userError;
   if (!user) return false;
   if (await isCurrentUserAdmin()) return true;
-  const { data, error } = await supabase.from('artists')
-    .select('id').eq('user_id', user.id).maybeSingle();
+  const { data, error } = await supabase.from('profiles')
+    .select('account_type').eq('user_id', user.id).maybeSingle();
   if (error) throw error;
-  return Boolean(data);
+  return data?.account_type === 'artist';
 }
 
 export async function uploadMySong({ file, title, artistName, producerName = '', description = '' }) {
@@ -472,10 +472,6 @@ export async function uploadMySong({ file, title, artistName, producerName = '',
       .select('account_type').eq('user_id', user.id).maybeSingle();
     if (accountError) throw accountError;
     if (accountProfile?.account_type !== 'artist') throw new Error('Somente contas Artista / DJ podem publicar músicas.');
-    const { data: artistProfile, error: artistError } = await supabase.from('artists')
-      .select('id').eq('user_id', user.id).maybeSingle();
-    if (artistError) throw artistError;
-    if (!artistProfile) throw new Error('Salve primeiro sua ficha artística para liberar o envio de músicas.');
   }
   if (!(file instanceof File)) throw new Error('Selecione um arquivo de áudio.');
   // Alguns seletores de arquivo do Android informam aliases ou MIME genérico.
