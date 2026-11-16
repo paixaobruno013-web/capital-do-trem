@@ -73,6 +73,28 @@ function renderPendingSongs(items){const root=$('pending-song-list');root.replac
 async function loadMyPendingSongs(){try{const items=await api.getMySongs();renderPendingSongs(items)}catch(e){$('pending-song-list').textContent='Não foi possível consultar suas músicas: '+e.message}}
 async function loadSongs(){try{allSongs=await api.getPublishedSongs();renderSongs(allSongs)}catch(e){$('song-list').textContent='Não foi possível carregar as músicas: '+e.message}}
 
+// Mantém o catálogo sincronizado: uma faixa recém-publicada aparece sem o usuário
+// precisar sair da tela ou adicionar o arquivo manualmente. O foco/retorno ao app
+// também atualiza o catálogo caso o Realtime não esteja disponível no projeto.
+let musicCatalogChannel=null;
+let musicCatalogRefreshPending=false;
+function refreshMusicCatalog(){
+  if(musicCatalogRefreshPending)return;
+  musicCatalogRefreshPending=true;
+  Promise.resolve().then(loadSongs).finally(()=>{musicCatalogRefreshPending=false});
+}
+function watchMusicCatalog(){
+  if(!musicCatalogChannel){
+    musicCatalogChannel=supabase.channel('capital-music-catalog')
+      .on('postgres_changes',{event:'*',schema:'public',table:'songs'},refreshMusicCatalog)
+      .subscribe();
+  }
+  window.addEventListener('focus',refreshMusicCatalog);
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible')refreshMusicCatalog();
+  });
+}
+
 async function loadPlaylists(){
  const root=$('my-playlists-list');if(!root)return;
  root.innerHTML='<p class="empty">Carregando playlists…</p>';
@@ -138,4 +160,4 @@ async function renderMedia(){if(!allPosts.length)await loadFeed();const root=$('
 
 async function loadEvents(){try{const events=await api.getPublishedEvents();const root=$('event-list');root.replaceChildren();for(const e of events){const card=document.createElement('article');card.className='feed-event';const h=document.createElement('strong');h.textContent=e.title;const p=document.createElement('p');p.textContent=new Date(e.event_date+'T12:00:00').toLocaleDateString('pt-BR')+' · '+e.address;card.append(h,p);root.append(card)}if(!root.children.length)root.innerHTML='<p class="empty">Nenhum evento publicado no momento.</p>'}catch(e){$('event-list').textContent=e.message}}
 $('media-search').addEventListener('input',()=>{const q=$('media-search').value.toLowerCase();[...$('media-list').children].forEach(el=>{el.hidden=q&&!el.title.toLowerCase().includes(q)})});
-try{await loadMyProfile();await Promise.all([loadSongs(),loadMyPendingSongs(),loadPeople(),loadEvents()]);await loadPlaylists();}catch(e){notice('global-status',e.message||'Não foi possível iniciar a rede social.')}
+try{await loadMyProfile();await Promise.all([loadSongs(),loadMyPendingSongs(),loadPeople(),loadEvents()]);watchMusicCatalog();await loadPlaylists();}catch(e){notice('global-status',e.message||'Não foi possível iniciar a rede social.')}
