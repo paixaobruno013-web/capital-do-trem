@@ -917,6 +917,14 @@ body.light header.header-has-custom-background::before{
 .home-story-compose-controls button:active,.home-story-effect-list button:active{transform:scale(.96)}
 .home-story-effect-list button[aria-pressed=true]{border-color:#ed1c24;box-shadow:0 0 0 2px rgba(237,28,36,.18),0 0 18px rgba(237,28,36,.2)}
 #home-story-caption{border-radius:14px;min-height:84px}
+.home-story-caption-assist{margin:10px 0;padding:10px;border:1px solid #ffffff24;border-radius:13px;background:linear-gradient(135deg,#171717,#080808)}
+.home-story-caption-assist>div:first-child{display:flex;flex-direction:column;gap:3px}
+.home-story-caption-assist strong{font-size:13px;color:#fff}
+.home-story-caption-assist small{font-size:10px;line-height:1.35;color:#c5c5c5}
+.home-story-caption-ideas{display:flex;gap:6px;overflow-x:auto;padding-top:8px}
+.home-story-caption-ideas button{flex:0 0 auto;min-height:32px;padding:5px 10px;border:1px solid #ffffff38;border-radius:18px;background:#242424;color:#fff;font-size:11px;font-weight:700}
+.home-story-caption-ideas button:active{border-color:#ed1c24;background:#501015}
+
 #capital-story-card{border:1px solid #ffffff20;box-shadow:0 24px 80px #000c}
 #capital-story-progress{overflow:hidden;border-radius:999px}
 @media(prefers-reduced-motion:reduce){#home-story-composer *,#capital-story-viewer *{transition:none!important;animation:none!important}}
@@ -2314,6 +2322,14 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
    <p>Os efeitos são aplicados à captura de fotos e à gravação feita pela câmera. “Beleza suave” é um ajuste visual, ainda não é IA generativa.</p>
   </div>
   <button id="home-story-save" class="home-story-save" type="button" disabled>↓ Salvar na galeria</button>
+  <section class="home-story-caption-assist" aria-labelledby="home-story-caption-assist-title">
+   <div><strong id="home-story-caption-assist-title">✨ Assistente de legenda</strong><small> Sugestões rápidas neste aparelho; sua foto e seu vídeo não são enviados para gerar texto.</small></div>
+   <div class="home-story-caption-ideas" id="home-story-caption-ideas">
+    <button type="button" data-story-caption="A quebrada tá on! 🔥 Chega junto e compartilha essa energia!">🔥 Energia</button>
+    <button type="button" data-story-caption="Momento especial registrado. Quem mais tá nessa? ❤️">❤️ Momento</button>
+    <button type="button" data-story-caption="Som, cultura e comunidade: é assim que a gente faz acontecer! 🎶">🎶 Comunidade</button>
+   </div>
+  </section>
   <label for="home-story-caption">Mensagem (opcional)</label>
   <textarea id="home-story-caption" maxlength="280" placeholder="O que você quer compartilhar?"></textarea>
   <button id="home-story-publish" class="home-story-publish" type="button" disabled>Publicar Story</button>
