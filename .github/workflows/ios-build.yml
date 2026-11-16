@@ -5,6 +5,18 @@ on:
   push:
     branches: [main]
     paths:
+      - '**.html'
+      - '**.js'
+      - '**.css'
+      - '**.json'
+      - '**.svg'
+      - '**.png'
+      - '**.webp'
+      - '**.jpg'
+      - '**.jpeg'
+      - '**.mp4'
+      - 'package-lock.json'
+      - '.github/workflows/**'
       - 'index.html'
       - 'youtube-feed.js'
       - 'event-social-composer.js'
