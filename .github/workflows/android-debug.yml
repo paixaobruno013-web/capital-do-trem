@@ -50,51 +50,43 @@ jobs:
     steps:
       - name: Baixar o código
         uses: actions/checkout@v4
-
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
       - name: Configurar Java 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
-
       - name: Preparar Android SDK
         uses: android-actions/setup-android@v3
         with:
           packages: 'platform-tools'
-
       - name: Instalar plataforma Android 36
         run: sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
-
       - name: Instalar dependências web e Capacitor
         run: npm install
-
       - name: Preparar arquivos web
         run: npm run build:web
-
       - name: Criar projeto Android
         run: npx cap add android
-
-      - name: Preparar ícones com a imagem oficial do perfil
+      - name: Preparar ícones com foto oficial ou marca local
         env:
           PROFILE_ICON_URL: https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/31937786-c321-445f-ae1c-de018eca95c8/avatar/b338f7a8-8964-4063-9086-64a9bd603f4f.jpg
         run: |
           mkdir -p assets
-          curl --fail --location --retry 3 "$PROFILE_ICON_URL" --output /tmp/capital-do-trem-profile.jpg
+          if ! curl --fail --location --retry 3 "$PROFILE_ICON_URL" --output /tmp/capital-do-trem-profile.jpg; then
+            echo "Foto remota indisponível; será usada a marca local do Capital do Trem."
+            rm -f /tmp/capital-do-trem-profile.jpg
+          fi
           python -m pip install --quiet Pillow
           python scripts/prepare-app-icons.py /tmp/capital-do-trem-profile.jpg assets
           npx --yes @capacitor/assets@3.0.0 generate --android --assetPath assets --iconBackgroundColor '#080809' --iconBackgroundColorDark '#080809'
-
       - name: Sincronizar Capacitor
         run: npx cap sync android
-
       - name: Permitir áudio automático no WebView Android
         run: python scripts/configure-android-media.py android
-
       - name: Compilar APK de teste com novas tentativas para falhas temporárias do Maven Central
         working-directory: android
         run: |
@@ -109,7 +101,6 @@ jobs:
             fi
           done
           exit 1
-
       - name: Publicar APK como artefato de teste
         uses: actions/upload-artifact@v4
         with:
