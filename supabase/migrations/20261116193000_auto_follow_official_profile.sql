@@ -3,14 +3,14 @@
 
 create table if not exists public.profile_follows (
   follower_id uuid not null references public.profiles(user_id) on delete cascade,
-  following_id uuid not null references public.profiles(user_id) on delete cascade,
+  followed_id uuid not null references public.profiles(user_id) on delete cascade,
   created_at timestamptz not null default now(),
-  primary key (follower_id, following_id),
-  constraint profile_follows_no_self_follow check (follower_id <> following_id)
+  primary key (follower_id, followed_id),
+  constraint profile_follows_no_self_follow check (follower_id <> followed_id)
 );
 
-create index if not exists profile_follows_following_created_idx
-  on public.profile_follows (following_id, created_at desc);
+create index if not exists profile_follows_followed_created_idx
+  on public.profile_follows (followed_id, created_at desc);
 create index if not exists profile_follows_follower_created_idx
   on public.profile_follows (follower_id, created_at desc);
 
@@ -25,7 +25,7 @@ create policy profile_follows_read_authenticated
 drop policy if exists profile_follows_insert_self on public.profile_follows;
 create policy profile_follows_insert_self
   on public.profile_follows for insert to authenticated
-  with check (follower_id = (select auth.uid()) and follower_id <> following_id);
+  with check (follower_id = (select auth.uid()) and follower_id <> followed_id);
 
 drop policy if exists profile_follows_delete_self on public.profile_follows;
 create policy profile_follows_delete_self
@@ -52,11 +52,11 @@ begin
   end if;
 
   if p_user_id is not null and p_user_id <> official_user_id then
-    insert into public.profile_follows (follower_id, following_id)
+    insert into public.profile_follows (follower_id, followed_id)
     values (p_user_id, official_user_id)
     on conflict do nothing;
   elsif p_user_id is null or p_user_id = official_user_id then
-    insert into public.profile_follows (follower_id, following_id)
+    insert into public.profile_follows (follower_id, followed_id)
     select p.user_id, official_user_id
     from public.profiles p
     where p.user_id <> official_user_id
