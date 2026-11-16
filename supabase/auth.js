@@ -666,8 +666,16 @@ export async function saveMyBasicProfile(profile) {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para salvar seu perfil.');
-  const username = String(profile.username || '').trim().toLowerCase();
-  if (!/^[a-z0-9][a-z0-9_]{2,31}$/.test(username)) throw new Error('O nome de usuário deve ter de 3 a 32 caracteres: letras minúsculas, números e _.');
+  // O identificador técnico é criado automaticamente e não é exigido do usuário.
+  let username = String(profile.username || '').trim().toLowerCase();
+  if (!username) {
+    const { data: existing } = await supabase.from('profiles').select('username').eq('user_id', user.id).maybeSingle();
+    username = String(existing?.username || '').trim().toLowerCase();
+  }
+  if (!/^[a-z0-9][a-z0-9_]{2,31}$/.test(username)) {
+    const base = 'uai_' + user.id.replace(/-/g, '').slice(0, 12);
+    username = base.slice(0, 32);
+  }
   const payload = {
     user_id: user.id,
     username,

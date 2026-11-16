@@ -139,16 +139,14 @@ label{letter-spacing:.01em}
 <div id="setup-message" class="notice" role="status">Escolha seu tipo de conta e use somente e-mail e senha. Tudo em uma única área, simples e direta.</div>
 </section>
 <section class="card" id="basic-profile-panel" hidden aria-labelledby="basic-profile-title">
-<h2 id="basic-profile-title">👤 Meu perfil na comunidade</h2>
-<p class="muted">Escolha como deseja aparecer: Usuário Uai ou Artista / DJ. Todo perfil Artista / DJ recebe o selo azul de artista.</p>
+<h2 id="basic-profile-title">👤 Meu perfil</h2>
+<p class="muted">Seu perfil já é criado automaticamente quando sua conta é cadastrada. Aqui você só precisa editar seu nome e sobrenome; a descrição é opcional e pode ser alterada quando quiser.</p>
 <form id="basic-profile-form">
-<label for="basic-display-name">Nome que será exibido</label><input id="basic-display-name" maxlength="80" required>
-<label for="basic-username">Nome de usuário (@)</label><input id="basic-username" maxlength="32" minlength="3" pattern="[a-zA-Z0-9][a-zA-Z0-9_]{2,31}" autocomplete="username" required placeholder="ex.: brunochock"><p class="muted">Seu @ será único e aparecerá nas conversas, comentários e publicações.</p>
-<label for="basic-account-type">Como deseja participar?</label>
-<select id="basic-account-type" style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"><option value="user">Usuário Uai</option><option value="artist">Artista / DJ</option></select>
-<label for="basic-city">Cidade (opcional)</label><input id="basic-city" maxlength="100">
-<label for="basic-bio">Sobre você (opcional)</label><textarea id="basic-bio" maxlength="500" rows="3" placeholder="Conte um pouco sobre você..." style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
-<label style="display:flex;gap:10px;align-items:center"><input id="basic-public" type="checkbox" style="width:auto"> Quero que meu perfil apareça no diretório público</label>
+<label for="basic-display-name">Nome e sobrenome</label><input id="basic-display-name" maxlength="80" required autocomplete="name" placeholder="Digite seu nome e sobrenome">
+<label for="basic-bio">Descrição (opcional)</label><textarea id="basic-bio" maxlength="500" rows="3" placeholder="Fale um pouco sobre você. Você poderá editar depois." style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
+<input id="basic-account-type" type="hidden" value="user">
+<input id="basic-city" type="hidden" value="">
+<input id="basic-public" type="checkbox" hidden>
 <button type="submit" id="save-basic-profile">Salvar meu perfil</button>
 <p id="basic-profile-status" class="status" role="status" aria-live="polite"></p>
 </form>
@@ -692,7 +690,6 @@ async function loadBasicProfile(){
  try{
   const profile=await auth.getMyBasicProfile();
   document.getElementById('basic-display-name').value=profile?.display_name||'';
-  document.getElementById('basic-username').value=profile?.username||'';
   document.getElementById('basic-account-type').value=profile?.account_type||'user';
   artistProfileArea.hidden=(profile?.account_type||'user')!=='artist';
   const eventAdmin=await auth.isCurrentUserAdmin().catch(()=>false);
@@ -708,17 +705,18 @@ basicProfileForm.addEventListener('submit',async event=>{
  const button=document.getElementById('save-basic-profile');
  button.disabled=true;basicProfileStatus.textContent='Salvando seu perfil...';
  try{
+  const currentProfile=await auth.getMyBasicProfile();
   await auth.saveMyBasicProfile({
    display_name:document.getElementById('basic-display-name').value,
-   username:document.getElementById('basic-username').value,
-   account_type:document.getElementById('basic-account-type').value,
-   city:document.getElementById('basic-city').value,
+   username:currentProfile.username,
+   account_type:currentProfile.account_type,
+   city:currentProfile.city||'',
    bio:document.getElementById('basic-bio').value,
-   is_public:document.getElementById('basic-public').checked
+   is_public:currentProfile.is_public===true
   });
-  artistProfileArea.hidden=document.getElementById('basic-account-type').value!=='artist';
+  artistProfileArea.hidden=currentProfile.account_type!=='artist';
   await loadAdminSongAccess();
-  basicProfileStatus.textContent='Perfil salvo! '+(document.getElementById('basic-public').checked?'Ele poderá aparecer no diretório público.':'Ele ficará visível somente para você.');
+  basicProfileStatus.textContent='Perfil salvo! Você poderá editar sua descrição quando quiser.';
  }catch(error){basicProfileStatus.textContent=error?.message||'Não foi possível salvar seu perfil.';}
  finally{button.disabled=false;}
 });
