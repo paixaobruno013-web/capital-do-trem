@@ -12,7 +12,7 @@ const checks=[
  [sql.includes('playlist_songs_insert_owner_published_song')&&sql.includes("s.status = 'published'"),'Só músicas publicadas podem entrar em playlists'],
  [auth.includes('export async function getMyPlaylists')&&auth.includes('export async function createMyPlaylist'),'API de listar e criar playlists existe'],
  [auth.includes('export async function addSongToMyPlaylist')&&auth.includes('export async function removeSongFromMyPlaylist'),'API de adicionar e remover faixas existe'],
- [auth.includes('export async function moveSongInMyPlaylist')&&auth.includes('const temporary=')&&!auth.includes('update({position:-1})'),'Reordenação não viola a validação de posição'],
+ [auth.includes('export async function moveSongInMyPlaylist')&&auth.includes('temporary=')&&!auth.includes('update({position:-1})'),'Reordenação não viola a validação de posição'],
  [redeHtml.includes('id="playlist-name"')&&redeHtml.includes('id="my-playlists-list"'),'Área de playlists aparece na Rede Social'],
  [redeJs.includes('async function loadPlaylists')&&redeJs.includes('api.createMyPlaylist')&&redeJs.includes('api.addSongToMyPlaylist'),'Interface permite criar playlists e adicionar faixas'],
  [redeJs.includes('api.moveSongInMyPlaylist')&&redeJs.includes('api.removeSongFromMyPlaylist'),'Interface permite reordenar e remover faixas'],
