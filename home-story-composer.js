@@ -479,6 +479,16 @@ flipButton?.addEventListener('click', async () => {
   const ok = await startCamera();
   if (ok) say(facingMode === 'user' ? 'Câmera frontal ativada.' : 'Câmera traseira ativada.');
 });
+document.querySelectorAll('[data-story-caption]').forEach(button => {
+  button.addEventListener('click', () => {
+    const caption = el('home-story-caption');
+    if (!caption) return;
+    caption.value = button.dataset.storyCaption || '';
+    caption.focus();
+    caption.dispatchEvent(new Event('input', { bubbles: true }));
+    say('Sugestão adicionada. Edite a legenda como quiser antes de publicar.');
+  });
+});
 effectButtons.forEach(button => button.addEventListener('click', () => {
   activeEffect = button.dataset.storyEffect;
   applyEffect();
