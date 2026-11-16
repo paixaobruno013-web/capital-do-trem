@@ -1,4 +1,4 @@
-import {initSupabase,getCurrentSession,getPublishedPosts,submitMyPost,getPostSocial,togglePostLike,addPostComment} from './supabase/auth.js';
+import {initSupabase,getCurrentSession,submitMyPost,getPostSocial,togglePostLike,addPostComment} from './supabase/auth.js';
 const supabase=initSupabase();
 const $=id=>document.getElementById(id);
 const root=$('home-feed-list'),form=$('home-feed-composer'),status=$('home-feed-status'),fileInput=$('home-feed-media'),fileName=$('home-feed-media-name');
@@ -28,7 +28,7 @@ if(root&&form){
  async function load(){
   root.innerHTML='<p class="muted">Atualizando o Feed dos Maquinistas…</p>';
   try{
-   const posts=await getPublishedPosts();
+   const {data:posts,error:postsError}=await supabase.from('posts').select('id,author_id,content,created_at').eq('status','published').order('created_at',{ascending:false}).limit(60);if(postsError)throw postsError;
    if(!posts.length){root.innerHTML='<p class="muted">Ainda não há publicações. Seja o primeiro Maquinista a compartilhar uma novidade!</p>';return}
    const ids=posts.map(p=>p.id),authors=[...new Set(posts.map(p=>p.author_id))];
    const [mediaQ,profilesQ,artistsQ]=await Promise.all([
