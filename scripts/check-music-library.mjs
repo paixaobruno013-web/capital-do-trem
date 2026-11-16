@@ -8,6 +8,8 @@ const checks = [
   [index.includes("toggleSavedSong(song.id)"), 'Botão de salvar música não está ligado ao banco.'],
   [index.includes("api.recordSongPlay(song.id)"), 'Reprodução não registra histórico.'],
   [auth.includes('export async function getMyMusicLibrary') && auth.includes('export async function toggleSavedSong') && auth.includes('export async function recordSongPlay'), 'Funções da biblioteca ausentes.'],
+  [auth.includes('export async function getPublishedSongs') && auth.includes(".eq('status','published')") && auth.includes('.range(from,from + pageSize - 1)'), 'Catálogo público não busca todas as músicas publicadas em páginas.'],
+  [rede.includes("on('postgres_changes',{event:'*',schema:'public',table:'songs'},refreshMusicCatalog)") && rede.includes("window.addEventListener('focus',refreshMusicCatalog)") && rede.includes('watchMusicCatalog();'), 'Catálogo não sincroniza novas publicações em tempo real e ao retornar ao app.'],
   [sql.includes('enable row level security') && sql.includes('saved_songs_select_own') && sql.includes('song_play_history_select_own'), 'Migração sem RLS e políticas de propriedade.']
 ];
 for (const [ok, message] of checks) if (!ok) throw new Error(message);
