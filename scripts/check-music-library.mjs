@@ -12,6 +12,7 @@ const checks = [
   [indexHtml.includes('async function deleteOfflineMusic(id)') && indexHtml.includes("objectStore('tracks').delete(String(id))"), 'Playlist local não permite remover arquivos e liberar espaço.'],
   [indexHtml.includes('navigator.storage?.persist') && indexHtml.includes('navigator.storage?.estimate') && indexHtml.includes('Espaço insuficiente no aparelho'), 'Armazenamento offline não protege os dados nem verifica espaço disponível.'],
   [offlinePolicy.includes("status = 'published'") && offlinePolicy.includes("or user_id = (select auth.uid())") && offlinePolicy.includes("or (select private.is_admin())") && offlinePolicy.includes("s.status = 'published'"), 'Faixas privadas não estão isoladas do catálogo público ou o proprietário perdeu acesso.'],
+  [auth.includes(".in('status',['pending','published'])") && auth.includes("status in ('pending', 'published')"), 'O catálogo não consulta faixas em análise que a política permite ouvir publicamente.'],
   [index.includes('id="saved-songs-list"') && index.includes('id="recent-songs-list"'), 'Listas de salvas e recentes ausentes.'],
   [index.includes("toggleSavedSong(song.id)"), 'Botão de salvar música não está ligado ao banco.'],
   [index.includes("api.recordSongPlay(song.id)"), 'Reprodução não registra histórico.'],
