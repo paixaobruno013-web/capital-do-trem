@@ -8,12 +8,14 @@ export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null
  const top=document.createElement('div');top.className='ct-player-topline';const brand=document.createElement('span');brand.textContent='CAPITAL DO TREM • MUSIC EXPERIENCE';const live=document.createElement('span');live.className='ct-player-live';live.textContent='● PLAYER';top.append(brand,live);
  const stage=document.createElement('div');stage.className='ct-player-stage';
  const artWrap=document.createElement('div');artWrap.className='ct-player-art-wrap';
- const art=document.createElement('div');art.className='ct-player-artwork';art.innerHTML='<span class="ct-art-orbit ct-art-orbit-one"></span><span class="ct-art-orbit ct-art-orbit-two"></span><span class="ct-art-triangle">🔺</span><span class="ct-art-equalizer" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><strong class="ct-art-brand">CAPITAL<br>DO TREM</strong><small class="ct-art-caption">A MÚSICA NÃO PARA</small>';artWrap.append(art);
+ const art=document.createElement('div');art.className='ct-player-artwork';art.innerHTML='<span class="ct-art-orbit ct-art-orbit-one"></span><span class="ct-art-orbit ct-art-orbit-two"></span><span class="ct-art-triangle">🔺</span><span class="ct-art-equalizer" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><strong class="ct-art-brand">CAPITAL<br>DO TREM</strong><small class="ct-art-caption">A MÚSICA NÃO PARA</small>';art.append(artTitle,artArtist);artWrap.append(art);
  const disc=document.createElement('div');disc.className='ct-player-disc';disc.setAttribute('aria-hidden','true');artWrap.append(disc);
  const info=document.createElement('div');info.className='ct-player-info';
  const eyebrow=document.createElement('span');eyebrow.className='ct-player-eyebrow';eyebrow.textContent='TOCANDO AGORA';
  const title=document.createElement('h3');title.className='ct-player-title';title.textContent='Escolha uma música';
  const artist=document.createElement('p');artist.className='ct-player-artist';artist.textContent='Artista da comunidade';
+ const artTitle=document.createElement('strong');artTitle.className='ct-art-track-title';artTitle.textContent='SUA PRÓXIMA FAIXA';
+ const artArtist=document.createElement('small');artArtist.className='ct-art-track-artist';artArtist.textContent='ARTISTA DA COMUNIDADE';
  const producer=document.createElement('p');producer.className='ct-player-producer';producer.hidden=true;
  info.append(eyebrow,title,artist,producer);stage.append(artWrap,info);
  let playlistSelect=null;
@@ -28,12 +30,14 @@ export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null
  const status=document.createElement('p');status.className='ct-player-status';status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.textContent='Escolha uma faixa para começar a ouvir.';
  const audio=document.createElement('audio');audio.preload='none';audio.hidden=true;
  shell.append(progressWrap,controls,status,audio);root.append(shell);
- let catalog=[],queue=[],index=0,playlists=[];
+ let catalog=[],queue=[],index=0,playlists=[],lastRecordedSongId=null;
  const current=()=>queue[index]||null;
  function setCurrent(song,{autoplay=false}={}){
+  lastRecordedSongId=null;
   if(!song){audio.pause();audio.removeAttribute('src');audio.load();title.textContent='Escolha uma música';artist.textContent='Artista da comunidade';producer.hidden=true;range.value='0';elapsed.textContent='0:00';duration.textContent='0:00';play.textContent='▶';status.textContent='Nenhuma faixa disponível nesta seleção.';return}
   const url=safeAudioUrl(song.audio_url);if(!url){status.textContent='O áudio desta faixa está indisponível.';return}
   audio.pause();audio.src=url;audio.load();title.textContent=song.title||'Faixa sem título';artist.textContent=song.artist_name||'Artista da comunidade';producer.textContent=song.producer_name?'Produção: '+song.producer_name:'';producer.hidden=!song.producer_name;
+  artTitle.textContent=song.title||'FAIXA MUSICAL';artArtist.textContent=(song.artist_name||'ARTISTA DA COMUNIDADE').toUpperCase();
   art.dataset.songId=song.id||'';art.style.setProperty('--art-hue',String((String(song.id||song.title||'trem').split('').reduce((n,ch)=>n+ch.charCodeAt(0),0)*7)%360));
   range.value='0';elapsed.textContent='0:00';duration.textContent='0:00';play.textContent='▶';status.textContent='Faixa '+(index+1)+' de '+queue.length+' • pronta para tocar.';
   if('mediaSession' in navigator){try{navigator.mediaSession.metadata=new MediaMetadata({title:song.title||'Capital do Trem',artist:song.artist_name||'Artista da comunidade',album:'Capital do Trem',artwork:[{src:'./marca.svg',sizes:'any',type:'image/svg+xml'}]});}catch{}}
@@ -46,8 +50,8 @@ export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null
  previous.addEventListener('click',()=>{if(audio.currentTime>3){audio.currentTime=0;return}step(-1)});
  next.addEventListener('click',()=>step(1));
  mute.addEventListener('click',()=>{audio.muted=!audio.muted;mute.textContent=audio.muted?'🔇':'🔊';mute.setAttribute('aria-label',audio.muted?'Ativar som':'Silenciar')});
- audio.addEventListener('play',()=>{play.textContent='Ⅱ';play.setAttribute('aria-label','Pausar');status.textContent='Tocando agora';if(typeof onPlay==='function'&&current())onPlay(current());if('mediaSession' in navigator){try{navigator.mediaSession.playbackState='playing';navigator.mediaSession.setActionHandler('play',()=>audio.play());navigator.mediaSession.setActionHandler('pause',()=>audio.pause());navigator.mediaSession.setActionHandler('previoustrack',()=>step(-1));navigator.mediaSession.setActionHandler('nexttrack',()=>step(1));}catch{}}});
- audio.addEventListener('pause',()=>{play.textContent='▶';play.setAttribute('aria-label','Reproduzir');if('mediaSession' in navigator){try{navigator.mediaSession.playbackState='paused'}catch{}}});
+ audio.addEventListener('play',()=>{if(current()?.id&&lastRecordedSongId!==current().id){lastRecordedSongId=current().id;if(typeof onPlay==='function')onPlay(current())}shell.classList.add('is-playing');play.textContent='Ⅱ';play.setAttribute('aria-label','Pausar');status.textContent='Tocando agora';if(typeof onPlay==='function'&&current())onPlay(current());if('mediaSession' in navigator){try{navigator.mediaSession.playbackState='playing';navigator.mediaSession.setActionHandler('play',()=>audio.play());navigator.mediaSession.setActionHandler('pause',()=>audio.pause());navigator.mediaSession.setActionHandler('previoustrack',()=>step(-1));navigator.mediaSession.setActionHandler('nexttrack',()=>step(1));}catch{}}});
+ audio.addEventListener('pause',()=>{shell.classList.remove('is-playing');play.textContent='▶';play.setAttribute('aria-label','Reproduzir');if('mediaSession' in navigator){try{navigator.mediaSession.playbackState='paused'}catch{}}});
  audio.addEventListener('ended',()=>{if(queue.length>1)step(1);else{play.textContent='↻';status.textContent='Faixa finalizada.'}});
  audio.addEventListener('timeupdate',()=>{if(Number.isFinite(audio.duration)&&audio.duration>0){range.value=String(Math.round(audio.currentTime/audio.duration*1000));elapsed.textContent=formatTime(audio.currentTime);duration.textContent=formatTime(audio.duration)}});
  audio.addEventListener('loadedmetadata',()=>{duration.textContent=formatTime(audio.duration)});
