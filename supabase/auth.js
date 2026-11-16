@@ -1936,8 +1936,8 @@ export async function moveSongInMyPlaylist(playlistId,songId,direction) {
  const {data:rows,error}=await supabase.from('playlist_songs').select('song_id,position').eq('playlist_id',playlistId).order('position',{ascending:true}).order('added_at',{ascending:true});
  if(error)throw error;const ordered=rows||[],index=ordered.findIndex(x=>x.song_id===songId),target=index+(direction<0?-1:1);
  if(index<0||target<0||target>=ordered.length)return false;
- const left=ordered[index],right=ordered[target];
- const {error:first}=await supabase.from('playlist_songs').update({position:-1}).eq('playlist_id',playlistId).eq('song_id',left.song_id);if(first)throw first;
+ const left=ordered[index],right=ordered[target],temporary=(ordered.reduce((max,row)=>Math.max(max,row.position),-1))+1;
+ const {error:first}=await supabase.from('playlist_songs').update({position:temporary}).eq('playlist_id',playlistId).eq('song_id',left.song_id);if(first)throw first;
  const {error:second}=await supabase.from('playlist_songs').update({position:left.position}).eq('playlist_id',playlistId).eq('song_id',right.song_id);if(second)throw second;
  const {error:third}=await supabase.from('playlist_songs').update({position:right.position}).eq('playlist_id',playlistId).eq('song_id',left.song_id);if(third)throw third;
  return true;
