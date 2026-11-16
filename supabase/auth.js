@@ -1877,3 +1877,68 @@ export async function toggleSavedPost(postId) {
  if(existing){const {error}=await supabase.from('saved_posts').delete().eq('user_id',user.id).eq('post_id',postId);if(error)throw error;return false;}
  const {error}=await supabase.from('saved_posts').insert({user_id:user.id,post_id:postId});if(error)throw error;return true;
 }
+
+
+// Playlists pessoais: o banco e as políticas RLS garantem propriedade por usuário.
+export async function getMyPlaylists() {
+ const supabase=initSupabase(); const {data:{user},error:userError}=await supabase.auth.getUser();
+ if(userError)throw userError; if(!user)throw new Error('Entre na sua conta para acessar suas playlists.');
+ const {data:playlists,error}=await supabase.from('playlists').select('id,name,created_at,updated_at').eq('user_id',user.id).order('updated_at',{ascending:false}).limit(100);
+ if(error)throw error; const ids=(playlists||[]).map(x=>x.id); if(!ids.length)return [];
+ const {data:entries,error:entriesError}=await supabase.from('playlist_songs').select('playlist_id,song_id,position,added_at').in('playlist_id',ids).order('position',{ascending:true}).order('added_at',{ascending:true});
+ if(entriesError)throw entriesError; const grouped=new Map();
+ for(const row of entries||[]){const list=grouped.get(row.playlist_id)||[];list.push(row);grouped.set(row.playlist_id,list);}
+ return (playlists||[]).map(x=>({...x,songs:grouped.get(x.id)||[]}));
+}
+export async function createMyPlaylist(name) {
+ const supabase=initSupabase();const {data:{user},error:userError}=await supabase.auth.getUser();
+ if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para criar uma playlist.');
+ const clean=String(name||'').trim();if(!clean||clean.length>60)throw new Error('O nome deve ter entre 1 e 60 caracteres.');
+ const {data,error}=await supabase.from('playlists').insert({user_id:user.id,name:clean}).select('id,name,created_at,updated_at').single();
+ if(error){if(error.code==='23505')throw new Error('Você já tem uma playlist com esse nome.');throw error;}return data;
+}
+export async function renameMyPlaylist(playlistId,name) {
+ const supabase=initSupabase();const {data:{user},error:userError}=await supabase.auth.getUser();
+ if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para editar playlists.');
+ const clean=String(name||'').trim();if(!clean||clean.length>60)throw new Error('O nome deve ter entre 1 e 60 caracteres.');
+ const {data,error}=await supabase.from('playlists').update({name:clean,updated_at:new Date().toISOString()}).eq('id',playlistId).eq('user_id',user.id).select('id,name,created_at,updated_at').single();
+ if(error)throw error;return data;
+}
+export async function deleteMyPlaylist(playlistId) {
+ const supabase=initSupabase();const {data:{user},error:userError}=await supabase.auth.getUser();
+ if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para excluir playlists.');
+ const {error}=await supabase.from('playlists').delete().eq('id',playlistId).eq('user_id',user.id);if(error)throw error;
+}
+export async function addSongToMyPlaylist(playlistId,songId) {
+ const supabase=initSupabase();const {data:{user},error:userError}=await supabase.auth.getUser();
+ if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para montar playlists.');
+ const {data:playlist,error:playlistError}=await supabase.from('playlists').select('id').eq('id',playlistId).eq('user_id',user.id).maybeSingle();
+ if(playlistError)throw playlistError;if(!playlist)throw new Error('Playlist não encontrada.');
+ const {data:existing,error:existingError}=await supabase.from('playlist_songs').select('song_id').eq('playlist_id',playlistId).eq('song_id',songId).maybeSingle();
+ if(existingError)throw existingError;if(existing)return false;
+ const {data:last,error:lastError}=await supabase.from('playlist_songs').select('position').eq('playlist_id',playlistId).order('position',{ascending:false}).limit(1).maybeSingle();
+ if(lastError)throw lastError;
+ const {error}=await supabase.from('playlist_songs').insert({playlist_id:playlistId,song_id:songId,position:(last?.position??-1)+1});if(error)throw error;
+ const {error:touchError}=await supabase.from('playlists').update({updated_at:new Date().toISOString()}).eq('id',playlistId).eq('user_id',user.id);if(touchError)throw touchError;return true;
+}
+export async function removeSongFromMyPlaylist(playlistId,songId) {
+ const supabase=initSupabase();const {data:{user},error:userError}=await supabase.auth.getUser();
+ if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para editar playlists.');
+ const {data:playlist,error:playlistError}=await supabase.from('playlists').select('id').eq('id',playlistId).eq('user_id',user.id).maybeSingle();
+ if(playlistError)throw playlistError;if(!playlist)throw new Error('Playlist não encontrada.');
+ const {error}=await supabase.from('playlist_songs').delete().eq('playlist_id',playlistId).eq('song_id',songId);if(error)throw error;
+}
+export async function moveSongInMyPlaylist(playlistId,songId,direction) {
+ const supabase=initSupabase();const {data:{user},error:userError}=await supabase.auth.getUser();
+ if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para organizar playlists.');
+ const {data:playlist,error:playlistError}=await supabase.from('playlists').select('id').eq('id',playlistId).eq('user_id',user.id).maybeSingle();
+ if(playlistError)throw playlistError;if(!playlist)throw new Error('Playlist não encontrada.');
+ const {data:rows,error}=await supabase.from('playlist_songs').select('song_id,position').eq('playlist_id',playlistId).order('position',{ascending:true}).order('added_at',{ascending:true});
+ if(error)throw error;const ordered=rows||[],index=ordered.findIndex(x=>x.song_id===songId),target=index+(direction<0?-1:1);
+ if(index<0||target<0||target>=ordered.length)return false;
+ const left=ordered[index],right=ordered[target];
+ const {error:first}=await supabase.from('playlist_songs').update({position:-1}).eq('playlist_id',playlistId).eq('song_id',left.song_id);if(first)throw first;
+ const {error:second}=await supabase.from('playlist_songs').update({position:left.position}).eq('playlist_id',playlistId).eq('song_id',right.song_id);if(second)throw second;
+ const {error:third}=await supabase.from('playlist_songs').update({position:right.position}).eq('playlist_id',playlistId).eq('song_id',left.song_id);if(third)throw third;
+ return true;
+}
