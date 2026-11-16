@@ -154,6 +154,8 @@ jobs:
           grep -q 'subscribePrivateMessages' mensagens.html
           grep -q 'author_avatar_type' bate-papo.html
           echo "Políticas de perfil, configurações e avatar sincronizado verificadas."
+      - name: Verificar selo de artista e privacidade de amizades
+        run: node scripts/check-artist-verification.mjs
       - name: Verificar monitoramento local de falhas
         run: node scripts/check-health-monitor.mjs
       - name: Verificar área de apoiadores
