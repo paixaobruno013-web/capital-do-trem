@@ -55,7 +55,7 @@ begin
     insert into public.profile_follows (follower_id, following_id)
     values (p_user_id, official_user_id)
     on conflict do nothing;
-  elsif p_user_id = official_user_id then
+  elsif p_user_id is null or p_user_id = official_user_id then
     insert into public.profile_follows (follower_id, following_id)
     select p.user_id, official_user_id
     from public.profiles p
