@@ -141,3 +141,34 @@ body.light .ct-player-artist{color:#283142}body.light .ct-player-playlist{backgr
 @media(max-width:460px){.ct-player-stage{grid-template-columns:minmax(0,1fr);gap:12px;padding:17px 0 14px}.ct-player-art-wrap{max-width:205px}.ct-player-disc{right:8%;top:12%}.ct-player-info{text-align:center}.ct-player-controls{gap:18px}.ct-player-control{width:44px;height:44px}}
 @media(prefers-reduced-motion:no-preference){.ct-player-art-wrap{animation:ct-player-float 6s ease-in-out infinite}.ct-player-artwork{animation:ct-player-turn 9s ease-in-out infinite alternate}.ct-player-shell:has(audio:not([paused])) .ct-art-equalizer i{animation:ct-player-eq .65s ease-in-out infinite alternate}.ct-player-shell:has(audio:not([paused])) .ct-art-equalizer i:nth-child(2){animation-delay:.2s}.ct-player-shell:has(audio:not([paused])) .ct-art-equalizer i:nth-child(3){animation-delay:.35s}@keyframes ct-player-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}@keyframes ct-player-turn{from{transform:rotateY(-13deg) rotateX(7deg) translateZ(18px)}to{transform:rotateY(13deg) rotateX(-4deg) translateZ(18px)}}@keyframes ct-player-eq{from{height:25%}to{height:100%}}}
 @media(prefers-reduced-motion:reduce){.ct-player-art-wrap,.ct-player-artwork{animation:none!important}}
+
+.ct-art-track-title{position:relative;z-index:3;max-width:78%;margin-top:3px;text-align:center;font-size:clamp(9px,2.2vw,13px);font-weight:950;line-height:1.1;letter-spacing:.5px;overflow-wrap:anywhere;text-shadow:0 2px 8px #000}
+.ct-art-track-artist{position:relative;z-index:3;max-width:78%;font-size:7px;letter-spacing:1px;color:#d2e7f5;text-align:center;overflow-wrap:anywhere;text-shadow:0 2px 6px #000}
+.ct-player-shell.is-playing .ct-art-equalizer i{animation:ct-player-eq .55s ease-in-out infinite alternate}
+.ct-player-shell.is-playing .ct-art-equalizer i:nth-child(2){animation-delay:.15s}
+.ct-player-shell.is-playing .ct-art-equalizer i:nth-child(3){animation-delay:.28s}
+.ct-player-shell.is-playing .ct-art-equalizer i:nth-child(4){animation-delay:.4s}
+body:has(#basic-profile-form) header{padding-top:30px;padding-bottom:26px}
+body:has(#basic-profile-form) header .logo{width:92px;height:92px}
+body:has(#basic-profile-form) main{max-width:760px}
+body:has(#basic-profile-form) main>.card{border-radius:22px;padding:clamp(18px,4vw,28px);background:linear-gradient(145deg,rgba(19,23,34,.93),rgba(8,10,16,.9));border-color:rgba(84,233,255,.15)!important}
+body:has(#basic-profile-form) form label{display:block;margin:14px 0 6px;color:#d9e4f1;font-size:13px;font-weight:850;letter-spacing:.2px}
+body:has(#basic-profile-form) input:not([type=checkbox]):not([type=file]),body:has(#basic-profile-form) textarea,body:has(#basic-profile-form) select{min-height:48px;border-radius:12px;padding:12px 14px}
+body:has(#basic-profile-form) form button[type=submit]{width:100%;min-height:52px;border-radius:13px;font-weight:950;letter-spacing:.3px}
+body:has(#basic-profile-form) .notice{border:1px solid rgba(84,233,255,.24);border-left:3px solid var(--ct-neon-red);border-radius:13px;background:linear-gradient(100deg,rgba(255,38,56,.1),rgba(84,233,255,.05))}
+body:has(#basic-profile-form) .tabs button{border-radius:999px}
+body:has(#basic-profile-form) .password-row button{border-radius:12px}
+body:has(#basic-profile-form) .admin-identity{backdrop-filter:blur(12px)}
+body:has(#feed) .tabs{padding:8px 0 15px;scrollbar-width:thin}
+body:has(#feed) .tabs button{border:1px solid rgba(84,233,255,.2);background:rgba(12,16,24,.82);border-radius:999px;box-shadow:inset 0 1px rgba(255,255,255,.05)}
+body:has(#feed) .tabs button.active{background:linear-gradient(110deg,#ff2638,#9c1b79);border-color:#ff5267;color:white}
+body:has(#feed) main>.card{border-radius:18px}
+body:has(#feed) .song-card{background:linear-gradient(145deg,#151a26,#090b12);border:1px solid rgba(84,233,255,.18);border-radius:17px}
+body:has(#feed) .song-cover{border-radius:14px}
+body:has(#messages) .chat-panel{border-color:rgba(84,233,255,.18);background:linear-gradient(145deg,rgba(15,20,30,.96),rgba(8,10,16,.95))}
+body:has(#messages) #messages{background:radial-gradient(ellipse at 50% 0%,rgba(84,233,255,.07),transparent 60%),rgba(5,7,12,.72);border-color:rgba(84,233,255,.2)}
+body:has(#messages) .message{border:1px solid rgba(84,233,255,.13);background:linear-gradient(145deg,#151a26,#0b0e15);box-shadow:0 8px 20px #0004}
+body:has(#messages) .message strong{color:#54e9ff}
+body:has(#messages) .composer{border-color:rgba(84,233,255,.24);background:rgba(5,8,14,.88);box-shadow:0 0 24px rgba(84,233,255,.06)}
+body:has(#messages) .composer input{border-color:rgba(84,233,255,.22)}
+@media(max-width:520px){.ct-art-track-title{font-size:10px}.ct-art-track-artist{font-size:6px}}
