@@ -17,3 +17,9 @@ const checks=[
 [html.includes('./bate-papo.html')&&html.includes('./index.html#eventos'),'Atalhos para chat e eventos permanecem disponíveis']
 ];
 for(const [ok,msg] of checks){if(!ok)throw new Error(msg);console.log('OK',msg)}
+
+const rede = await readFile(new URL('../rede.html', import.meta.url), 'utf8');
+const redeJs = await readFile(new URL('../rede.js', import.meta.url), 'utf8');
+if (!rede.includes('id="cover-preset"') || !redeJs.includes('function makeCoverPreset') || !redeJs.includes("cover_url:makeCoverPreset(coverPreset)")) throw new Error('Personalização de capa por opções do sistema ausente.');
+if (!rede.includes('id="pending-song-list"') || !redeJs.includes('async function loadMyPendingSongs') || !redeJs.includes('renderPendingSongs')) throw new Error('Prévia das músicas em análise ausente.');
+console.log('Perfis com capas do sistema e prévias das músicas em análise conferidos.');
