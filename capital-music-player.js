@@ -45,7 +45,7 @@ export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null
   if(autoplay)audio.play().catch(()=>{status.textContent='Toque em reproduzir para ouvir esta faixa.'});
  }
  function setQueue(items,start=0,{autoplay=false}={}){queue=(items||[]).filter(song=>safeAudioUrl(song.audio_url));index=Math.max(0,Math.min(start,queue.length-1));setCurrent(current(),{autoplay});}
- function playSong(song){const found=catalog.findIndex(item=>item.id===song?.id);if(found>=0){setQueue(catalog,found,{autoplay:true});return}setQueue([song],0,{autoplay:true});}
+ function playSong(song){const found=catalog.findIndex(item=>item.id===song?.id);if(found>=0&&safeAudioUrl(song.audio_url)===safeAudioUrl(catalog[found].audio_url)){setQueue(catalog,found,{autoplay:true});return}setQueue([song],0,{autoplay:true});}
  function step(amount){if(!queue.length)return;index=(index+amount+queue.length)%queue.length;setCurrent(current(),{autoplay:true});}
  play.addEventListener('click',()=>{if(!current()){status.textContent='Escolha uma música no catálogo ou uma playlist.';return}if(audio.paused)audio.play().catch(()=>{status.textContent='Não foi possível iniciar a reprodução. Tente novamente.'});else audio.pause()});
  previous.addEventListener('click',()=>{if(audio.currentTime>3){audio.currentTime=0;return}step(-1)});
