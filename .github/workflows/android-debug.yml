@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - 'index.html'
+      - 'youtube-feed.js'
       - 'event-social-composer.js'
       - 'home-story-composer.js'
       - 'offline.html'
@@ -28,6 +29,7 @@ on:
       - 'sw.js'
       - 'update.js'
       - 'supabase/**'
+      - 'supabase/auth.js'
       - 'scripts/**'
       - 'assets/**'
       - 'package.json'

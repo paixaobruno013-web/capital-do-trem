@@ -13,7 +13,7 @@ const [room, enhancements, emoji, privateChat, worker, stories, home, auth, admi
   read('admin-media.js'),
   read('package.json'),
   read('capacitor.config.ts'),
-  read('.github/workflows/android-debug-apk.yml'),
+  read('.github/workflows/android-debug.yml'),
   read('.github/workflows/ios-build.yml')
 ]);
 
