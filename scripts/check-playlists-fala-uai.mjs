@@ -19,7 +19,7 @@ const checks=[
  [chat.includes('<title>FALA UAI')&&chat.includes('id="fala-uai-player"'),'Bate-papo apresenta identidade FALA UAI'],
  [chat.includes('id="fala-uai-player"')&&chat.includes('showPlaylists:true'),'Player musical 3D está dentro da tela de conversa e carrega playlists'],
  [chat.includes('import {getMyPlaylists,getPublishedSongs,recordSongPlay}')&&chat.includes('createCapitalMusicPlayer')&&player.includes("audio.addEventListener('ended'")&&player.includes('function step(amount)'),'Player unificado carrega playlists, registra reprodução e avança faixas'],
- [chat.includes('O player continua tocando durante a chegada de novas mensagens')&&chat.indexOf('id="fala-uai-player"')<chat.indexOf('id="messages"'),'Player fica separado da lista de mensagens em tempo real'],
+ [player.includes("audio.addEventListener('play'")&&chat.indexOf('id="fala-uai-player"')<chat.indexOf('id="messages"'),'Player fica separado da lista de mensagens e segue ativo durante o chat'],
  [redeHtml.includes('id="post-caption-count"')&&redeHtml.includes('id="post-preview"')&&redeHtml.includes('id="clear-post-file"'),'Composer social oferece contador, prévia e remoção de mídia'],
  [redeJs.includes('function clearPostPreview')&&redeJs.includes('URL.createObjectURL(file)')&&redeJs.includes('URL.revokeObjectURL'),'Prévia de mídia libera URL temporária ao limpar'],
  [prepare.includes("'capital-futurista.css'")&&sw.includes("'./capital-futurista.css'"),'CSS futurista é empacotado e armazenado no cache PWA']
