@@ -1,10 +1,10 @@
 import {readFile} from 'node:fs/promises';
 import {spawnSync} from 'node:child_process';
 const read=path=>readFile(new URL('../'+path,import.meta.url),'utf8');
-const [home,rede,chat,account,redeJs,player,css,prepare,sw]=await Promise.all([
+const [home,rede,chat,account,redeJs,player,css,prepare,sw,auth]=await Promise.all([
  read('index.html'),read('rede.html'),read('bate-papo.html'),read('conta.html'),
  read('rede.js'),read('capital-music-player.js'),read('capital-futurista.css'),
- read('scripts/prepare-web.mjs'),read('sw.js')
+ read('scripts/prepare-web.mjs'),read('sw.js'),read('supabase/auth.js')
 ]);
 const checks=[
  [home.includes('id="capital-music-player"')&&home.includes("createCapitalMusicPlayer('capital-music-player'"),'Central de músicas tem player 3D integrado'],
@@ -13,6 +13,9 @@ const checks=[
  [redeJs.includes('musicPlayer.playSong(song)'),'Faixas da rede social usam os controles do player'],
  [chat.includes('id="fala-uai-player"')&&chat.includes("createCapitalMusicPlayer('fala-uai-player'"),'FALA UAI tem player musical integrado'],
  [chat.includes('showPlaylists:true')&&chat.includes('getMyPlaylists()'),'FALA UAI permite selecionar playlists pessoais'],
+ [player.includes('MÚSICAS DISPONÍVEIS')&&player.includes('catalogSelect.addEventListener')&&player.includes('Escolha uma música publicada'),'Player oferece automaticamente o catálogo completo para escolha de faixa'],
+ [auth.includes('export async function getPublishedSongs')&&auth.includes('.range(from,from + pageSize - 1)')&&auth.includes('storage.createSignedUrls(paths, 60 * 60)'),'Catálogo público busca todas as músicas publicadas em lotes e prepara links de reprodução'],
+ [player.includes('lastRecordedSongId!==current().id')&&!player.includes("if(typeof onPlay==='function'&&current())onPlay(current())"),'Reprodução registra cada faixa sem duplicar o histórico'],
  [player.includes('ct-player-artwork')&&player.includes('ct-art-track-title')&&player.includes('ct-art-track-artist'),'Capa musical mostra identidade, faixa e artista'],
  [player.includes('ct-player-play')&&player.includes('previous.addEventListener')&&player.includes('next.addEventListener')&&player.includes('range.addEventListener'),'Player tem reproduzir/pausar, voltar, avançar e busca de faixa'],
  [player.includes('MediaMetadata')&&player.includes('setActionHandler'),'Player integra controles de mídia do aparelho'],
