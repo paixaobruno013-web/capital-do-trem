@@ -17,7 +17,7 @@ const checks=[
  [redeJs.includes('async function loadPlaylists')&&redeJs.includes('api.createMyPlaylist')&&redeJs.includes('api.addSongToMyPlaylist'),'Interface permite criar playlists e adicionar faixas'],
  [redeJs.includes('api.moveSongInMyPlaylist')&&redeJs.includes('api.removeSongFromMyPlaylist'),'Interface permite reordenar e remover faixas'],
  [chat.includes('<title>FALA UAI')&&chat.includes('id="fala-uai-player"'),'Bate-papo apresenta identidade FALA UAI'],
- [chat.includes('id="fala-uai-player"')&&chat.includes('showPlaylists:true'),'Player musical 3D está dentro da tela de conversa e carrega playlists'],
+ [chat.includes('id="fala-uai-player"')&&chat.includes('showPlaylists:true')&&chat.includes('Promise.allSettled([getPublishedSongs(),getMyPlaylists()])'),'Player musical 3D carrega catálogo mesmo se playlists precisarem de migração'],
  [chat.includes('import {getMyPlaylists,getPublishedSongs,recordSongPlay}')&&chat.includes('createCapitalMusicPlayer')&&player.includes("audio.addEventListener('ended'")&&player.includes('function step(amount)'),'Player unificado carrega playlists, registra reprodução e avança faixas'],
  [player.includes("audio.addEventListener('play'")&&chat.indexOf('id="fala-uai-player"')<chat.indexOf('id="messages"'),'Player fica separado da lista de mensagens e segue ativo durante o chat'],
  [redeHtml.includes('id="post-caption-count"')&&redeHtml.includes('id="post-preview"')&&redeHtml.includes('id="clear-post-file"'),'Composer social oferece contador, prévia e remoção de mídia'],
