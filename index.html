@@ -1824,7 +1824,7 @@ async function saveOfflineMusic(id,blob,title){
       if(session){recentSongIds=[song.id,...recentSongIds.filter(id=>id!==song.id)].slice(0,30);renderMusicLibrary();}
      });audio.style.cssText='width:100%;margin:8px 0';audio.setAttribute('aria-label','Ouvir '+song.title);
     let offlineTrack=null;
-    try{offlineTrack=await getOfflineMusic(song.id);if(offlineTrack?.blob){audio.src=URL.createObjectURL(offlineTrack.blob);audio.dataset.offlineReady='true';}}catch(error){/* A reprodução online continua disponível se o armazenamento local falhar. */}
+    try{offlineTrack=await getOfflineMusic(song.id);if(offlineTrack?.blob){offlineTrack.url=URL.createObjectURL(offlineTrack.blob);audio.src=offlineTrack.url;audio.dataset.offlineReady='true';}}catch(error){/* A reprodução online continua disponível se o armazenamento local falhar. */}
     if('mediaSession' in navigator){
      const updateMediaPlayback=()=>{try{navigator.mediaSession.playbackState=audio.paused?'paused':'playing';}catch{}};
      audio.addEventListener('play',()=>{
@@ -1841,7 +1841,7 @@ async function saveOfflineMusic(id,blob,title){
      audio.addEventListener('pause',updateMediaPlayback);
      audio.addEventListener('ended',()=>{try{navigator.mediaSession.playbackState='none';}catch{}});
     }
-    const listen=document.createElement('button');listen.type='button';listen.className='btn primary';listen.textContent='▶ Ouvir no player 3D';listen.addEventListener('click',()=>{musicPlayer.playSong(offlineTrack?.blob?{...song,audio_url:URL.createObjectURL(offlineTrack.blob)}:song);document.getElementById('capital-music-player')?.scrollIntoView({behavior:'smooth',block:'center'});});card.append(listen,audio);
+    const listen=document.createElement('button');listen.type='button';listen.className='btn primary';listen.textContent='▶ Ouvir no player 3D';listen.addEventListener('click',()=>{musicPlayer.playSong(offlineTrack?.blob?{...song,audio_url:offlineTrack.url||URL.createObjectURL(offlineTrack.blob)}:song);document.getElementById('capital-music-player')?.scrollIntoView({behavior:'smooth',block:'center'});});card.append(listen,audio);
    }else{const unavailable=document.createElement('p');unavailable.className='muted';unavailable.textContent='Áudio temporariamente indisponível.';card.append(unavailable);}
    if(downloadUrl){const download=document.createElement('a');download.className='btn alt';download.href=downloadUrl;download.rel='noopener';download.textContent='⬇ Baixar música';download.setAttribute('aria-label','Baixar '+song.title);download.style.display='inline-block';download.style.margin='4px 0';card.append(download);}
    if(audioUrl&&song.id){
@@ -1858,8 +1858,8 @@ async function saveOfflineMusic(id,blob,title){
       const blob=await response.blob();
       if(!blob.size)throw new Error('O arquivo recebido está vazio');
       await saveOfflineMusic(song.id,blob,song.title);
-      offlineTrack={blob,title:song.title};
-      audio.src=URL.createObjectURL(blob);audio.dataset.offlineReady='true';audio.load();
+      offlineTrack={blob,title:song.title,url:URL.createObjectURL(blob)};
+      audio.src=offlineTrack.url;audio.dataset.offlineReady='true';audio.load();
       offlineButton.textContent='✓ Salva para ouvir offline';offlineStatus.textContent='Música guardada neste aparelho. Agora pode tocar sem internet.';
      }catch(error){offlineStatus.textContent='Não foi possível guardar offline. Verifique a conexão e tente novamente.';}
      finally{offlineButton.disabled=false;}
