@@ -162,6 +162,8 @@ jobs:
         run: node scripts/check-account-deletion.mjs
       - name: Verificar biblioteca musical sincronizada
         run: node scripts/check-music-library.mjs
+      - name: Verificar playlists pessoais, player FALA UAI e publicações sociais
+        run: node scripts/check-playlists-fala-uai.mjs
       - name: Verificar álbum privado do administrador
         run: node scripts/check-private-admin-gallery.mjs
       - name: Verificar Stories no perfil do usuário
