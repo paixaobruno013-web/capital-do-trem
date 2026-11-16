@@ -115,7 +115,7 @@ if(searchRoot){
    const items=(mediaQ.data||[]).map(m=>({...m,url:urls.get((m.bucket_id||'capital-do-trem-social')+':'+m.storage_path),post:posts.find(p=>p.id===m.post_id)})).filter(m=>m.url);
    const render=()=>{
     const q=(search?.value||'').toLocaleLowerCase('pt-BR');
-    const filtered=items.filter(item=>{const author=people.get(item.post?.author_id)||{};return [item.post?.content,author.display_name,author.username].some(v=>safe(v).toLocaleLowerCase('pt-BR').includes(q))});
+    const filtered=items.filter(item=>{const author=people.get(item.post?.author_id)||{};return [item.post?.content,author.display_name,author.username].some(v=>String(v??'').toLocaleLowerCase('pt-BR').includes(q))});
     filtered.sort(()=>Math.random()-.5);searchRoot.replaceChildren();
     for(const item of filtered.slice(0,24)){const card=document.createElement('article');card.className='home-video-card';const video=document.createElement('video');video.src=item.url;video.controls=true;video.playsInline=true;video.preload='metadata';const caption=document.createElement('p');caption.textContent=item.post?.content||'Vídeo da comunidade';const author=document.createElement('small');const p=people.get(item.post?.author_id);author.textContent=p?.display_name||'Maquinista';card.append(video,caption,author);searchRoot.append(card)}
     if(!filtered.length)searchRoot.textContent='Nenhum vídeo encontrado com essa busca.';
