@@ -5,7 +5,7 @@ const [home, profile, profileScript, chat] = await Promise.all([
  readFile(new URL('../rede.js', import.meta.url), 'utf8'),
  readFile(new URL('../bate-papo.html', import.meta.url), 'utf8')
 ]);
-const discovery = home.match(/<section class="page" id="pesquisa">[\\s\\S]*?<section class="page" id="eventos">/)?.[0] || '';
+const discovery = home.match(/<section class="page" id="pesquisa">[\s\S]*?<section class="page" id="eventos">/)?.[0] || '';
 const checks = [
  ['Feed social é a página inicial e aparece na navegação', /data-page="inicio"[^>]*>⌂ Feed/.test(home) && /id="home-community-feed"/.test(home)],
  ['mensagem de boas-vindas aparece na entrada', /SEJA BEM-VINDO, MAQUINISTA DESSE TREM!/.test(home)],
