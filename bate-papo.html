@@ -398,11 +398,20 @@ import {createCapitalMusicPlayer} from './capital-music-player.js';
 (async()=>{
  const player=createCapitalMusicPlayer('fala-uai-player',{showPlaylists:true,onPlay:song=>recordSongPlay(song.id).catch(()=>{})});
  const status=document.createElement('p');status.className='ct-player-status';status.textContent='Carregando suas playlists e músicas…';document.getElementById('fala-uai-player')?.append(status);
- try{
-  const [playlists,songs]=await Promise.all([getMyPlaylists(),getPublishedSongs()]);
-  player.setCatalog(songs);player.setPlaylists(playlists);
-  if(!playlists.length)status.textContent='Crie suas playlists na Rede Social para ouvir aqui enquanto conversa.';
-  else status.textContent='Sua música continua tocando enquanto as mensagens chegam. 🎧';
- }catch(error){status.textContent=error?.message||'Entre na sua conta para carregar suas playlists.';}
+ const [songsResult,playlistsResult]=await Promise.allSettled([getPublishedSongs(),getMyPlaylists()]);
+ if(songsResult.status==='fulfilled'){
+  player.setCatalog(songsResult.value);
+  if(songsResult.value.length)status.textContent='Catálogo de músicas publicado e disponível para ouvir. 🎧';
+  else status.textContent='As músicas publicadas pela comunidade aparecerão automaticamente aqui.';
+ }else{
+  status.textContent=songsResult.reason?.message||'Não foi possível carregar o catálogo musical agora.';
+ }
+ if(playlistsResult.status==='fulfilled'){
+  player.setPlaylists(playlistsResult.value);
+  if(!playlistsResult.value.length&&songsResult.status==='fulfilled')status.textContent='Músicas disponíveis! Crie suas playlists na Rede Social para organizar sua trilha sonora.';
+  else if(playlistsResult.value.length&&songsResult.status==='fulfilled')status.textContent='Músicas e playlists prontas. Sua música continua tocando enquanto você conversa! 🎧';
+ }else if(songsResult.status==='fulfilled'){
+  status.textContent='O catálogo está disponível para ouvir. A área de playlists pessoais precisa da atualização do banco de dados.';
+ }
 })();
 </script></body></html>
