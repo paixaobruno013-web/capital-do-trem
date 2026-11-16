@@ -1,0 +1,98 @@
+/* CAPITAL DO TREM — identidade futurista imersiva
+   Direção: estação digital do futuro, trilhos de luz, energia do Funk e Minas Gerais.
+   Sem bibliotecas externas; respeita movimento reduzido e tema claro. */
+:root{
+  --ct-neon-red:#ff2638;
+  --ct-neon-cyan:#54e9ff;
+  --ct-neon-violet:#a78bfa;
+  --ct-glass:rgba(17,19,27,.78);
+  --ct-line:rgba(255,255,255,.13);
+  --ct-glow:0 0 24px rgba(255,38,56,.18),0 0 54px rgba(84,233,255,.08);
+}
+html{scroll-behavior:smooth}
+body{
+  background-color:#05060a;
+  background-image:
+    radial-gradient(ellipse at 12% 8%,rgba(255,38,56,.16),transparent 34%),
+    radial-gradient(ellipse at 88% 18%,rgba(84,233,255,.11),transparent 31%),
+    radial-gradient(ellipse at 50% 100%,rgba(112,72,210,.12),transparent 42%),
+    linear-gradient(180deg,#07080d 0%,#090a11 48%,#05060a 100%);
+  background-attachment:fixed;
+}
+body:not(.light)::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.19;
+  background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:linear-gradient(to bottom,black,transparent 88%);
+}
+body:not(.light)::after{
+  content:"";position:fixed;left:0;right:0;top:0;height:2px;z-index:30;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--ct-neon-red),var(--ct-neon-cyan),transparent);
+  opacity:.75;box-shadow:0 0 18px rgba(84,233,255,.55);
+}
+body>*{position:relative}
+header{
+  border-color:rgba(255,255,255,.12)!important;
+  background:rgba(7,8,13,.78)!important;
+  backdrop-filter:blur(22px) saturate(150%);
+  -webkit-backdrop-filter:blur(22px) saturate(150%);
+  box-shadow:0 12px 38px rgba(0,0,0,.3),inset 0 -1px rgba(84,233,255,.08);
+}
+header img,.logo{filter:drop-shadow(0 0 12px rgba(255,38,56,.38)) drop-shadow(0 0 22px rgba(84,233,255,.12))}
+h1,h2,h3{ text-wrap:balance }
+h1{ text-shadow:0 0 28px rgba(255,38,56,.17) }
+.card,.panel,.notice,.artist-song-studio,.event-composer,.song-card,.profile-post-card{
+  border-color:var(--ct-line)!important;
+  box-shadow:0 18px 54px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.045),var(--ct-glow);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+button,.btn,.tabs a,.tabs button{
+  transition:transform .2s ease,filter .2s ease,box-shadow .2s ease,border-color .2s ease;
+}
+button:not(:disabled):hover,.btn:hover,.tabs button:hover{
+  filter:brightness(1.12);
+  box-shadow:0 0 0 1px rgba(84,233,255,.18),0 8px 26px rgba(255,38,56,.16);
+}
+button:not(:disabled):active,.btn:active{transform:translateY(1px) scale(.985)}
+button.primary,.btn.primary,.publish-button,.event-publish-button{
+  background:linear-gradient(112deg,#ff2638 0%,#c40e35 52%,#7625a8 100%);
+  box-shadow:0 8px 28px rgba(255,38,56,.22),inset 0 1px rgba(255,255,255,.2);
+}
+input,textarea,select{
+  border-color:rgba(255,255,255,.16)!important;
+  background:rgba(7,9,15,.72)!important;
+  transition:border-color .2s ease,box-shadow .2s ease;
+}
+input:focus,textarea:focus,select:focus{
+  border-color:var(--ct-neon-cyan)!important;
+  box-shadow:0 0 0 3px rgba(84,233,255,.12),0 0 22px rgba(84,233,255,.09)!important;
+  outline:none;
+}
+a{ text-underline-offset:3px }
+a:focus-visible,button:focus-visible{outline:2px solid var(--ct-neon-cyan);outline-offset:3px}
+.tabs button.active,.profile-subtabs button.active{
+  box-shadow:0 0 0 1px rgba(255,255,255,.15),0 0 22px rgba(255,38,56,.26);
+}
+.profile-cover,.song-cover,.post-media,.event-photo-stage{
+  box-shadow:0 14px 34px rgba(0,0,0,.32),0 0 24px rgba(255,38,56,.10);
+}
+.song-cover{border:1px solid rgba(255,255,255,.16)}
+footer{border-color:rgba(255,255,255,.1)}
+/* Tema claro continua legível, sem perder a assinatura visual. */
+body.light{
+  background-color:#f3f4f8;
+  background-image:radial-gradient(ellipse at 10% 0%,rgba(255,38,56,.10),transparent 34%),radial-gradient(ellipse at 90% 10%,rgba(35,174,202,.10),transparent 32%),linear-gradient(180deg,#fafaff,#edf0f6);
+  background-attachment:fixed;
+}
+body.light header{background:rgba(255,255,255,.82)!important;box-shadow:0 10px 30px rgba(20,30,50,.08)}
+body.light input,body.light textarea,body.light select{background:rgba(255,255,255,.9)!important;border-color:rgba(30,40,60,.18)!important}
+body.light .card,body.light .panel{box-shadow:0 14px 38px rgba(30,40,60,.08)}
+@media(prefers-reduced-motion:no-preference){
+  .logo,header img{animation:ct-arrival-glow 5s ease-in-out infinite alternate}
+  @keyframes ct-arrival-glow{from{filter:drop-shadow(0 0 8px rgba(255,38,56,.24))}to{filter:drop-shadow(0 0 15px rgba(84,233,255,.28))}}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
