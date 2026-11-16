@@ -12,6 +12,7 @@ const files = [
   'rede.js',
   'capital-music-player.js',
   'home-feed.js',
+  'chat-topics.js',
   'capital-futurista.css',
   'admin.html',
   'file-picker-guard.js',
