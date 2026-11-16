@@ -271,3 +271,13 @@ body:has(.profile-overview-card) main{max-width:760px}
  .profile-subtabs{gap:4px}
  .profile-subtabs button{font-size:11px;padding:8px 3px}
 }
+
+
+/* Visualizador ampliado para foto de perfil e capa de outros Maquinistas. */
+.profile-overview-card .profile-cover,.profile-overview-card .profile-avatar-wrap .avatar{cursor:zoom-in}
+.profile-overview-card .profile-cover:focus-visible,.profile-overview-card .profile-avatar-wrap .avatar:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.profile-image-viewer{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:56px 14px 20px;background:rgba(0,0,0,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.profile-image-viewer[hidden]{display:none}
+.profile-image-viewer-image{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border-radius:10px;box-shadow:0 12px 48px #000b}
+.profile-image-viewer-close{position:absolute;top:max(14px,env(safe-area-inset-top));right:16px;width:44px;height:44px;border:1px solid #ffffff55;border-radius:50%;background:#222;color:#fff;font-size:22px;line-height:1}
+body.profile-image-viewer-open{overflow:hidden}
