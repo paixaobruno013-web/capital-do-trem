@@ -1000,11 +1000,21 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <p id="music-library-status" class="muted" role="status" aria-live="polite"></p>
 </section>
 <div id="capital-music-player" aria-label="Player 3D Capital do Trem"></div>
-<section id="music-playlists-area" class="music-playlists-area card">
- <div class="home-section-heading"><div><span class="eyebrow">SUA TRILHA SONORA</span><h3>♫ Minhas playlists</h3><p class="muted">Monte suas próprias seleções para ouvir suas músicas favoritas.</p></div></div>
- <form id="music-playlist-create" class="music-playlist-create"><label class="sr-only" for="music-playlist-name">Nome da playlist</label><input id="music-playlist-name" maxlength="60" placeholder="Nome da nova playlist" required><button class="btn primary" type="submit">＋ Criar playlist</button></form>
- <p id="music-playlist-status" class="muted" role="status" aria-live="polite"></p>
- <div id="music-playlists-list" class="music-playlists-list"><p class="muted">Carregando suas playlists…</p></div>
+
+
+<section id="music-upload-area" class="card music-upload-area" aria-labelledby="music-upload-title">
+ <div class="home-section-heading"><div><span class="eyebrow">ENVIE SEU SOM</span><h3 id="music-upload-title">＋ Publicar música</h3><p class="muted">MCs e DJs podem enviar suas faixas diretamente por aqui. Cada envio é independente, mesmo quando a música já existe no catálogo.</p></div></div>
+ <p id="music-upload-access" class="notice" role="status" aria-live="polite">Verificando acesso para envio…</p>
+ <form id="music-upload-form" hidden>
+  <label for="music-upload-file">Arquivo de áudio (MP3, M4A, AAC, WAV ou OGG • até 50 MB)</label>
+  <input id="music-upload-file" type="file" accept="audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/x-wav,audio/ogg,.mp3,.m4a,.aac,.wav,.ogg" required>
+  <label for="music-upload-title">Nome da música</label><input id="music-upload-title" maxlength="120" required placeholder="Título da faixa">
+  <label for="music-upload-artist">Nome artístico / MC / DJ</label><input id="music-upload-artist" maxlength="100" required placeholder="Como seu público conhece você">
+  <label for="music-upload-producer">Produtor (opcional)</label><input id="music-upload-producer" maxlength="100" placeholder="Nome do produtor">
+  <label for="music-upload-description">Descrição (opcional)</label><textarea id="music-upload-description" maxlength="1000" rows="3" placeholder="Conte um pouco sobre a faixa"></textarea>
+  <button class="btn primary" id="music-upload-submit" type="submit">Enviar música para o catálogo</button>
+ </form>
+ <p id="music-upload-status" class="muted" role="status" aria-live="polite"></p>
 </section>
 
 <label for="song-catalog-search" class="muted" style="display:block;margin:14px 0 5px;font-weight:700">🔎 Buscar por música ou artista</label><input id="song-catalog-search" type="search" inputmode="search" autocomplete="off" placeholder="Digite o nome da música ou do artista…" aria-controls="published-song-catalog" style="margin:0 0 8px"><p id="song-catalog-count" class="muted" role="status" aria-live="polite" style="margin:0 0 10px">Carregando músicas…</p><div id="published-song-catalog" class="list" aria-live="polite"><p class="muted">Carregando catálogo compartilhado…</p></div></div><div class="card"><h3>🎧 Player do Capital do Trem</h3><label for="audio">Escolha uma música autorizada que esteja no seu aparelho</label><input id="audio" type="file" accept="audio/*"><audio id="player" controls preload="metadata" style="width:100%;margin:12px 0"></audio><div class="social" style="align-items:center"><button class="btn" id="download-audio" type="button" disabled>⬇ Baixar música</button><span id="audio-status" class="muted" role="status" aria-live="polite">Selecione um áudio para ouvir e baixar nesta demonstração.</span></div><p class="muted">O player oferece controles de reprodução e pode continuar tocando com a tela bloqueada, conforme o suporte do navegador e as configurações de economia de bateria do celular. O download salva o arquivo selecionado neste aparelho.</p><p class="muted">Só compartilhe ou baixe músicas que você tenha autorização para distribuir.</p></div></section>
@@ -2403,5 +2413,5 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
 <script type="module" src="./home-story-composer.js"></script>
 <script type="module" src="./stories-ui.js"></script>
 <script type="module" src="./home-feed.js"></script>
-<script type="module" src="./music-playlists.js"></script>
+<script type="module" src="./music-upload.js"></script>
 </body></html>
