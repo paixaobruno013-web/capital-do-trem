@@ -690,7 +690,6 @@ async function loadBasicProfile(){
  try{
   const profile=await auth.getMyBasicProfile();
   document.getElementById('basic-display-name').value=profile?.display_name||'';
-  document.getElementById('basic-username').value=profile?.username||'';
   document.getElementById('basic-account-type').value=profile?.account_type||'user';
   artistProfileArea.hidden=(profile?.account_type||'user')!=='artist';
   const eventAdmin=await auth.isCurrentUserAdmin().catch(()=>false);
