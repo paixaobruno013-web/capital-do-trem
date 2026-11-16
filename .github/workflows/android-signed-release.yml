@@ -1,43 +1,57 @@
-name: Preparar Android — APK direto e Google Play
+name: Publicar CAPITAL DO TREM — APK Android direto
 
 on:
   workflow_dispatch:
+    inputs:
+      release_version:
+        description: "Versão do aplicativo (ex.: 1.0.0)"
+        required: true
+        default: "1.0.0"
+        type: string
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
-  group: android-production-release
+  group: capital-do-trem-android-direct-release
   cancel-in-progress: false
 
 jobs:
-  signed-release:
-    name: Gerar APK direto e AAB da Google Play
+  signed-apk:
+    name: Gerar e publicar APK Android assinado
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
-      - name: Validar presença das credenciais sem exibi-las
+      - name: Validar presença das credenciais de assinatura
         shell: bash
         env:
           APP_KEYSTORE_BASE64: ${{ secrets.ANDROID_APP_SIGNING_KEYSTORE_BASE64 }}
           APP_STORE_PASSWORD: ${{ secrets.ANDROID_APP_SIGNING_STORE_PASSWORD }}
           APP_KEY_ALIAS: ${{ secrets.ANDROID_APP_SIGNING_KEY_ALIAS }}
           APP_KEY_PASSWORD: ${{ secrets.ANDROID_APP_SIGNING_KEY_PASSWORD }}
-          UPLOAD_KEYSTORE_BASE64: ${{ secrets.ANDROID_PLAY_UPLOAD_KEYSTORE_BASE64 }}
-          UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_PLAY_UPLOAD_STORE_PASSWORD }}
-          UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_PLAY_UPLOAD_KEY_ALIAS }}
-          UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_PLAY_UPLOAD_KEY_PASSWORD }}
         run: |
           set -euo pipefail
-          for name in APP_KEYSTORE_BASE64 APP_STORE_PASSWORD APP_KEY_ALIAS APP_KEY_PASSWORD UPLOAD_KEYSTORE_BASE64 UPLOAD_STORE_PASSWORD UPLOAD_KEY_ALIAS UPLOAD_KEY_PASSWORD; do
+          for name in APP_KEYSTORE_BASE64 APP_STORE_PASSWORD APP_KEY_ALIAS APP_KEY_PASSWORD; do
             if [ -z "${!name:-}" ]; then
-              echo "::error::Falta configurar um segredo protegido relacionado à assinatura Android."
+              echo "::error::Falta configurar um segredo protegido de assinatura Android. Consulte as instruções do repositório."
               exit 1
             fi
           done
 
       - name: Baixar o código
         uses: actions/checkout@v4
+
+      - name: Validar versão da publicação
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ inputs.release_version }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Informe uma versão válida, como 1.0.0."
+            exit 1
+          fi
+          echo "RELEASE_TAG=android-v$RELEASE_VERSION" >> "$GITHUB_ENV"
 
       - name: Configurar Node.js
         uses: actions/setup-node@v4
@@ -64,10 +78,11 @@ jobs:
           npm run build:web
           npx cap add android
 
-      - name: Preparar ícones com a imagem oficial do perfil
+      - name: Preparar ícones com a marca oficial ou fallback local
         env:
           PROFILE_ICON_URL: https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/31937786-c321-445f-ae1c-de018eca95c8/avatar/b338f7a8-8964-4063-9086-64a9bd603f4f.jpg
         run: |
+          set -euo pipefail
           mkdir -p assets
           if ! curl --fail --location --retry 3 "$PROFILE_ICON_URL" --output /tmp/capital-do-trem-profile.jpg; then
             echo "Foto remota indisponível; será usada a marca local do Capital do Trem."
@@ -82,26 +97,20 @@ jobs:
           npx cap sync android
           python3 scripts/configure-android-media.py android
 
-      - name: Restaurar chaves protegidas em diretório temporário
+      - name: Restaurar chave de assinatura em diretório temporário protegido
         shell: bash
         env:
           APP_KEYSTORE_BASE64: ${{ secrets.ANDROID_APP_SIGNING_KEYSTORE_BASE64 }}
           APP_STORE_PASSWORD: ${{ secrets.ANDROID_APP_SIGNING_STORE_PASSWORD }}
           APP_KEY_ALIAS: ${{ secrets.ANDROID_APP_SIGNING_KEY_ALIAS }}
-          UPLOAD_KEYSTORE_BASE64: ${{ secrets.ANDROID_PLAY_UPLOAD_KEYSTORE_BASE64 }}
-          UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_PLAY_UPLOAD_STORE_PASSWORD }}
-          UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_PLAY_UPLOAD_KEY_ALIAS }}
         run: |
           set -euo pipefail
           umask 077
           printf '%s' "$APP_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/capital-do-trem-app-signing.jks"
-          printf '%s' "$UPLOAD_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/capital-do-trem-play-upload.jks"
           test -s "$RUNNER_TEMP/capital-do-trem-app-signing.jks"
-          test -s "$RUNNER_TEMP/capital-do-trem-play-upload.jks"
           keytool -list -keystore "$RUNNER_TEMP/capital-do-trem-app-signing.jks" -storepass "$APP_STORE_PASSWORD" -alias "$APP_KEY_ALIAS" >/dev/null
-          keytool -list -keystore "$RUNNER_TEMP/capital-do-trem-play-upload.jks" -storepass "$UPLOAD_STORE_PASSWORD" -alias "$UPLOAD_KEY_ALIAS" >/dev/null
 
-      - name: Gerar APK Release para distribuição direta
+      - name: Gerar APK Release assinado para distribuição direta
         working-directory: android
         shell: bash
         env:
@@ -110,13 +119,13 @@ jobs:
           APP_KEY_PASSWORD: ${{ secrets.ANDROID_APP_SIGNING_KEY_PASSWORD }}
         run: |
           set -euo pipefail
-          ./gradlew --no-daemon assembleRelease \
+          ./gradlew --no-daemon --max-workers=2 assembleRelease \
             -Pandroid.injected.signing.store.file="$RUNNER_TEMP/capital-do-trem-app-signing.jks" \
             -Pandroid.injected.signing.store.password="$APP_STORE_PASSWORD" \
             -Pandroid.injected.signing.key.alias="$APP_KEY_ALIAS" \
             -Pandroid.injected.signing.key.password="$APP_KEY_PASSWORD"
 
-      - name: Verificar assinatura do APK direto
+      - name: Verificar assinatura e integridade do APK
         shell: bash
         run: |
           set -euo pipefail
@@ -124,41 +133,23 @@ jobs:
           test -s "$APK"
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK" | tee capital-do-trem-apk-certificate.txt
           sha256sum "$APK" | tee capital-do-trem-apk.sha256
+          cp "$APK" "CAPITAL-DO-TREM-$RELEASE_TAG.apk"
 
-      - name: Gerar Android App Bundle assinado para Google Play
-        working-directory: android
-        shell: bash
-        env:
-          UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_PLAY_UPLOAD_STORE_PASSWORD }}
-          UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_PLAY_UPLOAD_KEY_ALIAS }}
-          UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_PLAY_UPLOAD_KEY_PASSWORD }}
-        run: |
-          set -euo pipefail
-          ./gradlew --no-daemon bundleRelease \
-            -Pandroid.injected.signing.store.file="$RUNNER_TEMP/capital-do-trem-play-upload.jks" \
-            -Pandroid.injected.signing.store.password="$UPLOAD_STORE_PASSWORD" \
-            -Pandroid.injected.signing.key.alias="$UPLOAD_KEY_ALIAS" \
-            -Pandroid.injected.signing.key.password="$UPLOAD_KEY_PASSWORD"
-
-      - name: Verificar assinatura e integridade do AAB
-        shell: bash
-        run: |
-          set -euo pipefail
-          AAB="android/app/build/outputs/bundle/release/app-release.aab"
-          test -s "$AAB"
-          jarsigner -verify -verbose -certs "$AAB" >/tmp/aab-signature-check.txt
-          grep -q "jar verified" /tmp/aab-signature-check.txt
-          sha256sum "$AAB" | tee capital-do-trem-aab.sha256
-
-      - name: Publicar artefatos assinados para conferência
-        uses: actions/upload-artifact@v4
+      - name: Publicar APK para download direto
+        uses: softprops/action-gh-release@v2
         with:
-          name: capital-do-trem-android-production-signed
-          path: |
-            android/app/build/outputs/apk/release/app-release.apk
-            android/app/build/outputs/bundle/release/app-release.aab
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: "CAPITAL DO TREM Android ${{ inputs.release_version }}"
+          body: |
+            Lançamento Android do CAPITAL DO TREM para instalação direta.
+
+            - APK Release assinado e verificado.
+            - Distribuição fora da Google Play.
+            - Download gratuito.
+            - Confira o SHA-256 publicado junto ao APK.
+          files: |
+            CAPITAL-DO-TREM-${{ env.RELEASE_TAG }}.apk
             capital-do-trem-apk.sha256
-            capital-do-trem-aab.sha256
             capital-do-trem-apk-certificate.txt
-          if-no-files-found: error
-          retention-days: 7
+          draft: false
+          prerelease: false
