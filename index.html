@@ -907,6 +907,20 @@ body.light header.header-has-custom-background::before{
 .event-social-gps-row button{flex:0 0 auto}
 #event-social-status{min-height:24px;margin:12px 0;font-size:13px}
 @media(min-width:650px){.event-social-modal{align-items:center}.event-social-panel{max-height:90dvh}}
+/* Estúdio de Stories: acabamento moderno para câmera, efeitos e prévia. */
+#home-story-composer{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+#home-story-composer-card{border:1px solid rgba(255,255,255,.13);box-shadow:0 24px 80px #000b,0 0 34px rgba(237,28,36,.14)}
+.home-story-compose-head{padding-bottom:12px}
+#home-story-camera-stage{border-radius:20px;overflow:hidden;background:radial-gradient(circle at 50% 35%,#262626,#050505 72%);box-shadow:inset 0 0 35px #0009}
+#home-story-live,#home-story-photo-preview,#home-story-selected-video{border-radius:18px}
+.home-story-compose-controls button,.home-story-effect-list button,.home-story-save,.home-story-publish{border-radius:999px;transition:transform .18s ease,filter .18s ease,box-shadow .18s ease}
+.home-story-compose-controls button:active,.home-story-effect-list button:active{transform:scale(.96)}
+.home-story-effect-list button[aria-pressed=true]{border-color:#ed1c24;box-shadow:0 0 0 2px rgba(237,28,36,.18),0 0 18px rgba(237,28,36,.2)}
+#home-story-caption{border-radius:14px;min-height:84px}
+#capital-story-card{border:1px solid #ffffff20;box-shadow:0 24px 80px #000c}
+#capital-story-progress{overflow:hidden;border-radius:999px}
+@media(prefers-reduced-motion:reduce){#home-story-composer *,#capital-story-viewer *{transition:none!important;animation:none!important}}
+
 </style><script>
 // Se o Android encerrar o processo enquanto a câmera nativa está aberta, retoma a conversa em vez de reiniciar na página inicial.
 try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(localStorage.getItem(key)||0);if(started&&Date.now()-started<3*60*1000){localStorage.removeItem(key);location.replace('./bate-papo.html?retorno-camera=1');}}catch(error){}
