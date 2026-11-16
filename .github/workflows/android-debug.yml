@@ -95,9 +95,20 @@ jobs:
       - name: Permitir áudio automático no WebView Android
         run: python scripts/configure-android-media.py android
 
-      - name: Compilar APK de teste
+      - name: Compilar APK de teste com novas tentativas para falhas temporárias do Maven Central
         working-directory: android
-        run: ./gradlew --no-daemon assembleDebug
+        run: |
+          for attempt in 1 2 3; do
+            echo "Tentativa $attempt de 3 para compilar o APK"
+            if ./gradlew --no-daemon --max-workers=2 assembleDebug; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              echo "Falha temporária possível ao baixar dependências; aguardando antes de tentar novamente."
+              sleep $((attempt * 30))
+            fi
+          done
+          exit 1
 
       - name: Publicar APK como artefato de teste
         uses: actions/upload-artifact@v4
