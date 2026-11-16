@@ -10,6 +10,7 @@ const files = [
   'conta.html',
   'rede.html',
   'rede.js',
+  'capital-futurista.css',
   'admin.html',
   'file-picker-guard.js',
   'admin-media.js',
