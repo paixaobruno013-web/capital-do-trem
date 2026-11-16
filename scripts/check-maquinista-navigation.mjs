@@ -6,7 +6,7 @@ const v=Object.fromEntries(await Promise.all(files.map(async p=>[p,await read(p)
 const checks=[
  [v['index.html'].includes('home-community-feed')&&v['index.html'].includes('home-feed-composer')&&v['index.html'].includes('home-feed.js'),'Feed com publicação fica na tela inicial'],
  [v['index.html'].includes('data-page="pesquisa"')&&v['index.html'].includes('random-video-results')&&v['home-feed.js'].includes('shuffle-videos'),'Pesquisa oferece vídeos aleatórios e filtro'],
- [v['index.html'].includes('id="music-playlists-area"')&&v['index.html'].includes('capital-music-player')&&v['music-playlists.js'].includes('createMyPlaylist'),'Músicas tem player e criação de playlists'],
+ [v['index.html'].includes('capital-music-player')&&v['rede.html'].includes('class="playlist-manager card"')&&v['rede.js'].includes('api.createMyPlaylist'),'Central de Músicas tem player e o perfil tem criação de playlists'],
  [v['supabase/auth.js'].includes('export async function getPublishedSongs')&&v['supabase/auth.js'].includes('storage.createSignedUrls(paths, 60 * 60)'),'Músicas publicadas ficam disponíveis automaticamente com links temporários'],
  [v['bate-papo.html'].includes('Grupo CAPITAL DO TREM')&&v['bate-papo.html'].includes('id="chat-topics"')&&v['bate-papo.html'].includes('id="fazer-amigos"')&&v['bate-papo.html'].includes('./mensagens.html'),'Chat separa grupo, assuntos, amizades e conversas privadas'],
  [!v['bate-papo.html'].includes('fala-uai-player')&&!v['bate-papo.html'].includes('createCapitalMusicPlayer'),'Chat não mistura player musical'],
