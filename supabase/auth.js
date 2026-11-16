@@ -527,6 +527,29 @@ export async function getMySongs() {
   return data || [];
 }
 
+
+// Faixas publicadas vinculadas ao perfil público do artista/MC/DJ.
+export async function getPublishedSongsForProfile(userId) {
+  const supabase = initSupabase();
+  const { data, error } = await supabase.from('songs')
+    .select('id,title,artist_name,producer_name,description,storage_path')
+    .eq('user_id', userId).eq('status', 'published')
+    .order('created_at', { ascending: false }).limit(100);
+  if (error) throw error;
+  const songs = data || [];
+  if (!songs.length) return [];
+  const paths = songs.map(song => song.storage_path);
+  const { data: signed, error: signedError } = await supabase.storage
+    .from('capital-do-trem-audio').createSignedUrls(paths, 60 * 60);
+  if (signedError) throw signedError;
+  const urls = new Map((signed || []).map(item => [item.path, item.signedUrl]));
+  return songs.filter(song => urls.has(song.storage_path)).map(song => ({
+    id: song.id, title: song.title, artist_name: song.artist_name,
+    producer_name: song.producer_name || '', description: song.description || '',
+    audio_url: urls.get(song.storage_path)
+  }));
+}
+
 export async function getPublishedSongs() {
   const supabase = initSupabase();
   // Busca o catálogo completo em páginas para que novas publicações não fiquem
@@ -647,9 +670,28 @@ export async function getMyBasicProfile() {
     .select('user_id, display_name, username, account_type, bio, city, is_public, avatar_type, avatar_url, avatar_path, avatar_data, cover_url, cover_path')
     .eq('user_id', user.id).maybeSingle();
   if (error) throw error;
+  // O perfil do administrador oficial é preparado automaticamente após a
+  // autenticação; a autorização continua sendo confirmada pelo RPC seguro do banco.
+  if ((user.email || '').toLowerCase() === 'capitaldotrem07@gmail.com') {
+    try { await bootstrapFirstAdmin(); } catch (error) { console.warn('Bootstrap administrativo não concluído:', error); }
+    if (await isCurrentUserAdmin()) {
+      const taken = await supabase.from('profiles').select('user_id')
+        .eq('username', 'sbrunochock').neq('user_id', user.id).maybeSingle();
+      if (taken.error) throw taken.error;
+      if (taken.data) throw new Error('O identificador @sbrunochock já está associado a outra conta. A equipe precisa revisar o cadastro.');
+      return saveMyBasicProfile({
+        ...(data || {}),
+        display_name: 'Administrador',
+        username: 'sbrunochock',
+        account_type: 'user',
+        city: 'Belo Horizonte • MG',
+        bio: data?.bio || 'Administrador oficial do Capital do Trem',
+        is_public: true
+      });
+    }
+  }
   if (data) return data;
-  // Se o cadastro foi confirmado por e-mail e ainda não existe perfil básico,
-  // recupera o tipo escolhido no cadastro e cria o perfil na primeira entrada.
+  // Perfis comuns também são criados automaticamente na primeira entrada.
   const metadata = user.user_metadata || {};
   const accountType = metadata.account_type === 'artist' ? 'artist' : 'user';
   const created = await saveMyBasicProfile({
