@@ -15,6 +15,7 @@ const checks=[
  [v['rede.html'].includes('profile-only-tabs')&&v['rede.html'].includes('profile-verified-seal')&&v['rede.html'].includes('stat-followers')&&v['rede.html'].includes('stat-following'),'Perfil fica focado em dados pessoais, seguidores e selo'],
  [v['rede.js'].includes("eq('status','published')")&&v['rede.js'].includes('profile-verified-seal'),'Selo aparece apenas para artistas publicados/aprovados'],
  [v['conta.html'].includes('SEJA BEM-VINDO')&&v['conta.html'].includes('MAQUINISTA DESSE TREM'),'Cadastro recebe mensagem de boas-vindas do projeto'],
+ [v['conta.html'].includes('nome, foto, nome de usuário e descrição são opcionais')&&!/<input id="basic-display-name"[^>]*required/.test(v['conta.html']),'Nome do perfil pode ficar em branco; o perfil continua automático'],
  [v['scripts/prepare-web.mjs'].includes('home-feed.js')&&v['scripts/prepare-web.mjs'].includes('music-playlists.js')&&v['scripts/prepare-web.mjs'].includes('chat-topics.js'),'Todos os módulos entram nos pacotes nativos'],
  [v['sw.js'].includes('home-feed.js')&&v['sw.js'].includes('music-playlists.js')&&v['sw.js'].includes('chat-topics.js'),'Todos os módulos entram no cache PWA']
 ];
