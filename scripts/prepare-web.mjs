@@ -11,6 +11,7 @@ const files = [
   'rede.html',
   'rede.js',
   'capital-music-player.js',
+  'persistent-music-player.js',
   'home-feed.js',
   'music-playlists.js',
   'chat-topics.js',
