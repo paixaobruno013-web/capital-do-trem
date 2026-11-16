@@ -2,7 +2,9 @@ import {createCapitalMusicPlayer} from './capital-music-player.js';
 import * as api from './supabase/auth.js';
 const $=id=>document.getElementById(id);
 const supabase=api.initSupabase();
-const musicPlayer=createCapitalMusicPlayer('rede-music-player',{onPlay:song=>api.recordSongPlay(song.id).catch(()=>{})});
+function setMusicFocusMode(active){const panel=$('musicas'),back=$('music-catalog-back');if(!panel||!back)return;panel.classList.toggle('music-focus-mode',Boolean(active));back.hidden=!active;}
+const musicPlayer=createCapitalMusicPlayer('rede-music-player',{onPlay:song=>{api.recordSongPlay(song.id).catch(()=>{});setMusicFocusMode(true);}});
+$('music-catalog-back')?.addEventListener('click',()=>setMusicFocusMode(false));
 let me=null,profile=null,currentProfileUserId=null,allPosts=[],allMedia=[],allPeople=[],allSongs=[];
 const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const initials=value=>String(value||'Capital do Trem').trim().slice(0,2).toUpperCase();

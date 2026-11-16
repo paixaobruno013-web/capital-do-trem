@@ -11,6 +11,8 @@ const checks = [
   [auth.includes('export async function getMyMusicLibrary') && auth.includes('export async function toggleSavedSong') && auth.includes('export async function recordSongPlay'), 'Funções da biblioteca ausentes.'],
   [auth.includes('export async function getPublishedSongs') && auth.includes(".eq('status','published')") && auth.includes('.range(from,from + pageSize - 1)'), 'Catálogo público não busca todas as músicas publicadas em páginas.'],
   [rede.includes("on('postgres_changes',{event:'*',schema:'public',table:'songs'},refreshMusicCatalog)") && rede.includes("window.addEventListener('focus',refreshMusicCatalog)") && rede.includes('watchMusicCatalog();'), 'Catálogo não sincroniza novas publicações em tempo real e ao retornar ao app.'],
+  [rede.includes('function setMusicFocusMode(active)') && rede.includes("setMusicFocusMode(true)") && rede.includes("setMusicFocusMode(false)") && rede.includes("musicPlayer.playSong(song)"), 'Reprodução não alterna entre o feed musical e a tela focada na faixa atual.'],
+  [(await readFile(new URL('../rede.html', import.meta.url), 'utf8')).includes('id="music-catalog-back"') && (await readFile(new URL('../rede.html', import.meta.url), 'utf8')).includes('.music-focus-mode #song-list'), 'Tela de reprodução não oferece retorno ao feed nem oculta o catálogo durante a reprodução.'],
   [sql.includes('enable row level security') && sql.includes('saved_songs_select_own') && sql.includes('song_play_history_select_own'), 'Migração sem RLS e políticas de propriedade.']
 ];
 for (const [ok, message] of checks) if (!ok) throw new Error(message);
