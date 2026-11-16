@@ -183,7 +183,8 @@ jobs:
           test -s www/home-story-composer.js
           grep -q 'id="home-story-add"' www/index.html
           grep -q 'id="home-story-album-button"' www/index.html
-          grep -q 'id="artist-song-submit-form"' www/conta.html
+          grep -q 'id="music-upload-form"' www/index.html
+          test -s www/music-upload.js
           test -s www/conta.html
           test -s www/admin.html
           test -s www/privacidade.html
