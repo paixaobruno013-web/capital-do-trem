@@ -1792,7 +1792,7 @@ async function saveOfflineMusic(id,blob,title){
   const api=await import('./supabase/auth.js');api.initSupabase();
   const playerModule=await import('./capital-music-player.js');
   const session=await api.getCurrentSession();
-  const musicPlayer=playerModule.createCapitalMusicPlayer('capital-music-player',{onPlay:song=>{if(session)api.recordSongPlay(song.id).catch(()=>{});}});
+  const musicPlayer=playerModule.createCapitalMusicPlayer('capital-music-player',{showPlaylists:true,onPlay:song=>{if(session)api.recordSongPlay(song.id).catch(()=>{});}});window.capitalMusicPlayer=musicPlayer;
   const songs=await api.getPublishedSongs();container.replaceChildren();
   const libraryPanel=document.getElementById('music-library');
   const libraryLogin=document.getElementById('music-library-login');
