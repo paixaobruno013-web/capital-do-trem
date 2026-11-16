@@ -1,9 +1,9 @@
 import { readFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 const read=path=>readFile(new URL('../'+path,import.meta.url),'utf8');
-const [auth,redeJs,redeHtml,chat,sql,prepare,sw,player]=await Promise.all([
+const [auth,redeJs,redeHtml,chat,sql,prepare,sw,player,home,musicUi]=await Promise.all([
  read('supabase/auth.js'),read('rede.js'),read('rede.html'),read('bate-papo.html'),
- read('supabase/migrations/20261116150000_personal_playlists.sql'),read('scripts/prepare-web.mjs'),read('sw.js'),read('capital-music-player.js')
+ read('supabase/migrations/20261116150000_personal_playlists.sql'),read('scripts/prepare-web.mjs'),read('sw.js'),read('capital-music-player.js'),read('index.html'),read('music-playlists.js')
 ]);
 const checks=[
  [sql.includes('create table if not exists public.playlists')&&sql.includes('create table if not exists public.playlist_songs'),'Banco cria playlists e itens com ordem'],
@@ -13,13 +13,13 @@ const checks=[
  [auth.includes('export async function getMyPlaylists')&&auth.includes('export async function createMyPlaylist'),'API de listar e criar playlists existe'],
  [auth.includes('export async function addSongToMyPlaylist')&&auth.includes('export async function removeSongFromMyPlaylist'),'API de adicionar e remover faixas existe'],
  [auth.includes('export async function moveSongInMyPlaylist')&&auth.includes('temporary=')&&!auth.includes('update({position:-1})'),'Reordenação não viola a validação de posição'],
- [redeHtml.includes('id="playlist-name"')&&redeHtml.includes('id="my-playlists-list"'),'Área de playlists aparece na Rede Social'],
+ [home.includes('id="music-playlists-area"')&&home.includes('id="music-playlists-list"'),'Área de playlists aparece na tela exclusiva de músicas'],
  [redeJs.includes('async function loadPlaylists')&&redeJs.includes('api.createMyPlaylist')&&redeJs.includes('api.addSongToMyPlaylist'),'Interface permite criar playlists e adicionar faixas'],
  [redeJs.includes('api.moveSongInMyPlaylist')&&redeJs.includes('api.removeSongFromMyPlaylist'),'Interface permite reordenar e remover faixas'],
- [chat.includes('<title>FALA UAI')&&chat.includes('id="fala-uai-player"'),'Bate-papo apresenta identidade FALA UAI'],
- [chat.includes('id="fala-uai-player"')&&chat.includes('showPlaylists:true')&&chat.includes('Promise.allSettled([getPublishedSongs(),getMyPlaylists()])'),'Player musical 3D carrega catálogo mesmo se playlists precisarem de migração'],
- [chat.includes('import {getMyPlaylists,getPublishedSongs,recordSongPlay}')&&chat.includes('createCapitalMusicPlayer')&&player.includes("audio.addEventListener('ended'")&&player.includes('function step(amount)'),'Player unificado carrega playlists, registra reprodução e avança faixas'],
- [player.includes("audio.addEventListener('play'")&&chat.indexOf('id="fala-uai-player"')<chat.indexOf('id="messages"'),'Player fica separado da lista de mensagens e segue ativo durante o chat'],
+ [chat.includes('Grupo CAPITAL DO TREM')&&chat.includes('id="chat-topics"')&&!chat.includes('fala-uai-player'),'Chat apresenta grupo oficial e salas por assunto sem misturar o player'],
+ [home.includes('id="capital-music-player"')&&home.includes('showPlaylists:true')&&musicUi.includes('getMyPlaylists()'),'Player musical e playlists estão na área de músicas'],
+ [musicUi.includes('createMyPlaylist')&&musicUi.includes('addSongToMyPlaylist')&&player.includes("audio.addEventListener('ended'")&&player.includes('function step(amount)'),'Usuário cria playlists, adiciona faixas e reproduz pelo player 3D'],
+ [chat.includes('id="messages"')&&!chat.includes('fala-uai-player'),'Player não invade a área de bate-papo'],
  [redeHtml.includes('id="post-caption-count"')&&redeHtml.includes('id="post-preview"')&&redeHtml.includes('id="clear-post-file"'),'Composer social oferece contador, prévia e remoção de mídia'],
  [redeJs.includes('function clearPostPreview')&&redeJs.includes('URL.createObjectURL(file)')&&redeJs.includes('URL.revokeObjectURL'),'Prévia de mídia libera URL temporária ao limpar'],
  [prepare.includes("'capital-futurista.css'")&&sw.includes("'./capital-futurista.css'"),'CSS futurista é empacotado e armazenado no cache PWA']
