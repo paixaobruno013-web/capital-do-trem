@@ -1,9 +1,9 @@
 import { readFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 const read=path=>readFile(new URL('../'+path,import.meta.url),'utf8');
-const [auth,redeJs,redeHtml,chat,sql,prepare,sw]=await Promise.all([
+const [auth,redeJs,redeHtml,chat,sql,prepare,sw,player]=await Promise.all([
  read('supabase/auth.js'),read('rede.js'),read('rede.html'),read('bate-papo.html'),
- read('supabase/migrations/20261116150000_personal_playlists.sql'),read('scripts/prepare-web.mjs'),read('sw.js')
+ read('supabase/migrations/20261116150000_personal_playlists.sql'),read('scripts/prepare-web.mjs'),read('sw.js'),read('capital-music-player.js')
 ]);
 const checks=[
  [sql.includes('create table if not exists public.playlists')&&sql.includes('create table if not exists public.playlist_songs'),'Banco cria playlists e itens com ordem'],
@@ -17,8 +17,8 @@ const checks=[
  [redeJs.includes('async function loadPlaylists')&&redeJs.includes('api.createMyPlaylist')&&redeJs.includes('api.addSongToMyPlaylist'),'Interface permite criar playlists e adicionar faixas'],
  [redeJs.includes('api.moveSongInMyPlaylist')&&redeJs.includes('api.removeSongFromMyPlaylist'),'Interface permite reordenar e remover faixas'],
  [chat.includes('<title>FALA UAI')&&chat.includes('id="fala-uai-player"'),'Bate-papo apresenta identidade FALA UAI'],
- [chat.includes('id="fala-uai-playlist"')&&chat.includes('id="fala-uai-audio"')&&chat.includes('controls'),'Player de música está dentro da tela de conversa'],
- [chat.includes('import {getMyPlaylists,getPublishedSongs,recordSongPlay}')&&chat.includes("audio.addEventListener('ended',()=>move(1))"),'Player carrega playlists, registra reprodução e avança faixas'],
+ [chat.includes('id="fala-uai-player"')&&chat.includes('showPlaylists:true'),'Player musical 3D está dentro da tela de conversa e carrega playlists'],
+ [chat.includes('import {getMyPlaylists,getPublishedSongs,recordSongPlay}')&&chat.includes('createCapitalMusicPlayer')&&player.includes("audio.addEventListener('ended'")&&player.includes('function step(amount)'),'Player unificado carrega playlists, registra reprodução e avança faixas'],
  [chat.includes('O player continua tocando durante a chegada de novas mensagens')&&chat.indexOf('id="fala-uai-player"')<chat.indexOf('id="messages"'),'Player fica separado da lista de mensagens em tempo real'],
  [redeHtml.includes('id="post-caption-count"')&&redeHtml.includes('id="post-preview"')&&redeHtml.includes('id="clear-post-file"'),'Composer social oferece contador, prévia e remoção de mídia'],
  [redeJs.includes('function clearPostPreview')&&redeJs.includes('URL.createObjectURL(file)')&&redeJs.includes('URL.revokeObjectURL'),'Prévia de mídia libera URL temporária ao limpar'],
