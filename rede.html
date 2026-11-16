@@ -42,6 +42,16 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--red);box
 @media(min-width:700px){#feed-list{max-width:680px;margin:0 auto}.profile-grid,.media-grid,.song-grid{gap:10px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 
+/* Player de música com prévia antes da reprodução */
+.song-card{display:flex;flex-direction:column;gap:7px;overflow:hidden}
+.song-card .song-cover{width:100%;min-height:0}
+.song-title{display:block;font-size:15px;line-height:1.35;overflow-wrap:anywhere}
+.song-artist{margin:0;font-size:13px}
+.song-preview-note{font-size:12px;color:var(--muted);margin:0}
+.song-preview-button{width:100%;justify-content:center;border-radius:999px;min-height:42px}
+.song-card audio{width:100%;margin-top:2px;accent-color:var(--red)}
+.song-card audio[hidden]{display:none}
+.song-preview-button:focus-visible{outline:3px solid #fff;outline-offset:3px}
 </style></head>
 <body>
 <header><a href="./index.html" aria-label="Voltar ao início">←</a><img src="./marca.svg" alt=""><strong>CAPITAL DO TREM</strong><span style="margin-left:auto"><a href="./bate-papo.html">💬 Chat</a></span></header>
