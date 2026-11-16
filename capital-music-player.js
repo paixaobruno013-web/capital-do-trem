@@ -8,7 +8,7 @@ export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null
  const top=document.createElement('div');top.className='ct-player-topline';const brand=document.createElement('span');brand.textContent='CAPITAL DO TREM • MUSIC EXPERIENCE';const live=document.createElement('span');live.className='ct-player-live';live.textContent='● PLAYER';top.append(brand,live);
  const stage=document.createElement('div');stage.className='ct-player-stage';
  const artWrap=document.createElement('div');artWrap.className='ct-player-art-wrap';
- const art=document.createElement('div');art.className='ct-player-artwork';art.innerHTML='<span class="ct-art-orbit ct-art-orbit-one"></span><span class="ct-art-orbit ct-art-orbit-two"></span><span class="ct-art-triangle">🔺</span><span class="ct-art-equalizer" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><strong class="ct-art-brand">CAPITAL<br>DO TREM</strong><small class="ct-art-caption">A MÚSICA NÃO PARA</small>';art.append(artTitle,artArtist);artWrap.append(art);
+ const art=document.createElement('div');art.className='ct-player-artwork';art.innerHTML='<span class="ct-art-orbit ct-art-orbit-one"></span><span class="ct-art-orbit ct-art-orbit-two"></span><span class="ct-art-triangle">🔺</span><span class="ct-art-equalizer" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><strong class="ct-art-brand">CAPITAL<br>DO TREM</strong><small class="ct-art-caption">A MÚSICA NÃO PARA</small>';artWrap.append(art);
  const disc=document.createElement('div');disc.className='ct-player-disc';disc.setAttribute('aria-hidden','true');artWrap.append(disc);
  const info=document.createElement('div');info.className='ct-player-info';
  const eyebrow=document.createElement('span');eyebrow.className='ct-player-eyebrow';eyebrow.textContent='TOCANDO AGORA';
@@ -16,6 +16,7 @@ export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null
  const artist=document.createElement('p');artist.className='ct-player-artist';artist.textContent='Artista da comunidade';
  const artTitle=document.createElement('strong');artTitle.className='ct-art-track-title';artTitle.textContent='SUA PRÓXIMA FAIXA';
  const artArtist=document.createElement('small');artArtist.className='ct-art-track-artist';artArtist.textContent='ARTISTA DA COMUNIDADE';
+ art.append(artTitle,artArtist);
  const producer=document.createElement('p');producer.className='ct-player-producer';producer.hidden=true;
  info.append(eyebrow,title,artist,producer);stage.append(artWrap,info);
  let playlistSelect=null;
