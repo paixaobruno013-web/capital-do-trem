@@ -59,7 +59,15 @@ using (
       and (select auth.uid()) in (c.participant_one, c.participant_two)
   )
 )
-with check (sender_id = (select auth.uid()));
+with check (
+  sender_id = (select auth.uid())
+  and exists (
+    select 1 from public.private_conversations c
+    where c.id = private_messages.conversation_id
+      and c.status = 'accepted'
+      and (select auth.uid()) in (c.participant_one, c.participant_two)
+  )
+);
 drop policy if exists private_messages_delete_sender on public.private_messages;
 create policy private_messages_delete_sender on public.private_messages
 for delete to authenticated
