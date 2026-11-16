@@ -23,3 +23,6 @@ const redeJs = await readFile(new URL('../rede.js', import.meta.url), 'utf8');
 if (!rede.includes('id="cover-preset"') || !redeJs.includes('function makeCoverPreset') || !redeJs.includes("cover_url:makeCoverPreset(coverPreset)")) throw new Error('Personalização de capa por opções do sistema ausente.');
 if (!rede.includes('id="pending-song-list"') || !redeJs.includes('async function loadMyPendingSongs') || !redeJs.includes('renderPendingSongs')) throw new Error('Prévia das músicas em análise ausente.');
 console.log('Perfis com capas do sistema e prévias das músicas em análise conferidos.');
+
+if (!redeJs.includes("profileLink.href='./rede.html?perfil='+encodeURIComponent(post.author_id)") || !redeJs.includes('profileLink.append(img,name)')) throw new Error('Feed não permite abrir o perfil do autor.');
+console.log('Feed direciona para o perfil público de cada autor.');
