@@ -1,6 +1,8 @@
+import {createCapitalMusicPlayer} from './capital-music-player.js';
 import * as api from './supabase/auth.js';
 const $=id=>document.getElementById(id);
 const supabase=api.initSupabase();
+const musicPlayer=createCapitalMusicPlayer('rede-music-player',{onPlay:song=>api.recordSongPlay(song.id).catch(()=>{})});
 let me=null,profile=null,currentProfileUserId=null,allPosts=[],allMedia=[],allPeople=[],allSongs=[];
 const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const initials=value=>String(value||'Capital do Trem').trim().slice(0,2).toUpperCase();
@@ -116,27 +118,15 @@ async function loadPlaylists(){
 }
 $('create-playlist')?.addEventListener('click',async()=>{const input=$('playlist-name'),button=$('create-playlist');button.disabled=true;try{await api.createMyPlaylist(input.value);input.value='';notice('playlist-status','Playlist criada! Agora adicione músicas do catálogo.');await loadPlaylists()}catch(e){notice('playlist-status',e.message)}finally{button.disabled=false}});
 function renderSongs(items){
- const root=$('song-list');root.replaceChildren();
+ const root=$('song-list');root.replaceChildren();musicPlayer.setCatalog(allSongs);
  for(const song of items){
   const card=document.createElement('article');card.className='song-card';
   const cover=document.createElement('div');cover.className='song-cover';cover.setAttribute('aria-hidden','true');
   const span=document.createElement('span');span.textContent=song.title||'Faixa musical';cover.append(span);
   const title=document.createElement('strong');title.className='song-title';title.textContent=song.title||'Faixa sem título';
   const artist=document.createElement('p');artist.className='muted song-artist';artist.textContent=song.artist_name||'Artista da comunidade';
-  const meta=document.createElement('p');meta.className='song-preview-note';meta.textContent='Conheça a faixa antes de dar o play.';
-  const play=document.createElement('button');play.type='button';play.className='song-preview-button btn primary';play.textContent='▶ Ouvir música';play.setAttribute('aria-label','Ouvir '+(song.title||'música')+' de '+(song.artist_name||'artista'));
-  const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.hidden=true;audio.setAttribute('aria-label','Reprodutor: '+(song.title||'música'));
-  play.addEventListener('click',async()=>{
-   const wasLoaded=audio.dataset.loaded==='true';
-   document.querySelectorAll('#song-list audio').forEach(other=>{if(other!==audio){other.pause();other.hidden=true;const b=other.parentElement.querySelector('.song-preview-button');if(b)b.textContent='▶ Ouvir música'}});
-   if(!wasLoaded){audio.src=song.audio_url;audio.dataset.loaded='true';audio.load()}
-   audio.hidden=false;play.textContent='♪ Player aberto';
-   try{await audio.play();play.textContent='Ⅱ Tocando agora'}catch{play.textContent='▶ Continuar reprodução';audio.focus()}
-  });
-  audio.addEventListener('play',()=>{document.querySelectorAll('#song-list audio').forEach(other=>{if(other!==audio)other.pause()});play.textContent='Ⅱ Tocando agora'});
-  audio.addEventListener('pause',()=>{if(!audio.ended)play.textContent='▶ Continuar reprodução'});
-  audio.addEventListener('ended',()=>{play.textContent='↻ Ouvir novamente'});
-  card.append(cover,title,artist,meta,play,audio);root.append(card);
+  const play=document.createElement('button');play.type='button';play.className='song-preview-button btn primary';play.textContent='▶ Ouvir no player 3D';play.addEventListener('click',()=>{musicPlayer.playSong(song);$('rede-music-player')?.scrollIntoView({behavior:'smooth',block:'center'});});
+  card.append(cover,title,artist,play);root.append(card);
  }
  if(!root.children.length)root.innerHTML='<p class="empty">Nenhuma música publicada ainda.</p>';
 }

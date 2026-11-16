@@ -933,7 +933,7 @@ body.light header.header-has-custom-background::before{
 // Se o Android encerrar o processo enquanto a câmera nativa está aberta, retoma a conversa em vez de reiniciar na página inicial.
 try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(localStorage.getItem(key)||0);if(started&&Date.now()-started<3*60*1000){localStorage.removeItem(key);location.replace('./bate-papo.html?retorno-camera=1');}}catch(error){}
 </script>
-<link rel="stylesheet" href="./capital-futurista.css?v=2">\n</head>
+<link rel="stylesheet" href="./capital-futurista.css?v=3">\n</head>
 <body>
 <script>
 (function(){
@@ -988,6 +988,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 </div>
 <p id="music-library-status" class="muted" role="status" aria-live="polite"></p>
 </section>
+<div id="capital-music-player" aria-label="Player 3D Capital do Trem"></div>
 <label for="song-catalog-search" class="muted" style="display:block;margin:14px 0 5px;font-weight:700">🔎 Buscar por música ou artista</label><input id="song-catalog-search" type="search" inputmode="search" autocomplete="off" placeholder="Digite o nome da música ou do artista…" aria-controls="published-song-catalog" style="margin:0 0 8px"><p id="song-catalog-count" class="muted" role="status" aria-live="polite" style="margin:0 0 10px">Carregando músicas…</p><div id="published-song-catalog" class="list" aria-live="polite"><p class="muted">Carregando catálogo compartilhado…</p></div></div><div class="card"><h3>🎧 Player do Capital do Trem</h3><label for="audio">Escolha uma música autorizada que esteja no seu aparelho</label><input id="audio" type="file" accept="audio/*"><audio id="player" controls preload="metadata" style="width:100%;margin:12px 0"></audio><div class="social" style="align-items:center"><button class="btn" id="download-audio" type="button" disabled>⬇ Baixar música</button><span id="audio-status" class="muted" role="status" aria-live="polite">Selecione um áudio para ouvir e baixar nesta demonstração.</span></div><p class="muted">O player oferece controles de reprodução e pode continuar tocando com a tela bloqueada, conforme o suporte do navegador e as configurações de economia de bateria do celular. O download salva o arquivo selecionado neste aparelho.</p><p class="muted">Só compartilhe ou baixe músicas que você tenha autorização para distribuir.</p></div></section>
 <section class="page" id="eventos">
 <div class="card"><h2>📍 Logo ali</h2><p class="muted">Encontre shows, bailes, encontros e ações sociais próximos de onde você está.</p><button class="btn" id="find-nearby">Usar localização do meu celular</button><p id="location-status" class="muted" aria-live="polite">Sua localização só será acessada se você tocar no botão e autorizar o GPS. As coordenadas serão usadas para abrir o Google Maps e não serão salvas pelo Capital do Trem.</p><a id="nearby-map" class="btn alt" href="#" target="_blank" rel="noopener" hidden>Abrir mapa com opções próximas</a></div>
@@ -1766,7 +1767,9 @@ async function saveOfflineMusic(id,blob,title){
  const container=document.getElementById('published-song-catalog');
  try{
   const api=await import('./supabase/auth.js');api.initSupabase();
+  const playerModule=await import('./capital-music-player.js');
   const session=await api.getCurrentSession();
+  const musicPlayer=playerModule.createCapitalMusicPlayer('capital-music-player',{onPlay:song=>{if(session)api.recordSongPlay(song.id).catch(()=>{});}});
   const songs=await api.getPublishedSongs();container.replaceChildren();
   const libraryPanel=document.getElementById('music-library');
   const libraryLogin=document.getElementById('music-library-login');
@@ -1793,7 +1796,7 @@ async function saveOfflineMusic(id,blob,title){
     const open=document.createElement('button');open.type='button';open.className='btn alt';open.textContent='Tocar';
     open.addEventListener('click',()=>{
      const card=songCards.get(id);const audio=card?.querySelector('audio');
-     if(card){card.scrollIntoView({behavior:'smooth',block:'center'});if(audio)window.setTimeout(()=>audio.play().catch(()=>{}),220);}
+     if(card){card.scrollIntoView({behavior:'smooth',block:'center'});const song=songs.find(item=>item.id===id);if(song)musicPlayer.playSong(song);}
     });
     row.append(label,open);target.append(row);
    }
@@ -1805,6 +1808,7 @@ async function saveOfflineMusic(id,blob,title){
   const searchInput=document.getElementById('song-catalog-search');
   const countLabel=document.getElementById('song-catalog-count');
   if(session)renderMusicLibrary();
+  musicPlayer.setCatalog(songs);
   if(!songs.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='As músicas publicadas pela comunidade aparecerão aqui.';container.append(empty);return;}
   for(const song of songs){
    const card=document.createElement('article');card.className='item';card.style.margin='10px 0';card.dataset.songId=song.id;songCards.set(song.id,card);card.dataset.searchText=[song.title,song.artist_name,song.description].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
@@ -1815,12 +1819,12 @@ async function saveOfflineMusic(id,blob,title){
    if(song.description){const desc=document.createElement('p');desc.textContent=song.description;card.append(desc);}
    const audioUrl=safeHttpsUrl(song.audio_url);const downloadUrl=safeHttpsUrl(song.download_url)||audioUrl;
    if(audioUrl){
-    const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=audioUrl;audio.addEventListener('play',()=>{
+    const audio=document.createElement('audio');audio.controls=false;audio.preload='none';audio.hidden=true;audio.src=audioUrl;audio.addEventListener('play',()=>{
       container.querySelectorAll('audio').forEach(other=>{if(other!==audio&&!other.paused)other.pause();});
-      if(session){recentSongIds=[song.id,...recentSongIds.filter(id=>id!==song.id)].slice(0,30);renderMusicLibrary();api.recordSongPlay(song.id).catch(error=>console.warn('Histórico musical não sincronizado.',error));}
+      if(session){recentSongIds=[song.id,...recentSongIds.filter(id=>id!==song.id)].slice(0,30);renderMusicLibrary();}
      });audio.style.cssText='width:100%;margin:8px 0';audio.setAttribute('aria-label','Ouvir '+song.title);
     let offlineTrack=null;
-    try{offlineTrack=await getOfflineMusic(song.id);if(offlineTrack?.blob){audio.src=URL.createObjectURL(offlineTrack.blob);audio.dataset.offlineReady='true';}}catch(error){/* A reprodução online continua disponível se o armazenamento local falhar. */}
+    try{offlineTrack=await getOfflineMusic(song.id);if(offlineTrack?.blob){offlineTrack.url=URL.createObjectURL(offlineTrack.blob);audio.src=offlineTrack.url;audio.dataset.offlineReady='true';}}catch(error){/* A reprodução online continua disponível se o armazenamento local falhar. */}
     if('mediaSession' in navigator){
      const updateMediaPlayback=()=>{try{navigator.mediaSession.playbackState=audio.paused?'paused':'playing';}catch{}};
      audio.addEventListener('play',()=>{
@@ -1837,7 +1841,7 @@ async function saveOfflineMusic(id,blob,title){
      audio.addEventListener('pause',updateMediaPlayback);
      audio.addEventListener('ended',()=>{try{navigator.mediaSession.playbackState='none';}catch{}});
     }
-    card.append(audio);
+    const listen=document.createElement('button');listen.type='button';listen.className='btn primary';listen.textContent='▶ Ouvir no player 3D';listen.addEventListener('click',()=>{musicPlayer.playSong(offlineTrack?.blob?{...song,audio_url:offlineTrack.url||URL.createObjectURL(offlineTrack.blob)}:song);document.getElementById('capital-music-player')?.scrollIntoView({behavior:'smooth',block:'center'});});card.append(listen,audio);
    }else{const unavailable=document.createElement('p');unavailable.className='muted';unavailable.textContent='Áudio temporariamente indisponível.';card.append(unavailable);}
    if(downloadUrl){const download=document.createElement('a');download.className='btn alt';download.href=downloadUrl;download.rel='noopener';download.textContent='⬇ Baixar música';download.setAttribute('aria-label','Baixar '+song.title);download.style.display='inline-block';download.style.margin='4px 0';card.append(download);}
    if(audioUrl&&song.id){
@@ -1854,8 +1858,8 @@ async function saveOfflineMusic(id,blob,title){
       const blob=await response.blob();
       if(!blob.size)throw new Error('O arquivo recebido está vazio');
       await saveOfflineMusic(song.id,blob,song.title);
-      offlineTrack={blob,title:song.title};
-      audio.src=URL.createObjectURL(blob);audio.dataset.offlineReady='true';audio.load();
+      offlineTrack={blob,title:song.title,url:URL.createObjectURL(blob)};
+      audio.src=offlineTrack.url;audio.dataset.offlineReady='true';audio.load();
       offlineButton.textContent='✓ Salva para ouvir offline';offlineStatus.textContent='Música guardada neste aparelho. Agora pode tocar sem internet.';
      }catch(error){offlineStatus.textContent='Não foi possível guardar offline. Verifique a conexão e tente novamente.';}
      finally{offlineButton.disabled=false;}

@@ -164,6 +164,8 @@ jobs:
         run: node scripts/check-music-library.mjs
       - name: Verificar playlists pessoais, player FALA UAI e publicações sociais
         run: node scripts/check-playlists-fala-uai.mjs
+      - name: Verificar identidade futurista e player musical 3D
+        run: node scripts/check-immersive-ui.mjs
       - name: Verificar álbum privado do administrador
         run: node scripts/check-private-admin-gallery.mjs
       - name: Verificar Stories no perfil do usuário
