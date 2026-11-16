@@ -172,3 +172,9 @@ body:has(#messages) .message strong{color:#54e9ff}
 body:has(#messages) .composer{border-color:rgba(84,233,255,.24);background:rgba(5,8,14,.88);box-shadow:0 0 24px rgba(84,233,255,.06)}
 body:has(#messages) .composer input{border-color:rgba(84,233,255,.22)}
 @media(max-width:520px){.ct-art-track-title{font-size:10px}.ct-art-track-artist{font-size:6px}}
+
+.ct-player-catalog-label{margin-top:4px}
+.ct-player-catalog-select{border-color:rgba(255,45,75,.42);box-shadow:0 0 18px rgba(255,38,56,.08)}
+.ct-player-catalog-select:focus,.ct-player-playlist:focus{outline:2px solid rgba(84,233,255,.55);outline-offset:2px}
+.ct-player-shell .ct-player-playlist-label{display:grid;gap:7px;font-size:10px;letter-spacing:1.3px;font-weight:900;color:#a9d9e8}
+.ct-player-shell .ct-player-playlist{width:100%;min-width:0}
