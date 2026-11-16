@@ -1,11 +1,13 @@
 import { readFile } from 'node:fs/promises';
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [home, story, eventComposer, account, auth, prepare, eventPolicy, songPolicy, directSongPolicy, artistAccountPolicy, schema, androidConfig, iosConfig, youtubeFeed, videoPolicy] = await Promise.all([
+const [home, story, eventComposer, account, auth, musicUpload, uploadPolicy, prepare, eventPolicy, songPolicy, directSongPolicy, artistAccountPolicy, schema, androidConfig, iosConfig, youtubeFeed, videoPolicy] = await Promise.all([
   read('index.html'),
   read('home-story-composer.js'),
   read('event-social-composer.js'),
   read('conta.html'),
   read('supabase/auth.js'),
+  read('music-upload.js'),
+  read('supabase/migrations/20261116200000_allow_artist_music_upload_without_artist_profile.sql'),
   read('scripts/prepare-web.mjs'),
   read('supabase/migrations/20261111173858_allow_all_users_to_publish_events.sql'),
   read('supabase/migrations/20261111171633_artist_song_submissions_with_producer.sql'),
@@ -37,12 +39,12 @@ const checks = [
   ['evento pode ser publicado por qualquer conta autenticada', eventPolicy.includes('create policy events_insert_authenticated') && eventPolicy.includes('created_by = (select auth.uid())') && !eventPolicy.includes("account_type='artist'")],
   ['schema base mantém publicação comunitária de eventos', schema.includes('create policy events_insert_authenticated') && schema.includes('created_by = (select auth.uid())') && !schema.includes('create policy "events_publish_artist_or_admin"')],
   ['painel musical fica na área de perfil artístico', account.includes('id="artist-profile-area" hidden') && account.includes("artistProfileArea.hidden=(profile?.account_type||'user')!=='artist'")],
-  ['painel musical identifica título, artista e produtor', ['artist-song-submit-title','artist-song-submit-artist','artist-song-submit-producer'].every(id => account.includes('id="'+id+'"')) && auth.includes('producer_name')],
-  ['envio de áudio chama uploadMySong com nome do produtor', account.includes('uploadMySong({') && account.includes("producerName:document.getElementById('artist-song-submit-producer')")],
-  ['envio de música exige ficha de artista no backend', auth.includes('export async function uploadMySong') && auth.includes("from('artists')") && auth.includes('if (!artistProfile) throw new Error')],
-  ['RLS permite artista publicar diretamente e restringe upload ao artista ou administrador', directSongPolicy.includes('songs_insert_artist_published_or_admin') && directSongPolicy.includes("status = 'published'") && songPolicy.includes('audio_upload_artist_own_folder_or_admin')],
+  ['formulário de envio musical fica na Central de Músicas', ['music-upload-file','music-upload-title','music-upload-artist','music-upload-producer'].every(id => home.includes('id="'+id+'"')) && home.includes('id="music-upload-form"')],
+  ['envio de áudio chama uploadMySong com nome do produtor', musicUpload.includes('uploadMySong({') && musicUpload.includes('producerName:') && musicUpload.includes('music-upload-producer')],
+  ['envio musical não exige ficha artística preenchida', auth.includes("accountProfile?.account_type !== 'artist'") && !auth.includes('if (!artistProfile) throw new Error') && musicUpload.includes('isCurrentUserArtistOrAdmin')],
+  ['RLS permite envio pela conta Artista sem ficha e mantém upload restrito', uploadPolicy.includes('create policy songs_insert_admin_or_artist') && uploadPolicy.includes("p.account_type = 'artist'") && !uploadPolicy.includes('public.artists') && uploadPolicy.includes('create policy audio_upload_admin_or_artist') && directSongPolicy.includes('songs_insert_artist_published_or_admin') && songPolicy.includes('audio_upload_artist_own_folder_or_admin')],
   ['upload musical exige perfil Artista/DJ no cadastro e no Storage', auth.includes("accountProfile?.account_type !== 'artist'") && artistAccountPolicy.includes("p.account_type = 'artist'") && artistAccountPolicy.includes('audio_upload_artist_own_folder_or_admin') && schema.slice(schema.indexOf('create policy \"audio_upload_artist_own_folder_or_admin\"')).includes("p.account_type = 'artist'")],
-  ['música enviada por artista é publicada direto, sem pré-análise do áudio', auth.includes("file_size:file.size,status:'published'") && account.includes('Publicando sua faixa diretamente no catálogo') && account.includes('sem análise prévia do áudio') && !account.includes('artist-song-submit-preview')],
+  ['música enviada pela Central é publicada diretamente e vinculada ao perfil', auth.includes("file_size:file.size,status:'published'") && home.includes('Cada envio é independente') && musicUpload.includes('Música publicada no catálogo') && !home.includes('music-playlists-area')],
   ['pacote Android/iOS inclui os dois compositores', prepare.includes("'home-story-composer.js'") && prepare.includes("'event-social-composer.js'") && prepare.includes("'conta.html'")],
   ['GPS tem permissões nativas configuradas no Android e iOS', androidConfig.includes('android.permission.ACCESS_FINE_LOCATION') && androidConfig.includes('android.permission.ACCESS_COARSE_LOCATION') && iosConfig.includes('NSLocationWhenInUseUsageDescription')],
   ['Explorar reúne atalhos de humor, criadores, música, notícias e Funk Consciente', home.includes('id="radar-funk-consciente"') && home.includes('Explorar — vídeos e novidades') && home.includes('videos+engracados+brasil+shorts') && home.includes('criadores+influenciadores+brasil+shorts') && home.includes('funk+consciente+clipes+musica') && home.includes('news.google.com/search?q=funk') && home.includes('funk+consciente+entrevistas+projetos+sociais')],
