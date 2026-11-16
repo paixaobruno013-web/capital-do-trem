@@ -1,6 +1,6 @@
 const byId=id=>document.getElementById(id);
 const formatTime=value=>{if(!Number.isFinite(value)||value<0)return '0:00';const m=Math.floor(value/60),s=Math.floor(value%60);return m+':'+String(s).padStart(2,'0')};
-function safeAudioUrl(value){try{const url=new URL(value,location.href);return ['https:','http:'].includes(url.protocol)?url.href:''}catch{return ''}}
+function safeAudioUrl(value){try{const url=new URL(value,location.href);return ['https:','http:','blob:'].includes(url.protocol)?url.href:''}catch{return ''}}
 export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null}={}){
  const root=typeof rootId==='string'?byId(rootId):rootId;if(!root)return null;
  root.replaceChildren();root.classList.add('ct-player-host');
