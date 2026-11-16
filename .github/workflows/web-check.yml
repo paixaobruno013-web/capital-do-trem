@@ -162,6 +162,8 @@ jobs:
         run: node scripts/check-supporters.mjs
       - name: Verificar fluxo de exclusão de conta
         run: node scripts/check-account-deletion.mjs
+      - name: Verificar música persistente e controles de mídia
+        run: node scripts/check-background-music.mjs
       - name: Verificar biblioteca musical sincronizada
         run: node scripts/check-music-library.mjs
       - name: Verificar playlists pessoais, player FALA UAI e publicações sociais
