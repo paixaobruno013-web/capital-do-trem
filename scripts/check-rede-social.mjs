@@ -14,6 +14,9 @@ const checks=[
 [html.includes('.profile-post-card')&&html.includes('.profile-post-caption'),'Cartões de publicações do perfil têm estilo próprio'],
 [js.includes('capital-do-trem-social')&&js.includes("bucket_id:'capital-do-trem-social'")&&js.includes('50*1024*1024')&&js.includes('10*1024*1024'),'Upload social usa bucket privado e limites por tipo'],
 [js.includes('createSignedUrls')&&js.includes('resolveMediaUrls')&&js.includes('bucket_id'),'Feed, perfil e mural geram URLs assinadas do bucket correto'],
-[html.includes('./bate-papo.html')&&html.includes('./index.html#eventos'),'Atalhos para chat e eventos permanecem disponíveis']
+[html.includes('./bate-papo.html')&&html.includes('./index.html#eventos'),'Atalhos para chat e eventos permanecem disponíveis'],
+[js.includes('song-preview-button')&&js.includes('audio.hidden=true')&&js.includes("audio.dataset.loaded==='true'"),'Músicas mostram prévia antes de carregar o áudio'],
+[js.includes("document.querySelectorAll('#song-list audio')")&&js.includes('other.pause()'),'Player pausa outras faixas ao iniciar uma música'],
+[html.includes('#feed-list .post-media')&&html.includes('aspect-ratio:1/1')&&html.includes('object-fit:cover'),'Feed apresenta fotos e vídeos em prévia quadrada']
 ];
 for(const [ok,msg] of checks){if(!ok)throw new Error(msg);console.log('OK',msg)}
