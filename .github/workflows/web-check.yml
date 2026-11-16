@@ -168,6 +168,9 @@ jobs:
         run: node scripts/check-immersive-ui.mjs
       - name: Verificar organização das áreas do Maquinista
         run: node scripts/check-maquinista-navigation.mjs
+
+      - name: Check screen organization
+        run: node scripts/check-screen-organization.mjs
       - name: Verificar álbum privado do administrador
         run: node scripts/check-private-admin-gallery.mjs
       - name: Verificar Stories no perfil do usuário
