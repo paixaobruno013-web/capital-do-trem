@@ -917,7 +917,7 @@ body.light header.header-has-custom-background::before{
 .home-story-compose-controls button:active,.home-story-effect-list button:active{transform:scale(.96)}
 .home-story-effect-list button[aria-pressed=true]{border-color:#ed1c24;box-shadow:0 0 0 2px rgba(237,28,36,.18),0 0 18px rgba(237,28,36,.2)}
 #home-story-caption{border-radius:14px;min-height:84px}
-.home-story-caption-assist{margin:10px 0;padding:10px;border:1px solid #ffffff24;border-radius:13px;background:linear-gradient(135deg,#171717,#080808)}
+.home-story-caption-assist{position:absolute;z-index:8;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 116px);display:none;margin:0;padding:8px;border:1px solid #ffffff24;border-radius:13px;background:linear-gradient(135deg,#171717,#080808)}
 .home-story-caption-assist>div:first-child{display:flex;flex-direction:column;gap:3px}
 .home-story-caption-assist strong{font-size:13px;color:#fff}
 .home-story-caption-assist small{font-size:10px;line-height:1.35;color:#c5c5c5}
@@ -2249,7 +2249,7 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
 .home-story-effects p{display:none}
 .home-story-save,#home-story-caption,.home-story-publish,#home-story-status{position:absolute;z-index:8;left:12px;right:12px;width:calc(100% - 24px)}
 .home-story-save,#home-story-caption,.home-story-publish{display:none}
-#home-story-composer.has-selection .home-story-save,#home-story-composer.has-selection #home-story-caption,#home-story-composer.has-selection .home-story-publish{display:block}
+#home-story-composer.has-selection .home-story-save,#home-story-composer.has-selection #home-story-caption,#home-story-composer.has-selection .home-story-publish,#home-story-composer.has-selection .home-story-caption-assist{display:block}
 #home-story-composer.has-selection .home-story-zoom{display:none}
 .home-story-save{bottom:calc(env(safe-area-inset-bottom,0px) + 250px);min-height:38px;border:1px solid #ffffff66;border-radius:20px;background:#000a;color:#fff;font-weight:800}
 #home-story-caption{bottom:calc(env(safe-area-inset-bottom,0px) + 292px);min-height:42px;max-height:58px;resize:none;border:1px solid #ffffff55;border-radius:12px;background:#0009;color:#fff;padding:9px;font:inherit}
