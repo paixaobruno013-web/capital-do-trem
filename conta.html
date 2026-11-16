@@ -139,11 +139,10 @@ label{letter-spacing:.01em}
 <div id="setup-message" class="notice" role="status">Escolha seu tipo de conta e use somente e-mail e senha. Tudo em uma única área, simples e direta.</div>
 </section>
 <section class="card" id="basic-profile-panel" hidden aria-labelledby="basic-profile-title">
-<h2 id="basic-profile-title">👤 Crie seu perfil</h2>
-<p class="muted">É simples: informe seu nome e escolha seu @. Você pode escrever ou editar sua descrição quando quiser.</p>
+<h2 id="basic-profile-title">👤 Meu perfil</h2>
+<p class="muted">Seu perfil já é criado automaticamente quando sua conta é cadastrada. Aqui você só precisa editar seu nome e sobrenome; a descrição é opcional e pode ser alterada quando quiser.</p>
 <form id="basic-profile-form">
-<label for="basic-display-name">Seu nome</label><input id="basic-display-name" maxlength="80" required autocomplete="name" placeholder="Como quer ser chamado?">
-<label for="basic-username">Nome de usuário (@)</label><input id="basic-username" maxlength="32" minlength="3" pattern="[a-zA-Z0-9][a-zA-Z0-9_]{2,31}" autocomplete="username" required placeholder="ex.: brunochock"><p class="muted">Use letras, números ou _. Esse será seu identificador no Capital do Trem.</p>
+<label for="basic-display-name">Nome e sobrenome</label><input id="basic-display-name" maxlength="80" required autocomplete="name" placeholder="Digite seu nome e sobrenome">
 <label for="basic-bio">Descrição (opcional)</label><textarea id="basic-bio" maxlength="500" rows="3" placeholder="Fale um pouco sobre você. Você poderá editar depois." style="display:block;width:100%;padding:13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font:inherit"></textarea>
 <input id="basic-account-type" type="hidden" value="user">
 <input id="basic-city" type="hidden" value="">
@@ -710,7 +709,7 @@ basicProfileForm.addEventListener('submit',async event=>{
   const currentProfile=await auth.getMyBasicProfile();
   await auth.saveMyBasicProfile({
    display_name:document.getElementById('basic-display-name').value,
-   username:document.getElementById('basic-username').value,
+   username:currentProfile.username,
    account_type:currentProfile.account_type,
    city:currentProfile.city||'',
    bio:document.getElementById('basic-bio').value,
