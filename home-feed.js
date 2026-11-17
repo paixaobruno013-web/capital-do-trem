@@ -59,7 +59,7 @@ if(root&&form){
     author.append(link,meta);
     if(verified.has(post.author_id)){const seal=document.createElement('span');seal.className='home-verified-seal';seal.textContent='✓';seal.title='Artista verificado pela Capital do Trem';seal.setAttribute('aria-label','Artista verificado');author.append(seal)}
     header.append(avatar,author);card.append(header);
-    if(post.content){const text=document.createElement('p');text.className='home-feed-post-text';text.textContent=post.content;card.append(text)}
+    let text=null;if(post.content){text=document.createElement('p');text.className='home-feed-post-text';text.textContent=post.content;card.append(text)}
     for(const item of media.get(post.id)||[]){
      if(!item.url)continue;
      const el=document.createElement(item.media_type==='video'?'video':'img');
