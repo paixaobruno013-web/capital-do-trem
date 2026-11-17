@@ -60,6 +60,8 @@ jobs:
         run: node scripts/check-navigation-performance.mjs
       - name: Verificar controles e regressões do chat
         run: node scripts/check-chat-controls.mjs
+      - name: Verificar mídia de visualização única no chat
+        run: node scripts/check-view-once-chat.mjs
       - name: Verificar anexos seguros e envio moderno do chat
         run: |
           node --check scripts/check-chat-attachments.mjs

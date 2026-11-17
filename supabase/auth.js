@@ -875,14 +875,15 @@ async function uploadChatFile(file, path) {
   if (error) throw error;
   return { ...meta, path };
 }
-async function signChatAttachment(path) {
+async function signChatAttachment(path, expiresIn = 900) {
   if (!path) return null;
   const supabase = initSupabase();
-  const { data, error } = await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).createSignedUrl(path, 900);
+  const { data, error } = await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).createSignedUrl(path, expiresIn);
   if (error) throw error;
   return data?.signedUrl || null;
 }
 async function hydrateChatMessage(message) {
+  if (message?.view_once) return { ...message, attachment_url: null, viewed_by_me: false };
   if (!message?.attachment_path) return message;
   try { return { ...message, attachment_url: await signChatAttachment(message.attachment_path) }; }
   catch (error) {
@@ -890,33 +891,73 @@ async function hydrateChatMessage(message) {
     return { ...message, attachment_url: null };
   }
 }
-async function hydrateChatMessages(messages) {
+async function hydrateChatMessages(messages, kind = 'group') {
   const rows = messages || [];
   const supabase = initSupabase();
-  const paths = [...new Set(rows.map(m => m.attachment_path).filter(Boolean))];
-  if (!paths.length) return rows;
-  try {
-    const { data, error } = await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).createSignedUrls(paths, 900);
-    if (error) throw error;
-    const signed = new Map((data || []).filter(item => item?.path && item?.signedUrl).map(item => [item.path, item.signedUrl]));
-    return rows.map(message => ({
-      ...message,
-      attachment_url: message.attachment_path ? (signed.get(message.attachment_path) || null) : message.attachment_url
-    }));
-  } catch (error) {
-    console.warn('Não foi possível assinar alguns anexos; as mensagens continuam disponíveis.', error);
-    return rows.map(message => ({ ...message, attachment_url: message.attachment_url || null }));
+  const viewOnceRows = rows.filter(message => message.view_once === true);
+  const viewedIds = new Set();
+  if (viewOnceRows.length) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const table = kind === 'private' ? 'private_message_views' : 'chat_message_views';
+      const { data: views, error: viewError } = await supabase.from(table)
+        .select('message_id').eq('viewer_id', user.id)
+        .in('message_id', viewOnceRows.map(message => message.id));
+      if (viewError) console.warn('Não foi possível consultar o histórico de visualização única.', viewError);
+      for (const view of views || []) viewedIds.add(view.message_id);
+    }
   }
+  const regular = rows.filter(message => !message.view_once && message.attachment_path);
+  const paths = [...new Set(regular.map(message => message.attachment_path))];
+  const signed = new Map();
+  if (paths.length) {
+    try {
+      const { data, error } = await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).createSignedUrls(paths, 900);
+      if (error) throw error;
+      for (const item of data || []) if (item?.path && item?.signedUrl) signed.set(item.path, item.signedUrl);
+    } catch (error) {
+      console.warn('Não foi possível assinar alguns anexos; as mensagens continuam disponíveis.', error);
+    }
+  }
+  return rows.map(message => {
+    if (message.view_once) return { ...message, attachment_url: null, viewed_by_me: viewedIds.has(message.id) };
+    return { ...message, attachment_url: message.attachment_path ? (signed.get(message.attachment_path) || null) : message.attachment_url };
+  });
+}
+export async function openViewOnceChatMedia(messageId, kind = 'private') {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para abrir esta mídia.');
+  const isGroup = kind === 'group';
+  const table = isGroup ? 'chat_messages' : 'private_messages';
+  const ownerField = isGroup ? 'author_id' : 'sender_id';
+  const viewTable = isGroup ? 'chat_message_views' : 'private_message_views';
+  const { data: message, error: readError } = await supabase.from(table)
+    .select('id,' + ownerField + ',attachment_path,attachment_type,view_once')
+    .eq('id', messageId).single();
+  if (readError) throw readError;
+  if (!message.view_once || !message.attachment_path || !['image','video','audio'].includes(message.attachment_type)) {
+    throw new Error('Esta mensagem não contém mídia de visualização única válida.');
+  }
+  if (message[ownerField] === user.id) throw new Error('Quem enviou esta mídia não pode visualizá-la.');
+  const url = await signChatAttachment(message.attachment_path, 300);
+  const { error: viewError } = await supabase.from(viewTable).insert({ message_id: messageId, viewer_id: user.id });
+  if (viewError) {
+    if (viewError.code === '23505') throw new Error('Você já visualizou esta mídia. Ela não pode ser aberta novamente.');
+    throw viewError;
+  }
+  return { url, type: message.attachment_type };
 }
 
 // Bate-papo geral em tempo real para todos os usuários autenticados.
 export async function getChatMessages(limit = 60) {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('chat_messages')
-    .select('id, author_id, author_name, content, created_at, author_avatar_type, author_avatar_url, author_avatar_data, attachment_url, attachment_path, attachment_type, attachment_name, attachment_mime, attachment_size')
+    .select('id, author_id, author_name, content, created_at, author_avatar_type, author_avatar_url, author_avatar_data, attachment_url, attachment_path, attachment_type, attachment_name, attachment_mime, attachment_size, view_once')
     .order('created_at', { ascending: false }).limit(Math.min(Math.max(Number(limit) || 60, 1), 100));
   if (error) throw error;
-  return await hydrateChatMessages((data || []).reverse());
+  return await hydrateChatMessages((data || []).reverse(),'group');
 }
 
 export async function uploadChatAttachment(file) {
@@ -929,7 +970,7 @@ export async function uploadChatAttachment(file) {
   return await uploadChatFile(file, path);
 }
 
-export async function sendChatMessage(content, attachment = null) {
+export async function sendChatMessage(content, attachment = null, viewOnce = false) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
@@ -937,13 +978,13 @@ export async function sendChatMessage(content, attachment = null) {
   const cleanContent = String(content || '').trim();
   if ((!cleanContent && !attachment) || cleanContent.length > 1000) throw new Error('Escreva uma mensagem ou anexe um arquivo. O texto pode ter até 1.000 caracteres.');
   const fallback = attachment?.type === 'image' ? '📷 Foto' : attachment?.type === 'video' ? '🎬 Vídeo' : attachment?.type === 'audio' ? '🎵 Áudio' : '📎 ' + (attachment?.name || 'Documento');
-  const payload = { author_id:user.id, content:cleanContent || fallback };
+  const payload = { author_id:user.id, content:cleanContent || fallback, view_once:Boolean(viewOnce&&attachment&&['image','video','audio'].includes(attachment.type)) };
   if (attachment) Object.assign(payload,{
     attachment_path:attachment.path,attachment_type:attachment.type,attachment_name:attachment.name,
     attachment_mime:attachment.mime,attachment_size:attachment.size
   });
   const { data, error } = await supabase.from('chat_messages').insert(payload)
-    .select('id, author_id, author_name, content, created_at, author_avatar_type, author_avatar_url, author_avatar_data, attachment_url, attachment_path, attachment_type, attachment_name, attachment_mime, attachment_size').single();
+    .select('id, author_id, author_name, content, created_at, author_avatar_type, author_avatar_url, author_avatar_data, attachment_url, attachment_path, attachment_type, attachment_name, attachment_mime, attachment_size, view_once').single();
   if (error) {
     if (attachment?.path) await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).remove([attachment.path]).catch(() => {});
     throw error;
@@ -1103,13 +1144,13 @@ export async function decidePrivateConversation(conversationId,decision) {
 export async function getPrivateMessages(conversationId) {
   const supabase=initSupabase();
   const {data,error}=await supabase.from('private_messages')
-    .select('id,conversation_id,sender_id,content,created_at,attachment_path,attachment_type,attachment_name,attachment_mime,attachment_size')
+    .select('id,conversation_id,sender_id,content,created_at,attachment_path,attachment_type,attachment_name,attachment_mime,attachment_size,view_once')
     .eq('conversation_id',conversationId).order('created_at',{ascending:true}).limit(100);
   if(error)throw error;
-  return await hydrateChatMessages(data||[]);
+  return await hydrateChatMessages(data||[],'private');
 }
 
-export async function sendPrivateMessage(conversationId,content,file=null) {
+export async function sendPrivateMessage(conversationId,content,file=null,viewOnce=false) {
   const supabase=initSupabase();
   const {data:{user},error:userError}=await supabase.auth.getUser();
   if(userError)throw userError;
@@ -1124,14 +1165,14 @@ export async function sendPrivateMessage(conversationId,content,file=null) {
     attachment=await uploadChatFile(file,path);
   }
   const fallback=attachment?.type==='image'?'📷 Foto':attachment?.type==='video'?'🎬 Vídeo':attachment?.type==='audio'?'🎵 Áudio':'📎 '+(attachment?.name||'Documento');
-  const payload={conversation_id:conversationId,sender_id:user.id,content:clean||fallback};
+  const payload={conversation_id:conversationId,sender_id:user.id,content:clean||fallback,view_once:Boolean(viewOnce&&attachment&&['image','video','audio'].includes(attachment.type))};
   if(attachment)Object.assign(payload,{
     attachment_path:attachment.path,attachment_type:attachment.type,attachment_name:attachment.name,
     attachment_mime:attachment.mime,attachment_size:attachment.size
   });
   const {data,error}=await supabase.from('private_messages')
     .insert(payload)
-    .select('id,conversation_id,sender_id,content,created_at,attachment_path,attachment_type,attachment_name,attachment_mime,attachment_size').single();
+    .select('id,conversation_id,sender_id,content,created_at,attachment_path,attachment_type,attachment_name,attachment_mime,attachment_size,view_once').single();
   if(error){
     if(attachment?.path)await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).remove([attachment.path]).catch(()=>{});
     throw error;

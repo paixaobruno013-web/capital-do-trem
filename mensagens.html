@@ -209,7 +209,7 @@ body.light .emoji-picker,body.light .emoji-full-panel,body.light .emoji-category
   background:radial-gradient(ellipse at 50% 0%,rgba(237,28,36,.14),#13090a 78%)!important;
 }
 
-</style></head>
+.view-once-option{display:flex;align-items:center;gap:6px;flex:0 0 100%;font-size:11px;color:var(--muted);padding:4px 8px}.view-once-option input{width:16px;height:16px;flex:0 0 16px;accent-color:var(--red)}</style></head>
 <body><a class="skip" href="#main">Pular para o conteúdo</a>
 <header><img src="./marca.svg" alt="Capital do Trem"><h1>Minhas conversas</h1><p class="muted">Conversas individuais com convite e aceite antes de começar.</p><div class="actions"><a class="btn" href="./index.html">Início</a><a class="btn" href="./bate-papo.html">Fala Trem • Geral</a><a class="btn" href="./conta.html">Minha conta</a><button id="theme" type="button">☀️ Claro</button></div></header>
 <main id="main">
@@ -223,13 +223,13 @@ body.light .emoji-picker,body.light .emoji-full-panel,body.light .emoji-category
 <div class="security-seal" role="note">
   <div class="security-seal-title"><span aria-hidden="true">🔒</span><span>Conexão criptografada</span><small>HTTPS</small></div>
   <p>Seus dados são protegidos durante a transmissão por HTTPS. Esta versão ainda não oferece criptografia ponta a ponta.</p>
-</div><div id="messages" class="messages" aria-live="polite"><p class="empty">Suas mensagens aparecerão aqui.</p></div><form id="compose" class="compose" hidden><div id="emoji-tray" data-emoji-picker data-input="#message"></div><button id="private-attach" type="button" aria-label="Anexar arquivo" aria-haspopup="true" aria-expanded="false">📎</button><button id="private-emoji-toggle" type="button" aria-label="Abrir emojis" aria-expanded="false">😊</button><input id="message" maxlength="2000" autocomplete="off" placeholder="Escreva sua mensagem…" aria-label="Mensagem privada"><input id="private-attachment-input" type="file" accept="image/*,video/*,audio/*,application/pdf,text/plain,text/csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx" hidden><div id="private-attachment-preview" class="private-attachment-preview" hidden><div id="private-attachment-thumb" class="private-attachment-thumb" aria-hidden="true">📎</div><span class="file-copy"><strong id="private-attachment-name"></strong><small id="private-attachment-size"></small><small id="private-attachment-kind"></small></span><button id="private-attachment-remove" type="button">Remover</button></div><div id="private-upload-progress" class="private-upload-progress" hidden><span></span></div><button class="primary" id="send" type="submit">➤</button></form><p class="status" id="status" role="status" aria-live="polite"></p></section>
+</div><div id="messages" class="messages" aria-live="polite"><p class="empty">Suas mensagens aparecerão aqui.</p></div><form id="compose" class="compose" hidden><div id="emoji-tray" data-emoji-picker data-input="#message"></div><button id="private-attach" type="button" aria-label="Anexar arquivo" aria-haspopup="true" aria-expanded="false">📎</button><button id="private-emoji-toggle" type="button" aria-label="Abrir emojis" aria-expanded="false">😊</button><input id="message" maxlength="2000" autocomplete="off" placeholder="Escreva sua mensagem…" aria-label="Mensagem privada"><input id="private-attachment-input" type="file" accept="image/*,video/*,audio/*,application/pdf,text/plain,text/csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx" hidden><label class="view-once-option"><input id="private-view-once" type="checkbox"> 👁️ Visualização única (foto, vídeo ou áudio)</label><div id="private-attachment-preview" class="private-attachment-preview" hidden><div id="private-attachment-thumb" class="private-attachment-thumb" aria-hidden="true">📎</div><span class="file-copy"><strong id="private-attachment-name"></strong><small id="private-attachment-size"></small><small id="private-attachment-kind"></small></span><button id="private-attachment-remove" type="button">Remover</button></div><div id="private-upload-progress" class="private-upload-progress" hidden><span></span></div><button class="primary" id="send" type="submit">➤</button></form><p class="status" id="status" role="status" aria-live="polite"></p></section>
 </div>
 <section class="panel"><h2>Privacidade e respeito</h2><p class="muted">Só participantes de uma conversa aceita conseguem ler as mensagens privadas. O grupo geral é voluntário: entre para ver as mensagens e saia quando quiser. Novos convites privados só são liberados entre pessoas ativas que já conversaram no grupo. Você pode bloquear alguém. Não compartilhe senhas, códigos ou dados bancários.</p></section>
 </div>
 </main>
 <script type="module">
-import {getCurrentSession,getPrivateConversationData,getOnlineUserIds,requestPrivateConversation,decidePrivateConversation,getPrivateMessages,sendPrivateMessage,subscribePrivateMessages,blockPrivateUser,getChatMessages,sendChatMessage,uploadChatAttachment,subscribeChatMessages,getPublicBranding,joinChatGroup,leaveChatGroup,updateMyPrivateMessage,deleteMyPrivateMessage,updateMyGroupMessage,deleteMyGroupMessage} from './supabase/auth.js';
+import {getCurrentSession,getPrivateConversationData,getOnlineUserIds,requestPrivateConversation,decidePrivateConversation,getPrivateMessages,sendPrivateMessage,subscribePrivateMessages,blockPrivateUser,getChatMessages,sendChatMessage,uploadChatAttachment,subscribeChatMessages,getPublicBranding,joinChatGroup,leaveChatGroup,updateMyPrivateMessage,deleteMyPrivateMessage,updateMyGroupMessage,deleteMyGroupMessage,openViewOnceChatMedia} from './supabase/auth.js';
 const $=id=>document.getElementById(id);let state=null,active=null,activeGroup=false,unsubscribe=null,onlineIds=new Set(),groupLogo="./marca.svg";
 const esc=s=>String(s||'');const fmt=v=>new Date(v).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
 const shareParams=new URLSearchParams(window.location.search);
@@ -361,10 +361,25 @@ function addOwnMessageControls(container,body,message,isGroup){
  remove.addEventListener('click',async()=>{if(!confirm('Excluir esta mensagem e seu anexo? Esta ação não pode ser desfeita.'))return;remove.disabled=true;try{if(isGroup)await deleteMyGroupMessage(message.id);else await deleteMyPrivateMessage(message.id);container.remove()}catch(error){alert(error.message||'Não foi possível excluir a mensagem.')}finally{remove.disabled=false}});
  controls.append(remove);container.append(controls);
 }
+function appendViewOnceAttachment(container,message,isGroup){
+ const senderId=isGroup?message.author_id:message.sender_id;
+ if(senderId===state.userId){container.append(node('small','muted','🔒 Mídia enviada para visualização única. Você não pode abri-la.'));return;}
+ if(message.viewed_by_me){container.append(node('small','muted','👁️ Você já visualizou esta mídia.'));return;}
+ const button=node('button','btn alt','👁️ Abrir mídia (uma vez)');button.type='button';
+ button.addEventListener('click',async()=>{button.disabled=true;try{
+  const opened=await openViewOnceChatMedia(message.id,isGroup?'group':'private');message.viewed_by_me=true;
+  const media=node('div','message-attachment');
+  if(opened.type==='image'){const img=node('img');img.src=opened.url;img.alt='Mídia de visualização única';img.loading='eager';media.append(img);}
+  else if(opened.type==='video'){const video=node('video');video.src=opened.url;video.controls=true;video.playsInline=true;video.preload='metadata';media.append(video);}
+  else if(opened.type==='audio'){const audio=node('audio');audio.src=opened.url;audio.controls=true;audio.preload='metadata';media.append(audio);}
+  button.replaceWith(media);container.append(node('small','muted','Visualização única consumida.'));
+ }catch(error){button.disabled=false;alert(error.message||'Não foi possível abrir esta mídia.')}});
+ container.append(button);
+}
 function drawMessage(m){
  if($('messages').querySelector('[data-id="'+m.id+'"]'))return;
  const b=node('div','bubble'+(m.sender_id===state.userId?' mine':''));const body=node('div','message-content');appendEmojiText(body,m.content||'');b.append(body);b.dataset.id=m.id;
- if(m.attachment_url&&typeof m.attachment_url==='string'&&m.attachment_url.startsWith('https://')){
+ if(m.view_once){const media=node('div','message-attachment');appendViewOnceAttachment(media,m,false);b.append(media);}else if(m.attachment_url&&typeof m.attachment_url==='string'&&m.attachment_url.startsWith('https://')){
   const media=node('div','message-attachment');
   if(m.attachment_type==='image'){const img=node('img');img.src=m.attachment_url;img.alt='Imagem compartilhada na conversa';img.loading='lazy';media.append(img);}
   else if(m.attachment_type==='video'){const video=node('video');video.src=m.attachment_url;video.controls=true;video.preload='metadata';video.playsInline=true;media.append(video);}
@@ -386,7 +401,7 @@ function drawGroupMessage(m){
  const who=node('strong',null,m.author_name||'Usuário Uai');
  who.style.cssText='display:block;font-size:11px;margin:0;opacity:.9';
  head.append(avatar,who);box.prepend(head);
- if(m.attachment_url&&typeof m.attachment_url==='string'&&m.attachment_url.startsWith('https://')){
+ if(m.view_once){const media=node('div','message-attachment');appendViewOnceAttachment(media,m,true);box.append(media);}else if(m.attachment_url&&typeof m.attachment_url==='string'&&m.attachment_url.startsWith('https://')){
   if(m.attachment_type==='image'){const img=node('img');img.src=m.attachment_url;img.alt='Imagem compartilhada no grupo';img.loading='lazy';img.style.cssText='display:block;max-width:100%;max-height:260px;border-radius:10px;margin-top:7px';box.append(img);}
   else if(m.attachment_type==='video'){const video=node('video');video.controls=true;video.playsInline=true;video.preload='metadata';video.src=m.attachment_url;video.style.cssText='display:block;max-width:100%;max-height:280px;border-radius:10px;margin-top:7px';box.append(video);}
   else if(m.attachment_type==='audio'){const audio=node('audio');audio.controls=true;audio.src=m.attachment_url;audio.preload='metadata';box.append(audio);}
@@ -437,8 +452,8 @@ $('compose').addEventListener('submit',async e=>{
  $('status').textContent=selectedPrivateFile?(activeGroup?'Enviando anexo para o grupo…':'Enviando arquivo com acesso protegido…'):'Enviando mensagem…';
  try{
   if(activeGroup){let uploaded=null;if(selectedPrivateFile)uploaded=await uploadChatAttachment(selectedPrivateFile);const sent=await sendChatMessage(value,uploaded);drawGroupMessage(sent);}
-  else{const sent=await sendPrivateMessage(active.id,value,selectedPrivateFile);drawMessage(sent);}
-  $('message').value='';clearPrivateFile();if(sharedDraft){sharedDraft='';const hint=$('shared-content-hint');if(hint)hint.hidden=true;history.replaceState({},'',window.location.pathname);}$('status').textContent='Mensagem enviada.';
+  else{const sent=await sendPrivateMessage(active.id,value,selectedPrivateFile,$('private-view-once').checked);drawMessage(sent);}
+  $('message').value='';$('private-view-once').checked=false;clearPrivateFile();if(sharedDraft){sharedDraft='';const hint=$('shared-content-hint');if(hint)hint.hidden=true;history.replaceState({},'',window.location.pathname);}$('status').textContent='Mensagem enviada.';
  }catch(err){$('status').textContent=err.message||'Não foi possível enviar.';}
  finally{$('send').disabled=false;$('private-attach').disabled=false;$('private-emoji-toggle').disabled=false;$('message').disabled=false;privateFileInput.disabled=false;privateProgress.hidden=true;}
 });
