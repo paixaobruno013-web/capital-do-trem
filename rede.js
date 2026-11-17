@@ -124,8 +124,41 @@ async function loadMyProfile(){const session=await api.getCurrentSession();if(!s
 let activeProfileView='posts';
 async function loadProfilePosts(userId,view=activeProfileView){activeProfileView=view;document.querySelectorAll('[data-profile-view]').forEach(b=>b.classList.toggle('active',b.dataset.profileView===view));const grid=$('profile-posts');grid.innerHTML='<p class="empty">Carregando…</p>';
 if(view==='music'){
- const songs=await api.getPublishedSongsForProfile(userId);
  grid.replaceChildren();
+ if(me?.id===userId){
+  const heading=document.createElement('div');heading.className='profile-playlists-heading';
+  const headingText=document.createElement('strong');headingText.textContent='♫ Minhas playlists';
+  const create=document.createElement('button');create.type='button';create.className='btn primary profile-playlist-create';create.textContent='＋ Criar playlist';
+  create.addEventListener('click',async()=>{const name=prompt('Nome da nova playlist:');if(name===null)return;try{await api.createMyPlaylist(name);notice('profile-playlist-status','Playlist criada!');await loadProfilePosts(userId,'music')}catch(e){notice('profile-playlist-status',e.message||'Não foi possível criar a playlist.')}});
+  heading.append(headingText,create);grid.append(heading);
+  const status=document.createElement('p');status.id='profile-playlist-status';status.className='status';status.setAttribute('role','status');grid.append(status);
+  try{
+   const playlists=await api.getMyPlaylists();
+   if(!playlists.length){const empty=document.createElement('p');empty.className='empty profile-playlist-empty';empty.textContent='Você ainda não criou uma playlist. Toque em + Criar playlist para começar.';grid.append(empty)}
+   if(!allSongs.length)allSongs=await api.getPublishedSongs();
+   const songById=new Map(allSongs.map(song=>[song.id,song]));
+   for(const playlist of playlists){
+    const card=document.createElement('section');card.className='profile-playlist-card';
+    const title=document.createElement('h3');title.textContent=playlist.name;card.append(title);
+    const list=document.createElement('div');list.className='profile-playlist-track-list';
+    for(const entry of playlist.songs){
+     const song=songById.get(entry.song_id);if(!song)continue;
+     const row=document.createElement('div');row.className='profile-playlist-track';
+     const copy=document.createElement('div');copy.className='profile-playlist-track-copy';
+     const songTitle=document.createElement('strong');songTitle.textContent=song.title||'Faixa sem título';
+     const artist=document.createElement('span');artist.textContent=song.artist_name||'Artista da comunidade';
+     copy.append(songTitle,artist);
+     const play=document.createElement('button');play.type='button';play.className='profile-playlist-play';play.textContent='▶';play.setAttribute('aria-label','Tocar '+(song.title||'música'));
+     play.addEventListener('click',()=>{musicPlayer.playSong(song);$('rede-music-player')?.scrollIntoView({behavior:'smooth',block:'center'})});
+     row.append(copy,play);list.append(row);
+    }
+    if(!list.children.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Adicione músicas a esta playlist pela área de Músicas.';list.append(empty)}
+    card.append(list);grid.append(card);
+   }
+  }catch(e){const error=document.createElement('p');error.className='status';error.textContent='Não foi possível carregar suas playlists: '+(e.message||'Tente novamente.');grid.append(error)}
+  return;
+ }
+ const songs=await api.getPublishedSongsForProfile(userId);
  for(const song of songs){
   const card=document.createElement('article');card.className='song-card profile-song-card';
   const cover=document.createElement('div');cover.className='song-cover';
