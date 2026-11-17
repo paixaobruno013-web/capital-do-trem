@@ -32,13 +32,20 @@ self.addEventListener('fetch',event=>{
   if(event.request.method!=='GET') return;
   const url=new URL(event.request.url);
   if(url.origin!==self.location.origin) return;
+  // Não armazenar respostas autenticadas nem URLs com parâmetros (incluindo tokens assinados).
+  if(event.request.headers.has('Authorization')||url.search) return;
+  const mayCache=response=>{
+    if(!response||!response.ok) return false;
+    const control=(response.headers.get('Cache-Control')||'').toLowerCase();
+    return !/(?:private|no-store|no-cache)/.test(control)&&!response.headers.has('Set-Cookie')&&response.headers.get('Vary')!=='*';
+  };
 
   // Páginas HTML: tenta buscar a versão mais recente primeiro e usa o cache sem internet.
   const isPage=event.request.mode==='navigate'||url.pathname.endsWith('.html')||url.pathname.endsWith('/');
   if(isPage){
     event.respondWith(
       fetch(event.request,{cache:'no-store'}).then(response=>{
-        if(response&&response.ok){
+        if(mayCache(response)){
           const copy=response.clone();
           caches.open(CACHE).then(cache=>cache.put(event.request,copy));
         }
@@ -52,7 +59,7 @@ self.addEventListener('fetch',event=>{
   event.respondWith(
     caches.match(event.request).then(cached=>{
       const network=fetch(event.request).then(response=>{
-        if(response&&response.ok){
+        if(mayCache(response)){
           const copy=response.clone();
           caches.open(CACHE).then(cache=>cache.put(event.request,copy));
         }
