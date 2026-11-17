@@ -173,6 +173,9 @@ jobs:
       - name: Verificar organização das áreas do Maquinista
         run: node scripts/check-maquinista-navigation.mjs
 
+      - name: Verificar edição e exclusão de conteúdo próprio
+        run: node scripts/check-content-controls.mjs
+
       - name: Check screen organization
         run: node scripts/check-screen-organization.mjs
       - name: Verificar álbum privado do administrador
