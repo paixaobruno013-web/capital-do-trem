@@ -229,7 +229,7 @@ body.light .emoji-picker,body.light .emoji-full-panel,body.light .emoji-category
 </div>
 </main>
 <script type="module">
-import {getCurrentSession,getPrivateConversationData,getOnlineUserIds,requestPrivateConversation,decidePrivateConversation,getPrivateMessages,sendPrivateMessage,subscribePrivateMessages,blockPrivateUser,getChatMessages,sendChatMessage,uploadChatAttachment,subscribeChatMessages,getPublicBranding,joinChatGroup,leaveChatGroup} from './supabase/auth.js';
+import {getCurrentSession,getPrivateConversationData,getOnlineUserIds,requestPrivateConversation,decidePrivateConversation,getPrivateMessages,sendPrivateMessage,subscribePrivateMessages,blockPrivateUser,getChatMessages,sendChatMessage,uploadChatAttachment,subscribeChatMessages,getPublicBranding,joinChatGroup,leaveChatGroup,updateMyPrivateMessage,deleteMyPrivateMessage,updateMyGroupMessage,deleteMyGroupMessage} from './supabase/auth.js';
 const $=id=>document.getElementById(id);let state=null,active=null,activeGroup=false,unsubscribe=null,onlineIds=new Set(),groupLogo="./marca.svg";
 const esc=s=>String(s||'');const fmt=v=>new Date(v).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
 const shareParams=new URLSearchParams(window.location.search);
@@ -350,9 +350,20 @@ function appendEmojiText(target,value){
   }else target.append(document.createTextNode(chunk));
  }
 }
+function addOwnMessageControls(container,body,message,isGroup){
+ const controls=node('div','message-own-controls');controls.style.cssText='display:flex;gap:6px;flex-wrap:wrap;margin-top:7px';
+ if(String(message.content||'').trim()){
+  const edit=node('button','btn alt','✏️ Editar');edit.type='button';edit.style.cssText='min-height:30px;padding:5px 9px;font-size:11px';
+  edit.addEventListener('click',async()=>{const value=prompt('Edite sua mensagem:',message.content||'');if(value===null)return;edit.disabled=true;try{const clean=value.trim();if(!clean)throw new Error('A mensagem não pode ficar vazia.');if(isGroup)await updateMyGroupMessage(message.id,clean);else await updateMyPrivateMessage(message.id,clean);message.content=clean;body.replaceChildren();appendEmojiText(body,clean);}catch(error){alert(error.message||'Não foi possível editar a mensagem.')}finally{edit.disabled=false}});
+  controls.append(edit);
+ }
+ const remove=node('button','btn alt','🗑️ Excluir');remove.type='button';remove.style.cssText='min-height:30px;padding:5px 9px;font-size:11px';
+ remove.addEventListener('click',async()=>{if(!confirm('Excluir esta mensagem e seu anexo? Esta ação não pode ser desfeita.'))return;remove.disabled=true;try{if(isGroup)await deleteMyGroupMessage(message.id);else await deleteMyPrivateMessage(message.id);container.remove()}catch(error){alert(error.message||'Não foi possível excluir a mensagem.')}finally{remove.disabled=false}});
+ controls.append(remove);container.append(controls);
+}
 function drawMessage(m){
  if($('messages').querySelector('[data-id="'+m.id+'"]'))return;
- const b=node('div','bubble'+(m.sender_id===state.userId?' mine':''));appendEmojiText(b,m.content||'');b.dataset.id=m.id;
+ const b=node('div','bubble'+(m.sender_id===state.userId?' mine':''));const body=node('div','message-content');appendEmojiText(body,m.content||'');b.append(body);b.dataset.id=m.id;
  if(m.attachment_url&&typeof m.attachment_url==='string'&&m.attachment_url.startsWith('https://')){
   const media=node('div','message-attachment');
   if(m.attachment_type==='image'){const img=node('img');img.src=m.attachment_url;img.alt='Imagem compartilhada na conversa';img.loading='lazy';media.append(img);}
@@ -361,11 +372,11 @@ function drawMessage(m){
   else if(m.attachment_type==='document'){const link=node('a','document-attachment','📄 '+(m.attachment_name||'Documento')+' • '+(Number(m.attachment_size||0)/1024/1024).toFixed(2)+' MB');link.href=m.attachment_url;link.target='_blank';link.rel='noopener noreferrer';link.download=m.attachment_name||'';media.append(link);}
   b.append(media);
  }else if(m.attachment_path){b.append(node('div','small','📎 Anexo protegido. Atualize a conversa para abrir o arquivo.'));}
- const t=node('time',null,fmt(m.created_at));b.append(t);$('messages').append(b);$('messages').scrollTop=$('messages').scrollHeight;
+ if(m.sender_id===state.userId)addOwnMessageControls(b,body,m,false);const t=node('time',null,fmt(m.created_at));b.append(t);$('messages').append(b);$('messages').scrollTop=$('messages').scrollHeight;
 }
 function drawGroupMessage(m){
  if($('messages').querySelector('[data-id="'+m.id+'"]'))return;
- const box=node('div','bubble'+(m.author_id===state.userId?' mine':''));appendEmojiText(box,m.content||'');
+ const box=node('div','bubble'+(m.author_id===state.userId?' mine':''));const body=node('div','message-content');appendEmojiText(body,m.content||'');box.append(body);
  box.dataset.id=m.id;
  const head=node('div','group-message-head');
  const avatar=node('span','profile-avatar');avatar.style.cssText='width:28px;height:28px;flex:0 0 28px;font-size:12px';
@@ -381,7 +392,7 @@ function drawGroupMessage(m){
   else if(m.attachment_type==='audio'){const audio=node('audio');audio.controls=true;audio.src=m.attachment_url;audio.preload='metadata';box.append(audio);}
   else if(m.attachment_type==='document'){const link=node('a','document-attachment','📄 '+(m.attachment_name||'Documento')+' • '+(Number(m.attachment_size||0)/1024/1024).toFixed(2)+' MB');link.href=m.attachment_url;link.target='_blank';link.rel='noopener noreferrer';link.download=m.attachment_name||'';box.append(link);}
  }else if(m.attachment_path){box.append(node('div','small','📎 Anexo protegido. Atualize a conversa para gerar um novo link.'));}
- const t=node('time',null,fmt(m.created_at));box.append(t);$('messages').append(box);$('messages').scrollTop=$('messages').scrollHeight;
+ if(m.author_id===state.userId)addOwnMessageControls(box,body,m,true);const t=node('time',null,fmt(m.created_at));box.append(t);$('messages').append(box);$('messages').scrollTop=$('messages').scrollHeight;
 }
 async function openGroupConversation(){
  clearSubscription();active=null;activeGroup=true;$('private-layout').classList.add('chat-open');
