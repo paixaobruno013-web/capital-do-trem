@@ -1847,6 +1847,8 @@ async function saveOfflineMusic(id,blob,title){
   const session=await api.getCurrentSession();
   const musicPlayer=playerModule.createCapitalMusicPlayer('capital-music-player',{showPlaylists:true,onPlay:song=>{if(session)api.recordSongPlay(song.id).catch(()=>{});}});window.capitalMusicPlayer=musicPlayer;
   const songs=await api.getPublishedSongs();container.replaceChildren();
+  const mySongsById=new Map();
+  if(session){try{for(const owned of await api.getMySongs())mySongsById.set(owned.id,owned);}catch(error){console.warn('Não foi possível consultar as músicas próprias para edição.',error);}}
   const libraryPanel=document.getElementById('music-library');
   const libraryLogin=document.getElementById('music-library-login');
   const libraryContent=document.getElementById('music-library-content');
@@ -1888,7 +1890,7 @@ async function saveOfflineMusic(id,blob,title){
   if(!songs.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='As músicas publicadas pela comunidade aparecerão aqui.';container.append(empty);return;}
   for(const song of songs){
    const card=document.createElement('article');card.className='item';card.style.margin='10px 0';card.dataset.songId=song.id;songCards.set(song.id,card);card.dataset.searchText=[song.title,song.artist_name,song.description].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
-   const title=document.createElement('h3');title.textContent=song.title;
+   const title=document.createElement('h3');title.textContent=song.title;title.tabIndex=0;title.setAttribute('role','button');title.title='Toque para abrir o reprodutor em tela cheia';
    const artist=document.createElement('p');artist.className='muted';artist.textContent=song.artist_name;
    card.append(title,artist);
    if(song.producer_name){const producer=document.createElement('p');producer.className='muted';producer.textContent='🎚️ Produção: '+song.producer_name;card.append(producer);}
@@ -1917,7 +1919,9 @@ async function saveOfflineMusic(id,blob,title){
      audio.addEventListener('pause',updateMediaPlayback);
      audio.addEventListener('ended',()=>{try{navigator.mediaSession.playbackState='none';}catch{}});
     }
-    const listen=document.createElement('button');listen.type='button';listen.className='btn primary';listen.textContent='▶ Ouvir no player 3D';listen.addEventListener('click',()=>{musicPlayer.playSong(offlineTrack?.blob?{...song,audio_url:offlineTrack.url||URL.createObjectURL(offlineTrack.blob)}:song);document.getElementById('capital-music-player')?.scrollIntoView({behavior:'smooth',block:'center'});});card.append(listen,audio);
+    const openTrack=()=>{musicPlayer.playSong(offlineTrack?.blob?{...song,audio_url:offlineTrack.url||URL.createObjectURL(offlineTrack.blob)}:song);const playerRoot=document.getElementById('capital-music-player');playerRoot?.scrollIntoView({behavior:'smooth',block:'center'});if(playerRoot&&!playerRoot.classList.contains('ct-player-fullscreen'))playerRoot.querySelector('.ct-player-fullscreen')?.click();};
+    title.addEventListener('click',openTrack);title.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openTrack();}});
+    const listen=document.createElement('button');listen.type='button';listen.className='btn primary';listen.textContent='▶ Abrir reprodutor ampliado';listen.addEventListener('click',openTrack);card.append(listen,audio);
    }else{const unavailable=document.createElement('p');unavailable.className='muted';unavailable.textContent='Áudio temporariamente indisponível.';card.append(unavailable);}
    if(downloadUrl){const download=document.createElement('a');download.className='btn alt';download.href=downloadUrl;download.rel='noopener';download.textContent='⬇ Baixar música';download.setAttribute('aria-label','Baixar '+song.title);download.style.display='inline-block';download.style.margin='4px 0';card.append(download);}
    if(audioUrl&&song.id){
@@ -1968,6 +1972,15 @@ async function saveOfflineMusic(id,blob,title){
      finally{saveButton.disabled=false;}
     });
     card.append(saveButton);
+   }
+   const ownedSong=mySongsById.get(song.id);
+   if(ownedSong){
+    const ownerTools=document.createElement('div');ownerTools.className='social';ownerTools.style.marginTop='8px';
+    const editSong=document.createElement('button');editSong.type='button';editSong.className='btn alt';editSong.textContent='✏️ Corrigir música / artista';
+    editSong.addEventListener('click',async()=>{const titleValue=prompt('Nome da música:',song.title);if(titleValue===null)return;const artistValue=prompt('Nome do artista / MC / DJ:',song.artist_name||'');if(artistValue===null)return;const producerValue=prompt('Produtor (opcional):',song.producer_name||'');if(producerValue===null)return;const descriptionValue=prompt('Descrição (opcional):',song.description||'');if(descriptionValue===null)return;editSong.disabled=true;try{const updated=await api.updateMySong(song.id,{title:titleValue,artistName:artistValue,producerName:producerValue,description:descriptionValue});Object.assign(song,{title:updated.title,artist_name:updated.artist_name,producer_name:updated.producer_name||'',description:updated.description||''});title.textContent=song.title;artist.textContent=song.artist_name;card.dataset.searchText=[song.title,song.artist_name,song.description].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');musicPlayer.setCatalog(songs);libraryStatus.textContent='Informações da sua música corrigidas.';}catch(error){libraryStatus.textContent=error.message||'Não foi possível corrigir a música.';}finally{editSong.disabled=false}});
+    const deleteSong=document.createElement('button');deleteSong.type='button';deleteSong.className='btn alt';deleteSong.textContent='🗑️ Excluir minha música';
+    deleteSong.addEventListener('click',async()=>{if(!confirm('Excluir esta música e seu arquivo de áudio? Esta ação não pode ser desfeita.'))return;deleteSong.disabled=true;try{await api.deleteMySong(song.id);card.remove();const at=songs.findIndex(item=>item.id===song.id);if(at>=0)songs.splice(at,1);mySongsById.delete(song.id);musicPlayer.setCatalog(songs);if(countLabel)countLabel.textContent=songs.length+' música(s) no catálogo';libraryStatus.textContent='Sua música foi excluída do catálogo.';}catch(error){libraryStatus.textContent=error.message||'Não foi possível excluir a música.';}finally{deleteSong.disabled=false}});
+    ownerTools.append(editSong,deleteSong);card.append(ownerTools);
    }
    if(!session){
     const access=document.createElement('div');access.className='notice';access.style.marginTop='12px';
