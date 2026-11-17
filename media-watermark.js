@@ -95,6 +95,10 @@ export async function createWatermarkedVideo(sourceBlob) {
       video.addEventListener('ended',()=>{if(recorder?.state==='recording')recorder.stop();},{once:true});
     });
     drawFrame();recorder.start(1000);await video.play();
+    // O elemento inicia mutado para permitir autoplay durante o processamento.
+    // Depois que o áudio passa pelo ganho zero do AudioContext, liberamos a trilha
+    // para a captura, sem reproduzi-la nos alto-falantes do usuário.
+    if(audioContext)video.muted=false;
     return await result;
   }catch(error){if(recorder?.state==='recording')recorder.stop();throw error;}
   finally{cancelAnimationFrame(frameRequest);video.pause();video.removeAttribute('src');video.load();tracks.forEach(track=>track.stop());canvasStream?.getTracks().forEach(track=>track.stop());if(audioContext&&audioContext.state!=='closed')await audioContext.close().catch(()=>{});logo?.close?.();URL.revokeObjectURL(sourceUrl);}
