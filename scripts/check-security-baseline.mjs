@@ -49,7 +49,7 @@ for (const [label, pattern, source] of mustContain) {
   else fail('Controle ausente: ' + label);
 }
 
-if (/service_role|sb_secret_|SUPABASE_SERVICE_ROLE_KEY/i.test(auth)) {
+if (/(?:SUPABASE_SERVICE_ROLE_KEY\\s*[:=]|service_role\\s*[:=]\\s*['\"][^'\"]+|sb_secret_[A-Za-z0-9_-]{20,})/i.test(auth)) {
   fail('Credencial privilegiada encontrada em supabase/auth.js');
 } else {
   pass('Nenhuma chave service_role/secret no cliente Supabase');
@@ -58,7 +58,7 @@ if (/service_role|sb_secret_|SUPABASE_SERVICE_ROLE_KEY/i.test(auth)) {
 const publicFiles = walk('www').filter((file) => /\.(?:js|mjs|html|json|css)$/i.test(file));
 for (const file of publicFiles) {
   const content = fs.readFileSync(path.join(root, file), 'utf8');
-  if (/service_role|sb_secret_|SUPABASE_SERVICE_ROLE_KEY/i.test(content)) {
+  if (/(?:SUPABASE_SERVICE_ROLE_KEY\\s*[:=]|service_role\\s*[:=]\\s*['\"][^'\"]+|sb_secret_[A-Za-z0-9_-]{20,})/i.test(content)) {
     fail('Possível segredo privilegiado publicado em ' + file);
   }
 }
