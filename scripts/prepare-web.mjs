@@ -13,6 +13,7 @@ const files = [
   'capital-music-player.js',
   'persistent-music-player.js',
   'home-feed.js',
+  'post-music.js',
   'music-upload.js',
   'music-playlists.js',
   'chat-topics.js',
