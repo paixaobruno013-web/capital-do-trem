@@ -1,10 +1,8 @@
-const CACHE='capital-do-trem-v297';
+const CACHE='capital-do-trem-v298';
 const CORE_FILES=['./','./index.html','./rede.html','./offline.html','./marca.svg','./manifest.webmanifest','./update.js','./diagnostico.html','./assets/favela-header.webp','./assets/banner-speakers.webp'];
 const OPTIONAL_FILES=['./admin.html','./file-picker-guard.js','./estudio.html','./admin-media.js','./privacidade.html','./account-deletion.html','./conta.html','./rede.js','./capital-music-player.js','./persistent-music-player.js','./home-feed.js','./music-playlists.js','./chat-topics.js','./capital-futurista.css','./supabase/auth.js','./diagnostico.html','./bate-papo.html','./chat-enhancements.js','./emoji-picker.js','./stories-ui.js','./home-story-composer.js','./event-social-composer.js','./admin-stories.js','./account-stories.js','./avatar.html','./mensagens.html','./youtube-feed.js','./admin-apoiadores.html','./apoiadores.html','./supporters-admin.js','./supporters-public.js'];
 
 self.addEventListener('install',event=>{
-  // O núcleo do app precisa estar disponível para preservar uma instalação offline íntegra.
-  // Páginas e módulos complementares são armazenados individualmente: uma falha isolada não bloqueia o app.
   event.waitUntil(caches.open(CACHE).then(async cache=>{
     await cache.addAll(CORE_FILES);
     await Promise.all(OPTIONAL_FILES.map(file=>cache.add(file).catch(error=>{
@@ -19,7 +17,6 @@ self.addEventListener('message',event=>{
 });
 
 self.addEventListener('activate',event=>{
-  // Aguarda a limpeza dos caches antigos e a tomada de controle das páginas abertas.
   event.waitUntil(Promise.all([
     caches.keys().then(keys=>Promise.all(
       keys.filter(key=>key.startsWith('capital-do-trem-')&&key!==CACHE).map(key=>caches.delete(key))
@@ -33,7 +30,6 @@ self.addEventListener('fetch',event=>{
   const url=new URL(event.request.url);
   if(url.origin!==self.location.origin) return;
 
-  // Páginas HTML: tenta buscar a versão mais recente primeiro e usa o cache sem internet.
   const isPage=event.request.mode==='navigate'||url.pathname.endsWith('.html')||url.pathname.endsWith('/');
   if(isPage){
     event.respondWith(
@@ -48,7 +44,26 @@ self.addEventListener('fetch',event=>{
     return;
   }
 
-  // Arquivos estáticos: resposta rápida do cache e atualização em segundo plano.
+  // Código executável e estilos precisam ser atualizados pela rede.
+  // Cache só é fallback offline; não servir JS/CSS antigo indefinidamente.
+  const isExecutableOrStyle=/\.(?:js|mjs|css|webmanifest)$/i.test(url.pathname);
+  if(isExecutableOrStyle){
+    event.respondWith(
+      fetch(event.request,{cache:'no-store'}).then(response=>{
+        if(response&&response.ok){
+          const copy=response.clone();
+          caches.open(CACHE).then(cache=>cache.put(event.request,copy));
+        }
+        return response;
+      }).catch(()=>caches.match(event.request).then(cached=>cached||new Response('Recurso indisponível sem conexão.',{
+        status:503,
+        headers:{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store'}
+      })))
+    );
+    return;
+  }
+
+  // Imagens, fontes e demais arquivos estáticos continuam rápidos no cache.
   event.respondWith(
     caches.match(event.request).then(cached=>{
       const network=fetch(event.request).then(response=>{
