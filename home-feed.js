@@ -15,6 +15,8 @@ if(root&&form){
   return '';
  }
  function initials(name){return Array.from(safe(name).trim()||'U').slice(0,2).join('').toUpperCase()}
+ const feedVideoObserver=typeof IntersectionObserver==='function'?new IntersectionObserver(entries=>{for(const entry of entries){const video=entry.target;if(entry.isIntersecting&&entry.intersectionRatio>=0.6){video.muted=true;const others=[...document.querySelectorAll('.home-feed-media[data-feed-autoplay]')].filter(item=>item!==video);for(const other of others)other.pause();video.play().catch(()=>{video.dataset.autoplayBlocked='true'});}else{video.pause();}}},{threshold:[0,0.6,1]}):null;
+ function observeFeedVideo(video){video.muted=true;video.playsInline=true;video.preload='metadata';video.controls=true;video.dataset.feedAutoplay='true';if(feedVideoObserver)feedVideoObserver.observe(video);}
  async function signedMedia(rows){
   const map=new Map(),groups=new Map();
   for(const row of rows){const bucket=row.bucket_id||'capital-do-trem-social';const list=groups.get(bucket)||[];list.push(row);groups.set(bucket,list)}
@@ -61,7 +63,7 @@ if(root&&form){
      if(!item.url)continue;
      const el=document.createElement(item.media_type==='video'?'video':'img');
      el.className='home-feed-media';el.src=item.url;el.loading='lazy';
-     if(item.media_type==='video'){el.controls=true;el.playsInline=true}else el.alt=item.alt_text||post.content||'Foto publicada na comunidade';
+     if(item.media_type==='video'){observeFeedVideo(el)}else{el.alt=item.alt_text||post.content||'Foto publicada na comunidade';el.tabIndex=0;el.title='Toque para ampliar (opcional)';el.addEventListener('click',()=>{const viewer=document.createElement('div');viewer.style.cssText='position:fixed;inset:0;z-index:9999;background:#000e;display:grid;place-items:center;padding:16px';const image=document.createElement('img');image.src=item.url;image.alt=el.alt;image.style.cssText='max-width:100%;max-height:100%;object-fit:contain';const close=document.createElement('button');close.type='button';close.textContent='Fechar';close.style.cssText='position:absolute;top:16px;right:16px;padding:10px 14px;border:1px solid #fff;border-radius:22px;background:#111;color:#fff';close.addEventListener('click',()=>viewer.remove());viewer.addEventListener('click',event=>{if(event.target===viewer)viewer.remove()});viewer.append(image,close);document.body.append(viewer)});}
      card.append(el);
     }
     const actions=document.createElement('div');actions.className='home-feed-actions';
