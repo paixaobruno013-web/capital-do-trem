@@ -28,7 +28,7 @@ drop policy if exists songs_update_own_pending_admin on public.songs;
 drop policy if exists songs_delete_own_pending_admin on public.songs;
 create or replace function private.protect_song_owner_metadata_update()
 returns trigger language plpgsql security invoker set search_path = ''
-as $
+as $$
 begin
   if (select auth.uid()) = old.user_id and not (select private.is_admin()) then
     if new.id is distinct from old.id
@@ -43,8 +43,7 @@ begin
   end if;
   return new;
 end;
-$;
-revoke all on function private.protect_song_owner_metadata_update() from public, anon, authenticated;
+$$;revoke all on function private.protect_song_owner_metadata_update() from public, anon, authenticated;
 drop trigger if exists songs_protect_owner_metadata_update on public.songs;
 create trigger songs_protect_owner_metadata_update
 before update on public.songs
