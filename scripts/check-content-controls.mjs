@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 const auth = fs.readFileSync('supabase/auth.js', 'utf8');
 const sql = fs.readFileSync('supabase/migrations/20261116203000_user_content_edit_delete.sql', 'utf8');
+const rede = fs.readFileSync('rede.js', 'utf8');
 
 for (const fn of [
   'updateMyPost', 'deleteMyPost', 'updateMyPostComment', 'deleteMyPostComment',
@@ -22,4 +23,8 @@ assert.match(sql, /private_messages_delete_sender[\s\S]*?status = 'accepted'/);
 assert.match(auth, /\.eq\('author_id', user\.id\)/);
 assert.match(auth, /\.eq\('user_id', user\.id\)/);
 assert.match(auth, /\.eq\('sender_id', user\.id\)/);
+assert.match(rede, /Editar publicação/);
+assert.match(rede, /Excluir publicação/);
+assert.match(rede, /api\.updateMySong/);
+assert.match(rede, /api\.deleteMySong/);
 console.log('Controle de edição e exclusão: 10 APIs, isolamento por proprietário e conversas privadas aceitas verificados.');
