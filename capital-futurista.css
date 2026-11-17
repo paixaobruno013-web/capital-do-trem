@@ -343,3 +343,8 @@ body.profile-image-viewer-open{overflow:hidden}
 #capital-music-player.ct-player-persistent.ct-player-fullscreen .ct-player-shell{pointer-events:auto!important}
 body.ct-player-fullscreen-open.ct-has-floating-player{padding-bottom:0!important}
 @media(max-width:520px){#capital-music-player.ct-player-persistent.ct-player-fullscreen .ct-player-stage{grid-template-columns:minmax(0,1fr);gap:12px}#capital-music-player.ct-player-persistent.ct-player-fullscreen .ct-player-art-wrap{max-width:min(30vh,230px)}}
+
+/* Ações sociais aparecem somente ao abrir uma mídia no perfil. */
+.profile-post-media-actions{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;width:min(100%,620px);padding:10px 12px;border:1px solid #ffffff2b;border-radius:14px;background:rgba(12,12,14,.96);box-shadow:0 8px 28px #0008}
+.profile-post-media-actions .btn{min-height:44px;flex:1 1 130px;white-space:normal}
+@media(max-width:420px){.profile-post-media-actions{gap:7px;padding:8px}.profile-post-media-actions .btn{flex-basis:100%;min-height:42px}}
