@@ -1001,6 +1001,15 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 </section>
 <div id="capital-music-player" aria-label="Player 3D Capital do Trem"></div>
 
+<section class="card music-local-picker" aria-labelledby="music-local-picker-title">
+ <div class="home-section-heading"><div><span class="eyebrow">OUÇA DO SEU APARELHO</span><h3 id="music-local-picker-title">♫ Escolher arquivo de música</h3><p class="muted">Selecione um áudio salvo no seu celular para ouvir diretamente no Capital do Trem.</p></div></div>
+ <label for="audio">Escolher música (MP3, M4A, WAV e outros formatos de áudio)</label>
+ <input id="audio" type="file" accept="audio/*">
+ <audio id="player" controls preload="metadata" style="width:100%;margin:12px 0"></audio>
+ <div class="social" style="align-items:center"><button class="btn" id="download-audio" type="button" disabled>⬇ Baixar música escolhida</button><span id="audio-status" class="muted" role="status" aria-live="polite">Escolha um arquivo para começar a ouvir.</span></div>
+ <p class="muted">Este modo toca o arquivo localmente no seu aparelho. Para publicar no catálogo compartilhado, use a opção de envio logo abaixo. Envie somente músicas que você tenha autorização para distribuir.</p>
+</section>
+
 
 <section id="music-upload-area" class="card music-upload-area" aria-labelledby="music-upload-title">
  <div class="home-section-heading"><div><span class="eyebrow">ENVIE SEU SOM</span><h3 id="music-upload-title">＋ Publicar música</h3><p class="muted">MCs e DJs podem enviar suas faixas diretamente por aqui. Cada envio é independente, mesmo quando a música já existe no catálogo.</p></div></div>
@@ -1017,7 +1026,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
  <p id="music-upload-status" class="muted" role="status" aria-live="polite"></p>
 </section>
 
-<label for="song-catalog-search" class="muted" style="display:block;margin:14px 0 5px;font-weight:700">🔎 Buscar por música ou artista</label><input id="song-catalog-search" type="search" inputmode="search" autocomplete="off" placeholder="Digite o nome da música ou do artista…" aria-controls="published-song-catalog" style="margin:0 0 8px"><p id="song-catalog-count" class="muted" role="status" aria-live="polite" style="margin:0 0 10px">Carregando músicas…</p><div id="published-song-catalog" class="list" aria-live="polite"><p class="muted">Carregando catálogo compartilhado…</p></div></div><div class="card"><h3>🎧 Player do Capital do Trem</h3><label for="audio">Escolha uma música autorizada que esteja no seu aparelho</label><input id="audio" type="file" accept="audio/*"><audio id="player" controls preload="metadata" style="width:100%;margin:12px 0"></audio><div class="social" style="align-items:center"><button class="btn" id="download-audio" type="button" disabled>⬇ Baixar música</button><span id="audio-status" class="muted" role="status" aria-live="polite">Selecione um áudio para ouvir e baixar nesta demonstração.</span></div><p class="muted">O player oferece controles de reprodução e pode continuar tocando com a tela bloqueada, conforme o suporte do navegador e as configurações de economia de bateria do celular. O download salva o arquivo selecionado neste aparelho.</p><p class="muted">Só compartilhe ou baixe músicas que você tenha autorização para distribuir.</p></div></section>
+<label for="song-catalog-search" class="muted" style="display:block;margin:14px 0 5px;font-weight:700">🔎 Buscar por música ou artista</label><input id="song-catalog-search" type="search" inputmode="search" autocomplete="off" placeholder="Digite o nome da música ou do artista…" aria-controls="published-song-catalog" style="margin:0 0 8px"><p id="song-catalog-count" class="muted" role="status" aria-live="polite" style="margin:0 0 10px">Carregando músicas…</p><div id="published-song-catalog" class="list" aria-live="polite"><p class="muted">Carregando catálogo compartilhado…</p></div></div></section>
 <section class="page" id="pesquisa"><div class="card home-discovery-card"><span class="eyebrow">CAPITAL DO TREM • DESCOBRIR</span><h2>🔎 Pesquisar e descobrir</h2><p class="muted">Encontre vídeos, artistas e momentos da comunidade.</p><label for="video-discovery-search">Pesquisar vídeos por legenda ou Maquinista</label><input id="video-discovery-search" type="search" placeholder="Digite o nome ou assunto…"><div class="home-section-heading"><h3>Vídeos da comunidade</h3><button class="btn alt" id="shuffle-videos" type="button">↻ Vídeos aleatórios</button></div><div id="random-video-results" class="home-video-grid"><p class="muted">Carregando vídeos…</p></div></div><section class="card home-youtube" aria-labelledby="home-youtube-title">
 <h2 id="home-youtube-title">▶ Vídeos da Capital do Trem</h2>
 <p class="muted">Os seis vídeos originais do projeto. Quando houver evento dentro da data, sua divulgação aparece aqui acima desta seleção.</p>

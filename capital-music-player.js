@@ -28,7 +28,8 @@ export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null
  const play=document.createElement('button');play.type='button';play.className='ct-player-play';play.textContent='▶';play.setAttribute('aria-label','Reproduzir');
  const next=document.createElement('button');next.type='button';next.className='ct-player-control';next.textContent='⏭';next.setAttribute('aria-label','Próxima música');
  const mute=document.createElement('button');mute.type='button';mute.className='ct-player-volume';mute.textContent='🔊';mute.setAttribute('aria-label','Silenciar ou ativar som');
- controls.append(previous,play,next,mute);
+ const fullscreen=document.createElement('button');fullscreen.type='button';fullscreen.className='ct-player-fullscreen';fullscreen.textContent='⛶';fullscreen.setAttribute('aria-label','Abrir player em tela cheia');fullscreen.setAttribute('aria-pressed','false');
+ controls.append(previous,play,next,mute,fullscreen);
  const status=document.createElement('p');status.className='ct-player-status';status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.textContent='Escolha uma faixa para começar a ouvir.';
  const audio=document.createElement('audio');audio.preload='none';audio.hidden=true;
  shell.append(progressWrap,controls,status,audio);root.append(shell);
@@ -53,6 +54,15 @@ export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null
  previous.addEventListener('click',()=>{if(audio.currentTime>3){audio.currentTime=0;return}step(-1)});
  next.addEventListener('click',()=>step(1));
  mute.addEventListener('click',()=>{audio.muted=!audio.muted;mute.textContent=audio.muted?'🔇':'🔊';mute.setAttribute('aria-label',audio.muted?'Ativar som':'Silenciar')});
+ function setFullscreen(enabled){
+  root.classList.toggle('ct-player-fullscreen',enabled);
+  document.body.classList.toggle('ct-player-fullscreen-open',enabled);
+  fullscreen.setAttribute('aria-pressed',String(enabled));
+  fullscreen.setAttribute('aria-label',enabled?'Sair da tela cheia':'Abrir player em tela cheia');
+  fullscreen.textContent=enabled?'✕':'⛶';
+ }
+ fullscreen.addEventListener('click',()=>setFullscreen(!root.classList.contains('ct-player-fullscreen')));
+ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&root.classList.contains('ct-player-fullscreen'))setFullscreen(false)});
  function updateMediaPosition(){if(!('mediaSession' in navigator)||!Number.isFinite(audio.duration)||audio.duration<=0)return;try{navigator.mediaSession.setPositionState({duration:audio.duration,playbackRate:audio.playbackRate,position:Math.min(audio.currentTime,audio.duration)})}catch{}}
  function configureMediaSession(){if(!('mediaSession' in navigator))return;const actions=[['play',()=>audio.play()],['pause',()=>audio.pause()],['previoustrack',()=>step(-1)],['nexttrack',()=>step(1)],['seekbackward',details=>{audio.currentTime=Math.max(0,audio.currentTime-(details.seekOffset||10))}],['seekforward',details=>{audio.currentTime=Math.min(audio.duration||Infinity,audio.currentTime+(details.seekOffset||10))}],['seekto',details=>{if(Number.isFinite(details.seekTime))audio.currentTime=Math.max(0,Math.min(audio.duration||Infinity,details.seekTime))}]];for(const [action,handler] of actions){try{navigator.mediaSession.setActionHandler(action,handler)}catch{}}}
  audio.addEventListener('play',()=>{if(current()&&typeof onPlay==='function'&&lastRecordedSongId!==current().id){lastRecordedSongId=current().id;onPlay(current())}shell.classList.add('is-playing');play.textContent='Ⅱ';play.setAttribute('aria-label','Pausar');status.textContent='Tocando agora';if('mediaSession' in navigator){try{navigator.mediaSession.playbackState='playing';configureMediaSession();updateMediaPosition()}catch{}}});
