@@ -11,7 +11,7 @@ const checks = [
  ['mensagem de boas-vindas aparece na entrada', /SEJA BEM-VINDO, MAQUINISTA DESSE TREM!/.test(home)],
  ['vídeos de descoberta ficam na Pesquisa, não misturados ao Feed', /home-youtube/.test(discovery) && !/<section class="card home-youtube"/.test(home.slice(home.indexOf('<section class="page active" id="inicio">'),home.indexOf('<section class="page" id="musicas">')))],
  ['atalho de amizades fica no Chat, sem duplicação na tela inicial', /id="fazer-amigos"/.test(chat) && !/class="card home-friends"/.test(home)],
- ['perfil oferece abas separadas para fotos e vídeos', /data-profile-view="photos">▧ Fotos/.test(profile) && /data-profile-view="videos">Vídeos/.test(profile)],
+ ['perfil oferece abas separadas para fotos e vídeos', /data-profile-view="photos">▧ Fotos/.test(profile) && /data-profile-view="videos">[^<]*Vídeos/.test(profile)],
  ['aba Fotos não mistura vídeos e aba Vídeos filtra apenas vídeos', /const visibleMedia=media\.filter\(m=>view==='videos'\?m\.media_type==='video':m\.media_type!=='video'\)/.test(profileScript) && /for\(const m of visibleMedia\)/.test(profileScript)]
 ];
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO ') + name);
