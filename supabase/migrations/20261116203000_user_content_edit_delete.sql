@@ -21,8 +21,35 @@ for update to authenticated
 using (author_id = (select auth.uid()))
 with check (author_id = (select auth.uid()));
 
--- Músicas: o dono pode alterar metadados e excluir seu próprio envio.
+-- Músicas: o dono pode editar metadados e excluir a própria faixa.
+-- Mantém status, proprietário e caminho do arquivo protegidos contra autopublicação/troca.
 grant update, delete on public.songs to authenticated;
+drop policy if exists songs_update_own_pending_admin on public.songs;
+drop policy if exists songs_delete_own_pending_admin on public.songs;
+create or replace function private.protect_song_owner_metadata_update()
+returns trigger language plpgsql security invoker set search_path = ''
+as $
+begin
+  if (select auth.uid()) = old.user_id and not (select private.is_admin()) then
+    if new.id is distinct from old.id
+       or new.user_id is distinct from old.user_id
+       or new.status is distinct from old.status
+       or new.storage_path is distinct from old.storage_path
+       or new.mime_type is distinct from old.mime_type
+       or new.file_size is distinct from old.file_size
+       or new.created_at is distinct from old.created_at then
+      raise exception 'Somente a equipe pode alterar o status ou os dados do arquivo.';
+    end if;
+  end if;
+  return new;
+end;
+$;
+revoke all on function private.protect_song_owner_metadata_update() from public, anon, authenticated;
+drop trigger if exists songs_protect_owner_metadata_update on public.songs;
+create trigger songs_protect_owner_metadata_update
+before update on public.songs
+for each row execute function private.protect_song_owner_metadata_update();
+
 drop policy if exists songs_update_own_or_admin on public.songs;
 create policy songs_update_own_or_admin on public.songs
 for update to authenticated
