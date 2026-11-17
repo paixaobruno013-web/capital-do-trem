@@ -2172,6 +2172,13 @@ export async function updateMyGroupMessage(messageId, content) {
 
 export async function deleteMyGroupMessage(messageId) {
   const { supabase, user } = await requireCurrentUserForContent();
+  const { data: message, error: readError } = await supabase.from('chat_messages')
+    .select('attachment_path').eq('id', messageId).eq('author_id', user.id).single();
+  if (readError) throw readError;
+  if (message.attachment_path) {
+    const { error: storageError } = await supabase.storage.from('capital-do-trem-chat').remove([message.attachment_path]);
+    if (storageError) throw storageError;
+  }
   const { error } = await supabase.from('chat_messages').delete().eq('id', messageId).eq('author_id', user.id);
   if (error) throw error;
   return true;
@@ -2190,6 +2197,13 @@ export async function updateMyPrivateMessage(messageId, content) {
 
 export async function deleteMyPrivateMessage(messageId) {
   const { supabase, user } = await requireCurrentUserForContent();
+  const { data: message, error: readError } = await supabase.from('private_messages')
+    .select('attachment_path').eq('id', messageId).eq('sender_id', user.id).single();
+  if (readError) throw readError;
+  if (message.attachment_path) {
+    const { error: storageError } = await supabase.storage.from('capital-do-trem-chat').remove([message.attachment_path]);
+    if (storageError) throw storageError;
+  }
   const { error } = await supabase.from('private_messages').delete().eq('id', messageId).eq('sender_id', user.id);
   if (error) throw error;
   return true;
