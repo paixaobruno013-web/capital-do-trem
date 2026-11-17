@@ -37,9 +37,9 @@
       "url": "./conta.html",
       "icons": [
         {
-          "src": "./marca.svg",
-          "sizes": "any",
-          "type": "image/svg+xml"
+          "src": "./assets/capital-do-trem-logo.jpg",
+          "sizes": "96x96",
+          "type": "image/jpeg"
         }
       ]
     },
@@ -50,9 +50,9 @@
       "url": "./bate-papo.html",
       "icons": [
         {
-          "src": "./marca.svg",
-          "sizes": "any",
-          "type": "image/svg+xml"
+          "src": "./assets/capital-do-trem-logo.jpg",
+          "sizes": "96x96",
+          "type": "image/jpeg"
         }
       ]
     },
@@ -63,9 +63,9 @@
       "url": "./avatar.html",
       "icons": [
         {
-          "src": "./marca.svg",
-          "sizes": "any",
-          "type": "image/svg+xml"
+          "src": "./assets/capital-do-trem-logo.jpg",
+          "sizes": "96x96",
+          "type": "image/jpeg"
         }
       ]
     },
@@ -76,9 +76,9 @@
       "url": "./mensagens.html",
       "icons": [
         {
-          "src": "./marca.svg",
-          "sizes": "any",
-          "type": "image/svg+xml"
+          "src": "./assets/capital-do-trem-logo.jpg",
+          "sizes": "96x96",
+          "type": "image/jpeg"
         }
       ]
     }
