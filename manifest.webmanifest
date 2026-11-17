@@ -11,9 +11,9 @@
   "theme_color": "#080809",
   "icons": [
     {
-      "src": "https://zmjxkfjzrbbxyvgkwirv.supabase.co/functions/v1/capital-do-trem-pwa-icon",
-      "sizes": "180x180",
-      "type": "image/png",
+      "src": "./assets/capital-do-trem-logo.jpg",
+      "sizes": "96x96",
+      "type": "image/jpeg",
       "purpose": "any"
     },
     {
