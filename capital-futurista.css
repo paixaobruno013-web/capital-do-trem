@@ -360,3 +360,29 @@ body.ct-player-fullscreen-open.ct-has-floating-player{padding-bottom:0!important
 .music-playlist-row>strong{font-size:1rem}
 .music-playlist-row .social{margin:0;gap:7px}
 .music-playlist-row .btn{font-size:12px;padding:8px 11px}
+
+
+/* Identidade Capital do Trem: catálogo preto, branco e LED vermelho. */
+#published-song-catalog{display:flex;flex-direction:column;gap:12px}
+#published-song-catalog .music-track-row{
+ display:grid;grid-template-columns:minmax(0,1fr);gap:9px;margin:0!important;padding:15px;
+ border:1px solid rgba(255,35,55,.55);
+ border-radius:13px;background:#050505;
+ box-shadow:0 0 7px rgba(255,0,35,.22),inset 0 0 12px rgba(255,0,35,.07);
+}
+#published-song-catalog .music-track-row h3,
+#published-song-catalog .music-track-row h3+p{
+ display:block;width:fit-content;max-width:100%;margin:0;padding:7px 11px;
+ color:#fff;background:#080808;border:1px solid rgba(255,35,55,.9);border-radius:8px;
+ box-shadow:0 0 5px rgba(255,0,35,.8),0 0 12px rgba(255,0,35,.42),inset 0 0 7px rgba(255,0,35,.13);
+ text-shadow:0 0 5px rgba(255,255,255,.3);
+ overflow-wrap:anywhere;
+}
+#published-song-catalog .music-track-row h3{font-size:1.05rem;line-height:1.35;cursor:pointer}
+#published-song-catalog .music-track-row h3+p{font-size:.94rem;color:#fff!important}
+#published-song-catalog .music-track-row>p:not(:first-of-type){margin:0;color:#eee}
+.music-playlist-manager{background:#080808!important;border-color:rgba(255,35,55,.65)!important;box-shadow:0 0 10px rgba(255,0,35,.18)}
+.music-playlist-row{background:#050505;border:1px solid rgba(255,35,55,.55);box-shadow:0 0 7px rgba(255,0,35,.2)}
+@media(hover:hover){
+ #published-song-catalog .music-track-row:hover{border-color:#ff263f;box-shadow:0 0 9px rgba(255,0,35,.55),0 0 20px rgba(255,0,35,.25),inset 0 0 14px rgba(255,0,35,.1)}
+}
