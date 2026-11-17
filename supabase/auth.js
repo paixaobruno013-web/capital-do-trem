@@ -2057,3 +2057,23 @@ export async function moveSongInMyPlaylist(playlistId,songId,direction) {
  const {error:third}=await supabase.from('playlist_songs').update({position:right.position}).eq('playlist_id',playlistId).eq('song_id',left.song_id);if(third)throw third;
  return true;
 }
+
+export async function uploadMyCover(file) {
+ const supabase=initSupabase();const {data:{user},error:userError}=await supabase.auth.getUser();
+ if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para enviar a capa.');
+ if(!(file instanceof File))throw new Error('Selecione uma imagem para a capa.');
+ const allowed={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'};
+ if(!allowed[file.type])throw new Error('Use uma capa JPG, PNG ou WebP.');
+ if(file.size<1||file.size>8*1024*1024)throw new Error('A capa deve ter até 8 MB.');
+ const path=user.id+'/cover/'+crypto.randomUUID()+'.'+allowed[file.type];
+ const {error}=await supabase.storage.from('capital-do-trem-media').upload(path,file,{contentType:file.type,cacheControl:'3600',upsert:false});
+ if(error)throw error;
+ const {data:publicData}=supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
+ if(!publicData?.publicUrl){await supabase.storage.from('capital-do-trem-media').remove([path]).catch(()=>{});throw new Error('Não foi possível obter o endereço da capa.');}
+ const {data:previous,error:readError}=await supabase.from('profiles').select('cover_path').eq('user_id',user.id).single();
+ if(readError){await supabase.storage.from('capital-do-trem-media').remove([path]).catch(()=>{});throw readError;}
+ const {data:saved,error:saveError}=await supabase.from('profiles').update({cover_url:publicData.publicUrl,cover_path:path}).eq('user_id',user.id).select('cover_url,cover_path').single();
+ if(saveError){await supabase.storage.from('capital-do-trem-media').remove([path]).catch(()=>{});throw saveError;}
+ if(previous?.cover_path&&previous.cover_path!==path&&previous.cover_path.startsWith(user.id+'/cover/'))await supabase.storage.from('capital-do-trem-media').remove([previous.cover_path]);
+ return saved;
+}
