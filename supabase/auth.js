@@ -883,7 +883,7 @@ async function signChatAttachment(path) {
   return data?.signedUrl || null;
 }
 async function hydrateChatMessage(message) {
-  if (!message?.attachment_path) return message;
+  if (!message?.attachment_path || message?.attachment_once) return message;
   try { return { ...message, attachment_url: await signChatAttachment(message.attachment_path) }; }
   catch (error) {
     console.warn('Anexo temporariamente indisponível; a mensagem continuará visível.', error);
@@ -893,7 +893,7 @@ async function hydrateChatMessage(message) {
 async function hydrateChatMessages(messages) {
   const rows = messages || [];
   const supabase = initSupabase();
-  const paths = [...new Set(rows.map(m => m.attachment_path).filter(Boolean))];
+  const paths = [...new Set(rows.filter(m => !m.attachment_once).map(m => m.attachment_path).filter(Boolean))];
   if (!paths.length) return rows;
   try {
     const { data, error } = await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).createSignedUrls(paths, 900);
@@ -913,7 +913,7 @@ async function hydrateChatMessages(messages) {
 export async function getChatMessages(limit = 60) {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('chat_messages')
-    .select('id, author_id, author_name, content, created_at, author_avatar_type, author_avatar_url, author_avatar_data, attachment_url, attachment_path, attachment_type, attachment_name, attachment_mime, attachment_size')
+    .select('id, author_id, author_name, content, created_at, author_avatar_type, author_avatar_url, author_avatar_data, attachment_url, attachment_path, attachment_type, attachment_name, attachment_mime, attachment_size, attachment_once')
     .order('created_at', { ascending: false }).limit(Math.min(Math.max(Number(limit) || 60, 1), 100));
   if (error) throw error;
   return await hydrateChatMessages((data || []).reverse());
@@ -929,21 +929,22 @@ export async function uploadChatAttachment(file) {
   return await uploadChatFile(file, path);
 }
 
-export async function sendChatMessage(content, attachment = null) {
+export async function sendChatMessage(content, attachment = null, viewOnce = false) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para participar do bate-papo.');
   const cleanContent = String(content || '').trim();
   if ((!cleanContent && !attachment) || cleanContent.length > 1000) throw new Error('Escreva uma mensagem ou anexe um arquivo. O texto pode ter até 1.000 caracteres.');
+  if (viewOnce && (!attachment || !['image','video','audio'].includes(attachment.type))) throw new Error('A visualização única está disponível somente para fotos, vídeos e áudios.');
   const fallback = attachment?.type === 'image' ? '📷 Foto' : attachment?.type === 'video' ? '🎬 Vídeo' : attachment?.type === 'audio' ? '🎵 Áudio' : '📎 ' + (attachment?.name || 'Documento');
-  const payload = { author_id:user.id, content:cleanContent || fallback };
+  const payload = { author_id:user.id, content:cleanContent || fallback, attachment_once:Boolean(viewOnce) };
   if (attachment) Object.assign(payload,{
     attachment_path:attachment.path,attachment_type:attachment.type,attachment_name:attachment.name,
     attachment_mime:attachment.mime,attachment_size:attachment.size
   });
   const { data, error } = await supabase.from('chat_messages').insert(payload)
-    .select('id, author_id, author_name, content, created_at, author_avatar_type, author_avatar_url, author_avatar_data, attachment_url, attachment_path, attachment_type, attachment_name, attachment_mime, attachment_size').single();
+    .select('id, author_id, author_name, content, created_at, author_avatar_type, author_avatar_url, author_avatar_data, attachment_url, attachment_path, attachment_type, attachment_name, attachment_mime, attachment_size, attachment_once').single();
   if (error) {
     if (attachment?.path) await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).remove([attachment.path]).catch(() => {});
     throw error;
@@ -1103,13 +1104,13 @@ export async function decidePrivateConversation(conversationId,decision) {
 export async function getPrivateMessages(conversationId) {
   const supabase=initSupabase();
   const {data,error}=await supabase.from('private_messages')
-    .select('id,conversation_id,sender_id,content,created_at,attachment_path,attachment_type,attachment_name,attachment_mime,attachment_size')
+    .select('id,conversation_id,sender_id,content,created_at,attachment_path,attachment_type,attachment_name,attachment_mime,attachment_size,attachment_once')
     .eq('conversation_id',conversationId).order('created_at',{ascending:true}).limit(100);
   if(error)throw error;
   return await hydrateChatMessages(data||[]);
 }
 
-export async function sendPrivateMessage(conversationId,content,file=null) {
+export async function sendPrivateMessage(conversationId,content,file=null,viewOnce=false) {
   const supabase=initSupabase();
   const {data:{user},error:userError}=await supabase.auth.getUser();
   if(userError)throw userError;
@@ -1123,15 +1124,16 @@ export async function sendPrivateMessage(conversationId,content,file=null) {
     const path='private/'+conversationId+'/'+user.id+'/'+crypto.randomUUID()+'.'+meta.extension;
     attachment=await uploadChatFile(file,path);
   }
+  if(viewOnce&&(!attachment||!['image','video','audio'].includes(attachment.type)))throw new Error('A visualização única está disponível somente para fotos, vídeos e áudios.');
   const fallback=attachment?.type==='image'?'📷 Foto':attachment?.type==='video'?'🎬 Vídeo':attachment?.type==='audio'?'🎵 Áudio':'📎 '+(attachment?.name||'Documento');
-  const payload={conversation_id:conversationId,sender_id:user.id,content:clean||fallback};
+  const payload={conversation_id:conversationId,sender_id:user.id,content:clean||fallback,attachment_once:Boolean(viewOnce)};
   if(attachment)Object.assign(payload,{
     attachment_path:attachment.path,attachment_type:attachment.type,attachment_name:attachment.name,
     attachment_mime:attachment.mime,attachment_size:attachment.size
   });
   const {data,error}=await supabase.from('private_messages')
     .insert(payload)
-    .select('id,conversation_id,sender_id,content,created_at,attachment_path,attachment_type,attachment_name,attachment_mime,attachment_size').single();
+    .select('id,conversation_id,sender_id,content,created_at,attachment_path,attachment_type,attachment_name,attachment_mime,attachment_size,attachment_once').single();
   if(error){
     if(attachment?.path)await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).remove([attachment.path]).catch(()=>{});
     throw error;
@@ -2207,4 +2209,22 @@ export async function deleteMyPrivateMessage(messageId) {
   const { error } = await supabase.from('private_messages').delete().eq('id', messageId).eq('sender_id', user.id);
   if (error) throw error;
   return true;
+}
+
+// Consome atomicamente uma mídia de visualização única. O banco registra um consumo
+// independente por destinatário; o remetente não pode abrir a própria mídia.
+export async function consumeOneTimeChatMedia(messageKind,messageId) {
+  const supabase=initSupabase();
+  const {data:{user},error:userError}=await supabase.auth.getUser();
+  if(userError)throw userError;
+  if(!user)throw new Error('Entre na sua conta para abrir a mídia.');
+  if(!['group','private'].includes(messageKind)||!messageId)throw new Error('Mídia inválida.');
+  const {data,error}=await supabase.rpc('consume_one_time_chat_media',{p_message_kind:messageKind,p_message_id:messageId});
+  if(error)throw error;
+  const row=Array.isArray(data)?data[0]:data;
+  if(!row?.storage_path)throw new Error('Esta mídia já foi visualizada ou não está disponível.');
+  const {data:signed,error:signedError}=await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).createSignedUrl(row.storage_path,90);
+  if(signedError)throw signedError;
+  if(!signed?.signedUrl)throw new Error('Não foi possível abrir a mídia. O acesso de visualização única já foi consumido.');
+  return {url:signed.signedUrl,type:row.attachment_type};
 }
