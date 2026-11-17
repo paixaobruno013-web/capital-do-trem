@@ -91,7 +91,7 @@ function openProfilePostMedia(src,type,label,buildActions){
  let viewer=document.getElementById('profile-post-media-viewer');
  if(!viewer){
   viewer=document.createElement('div');viewer.id='profile-post-media-viewer';viewer.className='profile-image-viewer';viewer.hidden=true;viewer.setAttribute('role','dialog');viewer.setAttribute('aria-modal','true');viewer.setAttribute('aria-label','Visualização da publicação');
-  viewer.style.cssText='z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;padding:64px 14px 20px';
+  viewer.style.cssText='z-index:10000;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;padding:64px 14px 20px';
   const close=document.createElement('button');close.type='button';close.className='profile-image-viewer-close';close.textContent='✕';close.setAttribute('aria-label','Fechar publicação');
   const stage=document.createElement('div');stage.className='profile-post-media-stage';stage.style.cssText='display:flex;align-items:center;justify-content:center;width:100%;flex:1 1 auto;min-height:0;max-height:calc(100dvh - 150px)';
   const actions=document.createElement('div');actions.className='profile-post-media-actions';actions.setAttribute('aria-label','Ações da publicação');
