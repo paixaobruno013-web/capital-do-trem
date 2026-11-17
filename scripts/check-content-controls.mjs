@@ -27,4 +27,8 @@ assert.match(rede, /Editar publicação/);
 assert.match(rede, /Excluir publicação/);
 assert.match(rede, /api\.updateMySong/);
 assert.match(rede, /api\.deleteMySong/);
+assert.match(rede, /api\.updateMyPostComment/);
+assert.match(rede, /api\.deleteMyPostComment/);
+assert.match(rede, /Editar comentário/);
+assert.match(rede, /Excluir comentário/);
 console.log('Controle de edição e exclusão: 10 APIs, isolamento por proprietário e conversas privadas aceitas verificados.');
