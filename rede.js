@@ -127,10 +127,26 @@ async function getStats(userId){
  // Falha em um contador não pode impedir a abertura do perfil nem dos seus controles.
  return{posts:posts.error?0:(posts.count||0),followers:followers.error?0:(followers.count||0),following:following.error?0:(following.count||0)};
 }
+let profileLoadStage='inicialização';
+function setProfileLoadStage(stage){
+ profileLoadStage=stage;
+ const root=$('profile-posts');
+ if(root&&!root.querySelector('.profile-load-error')){
+  const status=root.querySelector('.empty');
+  if(status)status.textContent=stage;
+ }
+}
 function showProfileLoadError(error){
- const root=$('profile-posts');if(!root)return;
+ const root=$('profile-posts');
+ const heading=$('profile-name');
+ if(heading)heading.textContent='Perfil indisponível';
+ const handle=$('profile-handle');if(handle)handle.textContent='';
+ const city=$('profile-city');if(city)city.textContent='';
+ const bio=$('profile-bio');if(bio)bio.textContent='';
+ if(!root)return;
  root.replaceChildren();
- const message=document.createElement('p');message.className='status';message.textContent='Não foi possível carregar o perfil: '+(error?.message||'verifique a conexão e tente novamente.');
+ const message=document.createElement('p');message.className='status profile-load-error';message.setAttribute('role','alert');
+ message.textContent='Falha ao '+profileLoadStage.toLowerCase()+': '+(error?.message||'verifique a conexão e tente novamente.');
  const retry=document.createElement('button');retry.type='button';retry.className='btn primary';retry.textContent='↻ Tentar carregar perfil novamente';
  retry.addEventListener('click',async()=>{retry.disabled=true;retry.textContent='Carregando…';try{await loadMyProfile()}catch(e){showProfileLoadError(e)}finally{retry.disabled=false;retry.textContent='↻ Tentar carregar perfil novamente'}});
  root.append(message,retry);
@@ -143,6 +159,7 @@ function withProfileTimeout(promise,milliseconds,label){
  ]).finally(()=>window.clearTimeout(timer));
 }
 async function loadMyProfile(){
+ setProfileLoadStage('verificar a sessão');
  const session=await withProfileTimeout(api.getCurrentSession(),8000,'A sessão demorou para responder. Verifique a conexão e tente novamente.');
  if(!session){location.href='./conta.html?retorno=rede';return}
  me=session.user;
@@ -163,12 +180,14 @@ async function loadMyProfile(){
   for(const [id,value] of [['stat-posts',stats.posts],['stat-followers',stats.followers],['stat-following',stats.following]]){const el=$(id);if(el)el.textContent=value}
   return;
  }
+ setProfileLoadStage('buscar os dados da conta');
  profile=await withProfileTimeout(api.getMyBasicProfile(),10000,'Os dados do seu perfil demoraram para responder. Verifique a conexão e tente novamente.');
  currentProfileUserId=me.id;
  // getMyBasicProfile já inclui avatar e capa: não fazemos uma segunda consulta redundante.
  renderProfile(profile,{posts:0,followers:0,following:0},true);
  for(const [id,value] of [['edit-name',profile.display_name||''],['edit-username',profile.username||''],['edit-city',profile.city||''],['edit-bio',profile.bio||'']]){const el=$(id);if(el)el.value=value}
  const publicField=$('edit-public');if(publicField)publicField.checked=!!profile.is_public;
+ setProfileLoadStage('carregar as publicações');
  const statsPromise=withProfileTimeout(getStats(me.id),8000,'Os contadores do perfil demoraram para responder.').catch(()=>({posts:0,followers:0,following:0}));
  await withProfileTimeout(loadProfilePosts(me.id),15000,'As publicações do perfil demoraram para carregar.');
  const stats=await statsPromise;
