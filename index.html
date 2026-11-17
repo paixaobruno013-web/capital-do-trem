@@ -1233,8 +1233,41 @@ document.addEventListener('keydown',unlockIntroFromGesture,{capture:true});
 updateIntroControl();
 
 const pages=[...document.querySelectorAll('.page')],tabs=[...document.querySelectorAll('[data-page]')];
-function go(id){const target=pages.find(p=>p.id===id);if(!target)return;pages.forEach(p=>p.classList.toggle('active',p===target));tabs.forEach(t=>{const active=t.dataset.page===id;t.classList.toggle('active',active);if(active){t.setAttribute('aria-current','page');t.scrollIntoView({block:'nearest',inline:'nearest',behavior:window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}else t.removeAttribute('aria-current');});window.scrollTo({top:0,behavior:window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}
-tabs.forEach(t=>t.addEventListener('click',()=>go(t.dataset.page)));document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
+const pageScrollPositions=new Map();
+let activePageId=pages.find(page=>page.classList.contains('active'))?.id||'inicio';
+function go(id){
+ const target=pages.find(page=>page.id===id);
+ if(!target||target.id===activePageId)return;
+ const current=pages.find(page=>page.id===activePageId);
+ if(current){
+  pageScrollPositions.set(current.id,window.scrollY||window.pageYOffset||0);
+  // Evita áudio/vídeo continuando em segundo plano depois de sair da área.
+  current.querySelectorAll('audio,video').forEach(media=>{try{media.pause();}catch{}});
+ }
+ activePageId=target.id;
+ pages.forEach(page=>page.classList.toggle('active',page===target));
+ const activeTab=tabs.find(tab=>tab.dataset.page===id);
+ tabs.forEach(tab=>{
+  const active=tab===activeTab;
+  tab.classList.toggle('active',active);
+  if(active)tab.setAttribute('aria-current','page');
+  else tab.removeAttribute('aria-current');
+ });
+ // Ajusta somente a faixa horizontal de navegação; não força rolagem da página inteira.
+ if(activeTab){
+  const nav=activeTab.closest('nav');
+  if(nav){
+   const navRect=nav.getBoundingClientRect(),tabRect=activeTab.getBoundingClientRect();
+   if(tabRect.left<navRect.left)nav.scrollBy({left:tabRect.left-navRect.left-8,behavior:'smooth'});
+   else if(tabRect.right>navRect.right)nav.scrollBy({left:tabRect.right-navRect.right+8,behavior:'smooth'});
+  }
+ }
+ // Mantém a posição de cada área ao alternar entre elas, sem animação vertical pesada.
+ const restoreY=pageScrollPositions.get(id)||0;
+ window.scrollTo(0,restoreY);
+}
+tabs.forEach(tab=>tab.addEventListener('click',()=>go(tab.dataset.page)));
+document.querySelectorAll('[data-go]').forEach(button=>button.addEventListener('click',()=>go(button.dataset.go)));
 function openPageFromHash(){const id=decodeURIComponent(location.hash.slice(1));if(['inicio','musicas','eventos','artistas','amigos','comunidade','social','parcerias','divulgue','duvidas'].includes(id))go(id);}
 if(location.hash)openPageFromHash();window.addEventListener('hashchange',openPageFromHash);
 const themeButton=document.getElementById('theme');
