@@ -3,7 +3,7 @@
 create table if not exists public.post_music (
   post_id uuid primary key references public.posts(id) on delete cascade,
   song_id uuid not null references public.songs(id) on delete cascade,
-  start_seconds numeric(8,2) not null default 0 check (start_seconds >= 0),
+  start_seconds numeric(8,2) not null default 0 check (start_seconds between 0 and 3600),
   duration_seconds smallint not null default 15 check (duration_seconds between 5 and 60),
   volume numeric(3,2) not null default 0.80 check (volume >= 0 and volume <= 1),
   created_at timestamptz not null default now()
@@ -34,7 +34,7 @@ with check (
   )
   and exists (
     select 1 from public.post_media m
-    where m.post_id = post_id and m.media_type = 'image'
+    where m.post_id = post_id and m.owner_id = (select auth.uid()) and m.media_type = 'image'
   )
   and exists (
     select 1 from public.songs s
