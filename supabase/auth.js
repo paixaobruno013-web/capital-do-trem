@@ -666,22 +666,21 @@ export async function getMyBasicProfile() {
     .select('user_id, display_name, username, account_type, bio, city, is_public, avatar_type, avatar_url, avatar_path, avatar_data, cover_url, cover_path')
     .eq('user_id', user.id).maybeSingle();
   if (error) throw error;
-  // O perfil do administrador oficial é preparado automaticamente após a
-  // autenticação; a autorização continua sendo confirmada pelo RPC seguro do banco.
+  // Prepara o primeiro perfil administrativo somente quando ainda não existe.
+  // Perfis já cadastrados nunca são sobrescritos durante uma simples leitura.
   if ((user.email || '').toLowerCase() === 'capitaldotrem07@gmail.com') {
     try { await bootstrapFirstAdmin(); } catch (error) { console.warn('Bootstrap administrativo não concluído:', error); }
-    if (await isCurrentUserAdmin()) {
+    if (await isCurrentUserAdmin() && !data) {
       const taken = await supabase.from('profiles').select('user_id')
         .eq('username', 'sbrunochock').neq('user_id', user.id).maybeSingle();
       if (taken.error) throw taken.error;
       if (taken.data) throw new Error('O identificador @sbrunochock já está associado a outra conta. A equipe precisa revisar o cadastro.');
       return saveMyBasicProfile({
-        ...(data || {}),
         display_name: 'Administrador',
         username: 'sbrunochock',
         account_type: 'user',
         city: 'Belo Horizonte • MG',
-        bio: data?.bio || 'Administrador oficial do Capital do Trem',
+        bio: 'Administrador oficial do Capital do Trem',
         is_public: true
       });
     }
@@ -2052,4 +2051,24 @@ export async function moveSongInMyPlaylist(playlistId,songId,direction) {
  const {error:second}=await supabase.from('playlist_songs').update({position:left.position}).eq('playlist_id',playlistId).eq('song_id',right.song_id);if(second)throw second;
  const {error:third}=await supabase.from('playlist_songs').update({position:right.position}).eq('playlist_id',playlistId).eq('song_id',left.song_id);if(third)throw third;
  return true;
+}
+
+export async function uploadMyCover(file) {
+ const supabase=initSupabase();const {data:{user},error:userError}=await supabase.auth.getUser();
+ if(userError)throw userError;if(!user)throw new Error('Entre na sua conta para enviar a capa.');
+ if(!(file instanceof File))throw new Error('Selecione uma imagem para a capa.');
+ const allowed={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'};
+ if(!allowed[file.type])throw new Error('Use uma capa JPG, PNG ou WebP.');
+ if(file.size<1||file.size>8*1024*1024)throw new Error('A capa deve ter até 8 MB.');
+ const path=user.id+'/cover/'+crypto.randomUUID()+'.'+allowed[file.type];
+ const {error}=await supabase.storage.from('capital-do-trem-media').upload(path,file,{contentType:file.type,cacheControl:'3600',upsert:false});
+ if(error)throw error;
+ const {data:publicData}=supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
+ if(!publicData?.publicUrl){await supabase.storage.from('capital-do-trem-media').remove([path]).catch(()=>{});throw new Error('Não foi possível obter o endereço da capa.');}
+ const {data:previous,error:readError}=await supabase.from('profiles').select('cover_path').eq('user_id',user.id).single();
+ if(readError){await supabase.storage.from('capital-do-trem-media').remove([path]).catch(()=>{});throw readError;}
+ const {data:saved,error:saveError}=await supabase.from('profiles').update({cover_url:publicData.publicUrl,cover_path:path}).eq('user_id',user.id).select('cover_url,cover_path').single();
+ if(saveError){await supabase.storage.from('capital-do-trem-media').remove([path]).catch(()=>{});throw saveError;}
+ if(previous?.cover_path&&previous.cover_path!==path&&previous.cover_path.startsWith(user.id+'/cover/'))await supabase.storage.from('capital-do-trem-media').remove([previous.cover_path]);
+ return saved;
 }
