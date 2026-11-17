@@ -362,27 +362,39 @@ body.ct-player-fullscreen-open.ct-has-floating-player{padding-bottom:0!important
 .music-playlist-row .btn{font-size:12px;padding:8px 11px}
 
 
-/* Identidade Capital do Trem: catálogo preto, branco e LED vermelho. */
-#published-song-catalog{display:flex;flex-direction:column;gap:12px}
+/* Identidade Capital do Trem: LED vermelho vivo com profundidade futurista. */
+#published-song-catalog{display:flex;flex-direction:column;gap:14px;perspective:900px}
 #published-song-catalog .music-track-row{
- display:grid;grid-template-columns:minmax(0,1fr);gap:9px;margin:0!important;padding:15px;
- border:1px solid rgba(255,35,55,.55);
- border-radius:13px;background:#050505;
- box-shadow:0 0 7px rgba(255,0,35,.22),inset 0 0 12px rgba(255,0,35,.07);
+ display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin:0!important;padding:16px;
+ border:1px solid rgba(255,25,48,.72);border-radius:14px;background:
+ radial-gradient(ellipse at 50% 0%,rgba(110,0,16,.18),transparent 68%),#030303;
+ box-shadow:0 5px 0 #160006,0 7px 15px rgba(0,0,0,.72),0 0 8px rgba(255,0,32,.28),inset 0 1px 0 rgba(255,110,125,.12);
+ transform:translateZ(0);
 }
 #published-song-catalog .music-track-row h3,
 #published-song-catalog .music-track-row h3+p{
- display:block;width:fit-content;max-width:100%;margin:0;padding:7px 11px;
- color:#fff;background:#080808;border:1px solid rgba(255,35,55,.9);border-radius:8px;
- box-shadow:0 0 5px rgba(255,0,35,.8),0 0 12px rgba(255,0,35,.42),inset 0 0 7px rgba(255,0,35,.13);
- text-shadow:0 0 5px rgba(255,255,255,.3);
- overflow-wrap:anywhere;
+ position:relative;isolation:isolate;display:block;width:fit-content;max-width:100%;margin:0;padding:9px 13px;
+ color:#fff!important;background:linear-gradient(145deg,#171014 0%,#080608 55%,#140509 100%);
+ border:1px solid transparent;border-radius:9px;
+ background-image:linear-gradient(145deg,#171014 0%,#080608 55%,#140509 100%),linear-gradient(125deg,#ffb0b9 0%,#ff1838 22%,#8d0018 52%,#ff4058 78%,#ffb0b9 100%);
+ background-origin:border-box;background-clip:padding-box,border-box;
+ box-shadow:0 0 3px #ff1938,0 0 8px rgba(255,0,35,.95),0 0 18px rgba(255,0,35,.58),0 4px 0 #43000d,0 6px 9px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.16),inset 0 -3px 7px rgba(255,0,35,.2);
+ text-shadow:0 0 5px rgba(255,255,255,.52),0 0 12px rgba(255,65,85,.28);
+ overflow-wrap:anywhere;animation:ct-red-led-pulse 2.8s ease-in-out infinite alternate;
 }
-#published-song-catalog .music-track-row h3{font-size:1.05rem;line-height:1.35;cursor:pointer}
-#published-song-catalog .music-track-row h3+p{font-size:.94rem;color:#fff!important}
+#published-song-catalog .music-track-row h3{font-size:1.06rem;line-height:1.35;cursor:pointer}
+#published-song-catalog .music-track-row h3+p{font-size:.95rem;letter-spacing:.02em}
 #published-song-catalog .music-track-row>p:not(:first-of-type){margin:0;color:#eee}
-.music-playlist-manager{background:#080808!important;border-color:rgba(255,35,55,.65)!important;box-shadow:0 0 10px rgba(255,0,35,.18)}
-.music-playlist-row{background:#050505;border:1px solid rgba(255,35,55,.55);box-shadow:0 0 7px rgba(255,0,35,.2)}
+.music-playlist-manager{background:#080808!important;border-color:rgba(255,35,55,.72)!important;box-shadow:0 0 12px rgba(255,0,35,.25),inset 0 0 12px rgba(255,0,35,.07)}
+.music-playlist-row{background:#050505;border:1px solid rgba(255,35,55,.65);box-shadow:0 0 8px rgba(255,0,35,.24),inset 0 0 8px rgba(255,0,35,.06)}
+@keyframes ct-red-led-pulse{
+ from{box-shadow:0 0 3px #ff1938,0 0 7px rgba(255,0,35,.72),0 0 14px rgba(255,0,35,.38),0 4px 0 #43000d,0 6px 9px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -3px 7px rgba(255,0,35,.16)}
+ to{box-shadow:0 0 5px #ff4058,0 0 12px rgba(255,0,35,1),0 0 25px rgba(255,0,35,.72),0 4px 0 #5a0011,0 7px 11px rgba(0,0,0,.95),inset 0 1px 0 rgba(255,255,255,.2),inset 0 -3px 9px rgba(255,0,35,.28)}
+}
 @media(hover:hover){
- #published-song-catalog .music-track-row:hover{border-color:#ff263f;box-shadow:0 0 9px rgba(255,0,35,.55),0 0 20px rgba(255,0,35,.25),inset 0 0 14px rgba(255,0,35,.1)}
+ #published-song-catalog .music-track-row:hover{transform:translateY(-2px);border-color:#ff4058;box-shadow:0 7px 0 #200008,0 10px 20px rgba(0,0,0,.8),0 0 16px rgba(255,0,35,.5),inset 0 0 16px rgba(255,0,35,.12)}
+}
+@media(prefers-reduced-motion:reduce){
+ #published-song-catalog .music-track-row h3,#published-song-catalog .music-track-row h3+p{animation:none}
+ #published-song-catalog .music-track-row{transition:none}
 }
