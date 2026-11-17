@@ -198,7 +198,7 @@ body.light .emoji-picker,body.light .emoji-full-panel,body.light .emoji-category
 </section>
 <section id="fazer-amigos" class="panel friends-panel"><div class="room-heading"><div><span class="eyebrow">CAPITAL DO TREM • CONEXÕES</span><h2>🤝 Fazer amigos</h2></div><span class="room-tag">Comunidade</span></div><p class="muted">Conheça participantes que também fazem parte do Capital do Trem. Só aparecem pessoas que escolheram deixar o perfil público. A cidade é informada pela própria pessoa; não usamos GPS nem mostramos endereço ou distância exata.</p><label for="chat-friends-search">Buscar pessoas</label><input id="chat-friends-search" type="search" maxlength="80" placeholder="Nome, @usuário, cidade ou interesse"><label for="chat-friends-distance">Onde procurar</label><select id="chat-friends-distance"><option value="all">Todas as cidades</option><option value="same">Na minha cidade</option><option value="other">Em outras cidades</option></select><p id="chat-friends-count" class="status" aria-live="polite">Carregando participantes públicos…</p><div id="chat-friends-directory" class="friends-directory" aria-live="polite"><p class="muted">Carregando…</p></div><p class="muted">Respeite a privacidade e as escolhas de cada pessoa.</p><a class="btn alt" href="./mensagens.html">Abrir conversas privadas • Koe Fala Tu</a></section></main>
 <script type="module">
-import {getCurrentSession,getChatGroupMembership,joinChatGroup,leaveChatGroup,getChatMessages,sendChatMessage,subscribeChatMessages,uploadChatAttachment,reportChatParticipant,moderateChatParticipant,openViewOnceChatMedia} from './supabase/auth.js';
+import {getCurrentSession,getChatGroupMembership,joinChatGroup,leaveChatGroup,getChatMessages,sendChatMessage,subscribeChatMessages,uploadChatAttachment,reportChatParticipant,moderateChatParticipant,openViewOnceChatMedia,updateMyGroupMessage,deleteMyGroupMessage} from './supabase/auth.js';
 const gate=document.getElementById('gate'),area=document.getElementById('chat-area'),connection=document.getElementById('chat-connection'),list=document.getElementById('messages'),form=document.getElementById('composer'),input=document.getElementById('message'),send=document.getElementById('send'),status=document.getElementById('status');
 const counter=document.getElementById('message-counter'),attachmentInput=document.getElementById('chat-attachment'),cameraInput=document.getElementById('chat-camera'),attachmentName=document.getElementById('attachment-name');
 let selectedAttachment=null;
@@ -328,7 +328,18 @@ function addMessage(m){
  }else if(m.attachment_path){
   const note=document.createElement('small');note.className='muted';note.textContent='📎 Anexo protegido. Se não abrir agora, atualize a conversa para gerar um novo link.';box.append(note);
  }
- const stamp=Number.isNaN(d.getTime())?0:d.getTime();
+ if(m.author_id===currentUserId){
+   const tools=document.createElement('div');tools.className='message-own-controls';tools.style.cssText='display:flex;gap:7px;flex-wrap:wrap;margin-top:8px';
+   if(String(m.content||'').trim()){
+    const edit=document.createElement('button');edit.type='button';edit.className='btn alt';edit.textContent='✏️ Corrigir mensagem';edit.style.cssText='min-height:32px;padding:5px 10px;font-size:12px';
+    edit.addEventListener('click',async()=>{const value=prompt('Corrija sua mensagem:',m.content||'');if(value===null)return;edit.disabled=true;try{const updated=await updateMyGroupMessage(m.id,value);m.content=updated.content;m.edited_at=updated.edited_at||new Date().toISOString();body.replaceChildren();appendEmojiText(body,m.content);let mark=identity.querySelector('.message-edited');if(!mark){mark=document.createElement('small');mark.className='message-edited';mark.style.cssText='display:block;font-size:10px;color:var(--muted);font-style:italic';identity.append(mark);}mark.textContent='Editada';}catch(error){alert(error.message||'Não foi possível corrigir a mensagem.')}finally{edit.disabled=false}});
+    tools.append(edit);
+   }
+   const remove=document.createElement('button');remove.type='button';remove.className='btn alt';remove.textContent='🗑️ Excluir mensagem';remove.style.cssText='min-height:32px;padding:5px 10px;font-size:12px';
+   remove.addEventListener('click',async()=>{if(!confirm('Excluir sua mensagem e o anexo, se houver? Esta ação não pode ser desfeita.'))return;remove.disabled=true;try{await deleteMyGroupMessage(m.id);seen.delete(m.id);box.remove();}catch(error){alert(error.message||'Não foi possível excluir a mensagem.')}finally{remove.disabled=false}});
+   tools.append(remove);box.append(tools);
+  }
+  const stamp=Number.isNaN(d.getTime())?0:d.getTime();
  const next=[...list.children].find(node=>{const value=new Date(node.dataset.createdAt).getTime();return (Number.isNaN(value)?0:value)>stamp;});
  list.insertBefore(box,next||null);
  while(list.children.length>MAX_VISIBLE_MESSAGES){const first=list.firstElementChild;if(first){seen.delete(first.dataset.messageId);first.remove();}}

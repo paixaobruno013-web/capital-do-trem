@@ -8,7 +8,7 @@ const [home,rede,chat,account,redeJs,player,css,prepare,sw,auth]=await Promise.a
 ]);
 const checks=[
  [home.includes('id="capital-music-player"')&&home.includes("createCapitalMusicPlayer('capital-music-player'"),'Central de músicas tem player 3D integrado'],
- [home.includes('Ouvir no player 3D')&&home.includes('musicPlayer.playSong(song)'),'Catálogo e biblioteca iniciam o player unificado'],
+ [home.includes('Abrir reprodutor ampliado')&&home.includes('musicPlayer.playSong(song)')&&home.includes("querySelector('.ct-player-fullscreen')?.click()"),'Catálogo e biblioteca iniciam o player unificado'],
  [rede.includes('id="rede-music-player"')&&redeJs.includes("createCapitalMusicPlayer('rede-music-player'"),'Rede social tem player 3D integrado'],
  [redeJs.includes('musicPlayer.playSong(song)'),'Faixas da rede social usam os controles do player'],
  [chat.includes('id="chat-topics"')&&chat.includes('Grupo CAPITAL DO TREM')&&!chat.includes('id="fala-uai-player"'),'Chat permanece dedicado às conversas e ao grupo CAPITAL DO TREM'],
