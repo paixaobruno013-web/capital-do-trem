@@ -159,6 +159,25 @@ label{letter-spacing:.01em}
  <span class="admin-verified"><span class="admin-verified-mark" aria-hidden="true">✓</span> CONTA VERIFICADA</span>
  <small>Administrador oficial do Capital do Trem</small>
 </div>
+
+<section id="admin-profile-editor" class="card" hidden aria-labelledby="admin-profile-editor-title">
+<h3 id="admin-profile-editor-title">🛡️ Meu perfil de administrador</h3>
+<p class="muted">Salve suas informações atuais e atualize a foto de perfil ou a capa pela galeria do aparelho.</p>
+<form id="admin-profile-editor-form">
+<label for="admin-profile-display-name">Nome exibido</label><input id="admin-profile-display-name" maxlength="80">
+<label for="admin-profile-username">Nome de usuário</label><input id="admin-profile-username" readonly>
+<label for="admin-profile-city">Cidade</label><input id="admin-profile-city" maxlength="100">
+<label for="admin-profile-bio">Descrição</label><textarea id="admin-profile-bio" maxlength="500" rows="3"></textarea>
+<button type="submit" id="admin-profile-save">Salvar informações do perfil</button>
+</form>
+<p>Foto de perfil</p><img id="admin-profile-avatar-preview" alt="Prévia da foto de perfil" hidden style="width:104px;height:104px;object-fit:cover;border-radius:50%">
+<input id="admin-profile-avatar-file" type="file" accept="image/jpeg,image/png,image/webp">
+<button type="button" id="admin-profile-avatar-save">Atualizar foto de perfil</button>
+<p>Foto de capa</p><img id="admin-profile-cover-preview" alt="Prévia da capa" hidden style="width:100%;max-height:190px;object-fit:cover;border-radius:12px">
+<input id="admin-profile-cover-file" type="file" accept="image/jpeg,image/png,image/webp">
+<button type="button" id="admin-profile-cover-save">Atualizar capa</button>
+<p id="admin-profile-editor-status" class="status" role="status" aria-live="polite"></p>
+</section>
 <a id="admin-image-area-link" class="btn" href="./admin.html#header-background-section" hidden style="display:block;text-align:center;margin:14px 0;padding:14px 18px;border:1px solid rgba(237,28,36,.65);border-radius:12px;background:linear-gradient(110deg,#ed1c24,#9e1018);color:#fff;text-decoration:none;font-weight:900;box-shadow:0 0 14px rgba(237,28,36,.35)">🖼️ Área de alterações de imagens</a>
 <p class="muted">Sua sessão está ativa. Aqui você administra sua participação no Capital do Trem.</p>
 <section class="card" id="my-stories-panel" aria-labelledby="my-stories-title">
@@ -673,7 +692,7 @@ function showSession(session){
     if(window.location.hash==='#delete-account-panel')window.setTimeout(()=>document.getElementById('delete-account-panel')?.scrollIntoView({behavior:'smooth',block:'start'}),180);
     loadProfileInstallCount();
     scheduleAccountLock();
-    if(auth){loadBasicProfile();loadArtistProfile();loadMyEvents();loadAdminSongAccess();}
+    if(auth){loadBasicProfile();loadArtistProfile();loadMyEvents();loadAdminSongAccess();loadAdminProfileEditor();}
   }else{
     activeUserEmail=null;lockPanel.hidden=true;window.clearTimeout(lockTimer);
     try{localStorage.removeItem(ACCOUNT_LOCK_KEY);}catch{}
@@ -719,6 +738,41 @@ basicProfileForm.addEventListener('submit',async event=>{
   basicProfileStatus.textContent='Perfil salvo! Você poderá editar sua descrição quando quiser.';
  }catch(error){basicProfileStatus.textContent=error?.message||'Não foi possível salvar seu perfil.';}
  finally{button.disabled=false;}
+});
+
+
+const adminProfileEditor=document.getElementById("admin-profile-editor");
+const adminProfileEditorStatus=document.getElementById("admin-profile-editor-status");
+let adminProfileSnapshot=null;
+async function loadAdminProfileEditor(){
+ try{
+  if(!(await auth.isCurrentUserAdmin())){adminProfileEditor.hidden=true;return;}
+  adminProfileEditor.hidden=false;
+  const p=await auth.getMyBasicProfile();adminProfileSnapshot=p;
+  document.getElementById("admin-profile-display-name").value=p.display_name||"";
+  document.getElementById("admin-profile-username").value=p.username?"@"+p.username:"";
+  document.getElementById("admin-profile-city").value=p.city||"";
+  document.getElementById("admin-profile-bio").value=p.bio||"";
+  const av=document.getElementById("admin-profile-avatar-preview");if(p.avatar_url){av.src=p.avatar_url;av.hidden=false;}else{av.removeAttribute("src");av.hidden=true;}
+  const cv=document.getElementById("admin-profile-cover-preview");if(p.cover_url){cv.src=p.cover_url;cv.hidden=false;}else{cv.removeAttribute("src");cv.hidden=true;}
+ }catch(e){adminProfileEditorStatus.textContent=e?.message||"Não foi possível carregar o perfil.";}
+}
+document.getElementById("admin-profile-editor-form").addEventListener("submit",async e=>{
+ e.preventDefault();const b=document.getElementById("admin-profile-save");b.disabled=true;adminProfileEditorStatus.textContent="Salvando...";
+ try{const p=adminProfileSnapshot||await auth.getMyBasicProfile();await auth.saveMyBasicProfile({display_name:document.getElementById("admin-profile-display-name").value,username:p.username,account_type:p.account_type,city:document.getElementById("admin-profile-city").value,bio:document.getElementById("admin-profile-bio").value,is_public:p.is_public===true});adminProfileSnapshot=await auth.getMyBasicProfile();adminProfileEditorStatus.textContent="Informações do perfil salvas.";}
+ catch(e){adminProfileEditorStatus.textContent=e?.message||"Não foi possível salvar.";}finally{b.disabled=false;}
+});
+document.getElementById("admin-profile-avatar-file").addEventListener("change",e=>{const f=e.target.files?.[0];if(f){const p=document.getElementById("admin-profile-avatar-preview");p.src=URL.createObjectURL(f);p.hidden=false;}});
+document.getElementById("admin-profile-cover-file").addEventListener("change",e=>{const f=e.target.files?.[0];if(f){const p=document.getElementById("admin-profile-cover-preview");p.src=URL.createObjectURL(f);p.hidden=false;}});
+document.getElementById("admin-profile-avatar-save").addEventListener("click",async()=>{
+ const f=document.getElementById("admin-profile-avatar-file").files?.[0];if(!f){adminProfileEditorStatus.textContent="Escolha uma foto primeiro.";return;}
+ const b=document.getElementById("admin-profile-avatar-save");b.disabled=true;adminProfileEditorStatus.textContent="Atualizando foto...";
+ try{const uploaded=await auth.uploadMyAvatar(f);await auth.saveMyAvatar({type:"photo",path:uploaded.path});await loadAdminProfileEditor();adminProfileEditorStatus.textContent="Foto de perfil atualizada.";}catch(e){adminProfileEditorStatus.textContent=e?.message||"Falha ao atualizar a foto.";}finally{b.disabled=false;}
+});
+document.getElementById("admin-profile-cover-save").addEventListener("click",async()=>{
+ const f=document.getElementById("admin-profile-cover-file").files?.[0];if(!f){adminProfileEditorStatus.textContent="Escolha uma capa primeiro.";return;}
+ const b=document.getElementById("admin-profile-cover-save");b.disabled=true;adminProfileEditorStatus.textContent="Atualizando capa...";
+ try{await auth.uploadMyCover(f);await loadAdminProfileEditor();adminProfileEditorStatus.textContent="Capa atualizada.";}catch(e){adminProfileEditorStatus.textContent=e?.message||"Falha ao atualizar a capa.";}finally{b.disabled=false;}
 });
 
 const lockPanel=document.getElementById('account-lock');
