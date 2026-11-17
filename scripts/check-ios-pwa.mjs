@@ -15,7 +15,7 @@ assert(manifest.start_url && manifest.scope, 'Manifesto sem start_url/scope.');
 assert(html.includes('apple-mobile-web-app-capable') && html.includes('apple-mobile-web-app-title'), 'Metadados Apple ausentes.');
 assert(html.includes('apple-touch-icon'), 'Atalho Apple touch icon ausente.');
 assert(sw.includes("event.request.headers.has('Authorization')"), 'Service worker precisa ignorar requisições autenticadas.');
-assert(sw.includes('if(url.search) return;'), 'Service worker precisa ignorar URLs com query string.');
+assert(/url\.search\)\s*return;/.test(sw), 'Service worker precisa ignorar URLs com query string.');
 assert(sw.includes('private|no-store|no-cache'), 'Service worker precisa respeitar Cache-Control privado.');
 assert(sw.includes("response.headers.has('Set-Cookie')"), 'Service worker precisa evitar cache de respostas com cookie.');
 assert(info.includes('NSCameraUsageDescription') && info.includes('NSMicrophoneUsageDescription'), 'Descrições de câmera/microfone ausentes.');
