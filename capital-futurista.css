@@ -324,13 +324,22 @@ body.profile-image-viewer-open{overflow:hidden}
 /* Player em tela cheia e atalhos de áudio abaixo do palco musical. */
 .ct-player-controls .ct-player-fullscreen{display:grid;place-items:center;width:40px;height:40px;border:1px solid rgba(255,255,255,.28);border-radius:50%;background:rgba(255,255,255,.08);color:#fff;font-size:20px;cursor:pointer}
 .ct-player-fullscreen-open{overflow:hidden!important}
-#capital-music-player.ct-player-fullscreen{position:fixed!important;inset:0!important;z-index:10000!important;display:grid!important;place-items:center!important;width:100vw!important;height:100dvh!important;max-width:none!important;margin:0!important;padding:env(safe-area-inset-top) 12px env(safe-area-inset-bottom)!important;background:#05060a!important;perspective:none!important}
-#capital-music-player.ct-player-fullscreen .ct-player-shell{width:min(100%,900px);height:100%;max-height:100%;overflow-y:auto;display:flex;flex-direction:column;justify-content:center;border-radius:0;padding:clamp(18px,4vh,42px) clamp(14px,4vw,40px)}
-#capital-music-player.ct-player-fullscreen .ct-player-stage{flex:1;align-content:center;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-#capital-music-player.ct-player-fullscreen .ct-player-art-wrap{max-width:min(42vh,340px)}
-#capital-music-player.ct-player-fullscreen .ct-player-controls{gap:clamp(10px,3vw,28px)}
-#capital-music-player.ct-player-fullscreen .ct-player-fullscreen{width:48px;height:48px;font-size:22px}
+#capital-music-player.ct-player-persistent.ct-player-fullscreen{position:fixed!important;inset:0!important;z-index:10000!important;display:grid!important;place-items:center!important;width:100vw!important;height:100dvh!important;max-width:none!important;margin:0!important;padding:env(safe-area-inset-top) 12px env(safe-area-inset-bottom)!important;background:#05060a!important;perspective:none!important}
+#capital-music-player.ct-player-persistent.ct-player-fullscreen .ct-player-shell{width:min(100%,900px);height:100%;max-height:100%;overflow-y:auto;display:flex;flex-direction:column;justify-content:center;border-radius:0;padding:clamp(18px,4vh,42px) clamp(14px,4vw,40px)}
+#capital-music-player.ct-player-persistent.ct-player-fullscreen .ct-player-stage{flex:1;align-content:center;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+#capital-music-player.ct-player-persistent.ct-player-fullscreen .ct-player-art-wrap{max-width:min(42vh,340px)}
+#capital-music-player.ct-player-persistent.ct-player-fullscreen .ct-player-controls{gap:clamp(10px,3vw,28px)}
+#capital-music-player.ct-player-persistent.ct-player-fullscreen .ct-player-fullscreen{width:48px;height:48px;font-size:22px}
 .music-local-picker{border:1px solid rgba(237,28,36,.45)!important;box-shadow:0 0 22px rgba(237,28,36,.10)}
 .music-local-picker input[type=file]{display:block;width:100%;padding:12px;border:1px dashed rgba(237,28,36,.55);border-radius:12px;background:rgba(12,12,14,.85);color:#fff}
 .music-local-picker audio{display:block;width:100%;min-height:42px}
-@media(max-width:520px){#capital-music-player.ct-player-fullscreen .ct-player-stage{grid-template-columns:minmax(0,1fr);gap:12px}#capital-music-player.ct-player-fullscreen .ct-player-art-wrap{max-width:min(30vh,230px)}}
+#capital-music-player.ct-player-persistent.ct-player-fullscreen .ct-player-topline{display:flex!important}
+#capital-music-player.ct-player-persistent.ct-player-fullscreen .ct-player-art-wrap{display:grid!important}
+#capital-music-player.ct-player-persistent.ct-player-fullscreen .ct-player-disc{display:block!important}
+#capital-music-player.ct-player-persistent.ct-player-fullscreen .ct-player-catalog-label,
+#capital-music-player.ct-player-persistent.ct-player-fullscreen .ct-player-playlist-label,
+#capital-music-player.ct-player-persistent.ct-player-fullscreen .ct-player-status{display:block!important}
+#capital-music-player.ct-player-persistent.ct-player-fullscreen .ct-player-stage{display:grid!important}
+#capital-music-player.ct-player-persistent.ct-player-fullscreen .ct-player-shell{pointer-events:auto!important}
+body.ct-player-fullscreen-open.ct-has-floating-player{padding-bottom:0!important}
+@media(max-width:520px){#capital-music-player.ct-player-persistent.ct-player-fullscreen .ct-player-stage{grid-template-columns:minmax(0,1fr);gap:12px}#capital-music-player.ct-player-persistent.ct-player-fullscreen .ct-player-art-wrap{max-width:min(30vh,230px)}}
