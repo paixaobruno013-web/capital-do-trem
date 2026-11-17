@@ -1565,15 +1565,16 @@ window.addEventListener('pagehide',()=>{if(audioObjectUrl){URL.revokeObjectURL(a
 const connectionStatus=document.getElementById('connection-status');
 let reconnectNoticeTimer;
 function updateConnectionStatus(isReconnect=false){
+ clearTimeout(reconnectNoticeTimer);
+ if(!connectionStatus)return;
  if(!navigator.onLine){
-  clearTimeout(reconnectNoticeTimer);
   connectionStatus.textContent='⚠️ ALERTA — VOCÊ TÁ OFFLINE. As partes já carregadas podem continuar disponíveis, mas mapas, links e serviços externos podem não funcionar.';
   connectionStatus.hidden=false;
+  reconnectNoticeTimer=setTimeout(()=>{connectionStatus.hidden=true;},5000);
  }else if(isReconnect){
   connectionStatus.textContent='Conexão restabelecida. Você já pode tentar novamente os recursos que precisam de internet.';
   connectionStatus.hidden=false;
-  clearTimeout(reconnectNoticeTimer);
-  reconnectNoticeTimer=setTimeout(()=>{connectionStatus.hidden=true;},6500);
+  reconnectNoticeTimer=setTimeout(()=>{connectionStatus.hidden=true;},5000);
  }else{
   connectionStatus.hidden=true;
  }
