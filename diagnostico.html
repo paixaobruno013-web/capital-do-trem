@@ -75,10 +75,10 @@ body.light .card,body.light .panel,body.light .conversation,body.light .message-
 <p class="muted">A verificação não mostra cadastros, e-mails, senhas ou chaves secretas. A chave publicável já usada pelo aplicativo é própria para consultas no navegador, desde que as políticas de segurança do banco estejam configuradas.</p>
 </section>
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+let createClient=null;
 const URL='https://zmjxkfjzrbbxyvgkwirv.supabase.co';
 const KEY='sb_publishable_FLbDg6UCePQHb7s0wkywng_J9pNKlsP';
-const client=createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+let client=null;
 const button=document.getElementById('check'),overall=document.getElementById('overall'),results=document.getElementById('results');
 const testOffline=document.getElementById('test-offline'),testOnline=document.getElementById('test-online'),connectionTestStatus=document.getElementById('connection-test-status');
 testOffline.addEventListener('click',()=>{
@@ -116,9 +116,14 @@ function show(label,ok,detail){
  item.append(strong,p);results.append(item);
 }
 button.addEventListener('click',async()=>{
- button.disabled=true;results.replaceChildren();overall.textContent='Verificando conexão e tabelas...';overall.className='wait';
+ button.disabled=true;results.replaceChildren();overall.textContent='Carregando verificador e testando conexão...';overall.className='wait';
  let passed=0;
  try{
+  if(!createClient){
+   const sdk=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+   createClient=sdk.createClient;
+  }
+  if(!client)client=createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
   // getSession() apenas recupera a sessão local; não comprova conectividade.
   // Faz primeiro uma requisição HTTP real ao Auth do projeto, sem enviar credenciais do usuário.
   const healthResponse=await fetch(URL+'/auth/v1/health?cdt_diagnostic='+Date.now(),{
