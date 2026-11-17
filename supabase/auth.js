@@ -941,7 +941,7 @@ export async function openViewOnceChatMedia(messageId, kind = 'private') {
     throw new Error('Esta mensagem não contém mídia de visualização única válida.');
   }
   if (message[ownerField] === user.id) throw new Error('Quem enviou esta mídia não pode visualizá-la.');
-  const url = await signChatAttachment(message.attachment_path, 60);
+  const url = await signChatAttachment(message.attachment_path, 300);
   const { error: viewError } = await supabase.from(viewTable).insert({ message_id: messageId, viewer_id: user.id });
   if (viewError) {
     if (viewError.code === '23505') throw new Error('Você já visualizou esta mídia. Ela não pode ser aberta novamente.');
@@ -984,7 +984,7 @@ export async function sendChatMessage(content, attachment = null, viewOnce = fal
     attachment_mime:attachment.mime,attachment_size:attachment.size
   });
   const { data, error } = await supabase.from('chat_messages').insert(payload)
-    .select('id, author_id, author_name, content, created_at, author_avatar_type, author_avatar_url, author_avatar_data, attachment_url, attachment_path, attachment_type, attachment_name, attachment_mime, attachment_size').single();
+    .select('id, author_id, author_name, content, created_at, author_avatar_type, author_avatar_url, author_avatar_data, attachment_url, attachment_path, attachment_type, attachment_name, attachment_mime, attachment_size, view_once').single();
   if (error) {
     if (attachment?.path) await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).remove([attachment.path]).catch(() => {});
     throw error;
@@ -1172,7 +1172,7 @@ export async function sendPrivateMessage(conversationId,content,file=null,viewOn
   });
   const {data,error}=await supabase.from('private_messages')
     .insert(payload)
-    .select('id,conversation_id,sender_id,content,created_at,attachment_path,attachment_type,attachment_name,attachment_mime,attachment_size').single();
+    .select('id,conversation_id,sender_id,content,created_at,attachment_path,attachment_type,attachment_name,attachment_mime,attachment_size,view_once').single();
   if(error){
     if(attachment?.path)await supabase.storage.from(CHAT_ATTACHMENT_BUCKET).remove([attachment.path]).catch(()=>{});
     throw error;
