@@ -670,22 +670,21 @@ export async function getMyBasicProfile() {
     .select('user_id, display_name, username, account_type, bio, city, is_public, avatar_type, avatar_url, avatar_path, avatar_data, cover_url, cover_path')
     .eq('user_id', user.id).maybeSingle();
   if (error) throw error;
-  // O perfil do administrador oficial é preparado automaticamente após a
-  // autenticação; a autorização continua sendo confirmada pelo RPC seguro do banco.
+  // Prepara o primeiro perfil administrativo somente quando ainda não existe.
+  // Perfis já cadastrados nunca são sobrescritos durante uma simples leitura.
   if ((user.email || '').toLowerCase() === 'capitaldotrem07@gmail.com') {
     try { await bootstrapFirstAdmin(); } catch (error) { console.warn('Bootstrap administrativo não concluído:', error); }
-    if (await isCurrentUserAdmin()) {
+    if (await isCurrentUserAdmin() && !data) {
       const taken = await supabase.from('profiles').select('user_id')
         .eq('username', 'sbrunochock').neq('user_id', user.id).maybeSingle();
       if (taken.error) throw taken.error;
       if (taken.data) throw new Error('O identificador @sbrunochock já está associado a outra conta. A equipe precisa revisar o cadastro.');
       return saveMyBasicProfile({
-        ...(data || {}),
         display_name: 'Administrador',
         username: 'sbrunochock',
         account_type: 'user',
         city: 'Belo Horizonte • MG',
-        bio: data?.bio || 'Administrador oficial do Capital do Trem',
+        bio: 'Administrador oficial do Capital do Trem',
         is_public: true
       });
     }
