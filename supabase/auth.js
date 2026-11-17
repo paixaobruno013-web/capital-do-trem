@@ -698,20 +698,30 @@ export async function getMyBasicProfile() {
   return created;
 }
 
+export async function isUsernameAvailable(value) {
+  const username=String(value||'').trim().toLowerCase();
+  if(!/^[a-z0-9][a-z0-9_]{2,31}$/.test(username))throw new Error('Use de 3 a 32 caracteres: letras minúsculas, números e sublinhado; comece com letra ou número.');
+  const supabase=initSupabase();
+  const {data,error}=await supabase.rpc('is_username_available',{p_username:username});
+  if(error)throw error;
+  return data===true;
+}
+
 export async function saveMyBasicProfile(profile) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para salvar seu perfil.');
-  // O identificador técnico é criado automaticamente e não é exigido do usuário.
-  let username = String(profile.username || '').trim().toLowerCase();
-  if (!username) {
-    const { data: existing } = await supabase.from('profiles').select('username').eq('user_id', user.id).maybeSingle();
-    username = String(existing?.username || '').trim().toLowerCase();
-  }
+  const {data:existing,error:existingError}=await supabase.from('profiles').select('username').eq('user_id',user.id).maybeSingle();
+  if(existingError)throw existingError;
+  // O identificador técnico só é gerado quando a conta ainda não possui username.
+  let username = String(profile.username || existing?.username || '').trim().toLowerCase();
+  if (!username) username = ('uai_' + user.id.replace(/-/g, '').slice(0, 12)).slice(0,32);
   if (!/^[a-z0-9][a-z0-9_]{2,31}$/.test(username)) {
-    const base = 'uai_' + user.id.replace(/-/g, '').slice(0, 12);
-    username = base.slice(0, 32);
+    throw new Error('Nome de usuário inválido. Use de 3 a 32 caracteres: letras minúsculas, números e sublinhado.');
+  }
+  if(existing?.username && username!==String(existing.username).toLowerCase()){
+    if(!(await isUsernameAvailable(username)))throw new Error('Este nome de usuário já está em uso. Escolha outro.');
   }
   const payload = {
     user_id: user.id,
