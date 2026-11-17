@@ -354,7 +354,7 @@ function addOwnMessageControls(container,body,message,isGroup){
  const controls=node('div','message-own-controls');controls.style.cssText='display:flex;gap:6px;flex-wrap:wrap;margin-top:7px';
  if(String(message.content||'').trim()){
   const edit=node('button','btn alt','✏️ Editar');edit.type='button';edit.style.cssText='min-height:30px;padding:5px 9px;font-size:11px';
-  edit.addEventListener('click',async()=>{const value=prompt('Edite sua mensagem:',message.content||'');if(value===null)return;edit.disabled=true;try{const clean=value.trim();if(!clean)throw new Error('A mensagem não pode ficar vazia.');if(isGroup)await updateMyGroupMessage(message.id,clean);else await updateMyPrivateMessage(message.id,clean);message.content=clean;body.replaceChildren();appendEmojiText(body,clean);}catch(error){alert(error.message||'Não foi possível editar a mensagem.')}finally{edit.disabled=false}});
+  edit.addEventListener('click',async()=>{const value=prompt('Edite sua mensagem:',message.content||'');if(value===null)return;edit.disabled=true;try{const clean=value.trim();if(!clean)throw new Error('A mensagem não pode ficar vazia.');const updated=isGroup?await updateMyGroupMessage(message.id,clean):await updateMyPrivateMessage(message.id,clean);message.content=clean;message.edited_at=updated.edited_at||new Date().toISOString();body.replaceChildren();appendEmojiText(body,clean);markMessageEdited(container,message);}catch(error){alert(error.message||'Não foi possível editar a mensagem.')}finally{edit.disabled=false}});
   controls.append(edit);
  }
  const remove=node('button','btn alt','🗑️ Excluir');remove.type='button';remove.style.cssText='min-height:30px;padding:5px 9px;font-size:11px';
@@ -381,6 +381,12 @@ function appendViewOnceAttachment(container,message,isGroup){
  }catch(error){button.disabled=false;alert(error.message||'Não foi possível abrir esta mídia.')}});
  container.append(button);
 }
+function markMessageEdited(container,message){
+ if(!message?.edited_at)return;
+ if(container.querySelector('.message-edited'))return;
+ const label=node('small','message-edited','Editada');label.style.cssText='display:block;margin-top:3px;font-size:10px;color:var(--muted);font-style:italic';
+ const time=container.querySelector('time');if(time)container.insertBefore(label,time);else container.append(label);
+}
 function drawMessage(m){
  if($('messages').querySelector('[data-id="'+m.id+'"]'))return;
  const b=node('div','bubble'+(m.sender_id===state.userId?' mine':''));const body=node('div','message-content');appendEmojiText(body,m.content||'');b.append(body);b.dataset.id=m.id;
@@ -392,7 +398,7 @@ function drawMessage(m){
   else if(m.attachment_type==='document'){const link=node('a','document-attachment','📄 '+(m.attachment_name||'Documento')+' • '+(Number(m.attachment_size||0)/1024/1024).toFixed(2)+' MB');link.href=m.attachment_url;link.target='_blank';link.rel='noopener noreferrer';link.download=m.attachment_name||'';media.append(link);}
   b.append(media);
  }else if(m.attachment_path){b.append(node('div','small','📎 Anexo protegido. Atualize a conversa para abrir o arquivo.'));}
- if(m.sender_id===state.userId)addOwnMessageControls(b,body,m,false);const t=node('time',null,fmt(m.created_at));b.append(t);$('messages').append(b);$('messages').scrollTop=$('messages').scrollHeight;
+ if(m.sender_id===state.userId)addOwnMessageControls(b,body,m,false);markMessageEdited(b,m);const t=node('time',null,fmt(m.created_at));b.append(t);$('messages').append(b);$('messages').scrollTop=$('messages').scrollHeight;
 }
 function drawGroupMessage(m){
  if($('messages').querySelector('[data-id="'+m.id+'"]'))return;
@@ -412,7 +418,7 @@ function drawGroupMessage(m){
   else if(m.attachment_type==='audio'){const audio=node('audio');audio.controls=true;audio.src=m.attachment_url;audio.preload='metadata';box.append(audio);}
   else if(m.attachment_type==='document'){const link=node('a','document-attachment','📄 '+(m.attachment_name||'Documento')+' • '+(Number(m.attachment_size||0)/1024/1024).toFixed(2)+' MB');link.href=m.attachment_url;link.target='_blank';link.rel='noopener noreferrer';link.download=m.attachment_name||'';box.append(link);}
  }else if(m.attachment_path){box.append(node('div','small','📎 Anexo protegido. Atualize a conversa para gerar um novo link.'));}
- if(m.author_id===state.userId)addOwnMessageControls(box,body,m,true);const t=node('time',null,fmt(m.created_at));box.append(t);$('messages').append(box);$('messages').scrollTop=$('messages').scrollHeight;
+ if(m.author_id===state.userId)addOwnMessageControls(box,body,m,true);markMessageEdited(box,m);const t=node('time',null,fmt(m.created_at));box.append(t);$('messages').append(box);$('messages').scrollTop=$('messages').scrollHeight;
 }
 async function openGroupConversation(){
  clearSubscription();active=null;activeGroup=true;$('private-layout').classList.add('chat-open');
