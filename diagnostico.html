@@ -126,17 +126,32 @@ button.addEventListener('click',async()=>{
   if(!client)client=createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
   // getSession() apenas recupera a sessão local; não comprova conectividade.
   // Faz primeiro uma requisição HTTP real ao Auth do projeto, sem enviar credenciais do usuário.
-  const healthResponse=await fetch(URL+'/auth/v1/health?cdt_diagnostic='+Date.now(),{
-   method:'GET',cache:'no-store',credentials:'omit',
-   headers:{apikey:KEY,'Cache-Control':'no-cache'}
-  });
-  if(!healthResponse.ok) throw new Error('Supabase Auth respondeu HTTP '+healthResponse.status+'.');
-  show('Servidor Supabase',true,'O endpoint de saúde do serviço respondeu por HTTP.');passed++;
-  const {data:{session},error:sessionError}=await client.auth.getSession();
-  if(sessionError) throw sessionError;
-  window.__diagnosticSession=!!session;
-  show('Sessão local',true,session?'Uma sessão autenticada foi encontrada neste aparelho.':'Nenhuma sessão autenticada foi encontrada; serão testadas somente as consultas públicas.');
-  passed++;
+  let healthOk=false;
+  try{
+   const healthResponse=await fetch(URL+'/auth/v1/health?cdt_diagnostic='+Date.now(),{
+    method:'GET',cache:'no-store',credentials:'omit',
+    headers:{apikey:KEY,'Cache-Control':'no-cache'}
+   });
+   if(!healthResponse.ok) throw new Error('Supabase Auth respondeu HTTP '+healthResponse.status+'.');
+   healthOk=true;
+   show('Servidor Supabase',true,'O endpoint de saúde do serviço respondeu por HTTP.');passed++;
+  }catch(healthError){
+   show('Servidor Supabase',false,healthError.message||'Não foi possível confirmar a resposta do serviço Auth.');
+  }
+  // Uma falha no endpoint Auth não deve interromper as verificações independentes
+  // de tabelas e Storage: elas ajudam a localizar o serviço que está indisponível.
+  let session=null;
+  try{
+   const {data,error:sessionError}=await client.auth.getSession();
+   if(sessionError) throw sessionError;
+   session=data?.session||null;
+   window.__diagnosticSession=!!session;
+   show('Sessão local',true,session?'Uma sessão autenticada foi encontrada neste aparelho.':'Nenhuma sessão autenticada foi encontrada; serão testadas somente as consultas públicas.');
+   passed++;
+  }catch(sessionError){
+   window.__diagnosticSession=false;
+   show('Sessão local',false,sessionError.message||'Não foi possível ler a sessão local.');
+  }
  }catch(error){show('Conexão com Supabase',false,error.message||'Não foi possível conectar.');overall.textContent='Não foi possível concluir a verificação. Confira sua conexão com a internet.';overall.className='bad';button.disabled=false;return;}
  for(const [table,column] of publicChecks){
   try{
