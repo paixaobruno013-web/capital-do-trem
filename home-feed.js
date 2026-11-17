@@ -1,4 +1,4 @@
-import {initSupabase,getCurrentSession,submitMyPost,getPostSocial,togglePostLike,addPostComment} from './supabase/auth.js';
+import {initSupabase,getCurrentSession,submitMyPost,getPostSocial,togglePostLike,addPostComment,updateMyPost,deleteMyPost} from './supabase/auth.js';
 import {loadPostMusic,createPostMusicControl} from './post-music.js';
 const supabase=initSupabase();
 const $=id=>document.getElementById(id);
@@ -74,6 +74,13 @@ if(root&&form){
     try{const social=await getPostSocial(post.id);like.textContent=(social.liked?'♥':'♡')+' '+social.likeCount+' curtidas';comments.textContent='💬 '+social.comments.length+' comentários'}catch{}
     like.addEventListener('click',async()=>{like.disabled=true;try{await togglePostLike(post.id);const social=await getPostSocial(post.id);like.textContent=(social.liked?'♥':'♡')+' '+social.likeCount+' curtidas'}catch(error){status.textContent=error.message||'Entre na sua conta para curtir.'}finally{like.disabled=false}});
     comments.addEventListener('click',async()=>{try{const social=await getPostSocial(post.id);const current=social.comments.map(c=>(c.author_name||'Maquinista')+': '+c.content).join('\n');const value=prompt((current?'Comentários existentes:\n'+current+'\n\n':'')+'Escreva seu comentário:');if(value?.trim()){await addPostComment(post.id,value);const updated=await getPostSocial(post.id);comments.textContent='💬 '+updated.comments.length+' comentários';status.textContent='Comentário publicado!'}}catch(error){status.textContent=error.message||'Não foi possível comentar.'}});
+    if(currentUser?.id===post.author_id){
+     const edit=document.createElement('button');edit.type='button';edit.textContent='✏️ Editar publicação';
+     edit.addEventListener('click',async()=>{const value=prompt('Corrija o texto da sua publicação:',post.content||'');if(value===null)return;edit.disabled=true;try{const updated=await updateMyPost(post.id,value);post.content=updated.content;if(text)text.textContent=updated.content;else if(updated.content){const next=document.createElement('p');next.className='home-feed-post-text';next.textContent=updated.content;header.after(next);}status.textContent='Publicação corrigida com sucesso.';}catch(error){status.textContent=error.message||'Não foi possível editar a publicação.';}finally{edit.disabled=false}});
+     const remove=document.createElement('button');remove.type='button';remove.textContent='🗑️ Excluir publicação';
+     remove.addEventListener('click',async()=>{if(!confirm('Excluir sua publicação e as mídias vinculadas? Esta ação não pode ser desfeita.'))return;remove.disabled=true;try{await deleteMyPost(post.id);card.remove();status.textContent='Sua publicação foi excluída.';}catch(error){status.textContent=error.message||'Não foi possível excluir a publicação.';}finally{remove.disabled=false}});
+     actions.append(edit,remove);
+    }
     actions.append(like,comments);card.append(actions);root.append(card);
    }
   }catch(error){root.textContent='Não foi possível carregar o Feed: '+(error.message||'verifique sua conexão.')}
