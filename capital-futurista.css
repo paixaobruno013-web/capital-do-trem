@@ -311,3 +311,11 @@ body.profile-image-viewer-open{overflow:hidden}
 #musicas #song-list .song-preview-button{border:1px solid #ed1c24;box-shadow:0 0 9px rgba(237,28,36,.22)}
 #musicas .playlist-card{background:#050505;border:1px solid rgba(237,28,36,.68);box-shadow:0 0 12px rgba(237,28,36,.13),inset 0 0 10px rgba(237,28,36,.05)}
 #musicas .playlist-song-row{border-bottom:1px solid rgba(237,28,36,.4)}
+
+
+/* Mantém a grade do perfil com três colunas também em celulares estreitos. */
+@media(max-width:520px){
+ .profile-content-card .profile-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:3px}
+ .profile-content-card .profile-post-card{min-width:0}
+ .profile-content-card .profile-post-card img,.profile-content-card .profile-post-card video{width:100%;aspect-ratio:1;object-fit:cover}
+}
