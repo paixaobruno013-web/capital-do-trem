@@ -136,7 +136,45 @@ function showProfileLoadError(error){
  retry.addEventListener('click',async()=>{retry.disabled=true;retry.textContent='Carregando…';try{await loadMyProfile()}catch(e){showProfileLoadError(e)}finally{retry.disabled=false;retry.textContent='↻ Tentar carregar perfil novamente'}});
  root.append(message,retry);
 }
-async function loadMyProfile(){const session=await api.getCurrentSession();if(!session){location.href='./conta.html?retorno=rede';return}me=session.user;const requested=new URLSearchParams(location.search).get('perfil');if(requested&&requested!==me.id){const q=await supabase.from('profiles').select('user_id,display_name,username,account_type,bio,city,is_public,avatar_type,avatar_url,avatar_data,cover_url,cover_path').eq('user_id',requested).eq('is_public',true).maybeSingle();if(q.error)throw q.error;if(!q.data)throw new Error('Este perfil não está público ou não foi encontrado.');profile=q.data;currentProfileUserId=requested;renderProfile(profile,await getStats(requested),false);const editor=$('profile-edit');if(editor)editor.hidden=true;await loadProfilePosts(requested);return}profile=await api.getMyBasicProfile();currentProfileUserId=me.id;const avatar=await api.getMyAvatar().catch(()=>null);profile={...profile,...avatar};const stats=await getStats(me.id);renderProfile(profile,stats,true);$('edit-name').value=profile.display_name||'';$('edit-username').value=profile.username||'';$('edit-city').value=profile.city||'';$('edit-bio').value=profile.bio||'';$('edit-public').checked=!!profile.is_public;await loadProfilePosts(me.id)}
+function withProfileTimeout(promise,milliseconds,label){
+ let timer;
+ return Promise.race([
+  Promise.resolve(promise),
+  new Promise((_,reject)=>{timer=window.setTimeout(()=>reject(new Error(label)),milliseconds)})
+ ]).finally(()=>window.clearTimeout(timer));
+}
+async function loadMyProfile(){
+ const session=await withProfileTimeout(api.getCurrentSession(),8000,'A sessão demorou para responder. Verifique a conexão e tente novamente.');
+ if(!session){location.href='./conta.html?retorno=rede';return}
+ me=session.user;
+ const requested=new URLSearchParams(location.search).get('perfil');
+ if(requested&&requested!==me.id){
+  const query=await withProfileTimeout(
+   supabase.from('profiles').select('user_id,display_name,username,account_type,bio,city,is_public,avatar_type,avatar_url,avatar_data,cover_url,cover_path').eq('user_id',requested).eq('is_public',true).maybeSingle(),
+   10000,'O perfil público demorou para responder.'
+  );
+  if(query.error)throw query.error;
+  if(!query.data)throw new Error('Este perfil não está público ou não foi encontrado.');
+  profile=query.data;currentProfileUserId=requested;
+  renderProfile(profile,{posts:0,followers:0,following:0},false);
+  const editor=$('profile-edit');if(editor)editor.hidden=true;
+  const statsPromise=withProfileTimeout(getStats(requested),8000,'Os contadores do perfil demoraram para responder.').catch(()=>({posts:0,followers:0,following:0}));
+  await withProfileTimeout(loadProfilePosts(requested),15000,'As publicações do perfil demoraram para carregar.');
+  const stats=await statsPromise;
+  for(const [id,value] of [['stat-posts',stats.posts],['stat-followers',stats.followers],['stat-following',stats.following]]){const el=$(id);if(el)el.textContent=value}
+  return;
+ }
+ profile=await withProfileTimeout(api.getMyBasicProfile(),10000,'Os dados do seu perfil demoraram para responder. Verifique a conexão e tente novamente.');
+ currentProfileUserId=me.id;
+ // getMyBasicProfile já inclui avatar e capa: não fazemos uma segunda consulta redundante.
+ renderProfile(profile,{posts:0,followers:0,following:0},true);
+ for(const [id,value] of [['edit-name',profile.display_name||''],['edit-username',profile.username||''],['edit-city',profile.city||''],['edit-bio',profile.bio||'']]){const el=$(id);if(el)el.value=value}
+ const publicField=$('edit-public');if(publicField)publicField.checked=!!profile.is_public;
+ const statsPromise=withProfileTimeout(getStats(me.id),8000,'Os contadores do perfil demoraram para responder.').catch(()=>({posts:0,followers:0,following:0}));
+ await withProfileTimeout(loadProfilePosts(me.id),15000,'As publicações do perfil demoraram para carregar.');
+ const stats=await statsPromise;
+ for(const [id,value] of [['stat-posts',stats.posts],['stat-followers',stats.followers],['stat-following',stats.following]]){const el=$(id);if(el)el.textContent=value}
+}
 let activeProfileView='posts';
 async function loadProfilePosts(userId,view=activeProfileView){activeProfileView=view;document.querySelectorAll('[data-profile-view]').forEach(b=>b.classList.toggle('active',b.dataset.profileView===view));const grid=$('profile-posts');grid.innerHTML='<p class="empty">Carregando…</p>';
 if(view==='music'){
@@ -265,7 +303,7 @@ async function loadSongs(){
  try{
   allSongs=await Promise.race([
    api.getPublishedSongs(),
-   new Promise((_,reject)=>window.setTimeout(()=>reject(new Error('O catálogo demorou mais de 15 segundos para responder.')),15000))
+   new Promise((_,reject)=>window.setTimeout(()=>reject(new Error('O catálogo demorou mais de 12 segundos para responder. Você ainda pode selecionar músicas do aparelho; tente atualizar o catálogo quando a conexão voltar.')),12000))
   ]);
   renderSongs(allSongs);renderPostMusicOptions();
  }catch(e){
