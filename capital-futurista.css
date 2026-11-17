@@ -298,3 +298,16 @@ body.profile-image-viewer-open{overflow:hidden}
 .profile-playlist-track-copy span{font-size:12px;color:#c9c9c9}
 .profile-playlist-play{flex:0 0 36px;width:36px;height:36px;border:1px solid #ed1c24;border-radius:50%;background:#170506;color:#fff;font-weight:900;box-shadow:0 0 10px rgba(237,28,36,.35)}
 .profile-playlist-play:focus-visible,.profile-playlist-create:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+
+/* Central de Músicas: cada faixa em cartão preto com contorno LED vermelho. */
+#musicas #song-list .song-card{
+ background:#050505!important;
+ border:1px solid rgba(237,28,36,.82)!important;
+ box-shadow:0 0 10px rgba(237,28,36,.2),0 0 22px rgba(237,28,36,.08),inset 0 0 12px rgba(237,28,36,.07)!important;
+}
+#musicas #song-list .song-title{color:#fff;text-shadow:0 0 8px rgba(237,28,36,.22)}
+#musicas #song-list .song-artist{color:#d2d2d2}
+#musicas #song-list .song-preview-button{border:1px solid #ed1c24;box-shadow:0 0 9px rgba(237,28,36,.22)}
+#musicas .playlist-card{background:#050505;border:1px solid rgba(237,28,36,.68);box-shadow:0 0 12px rgba(237,28,36,.13),inset 0 0 10px rgba(237,28,36,.05)}
+#musicas .playlist-song-row{border-bottom:1px solid rgba(237,28,36,.4)}
