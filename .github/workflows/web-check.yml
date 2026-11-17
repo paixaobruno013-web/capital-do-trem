@@ -23,6 +23,8 @@ jobs:
         run: npm run build:web
       - name: Conferir arquivos e ícones do PWA
         run: node scripts/check-pwa.mjs
+      - name: Verificar compatibilidade iOS PWA e cache privado
+        run: node scripts/check-ios-pwa.mjs
       - name: Verificar sintaxe dos módulos de Stories
         run: |
           python3 -m py_compile scripts/configure-android-media.py scripts/prepare-ios-info.py
