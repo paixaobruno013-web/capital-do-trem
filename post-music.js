@@ -52,14 +52,17 @@ export async function loadPostMusic(supabase, postIds) {
 export function createPostMusicControl(track) {
   const root = document.createElement('div');
   root.className = 'post-music-control';
+  root.style.cssText = 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;margin:8px 0;border:1px solid #ed1c2455;border-radius:12px;background:#ed1c2410';
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'post-music-play';
+  button.style.cssText = 'border:1px solid #ed1c24;border-radius:999px;padding:8px 13px;background:#ed1c24;color:#fff;font-weight:850';
   button.textContent = '♫ Ouvir trecho';
   button.setAttribute('aria-label', 'Ouvir trecho de ' + track.title);
   const label = document.createElement('span');
   label.textContent = [track.title, track.artist].filter(Boolean).join(' · ');
   label.className = 'post-music-label';
+  label.style.cssText = 'font-size:12px;color:var(--muted);overflow-wrap:anywhere';
   const audio = new Audio(track.audioUrl);
   audio.preload = 'none';
   audio.volume = track.volume;
