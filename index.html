@@ -1921,9 +1921,9 @@ async function saveOfflineMusic(id,blob,title){
   if(!songs.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='As músicas publicadas pela comunidade aparecerão aqui.';container.append(empty);return;}
   for(const song of songs){
    const card=document.createElement('article');card.className='item music-track-row';card.style.margin='10px 0';card.dataset.songId=song.id;songCards.set(song.id,card);card.dataset.searchText=[song.title,song.artist_name,song.description].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
-   const title=document.createElement('h3');title.textContent=song.title;title.tabIndex=0;title.setAttribute('role','button');title.title='Toque para abrir o reprodutor em tela cheia';
-   const artist=document.createElement('p');artist.className='muted';artist.textContent=song.artist_name;
-   card.append(title,artist);
+   const title=document.createElement('h3');title.textContent=(song.artist_name||'Capital do Trem')+' — '+song.title;title.tabIndex=0;title.setAttribute('role','button');title.title='Toque para abrir o reprodutor em tela cheia';
+   title.setAttribute('aria-label',(song.artist_name||'Capital do Trem')+' — '+song.title);
+   card.append(title);
    if(song.producer_name){const producer=document.createElement('p');producer.className='muted';producer.textContent='🎚️ Produção: '+song.producer_name;card.append(producer);}
    if(song.description){const desc=document.createElement('p');desc.textContent=song.description;card.append(desc);}
    const audioUrl=safeHttpsUrl(song.audio_url);const downloadUrl=safeHttpsUrl(song.download_url)||audioUrl;
