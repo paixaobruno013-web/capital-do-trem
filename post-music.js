@@ -8,7 +8,11 @@ export async function loadPostMusic(supabase, postIds) {
     .from('post_music')
     .select('post_id,song_id,start_seconds,duration_seconds,volume')
     .in('post_id', ids);
-  if (error) throw error;
+  if (error) {
+    const message = String(error.message || '').toLowerCase();
+    if (error.code === '42P01' || error.code === 'PGRST205' || message.includes('post_music') && message.includes('schema cache')) return result;
+    throw error;
+  }
   if (!links?.length) return result;
 
   const songIds = [...new Set(links.map(item => item.song_id))];
