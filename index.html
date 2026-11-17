@@ -1000,6 +1000,11 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <p id="music-library-status" class="muted" role="status" aria-live="polite"></p>
 </section>
 <div id="capital-music-player" aria-label="Player 3D Capital do Trem"></div>
+<section class="card music-playlist-manager" aria-labelledby="music-playlist-title">
+ <div class="home-section-heading"><div><span class="eyebrow">SUA TRILHA</span><h3 id="music-playlist-title">♫ Minhas playlists</h3><p class="muted">Crie suas seleções e adicione as músicas do catálogo.</p></div><button class="btn primary" id="create-music-playlist" type="button">＋ Criar playlist</button></div>
+ <div id="music-playlist-list" class="list" aria-live="polite"><p class="muted">Entre na sua conta para criar e organizar playlists.</p></div>
+ <p id="music-playlist-status" class="muted" role="status" aria-live="polite"></p>
+</section>
 
 <section class="card music-local-picker" aria-labelledby="music-local-picker-title">
  <div class="home-section-heading"><div><span class="eyebrow">OUÇA DO SEU APARELHO</span><h3 id="music-local-picker-title">♫ Escolher arquivo de música</h3><p class="muted">Selecione um áudio salvo no seu celular para ouvir diretamente no Capital do Trem.</p></div></div>
@@ -1847,6 +1852,32 @@ async function saveOfflineMusic(id,blob,title){
   const session=await api.getCurrentSession();
   const musicPlayer=playerModule.createCapitalMusicPlayer('capital-music-player',{showPlaylists:true,onPlay:song=>{if(session)api.recordSongPlay(song.id).catch(()=>{});}});window.capitalMusicPlayer=musicPlayer;
   const songs=await api.getPublishedSongs();container.replaceChildren();
+  let userPlaylists=[];
+  const playlistList=document.getElementById('music-playlist-list');
+  const playlistStatus=document.getElementById('music-playlist-status');
+  const createPlaylistButton=document.getElementById('create-music-playlist');
+  const refreshPlaylists=async()=>{
+   if(!session){if(playlistList)playlistList.innerHTML='<p class="muted">Entre na sua conta para criar playlists.</p>';return;}
+   userPlaylists=await api.getMyPlaylists();
+   musicPlayer.setPlaylists(userPlaylists);
+   if(!playlistList)return;
+   playlistList.replaceChildren();
+   if(!userPlaylists.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Você ainda não criou uma playlist. Toque em “Criar playlist” para começar.';playlistList.append(empty);return;}
+   for(const playlist of userPlaylists){
+    const row=document.createElement('div');row.className='music-playlist-row';
+    const name=document.createElement('strong');name.textContent=playlist.name;
+    const count=document.createElement('span');count.className='muted';count.textContent=(playlist.songs?.length||0)+' faixa(s)';
+    const actions=document.createElement('div');actions.className='social';
+    const playList=document.createElement('button');playList.type='button';playList.className='btn alt';playList.textContent='▶ Ouvir playlist';playList.addEventListener('click',()=>{musicPlayer.setPlaylists(userPlaylists);const picker=document.querySelector('#capital-music-player .ct-player-playlist');if(picker){picker.value=playlist.id;picker.dispatchEvent(new Event('change'));}document.getElementById('capital-music-player')?.scrollIntoView({behavior:'smooth',block:'center'});});
+    const rename=document.createElement('button');rename.type='button';rename.className='btn alt';rename.textContent='✏️ Renomear';rename.addEventListener('click',async()=>{const value=prompt('Novo nome da playlist:',playlist.name);if(value===null)return;try{await api.renameMyPlaylist(playlist.id,value);await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível renomear a playlist.';}});
+    const remove=document.createElement('button');remove.type='button';remove.className='btn alt';remove.textContent='🗑️ Excluir';remove.addEventListener('click',async()=>{if(!confirm('Excluir a playlist “'+playlist.name+'”? As músicas originais não serão apagadas.'))return;try{await api.deleteMyPlaylist(playlist.id);await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível excluir a playlist.';}});
+    actions.append(playList,rename,remove);row.append(name,count,actions);
+    const tracks=document.createElement('p');tracks.className='muted';tracks.textContent=(playlist.songs||[]).map(entry=>songs.find(song=>song.id===entry.song_id)?.title).filter(Boolean).join(' • ')||'Adicione faixas pelo catálogo abaixo.';
+    row.append(tracks);playlistList.append(row);
+   }
+  };
+  if(createPlaylistButton)createPlaylistButton.addEventListener('click',async()=>{if(!session){if(playlistStatus)playlistStatus.textContent='Entre na sua conta para criar uma playlist.';return;}const name=prompt('Nome da nova playlist:');if(name===null)return;createPlaylistButton.disabled=true;try{await api.createMyPlaylist(name);if(playlistStatus)playlistStatus.textContent='Playlist criada! Agora adicione músicas pelo catálogo.';await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível criar a playlist.';}finally{createPlaylistButton.disabled=false;}});
+  if(session){try{await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível carregar suas playlists.';}}
   const mySongsById=new Map();
   if(session){try{for(const owned of await api.getMySongs())mySongsById.set(owned.id,owned);}catch(error){console.warn('Não foi possível consultar as músicas próprias para edição.',error);}}
   const libraryPanel=document.getElementById('music-library');
@@ -1945,6 +1976,11 @@ async function saveOfflineMusic(id,blob,title){
      finally{offlineButton.disabled=false;}
     });
     card.append(offlineButton,offlineStatus);
+   }
+   if(session){
+    const addToPlaylist=document.createElement('button');addToPlaylist.type='button';addToPlaylist.className='btn alt';addToPlaylist.style.margin='4px 0';addToPlaylist.textContent='＋ Adicionar à playlist';
+    addToPlaylist.addEventListener('click',async()=>{if(!userPlaylists.length){if(playlistStatus)playlistStatus.textContent='Crie uma playlist antes de adicionar músicas.';return;}const choices=userPlaylists.map((item,index)=>(index+1)+'. '+item.name).join('\n');const choice=prompt('Em qual playlist adicionar esta música?\n'+choices+'\nDigite o número:');if(choice===null)return;const selected=userPlaylists[Number(choice)-1];if(!selected){if(playlistStatus)playlistStatus.textContent='Escolha um número válido da lista.';return;}addToPlaylist.disabled=true;try{const added=await api.addSongToMyPlaylist(selected.id,song.id);if(playlistStatus)playlistStatus.textContent=added?'Música adicionada à playlist '+selected.name+'.':'Essa música já está nessa playlist.';await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível adicionar a música.';}finally{addToPlaylist.disabled=false;}});
+    card.append(addToPlaylist);
    }
    const shareRow=document.createElement('div');shareRow.className='social';shareRow.style.marginTop='6px';
    const shareButton=document.createElement('button');shareButton.type='button';shareButton.className='btn alt';shareButton.textContent='↗ Compartilhar música';shareButton.setAttribute('aria-label','Compartilhar a música '+song.title);
