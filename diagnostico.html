@@ -128,10 +128,12 @@ button.addEventListener('click',async()=>{
   // Faz primeiro uma requisição HTTP real ao Auth do projeto, sem enviar credenciais do usuário.
   let healthOk=false;
   try{
-   const healthResponse=await fetch(URL+'/auth/v1/health?cdt_diagnostic='+Date.now(),{
+   const healthController=new AbortController(),healthTimer=setTimeout(()=>healthController.abort(),8000);
+   let healthResponse;
+   try{healthResponse=await fetch(URL+'/auth/v1/health?cdt_diagnostic='+Date.now(),{
     method:'GET',cache:'no-store',credentials:'omit',
-    headers:{apikey:KEY,'Cache-Control':'no-cache'}
-   });
+    headers:{apikey:KEY,'Cache-Control':'no-cache'},signal:healthController.signal
+   })}finally{clearTimeout(healthTimer)}
    if(!healthResponse.ok) throw new Error('Supabase Auth respondeu HTTP '+healthResponse.status+'.');
    healthOk=true;
    show('Servidor Supabase',true,'O endpoint de saúde do serviço respondeu por HTTP.');passed++;
