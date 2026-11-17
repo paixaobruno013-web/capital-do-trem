@@ -964,7 +964,7 @@ export async function openViewOnceChatMedia(messageId, kind = 'private') {
 export async function getChatMessages(limit = 60) {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('chat_messages')
-    .select('id, author_id, author_name, content, created_at, author_avatar_type, author_avatar_url, author_avatar_data, attachment_url, attachment_path, attachment_type, attachment_name, attachment_mime, attachment_size, view_once')
+    .select('id, author_id, author_name, content, created_at, author_avatar_type, author_avatar_url, author_avatar_data, attachment_url, attachment_path, attachment_type, attachment_name, attachment_mime, attachment_size, view_once, edited_at')
     .order('created_at', { ascending: false }).limit(Math.min(Math.max(Number(limit) || 60, 1), 100));
   if (error) throw error;
   return await hydrateChatMessages((data || []).reverse(),'group');
@@ -1154,7 +1154,7 @@ export async function decidePrivateConversation(conversationId,decision) {
 export async function getPrivateMessages(conversationId) {
   const supabase=initSupabase();
   const {data,error}=await supabase.from('private_messages')
-    .select('id,conversation_id,sender_id,content,created_at,attachment_path,attachment_type,attachment_name,attachment_mime,attachment_size,view_once')
+    .select('id,conversation_id,sender_id,content,created_at,attachment_path,attachment_type,attachment_name,attachment_mime,attachment_size,view_once,edited_at')
     .eq('conversation_id',conversationId).order('created_at',{ascending:true}).limit(100);
   if(error)throw error;
   return await hydrateChatMessages(data||[],'private');
@@ -2216,7 +2216,7 @@ export async function updateMyGroupMessage(messageId, content) {
   if (!clean || clean.length > 1000) throw new Error('A mensagem deve ter entre 1 e 1.000 caracteres.');
   const { data, error } = await supabase.from('chat_messages').update({ content: clean })
     .eq('id', messageId).eq('author_id', user.id)
-    .select('id,content,created_at').single();
+    .select('id,content,created_at,edited_at').single();
   if (error) throw error;
   return data;
 }
@@ -2241,7 +2241,7 @@ export async function updateMyPrivateMessage(messageId, content) {
   if (!clean || clean.length > 2000) throw new Error('A mensagem deve ter entre 1 e 2.000 caracteres.');
   const { data, error } = await supabase.from('private_messages').update({ content: clean })
     .eq('id', messageId).eq('sender_id', user.id)
-    .select('id,content,created_at').single();
+    .select('id,content,created_at,edited_at').single();
   if (error) throw error;
   return data;
 }
