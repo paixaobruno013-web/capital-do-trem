@@ -666,6 +666,10 @@ export async function getMyBasicProfile() {
     .select('user_id, display_name, username, account_type, bio, city, is_public, avatar_type, avatar_url, avatar_path, avatar_data, cover_url, cover_path')
     .eq('user_id', user.id).maybeSingle();
   if (error) throw error;
+  // Perfil existente é devolvido imediatamente: não bloquear a tela com RPCs
+  // de bootstrap administrativo que só são necessários na primeira criação.
+  if (data) return data;
+
   // Prepara o primeiro perfil administrativo somente quando ainda não existe.
   // Perfis já cadastrados nunca são sobrescritos durante uma simples leitura.
   if ((user.email || '').toLowerCase() === 'capitaldotrem07@gmail.com') {
@@ -685,7 +689,6 @@ export async function getMyBasicProfile() {
       });
     }
   }
-  if (data) return data;
   // Perfis comuns também são criados automaticamente na primeira entrada.
   const metadata = user.user_metadata || {};
   const accountType = metadata.account_type === 'artist' ? 'artist' : 'user';
