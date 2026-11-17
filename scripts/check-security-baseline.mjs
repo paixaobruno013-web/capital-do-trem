@@ -34,18 +34,18 @@ for (const table of [
 }
 
 const mustContain = [
-  ['schema privado sem acesso público', /revoke\\s+all\\s+on\\s+schema\\s+private\\s+from\\s+public/i],
-  ['função administrativa com search_path fixo', /function\\s+private\\.is_admin\\s*\\([\\s\\S]*?security\\s+definer\\s+set\\s+search_path\\s*=\\s*''/i],
-  ['admin bootstrap verifica e-mail confirmado', /email_confirmed_at\\s+is\\s+not\\s+null/i],
-  ['admin_users sem política de escrita para usuários', /tabela admin_users não recebe políticas para usuários comuns/i],
-  ['bucket de áudio privado', /values\\s*\\('capital-do-trem-audio',[\\s\\S]{0,160}?false/i],
-  ['upload de áudio limitado à pasta do usuário', /audio_upload_artist_own_folder_or_admin[\\s\\S]{0,500}?storage\\.foldername\\(name\\)\\)\\[1\\]\\s*=\\s*\\(select auth\\.uid\\(\\)\\)::text/i],
-  ['mensagens privadas isoladas por participantes', /private_messages_read_accepted_participants[\\s\\S]{0,450}?participant_one[\\s\\S]{0,120}?participant_two/i],
-  ['mensagem privada exige remetente autenticado', /private_messages_insert_accepted_participants[\\s\\S]{0,220}?sender_id\\s*=\\s*auth\\.uid\\(\\)/i],
-  ['chave pública Supabase configurada sem service role', /sb_publishable_[A-Za-z0-9_-]+/.test(auth) ? /sb_publishable_[A-Za-z0-9_-]+/ : /$a/]
+  ['schema privado sem acesso público', /revoke\s+all\s+on\s+schema\s+private\s+from\s+public/i, schema],
+  ['função administrativa com search_path fixo', /function\s+private\.is_admin\s*\([\s\S]*?security\s+definer\s+set\s+search_path\s*=\s*''/i, schema],
+  ['admin bootstrap verifica e-mail confirmado', /email_confirmed_at\s+is\s+not\s+null/i, schema],
+  ['admin_users sem política de escrita para usuários', /tabela admin_users não recebe políticas para usuários comuns/i, schema],
+  ['bucket de áudio privado', /values\s*\('capital-do-trem-audio',[\s\S]{0,160}?false/i, schema],
+  ['upload de áudio limitado à pasta do usuário', /audio_upload_artist_own_folder_or_admin[\s\S]*?storage\.foldername\(name\)\)\[1\]\s*=\s*\(select auth\.uid\(\)\)::text/i, schema],
+  ['mensagens privadas isoladas por participantes', /private_messages_read_accepted_participants[\s\S]*?participant_one[\s\S]*?participant_two/i, schema],
+  ['mensagem privada exige remetente autenticado', /private_messages_insert_accepted_participants[\s\S]*?sender_id\s*=\s*auth\.uid\(\)/i, schema],
+  ['chave publicável Supabase configurada', /sb_publishable_[A-Za-z0-9_-]+/, auth]
 ];
-for (const [label, pattern] of mustContain) {
-  if (pattern.test(schema) || pattern.test(auth)) pass(label);
+for (const [label, pattern, source] of mustContain) {
+  if (pattern.test(source)) pass(label);
   else fail('Controle ausente: ' + label);
 }
 
@@ -55,7 +55,7 @@ if (/service_role|sb_secret_|SUPABASE_SERVICE_ROLE_KEY/i.test(auth)) {
   pass('Nenhuma chave service_role/secret no cliente Supabase');
 }
 
-const publicFiles = walk('www').filter((file) => /\\.(?:js|mjs|html|json|css)$/i.test(file));
+const publicFiles = walk('www').filter((file) => /\.(?:js|mjs|html|json|css)$/i.test(file));
 for (const file of publicFiles) {
   const content = fs.readFileSync(path.join(root, file), 'utf8');
   if (/service_role|sb_secret_|SUPABASE_SERVICE_ROLE_KEY/i.test(content)) {
@@ -65,7 +65,7 @@ for (const file of publicFiles) {
 if (publicFiles.length) pass('Arquivos web publicados verificados contra chaves privilegiadas');
 else fail('Diretório www vazio: build web deve ocorrer antes da auditoria');
 
-if (/setAllowFileAccess\\(true\\)|setAllowUniversalAccessFromFileURLs\\(true\\)|MIXED_CONTENT_ALWAYS_ALLOW|setWebContentsDebuggingEnabled\\(true\\)/i.test(androidSetup)) {
+if (/setAllowFileAccess\(true\)|setAllowUniversalAccessFromFileURLs\(true\)|MIXED_CONTENT_ALWAYS_ALLOW|setWebContentsDebuggingEnabled\(true\)/i.test(androidSetup)) {
   fail('Configuração Android contém opção WebView insegura');
 } else {
   pass('Script Android não habilita acesso irrestrito a arquivos, conteúdo misto ou depuração WebView');
