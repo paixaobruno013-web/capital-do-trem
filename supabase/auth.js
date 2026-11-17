@@ -2072,3 +2072,125 @@ export async function uploadMyCover(file) {
  if(previous?.cover_path&&previous.cover_path!==path&&previous.cover_path.startsWith(user.id+'/cover/'))await supabase.storage.from('capital-do-trem-media').remove([previous.cover_path]);
  return saved;
 }
+
+// Controle de conteúdo do próprio usuário: as políticas RLS do banco são a autoridade final.
+async function requireCurrentUserForContent() {
+  const supabase = initSupabase();
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error) throw error;
+  if (!user) throw new Error('Entre na sua conta para gerenciar seu conteúdo.');
+  return { supabase, user };
+}
+
+export async function updateMyPost(postId, content) {
+  const { supabase, user } = await requireCurrentUserForContent();
+  const clean = String(content || '').trim();
+  if (!postId || !clean || clean.length > 1500) throw new Error('Revise o texto da publicação (máximo de 1.500 caracteres).');
+  const { data, error } = await supabase.from('posts').update({ content: clean })
+    .eq('id', postId).eq('author_id', user.id)
+    .select('id,content,created_at').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteMyPost(postId) {
+  const { supabase, user } = await requireCurrentUserForContent();
+  const { data: media, error: mediaError } = await supabase.from('post_media')
+    .select('bucket_id,storage_path').eq('post_id', postId).eq('owner_id', user.id);
+  if (mediaError) throw mediaError;
+  for (const bucket of [...new Set((media || []).map(item => item.bucket_id))]) {
+    const paths = (media || []).filter(item => item.bucket_id === bucket).map(item => item.storage_path);
+    if (paths.length) {
+      const { error } = await supabase.storage.from(bucket).remove(paths);
+      if (error) throw error;
+    }
+  }
+  const { error } = await supabase.from('posts').delete().eq('id', postId).eq('author_id', user.id);
+  if (error) throw error;
+  return true;
+}
+
+export async function updateMyPostComment(commentId, content) {
+  const { supabase, user } = await requireCurrentUserForContent();
+  const clean = String(content || '').trim();
+  if (!clean || clean.length > 1000) throw new Error('O comentário deve ter entre 1 e 1.000 caracteres.');
+  const { data, error } = await supabase.from('post_comments').update({ content: clean })
+    .eq('id', commentId).eq('author_id', user.id)
+    .select('id,content,created_at').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteMyPostComment(commentId) {
+  const { supabase, user } = await requireCurrentUserForContent();
+  const { error } = await supabase.from('post_comments').delete().eq('id', commentId).eq('author_id', user.id);
+  if (error) throw error;
+  return true;
+}
+
+export async function updateMySong(songId, { title, artistName, producerName = '', description = '' }) {
+  const { supabase, user } = await requireCurrentUserForContent();
+  const cleanTitle = String(title || '').trim();
+  const cleanArtist = String(artistName || '').trim();
+  const cleanProducer = String(producerName || '').trim();
+  const cleanDescription = String(description || '').trim();
+  if (!cleanTitle || cleanTitle.length > 120 || !cleanArtist || cleanArtist.length > 100 || cleanProducer.length > 100 || cleanDescription.length > 1000) {
+    throw new Error('Confira os campos da música antes de salvar.');
+  }
+  const { data, error } = await supabase.from('songs').update({
+    title: cleanTitle, artist_name: cleanArtist, producer_name: cleanProducer, description: cleanDescription
+  }).eq('id', songId).eq('user_id', user.id)
+    .select('id,title,artist_name,producer_name,description,status').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteMySong(songId) {
+  const { supabase, user } = await requireCurrentUserForContent();
+  const { data: song, error: readError } = await supabase.from('songs')
+    .select('id,storage_path').eq('id', songId).eq('user_id', user.id).single();
+  if (readError) throw readError;
+  if (song.storage_path) {
+    const { error } = await supabase.storage.from('capital-do-trem-audio').remove([song.storage_path]);
+    if (error) throw error;
+  }
+  const { error } = await supabase.from('songs').delete().eq('id', songId).eq('user_id', user.id);
+  if (error) throw error;
+  return true;
+}
+
+export async function updateMyGroupMessage(messageId, content) {
+  const { supabase, user } = await requireCurrentUserForContent();
+  const clean = String(content || '').trim();
+  if (!clean || clean.length > 1000) throw new Error('A mensagem deve ter entre 1 e 1.000 caracteres.');
+  const { data, error } = await supabase.from('chat_messages').update({ content: clean })
+    .eq('id', messageId).eq('author_id', user.id)
+    .select('id,content,created_at').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteMyGroupMessage(messageId) {
+  const { supabase, user } = await requireCurrentUserForContent();
+  const { error } = await supabase.from('chat_messages').delete().eq('id', messageId).eq('author_id', user.id);
+  if (error) throw error;
+  return true;
+}
+
+export async function updateMyPrivateMessage(messageId, content) {
+  const { supabase, user } = await requireCurrentUserForContent();
+  const clean = String(content || '').trim();
+  if (!clean || clean.length > 2000) throw new Error('A mensagem deve ter entre 1 e 2.000 caracteres.');
+  const { data, error } = await supabase.from('private_messages').update({ content: clean })
+    .eq('id', messageId).eq('sender_id', user.id)
+    .select('id,content,created_at').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteMyPrivateMessage(messageId) {
+  const { supabase, user } = await requireCurrentUserForContent();
+  const { error } = await supabase.from('private_messages').delete().eq('id', messageId).eq('sender_id', user.id);
+  if (error) throw error;
+  return true;
+}
