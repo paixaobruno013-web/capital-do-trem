@@ -34,7 +34,7 @@ const checks = [
   ['grupo e conversa privada aceitam anexos de forma consistente no Android e iOS', /uploadChatAttachment/.test(privateChat) && /sendPrivateMessage\(active\.id,value,selectedPrivateFile,\$\('private-view-once'\)\.checked\)/.test(privateChat)],
   ['grupo renderiza documentos e mídia com URL temporária', /m\.attachment_type==='document'/.test(group) && /m\.attachment_url/.test(group)],
   ['conversa privada oferece menu de anexos e prévia', /id="private-attach"/.test(privateChat) && /id="private-attachment-preview"/.test(privateChat) && /private-attachment-menu/.test(privateChat)],
-  ['conversa privada envia arquivo junto da legenda', /sendPrivateMessage\(active\.id,value,selectedPrivateFile\)/.test(privateChat)],
+  ['conversa privada envia arquivo junto da legenda', /sendPrivateMessage\(active\.id,value,selectedPrivateFile,\$\('private-view-once'\)\.checked\)/.test(privateChat)],
   ['conversa privada renderiza foto, vídeo, áudio e documento', /m\.attachment_type==='image'/.test(privateChat) && /m\.attachment_type==='video'/.test(privateChat) && /m\.attachment_type==='audio'/.test(privateChat) && /m\.attachment_type==='document'/.test(privateChat)],
   ['build Android/iOS inclui páginas e módulo Supabase atualizado', /'mensagens\.html'/.test(prepare) && /'bate-papo\.html'/.test(prepare) && /'supabase\/auth\.js'/.test(prepare)],
   ['service worker recebeu versão de cache nova e inclui conversas e apoiadores', /capital-do-trem-v\d+/.test(worker) && /mensagens\.html/.test(worker) && /bate-papo\.html/.test(worker) && /supporters-admin\.js/.test(worker) && /supporters-public\.js/.test(worker)]
