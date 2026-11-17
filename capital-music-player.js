@@ -28,7 +28,7 @@ export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null
  const play=document.createElement('button');play.type='button';play.className='ct-player-play';play.textContent='▶';play.setAttribute('aria-label','Reproduzir');
  const next=document.createElement('button');next.type='button';next.className='ct-player-control';next.textContent='⏭';next.setAttribute('aria-label','Próxima música');
  const mute=document.createElement('button');mute.type='button';mute.className='ct-player-volume';mute.textContent='🔊';mute.setAttribute('aria-label','Silenciar ou ativar som');
- const fullscreen=document.createElement('button');fullscreen.type='button';fullscreen.className='ct-player-fullscreen';fullscreen.textContent='⛶';fullscreen.setAttribute('aria-label','Abrir player em tela cheia');fullscreen.setAttribute('aria-pressed','false');
+ const fullscreen=document.createElement('button');fullscreen.type='button';fullscreen.className='ct-player-fullscreen';fullscreen.textContent='⛶';fullscreen.title='Expandir o reprodutor';fullscreen.setAttribute('aria-label','Abrir player em tela cheia');fullscreen.setAttribute('aria-pressed','false');
  controls.append(previous,play,next,mute,fullscreen);
  const status=document.createElement('p');status.className='ct-player-status';status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.textContent='Escolha uma faixa para começar a ouvir.';
  const audio=document.createElement('audio');audio.preload='none';audio.hidden=true;
@@ -58,8 +58,8 @@ export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null
   root.classList.toggle('ct-player-fullscreen',enabled);
   document.body.classList.toggle('ct-player-fullscreen-open',enabled);
   fullscreen.setAttribute('aria-pressed',String(enabled));
-  fullscreen.setAttribute('aria-label',enabled?'Sair da tela cheia':'Abrir player em tela cheia');
-  fullscreen.textContent=enabled?'✕':'⛶';
+  fullscreen.setAttribute('aria-label',enabled?'Recolher reprodutor':'Expandir reprodutor');fullscreen.title=enabled?'Recolher reprodutor e continuar navegando':'Expandir reprodutor';
+  fullscreen.textContent=enabled?'⌄':'⛶';
  }
  fullscreen.addEventListener('click',()=>setFullscreen(!root.classList.contains('ct-player-fullscreen')));
  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&root.classList.contains('ct-player-fullscreen'))setFullscreen(false)});
