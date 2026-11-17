@@ -1,6 +1,6 @@
-const CACHE='capital-do-trem-v299';
+const CACHE='capital-do-trem-v300';
 const CORE_FILES=['./','./index.html','./rede.html','./offline.html','./marca.svg','./manifest.webmanifest','./update.js','./diagnostico.html','./assets/favela-header.webp','./assets/banner-speakers.webp'];
-const OPTIONAL_FILES=['./admin.html','./file-picker-guard.js','./estudio.html','./admin-media.js','./privacidade.html','./account-deletion.html','./conta.html','./rede.js','./capital-music-player.js','./persistent-music-player.js','./home-feed.js','./post-music.js','./music-playlists.js','./chat-topics.js','./capital-futurista.css','./supabase/auth.js','./diagnostico.html','./bate-papo.html','./chat-enhancements.js','./emoji-picker.js','./stories-ui.js','./home-story-composer.js','./event-social-composer.js','./admin-stories.js','./account-stories.js','./avatar.html','./mensagens.html','./youtube-feed.js','./admin-apoiadores.html','./apoiadores.html','./supporters-admin.js','./supporters-public.js'];
+const OPTIONAL_FILES=['./admin.html','./file-picker-guard.js','./estudio.html','./admin-media.js','./privacidade.html','./account-deletion.html','./conta.html','./rede.js','./capital-music-player.js','./persistent-music-player.js','./home-feed.js','./post-music.js','./music-upload.js','./music-playlists.js','./chat-topics.js','./capital-futurista.css','./supabase/auth.js','./diagnostico.html','./bate-papo.html','./chat-enhancements.js','./emoji-picker.js','./stories-ui.js','./home-story-composer.js','./event-social-composer.js','./admin-stories.js','./account-stories.js','./avatar.html','./mensagens.html','./youtube-feed.js','./admin-apoiadores.html','./apoiadores.html','./supporters-admin.js','./supporters-public.js'];
 
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(async cache=>{
@@ -29,12 +29,19 @@ self.addEventListener('fetch',event=>{
   if(event.request.method!=='GET') return;
   const url=new URL(event.request.url);
   if(url.origin!==self.location.origin) return;
+  // Nunca armazenar respostas autenticadas ou URLs com parâmetros/tokens.
+  if(event.request.headers.has('Authorization')||url.search) return;
+  const mayCache=response=>{
+    if(!response||!response.ok) return false;
+    const control=(response.headers.get('Cache-Control')||'').toLowerCase();
+    return !/(?:private|no-store|no-cache)/.test(control)&&!response.headers.has('Set-Cookie')&&response.headers.get('Vary')!=='*';
+  };
 
   const isPage=event.request.mode==='navigate'||url.pathname.endsWith('.html')||url.pathname.endsWith('/');
   if(isPage){
     event.respondWith(
       fetch(event.request,{cache:'no-store'}).then(response=>{
-        if(response&&response.ok){
+        if(mayCache(response)){
           const copy=response.clone();
           caches.open(CACHE).then(cache=>cache.put(event.request,copy));
         }
@@ -50,7 +57,7 @@ self.addEventListener('fetch',event=>{
   if(isExecutableOrStyle){
     event.respondWith(
       fetch(event.request,{cache:'no-store'}).then(response=>{
-        if(response&&response.ok){
+        if(mayCache(response)){
           const copy=response.clone();
           caches.open(CACHE).then(cache=>cache.put(event.request,copy));
         }
@@ -67,7 +74,7 @@ self.addEventListener('fetch',event=>{
   event.respondWith(
     caches.match(event.request).then(cached=>{
       const network=fetch(event.request).then(response=>{
-        if(response&&response.ok){
+        if(mayCache(response)){
           const copy=response.clone();
           caches.open(CACHE).then(cache=>cache.put(event.request,copy));
         }
