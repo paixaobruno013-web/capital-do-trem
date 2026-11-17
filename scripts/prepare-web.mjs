@@ -1,4 +1,4 @@
-import { cp, mkdir, rm } from 'node:fs/promises';
+import { cp, mkdir, rm, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 
 const root = process.cwd();
@@ -58,5 +58,8 @@ for (const file of files) {
 const assetsSource = join(root, 'assets');
 const assetsDestination = join(webDir, 'assets');
 await cp(assetsSource, assetsDestination, { recursive: true });
+const logoBase64 = await readFile(join(assetsDestination, 'capital-do-trem-logo.jpg.b64'), 'utf8');
+await writeFile(join(assetsDestination, 'capital-do-trem-logo.jpg'), Buffer.from(logoBase64.trim(), 'base64'));
+await rm(join(assetsDestination, 'capital-do-trem-logo.jpg.b64'), { force: true });
 
 console.log(`Arquivos web preparados em ${webDir} (${files.length} arquivos + pasta assets).`);
