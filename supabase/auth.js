@@ -2071,7 +2071,7 @@ async function requireCurrentUserForContent() {
 export async function updateMyPost(postId, content) {
   const { supabase, user } = await requireCurrentUserForContent();
   const clean = String(content || '').trim();
-  if (!postId || clean.length > 2000) throw new Error('Revise o texto da publicação (máximo de 2.000 caracteres).');
+  if (!postId || !clean || clean.length > 1500) throw new Error('Revise o texto da publicação (máximo de 1.500 caracteres).');
   const { data, error } = await supabase.from('posts').update({ content: clean })
     .eq('id', postId).eq('author_id', user.id)
     .select('id,content,created_at').single();
