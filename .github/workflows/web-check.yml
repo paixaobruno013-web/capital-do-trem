@@ -181,6 +181,8 @@ jobs:
 
       - name: Verificar edição e exclusão de conteúdo próprio
         run: node scripts/check-content-controls.mjs
+      - name: Verificar interface de edição, exclusão e catálogo musical
+        run: node scripts/check-content-ui.mjs
       - name: Verificar música persistente e controles de mídia
         run: node scripts/check-background-music.mjs
 
