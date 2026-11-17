@@ -119,7 +119,23 @@ function makeProfilePostMediaOpenable(el,type,label){
  el.addEventListener('click',open);el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}});
 }
 function renderProfile(p,stats,own){const avatar=$('profile-avatar');if(avatar)setAvatar(avatar,p);const verifiedSeal=$('profile-verified-seal');if(verifiedSeal){verifiedSeal.hidden=true;if(p.account_type==='artist')supabase.from('artists').select('id').eq('user_id',p.user_id).eq('status','published').maybeSingle().then(({data,error})=>{verifiedSeal.hidden=!!error||!data}).catch(()=>{verifiedSeal.hidden=true})}const cover=$('profile-cover');if(cover){if(p.cover_url){cover.src=p.cover_url;cover.style.objectFit='cover'}else{cover.removeAttribute('src');cover.style.objectFit='cover'}makeProfileImageOpenable(cover,'foto de capa')}makeProfileImageOpenable(avatar,'foto de perfil');for(const [id,value] of [['profile-name',p.display_name||'Usuário Uai'],['profile-handle','@'+(p.username||'')],['profile-city',p.city||'Cidade não informada'],['profile-bio',p.bio||''],['stat-posts',stats.posts],['stat-followers',stats.followers],['stat-following',stats.following]]){const el=$(id);if(el)el.textContent=value}const editor=$('profile-edit');if(editor)editor.hidden=!own;const actions=$('profile-actions');if(actions){actions.replaceChildren();if(!own){const b=document.createElement('button');b.className='btn primary';b.textContent='Seguir';b.onclick=()=>toggleFollow(p.user_id,b);actions.append(b)}}}
-async function getStats(userId){const [posts,followers,following]=await Promise.all([supabase.from('posts').select('id',{count:'exact',head:true}).eq('author_id',userId).eq('status','published'),supabase.from('profile_follows').select('follower_id',{count:'exact',head:true}).eq('followed_id',userId),supabase.from('profile_follows').select('followed_id',{count:'exact',head:true}).eq('follower_id',userId)]);for(const x of [posts,followers,following])if(x.error)throw x.error;return{posts:posts.count||0,followers:followers.count||0,following:following.count||0}}
+async function getStats(userId){
+ const [posts,followers,following]=await Promise.all([
+  supabase.from('posts').select('id',{count:'exact',head:true}).eq('author_id',userId).eq('status','published'),
+  supabase.from('profile_follows').select('follower_id',{count:'exact',head:true}).eq('followed_id',userId),
+  supabase.from('profile_follows').select('followed_id',{count:'exact',head:true}).eq('follower_id',userId)
+ ]);
+ // Falha em um contador não pode impedir a abertura do perfil nem dos seus controles.
+ return{posts:posts.error?0:(posts.count||0),followers:followers.error?0:(followers.count||0),following:following.error?0:(following.count||0)};
+}
+function showProfileLoadError(error){
+ const root=$('profile-posts');if(!root)return;
+ root.replaceChildren();
+ const message=document.createElement('p');message.className='status';message.textContent='Não foi possível carregar o perfil: '+(error?.message||'verifique a conexão e tente novamente.');
+ const retry=document.createElement('button');retry.type='button';retry.className='btn primary';retry.textContent='↻ Tentar carregar perfil novamente';
+ retry.addEventListener('click',async()=>{retry.disabled=true;retry.textContent='Carregando…';try{await loadMyProfile()}catch(e){showProfileLoadError(e)}finally{retry.disabled=false;retry.textContent='↻ Tentar carregar perfil novamente'}});
+ root.append(message,retry);
+}
 async function loadMyProfile(){const session=await api.getCurrentSession();if(!session){location.href='./conta.html?retorno=rede';return}me=session.user;const requested=new URLSearchParams(location.search).get('perfil');if(requested&&requested!==me.id){const q=await supabase.from('profiles').select('user_id,display_name,username,account_type,bio,city,is_public,avatar_type,avatar_url,avatar_data,cover_url,cover_path').eq('user_id',requested).eq('is_public',true).maybeSingle();if(q.error)throw q.error;if(!q.data)throw new Error('Este perfil não está público ou não foi encontrado.');profile=q.data;currentProfileUserId=requested;renderProfile(profile,await getStats(requested),false);const editor=$('profile-edit');if(editor)editor.hidden=true;await loadProfilePosts(requested);return}profile=await api.getMyBasicProfile();currentProfileUserId=me.id;const avatar=await api.getMyAvatar().catch(()=>null);profile={...profile,...avatar};const stats=await getStats(me.id);renderProfile(profile,stats,true);$('edit-name').value=profile.display_name||'';$('edit-username').value=profile.username||'';$('edit-city').value=profile.city||'';$('edit-bio').value=profile.bio||'';$('edit-public').checked=!!profile.is_public;await loadProfilePosts(me.id)}
 let activeProfileView='posts';
 async function loadProfilePosts(userId,view=activeProfileView){activeProfileView=view;document.querySelectorAll('[data-profile-view]').forEach(b=>b.classList.toggle('active',b.dataset.profileView===view));const grid=$('profile-posts');grid.innerHTML='<p class="empty">Carregando…</p>';
@@ -244,7 +260,24 @@ function renderPendingSongs(items){
  if(!root.children.length)root.innerHTML='<p class="empty">Você ainda não enviou músicas.</p>';
 }
 async function loadMyPendingSongs(){try{const items=await api.getMySongs();renderPendingSongs(items)}catch(e){$('pending-song-list').textContent='Não foi possível consultar suas músicas: '+e.message}}
-async function loadSongs(){try{allSongs=await api.getPublishedSongs();renderSongs(allSongs);renderPostMusicOptions()}catch(e){$('song-list').textContent='Não foi possível carregar as músicas: '+e.message}}
+async function loadSongs(){
+ const root=$('song-list');if(root)root.innerHTML='<p class="empty">Carregando catálogo de músicas…</p>';
+ try{
+  allSongs=await Promise.race([
+   api.getPublishedSongs(),
+   new Promise((_,reject)=>window.setTimeout(()=>reject(new Error('O catálogo demorou mais de 15 segundos para responder.')),15000))
+  ]);
+  renderSongs(allSongs);renderPostMusicOptions();
+ }catch(e){
+  if(root){
+   root.replaceChildren();
+   const message=document.createElement('p');message.className='status';message.textContent='Não foi possível carregar as músicas: '+(e.message||'tente novamente.');
+   const retry=document.createElement('button');retry.type='button';retry.className='btn primary';retry.textContent='↻ Tentar carregar músicas';
+   retry.addEventListener('click',()=>{retry.disabled=true;loadSongs().finally(()=>{retry.disabled=false})});
+   root.append(message,retry);
+  }
+ }
+}
 
 // Mantém o catálogo sincronizado: uma faixa recém-publicada aparece sem o usuário
 // precisar sair da tela ou adicionar o arquivo manualmente. O foco/retorno ao app
@@ -333,4 +366,17 @@ async function renderMedia(){if(!allPosts.length)await loadFeed();const root=$('
 
 async function loadEvents(){try{const events=await api.getPublishedEvents();const root=$('event-list');root.replaceChildren();for(const e of events){const card=document.createElement('article');card.className='feed-event';const h=document.createElement('strong');h.textContent=e.title;const p=document.createElement('p');p.textContent=new Date(e.event_date+'T12:00:00').toLocaleDateString('pt-BR')+' · '+e.address;card.append(h,p);root.append(card)}if(!root.children.length)root.innerHTML='<p class="empty">Nenhum evento publicado no momento.</p>'}catch(e){$('event-list').textContent=e.message}}
 $('media-search').addEventListener('input',()=>{const q=$('media-search').value.toLowerCase();[...$('media-list').children].forEach(el=>{el.hidden=q&&!el.title.toLowerCase().includes(q)})});
-try{await loadMyProfile();await Promise.all([loadSongs(),loadMyPendingSongs(),loadPeople(),loadEvents()]);watchMusicCatalog();await loadPlaylists();}catch(e){notice('global-status',e.message||'Não foi possível iniciar a rede social.')}
+// Cada área inicia de forma independente: uma falha no perfil não bloqueia o catálogo musical.
+const profileStartup=loadMyProfile().catch(error=>{
+ showProfileLoadError(error);
+ notice('global-status','Perfil indisponível no momento: '+(error.message||'tente novamente.'));
+});
+const independentStartup=[
+ loadSongs(),
+ loadMyPendingSongs(),
+ loadPeople(),
+ loadEvents()
+];
+await Promise.allSettled([profileStartup,...independentStartup]);
+watchMusicCatalog();
+loadPlaylists().catch(error=>notice('playlist-status',error.message||'Não foi possível carregar as playlists.'));
