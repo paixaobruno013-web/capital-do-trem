@@ -360,3 +360,29 @@ body.ct-player-fullscreen-open.ct-has-floating-player{padding-bottom:0!important
 .music-playlist-row>strong{font-size:1rem}
 .music-playlist-row .social{margin:0;gap:7px}
 .music-playlist-row .btn{font-size:12px;padding:8px 11px}
+
+
+/* Identidade Capital do Trem: uma placa por faixa, LED vermelho 3D. */
+#published-song-catalog{display:flex;flex-direction:column;gap:14px;perspective:900px}
+#published-song-catalog .music-track-row{
+ display:block;margin:0!important;padding:15px 16px;border:1px solid rgba(255,35,55,.8);
+ border-radius:13px;background:radial-gradient(ellipse at 50% 0%,rgba(110,0,16,.2),transparent 70%),#030303;
+ box-shadow:0 4px 0 #300008,0 7px 14px rgba(0,0,0,.8),0 0 9px rgba(255,0,35,.5),0 0 20px rgba(255,0,35,.22),inset 0 1px 0 rgba(255,120,135,.14);
+}
+#published-song-catalog .music-track-row h3{
+ display:block;width:100%;margin:0;padding:9px 11px;color:#fff!important;font-size:1.02rem;line-height:1.4;
+ text-align:left;overflow-wrap:anywhere;cursor:pointer;border:1px solid #ff2946;border-radius:8px;
+ background:linear-gradient(145deg,#171014,#080608 58%,#140509);
+ text-shadow:0 0 5px rgba(255,255,255,.55),0 0 12px rgba(255,50,75,.35);
+ box-shadow:0 0 4px #ff1938,0 0 10px rgba(255,0,35,.95),0 0 22px rgba(255,0,35,.62),inset 0 1px 0 rgba(255,255,255,.18),inset 0 -3px 8px rgba(255,0,35,.24),0 3px 0 #52000f,0 5px 8px rgba(0,0,0,.9);
+ animation:ct-red-led-pulse 2.8s ease-in-out infinite alternate;
+}
+#published-song-catalog .music-track-row>p{margin:8px 0 0;color:#eee}
+.music-playlist-manager{background:#080808!important;border-color:rgba(255,35,55,.72)!important;box-shadow:0 0 12px rgba(255,0,35,.25),inset 0 0 12px rgba(255,0,35,.07)}
+.music-playlist-row{background:#050505;border:1px solid rgba(255,35,55,.65);box-shadow:0 0 8px rgba(255,0,35,.24),inset 0 0 8px rgba(255,0,35,.06)}
+@keyframes ct-red-led-pulse{
+ from{box-shadow:0 0 3px #ff1938,0 0 7px rgba(255,0,35,.72),0 0 14px rgba(255,0,35,.38),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -3px 7px rgba(255,0,35,.16),0 3px 0 #43000d,0 5px 8px rgba(0,0,0,.9)}
+ to{box-shadow:0 0 5px #ff4058,0 0 12px #ff002e,0 0 25px rgba(255,0,35,.78),inset 0 1px 0 rgba(255,255,255,.2),inset 0 -3px 9px rgba(255,0,35,.28),0 3px 0 #5a0011,0 6px 10px rgba(0,0,0,.95)}
+}
+@media(hover:hover){#published-song-catalog .music-track-row:hover{transform:translateY(-2px);box-shadow:0 6px 0 #200008,0 10px 20px rgba(0,0,0,.85),0 0 17px rgba(255,0,35,.62)}}
+@media(prefers-reduced-motion:reduce){#published-song-catalog .music-track-row h3{animation:none}#published-song-catalog .music-track-row{transition:none}}
