@@ -2012,8 +2012,9 @@ async function saveOfflineMusic(id,blob,title){
   const openingScreenAtBoot=document.getElementById('intro-smoke');
   if(openingScreenAtBoot){openingScreenAtBoot.classList.add('custom-opening-screen');document.documentElement.classList.remove('intro-brand-pending');}
   const brandingRequest=auth.getPublicBranding().then(value=>{try{localStorage.setItem(BRANDING_CACHE_KEY,JSON.stringify(value||{}));}catch{}return value||{};});
-  // Sempre prioriza as configurações atuais do servidor; cache local é somente fallback offline.
-  const branding=await brandingRequest.catch(()=>cachedBranding||{});
+  // A identidade visual nunca pode bloquear a entrada no aplicativo: limita a espera do banco.
+  const brandingTimeout=new Promise((_,reject)=>window.setTimeout(()=>reject(new Error('Tempo limite ao carregar identidade visual.')),4500));
+  const branding=await Promise.race([brandingRequest,brandingTimeout]).catch(()=>cachedBranding||{});
   const safeUrl=value=>typeof value==='string'&&value.startsWith('https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/')?value:'';
   const profile=safeUrl(branding.profileImageUrl),opening=safeUrl(branding.openingImageUrl),openingVideo=safeUrl(branding.openingVideoUrl); 
   // Uploads recebem caminhos únicos no Storage; não é necessário furar o cache a cada abertura.
@@ -2035,8 +2036,11 @@ async function saveOfflineMusic(id,blob,title){
    const finish=()=>{if(finished)return;finished=true;progress=100;paint();screen.querySelector('video')?.pause();screen.classList.add('is-finished');window.setTimeout(()=>screen.remove(),600);};
    const begin=()=>{if(started)return;started=true;startOpeningTrain();window.setTimeout(finish,10000);};
    const loader=window.setInterval(()=>{if(!finished){progress=Math.min(92,progress+(progress<55?1.7:progress<82?0.68:0.21));paint();}else window.clearInterval(loader);},220);
-   if(intro.complete&&intro.naturalWidth>0){intro.style.visibility='visible';document.documentElement.classList.remove('intro-brand-pending');begin();}
-   else{intro.addEventListener('load',()=>{intro.style.visibility='visible';document.documentElement.classList.remove('intro-brand-pending');begin();},{once:true});intro.addEventListener('error',()=>{intro.src='./marca.svg';intro.style.objectFit='contain';intro.style.visibility='visible';document.documentElement.classList.remove('intro-brand-pending');begin();},{once:true});}
+   let openingImageSettled=false;
+   const settleOpeningImage=useFallback=>{if(openingImageSettled)return;openingImageSettled=true;clearTimeout(openingImageTimer);if(useFallback){intro.src='./marca.svg';intro.style.objectFit='contain';}intro.style.visibility='visible';document.documentElement.classList.remove('intro-brand-pending');begin();};
+   const openingImageTimer=window.setTimeout(()=>settleOpeningImage(true),6000);
+   if(intro.complete&&intro.naturalWidth>0)settleOpeningImage(false);
+   else{intro.addEventListener('load',()=>settleOpeningImage(false),{once:true});intro.addEventListener('error',()=>settleOpeningImage(true),{once:true});}
   }
  }
    if(!opening&&!openingVideo){const fallback=document.querySelector('.intro-smoke__brand img');if(fallback)fallback.style.visibility='visible';const brand=document.querySelector('.intro-smoke__brand');if(brand){brand.style.visibility='visible';brand.style.opacity='1';brand.style.animation='none';}document.documentElement.classList.remove('intro-brand-pending');}
