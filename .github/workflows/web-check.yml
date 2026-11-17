@@ -62,6 +62,8 @@ jobs:
         run: node scripts/check-chat-controls.mjs
       - name: Verificar mídia de visualização única no chat
         run: node scripts/check-view-once-chat.mjs
+      - name: Verificar bloqueio de download nativo de mídias do chat
+        run: node scripts/check-chat-media-download-guard.mjs
       - name: Verificar anexos seguros e envio moderno do chat
         run: |
           node --check scripts/check-chat-attachments.mjs

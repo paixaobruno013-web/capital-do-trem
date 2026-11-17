@@ -361,6 +361,11 @@ function addOwnMessageControls(container,body,message,isGroup){
  remove.addEventListener('click',async()=>{if(!confirm('Excluir esta mensagem e seu anexo? Esta ação não pode ser desfeita.'))return;remove.disabled=true;try{if(isGroup)await deleteMyGroupMessage(message.id);else await deleteMyPrivateMessage(message.id);container.remove()}catch(error){alert(error.message||'Não foi possível excluir a mensagem.')}finally{remove.disabled=false}});
  controls.append(remove);container.append(controls);
 }
+function protectChatMediaElement(element){
+ element.draggable=false;
+ element.addEventListener('contextmenu',event=>event.preventDefault());
+ if(element.tagName==='VIDEO'){element.setAttribute('controlsList','nodownload');element.disablePictureInPicture=true;}
+}
 function appendViewOnceAttachment(container,message,isGroup){
  const senderId=isGroup?message.author_id:message.sender_id;
  if(senderId===state.userId){container.append(node('small','muted','🔒 Mídia enviada para visualização única. Você não pode abri-la.'));return;}
@@ -369,8 +374,8 @@ function appendViewOnceAttachment(container,message,isGroup){
  button.addEventListener('click',async()=>{button.disabled=true;try{
   const opened=await openViewOnceChatMedia(message.id,isGroup?'group':'private');message.viewed_by_me=true;
   const media=node('div','message-attachment');
-  if(opened.type==='image'){const img=node('img');img.src=opened.url;img.alt='Mídia de visualização única';img.loading='eager';media.append(img);}
-  else if(opened.type==='video'){const video=node('video');video.src=opened.url;video.controls=true;video.playsInline=true;video.preload='metadata';media.append(video);}
+  if(opened.type==='image'){const img=node('img');img.src=opened.url;protectChatMediaElement(img);img.alt='Mídia de visualização única';img.loading='eager';media.append(img);}
+  else if(opened.type==='video'){const video=node('video');video.src=opened.url;protectChatMediaElement(video);video.controls=true;video.playsInline=true;video.preload='metadata';media.append(video);}
   else if(opened.type==='audio'){const audio=node('audio');audio.src=opened.url;audio.controls=true;audio.preload='metadata';media.append(audio);}
   button.replaceWith(media);container.append(node('small','muted','Visualização única consumida.'));
  }catch(error){button.disabled=false;alert(error.message||'Não foi possível abrir esta mídia.')}});
@@ -381,8 +386,8 @@ function drawMessage(m){
  const b=node('div','bubble'+(m.sender_id===state.userId?' mine':''));const body=node('div','message-content');appendEmojiText(body,m.content||'');b.append(body);b.dataset.id=m.id;
  if(m.view_once){const media=node('div','message-attachment');appendViewOnceAttachment(media,m,false);b.append(media);}else if(m.attachment_url&&typeof m.attachment_url==='string'&&m.attachment_url.startsWith('https://')){
   const media=node('div','message-attachment');
-  if(m.attachment_type==='image'){const img=node('img');img.src=m.attachment_url;img.alt='Imagem compartilhada na conversa';img.loading='lazy';media.append(img);}
-  else if(m.attachment_type==='video'){const video=node('video');video.src=m.attachment_url;video.controls=true;video.preload='metadata';video.playsInline=true;media.append(video);}
+  if(m.attachment_type==='image'){const img=node('img');img.src=m.attachment_url;protectChatMediaElement(img);img.alt='Imagem compartilhada na conversa';img.loading='lazy';media.append(img);}
+  else if(m.attachment_type==='video'){const video=node('video');video.src=m.attachment_url;protectChatMediaElement(video);video.controls=true;video.preload='metadata';video.playsInline=true;media.append(video);}
   else if(m.attachment_type==='audio'){const audio=node('audio');audio.src=m.attachment_url;audio.controls=true;audio.preload='metadata';media.append(audio);}
   else if(m.attachment_type==='document'){const link=node('a','document-attachment','📄 '+(m.attachment_name||'Documento')+' • '+(Number(m.attachment_size||0)/1024/1024).toFixed(2)+' MB');link.href=m.attachment_url;link.target='_blank';link.rel='noopener noreferrer';link.download=m.attachment_name||'';media.append(link);}
   b.append(media);
@@ -402,7 +407,7 @@ function drawGroupMessage(m){
  who.style.cssText='display:block;font-size:11px;margin:0;opacity:.9';
  head.append(avatar,who);box.prepend(head);
  if(m.view_once){const media=node('div','message-attachment');appendViewOnceAttachment(media,m,true);box.append(media);}else if(m.attachment_url&&typeof m.attachment_url==='string'&&m.attachment_url.startsWith('https://')){
-  if(m.attachment_type==='image'){const img=node('img');img.src=m.attachment_url;img.alt='Imagem compartilhada no grupo';img.loading='lazy';img.style.cssText='display:block;max-width:100%;max-height:260px;border-radius:10px;margin-top:7px';box.append(img);}
+  if(m.attachment_type==='image'){const img=node('img');img.src=m.attachment_url;protectChatMediaElement(img);img.alt='Imagem compartilhada no grupo';img.loading='lazy';img.style.cssText='display:block;max-width:100%;max-height:260px;border-radius:10px;margin-top:7px';box.append(img);}
   else if(m.attachment_type==='video'){const video=node('video');video.controls=true;video.playsInline=true;video.preload='metadata';video.src=m.attachment_url;video.style.cssText='display:block;max-width:100%;max-height:280px;border-radius:10px;margin-top:7px';box.append(video);}
   else if(m.attachment_type==='audio'){const audio=node('audio');audio.controls=true;audio.src=m.attachment_url;audio.preload='metadata';box.append(audio);}
   else if(m.attachment_type==='document'){const link=node('a','document-attachment','📄 '+(m.attachment_name||'Documento')+' • '+(Number(m.attachment_size||0)/1024/1024).toFixed(2)+' MB');link.href=m.attachment_url;link.target='_blank';link.rel='noopener noreferrer';link.download=m.attachment_name||'';box.append(link);}

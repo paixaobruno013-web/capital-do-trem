@@ -275,6 +275,11 @@ function appendEmojiText(target,value){
   }else target.append(document.createTextNode(chunk));
  }
 }
+function protectChatMediaElement(element){
+ element.draggable=false;
+ element.addEventListener('contextmenu',event=>event.preventDefault());
+ if(element.tagName==='VIDEO'){element.setAttribute('controlsList','nodownload');element.disablePictureInPicture=true;}
+}
 function appendViewOnceAttachment(container,message){
  if(message.author_id===currentUserId){const note=document.createElement('small');note.className='muted';note.textContent='🔒 Mídia enviada para visualização única. Você não pode abri-la.';container.append(note);return;}
  if(message.viewed_by_me){const note=document.createElement('small');note.className='muted';note.textContent='👁️ Você já visualizou esta mídia.';container.append(note);return;}
@@ -282,8 +287,8 @@ function appendViewOnceAttachment(container,message){
  button.addEventListener('click',async()=>{button.disabled=true;try{
   const opened=await openViewOnceChatMedia(message.id,'group');message.viewed_by_me=true;
   const media=document.createElement('div');media.className='message-attachment';
-  if(opened.type==='image'){const img=document.createElement('img');img.src=opened.url;img.alt='Mídia de visualização única';img.loading='eager';media.append(img);}
-  else if(opened.type==='video'){const video=document.createElement('video');video.src=opened.url;video.controls=true;video.preload='metadata';video.playsInline=true;media.append(video);}
+  if(opened.type==='image'){const img=document.createElement('img');img.src=opened.url;protectChatMediaElement(img);img.alt='Mídia de visualização única';img.loading='eager';media.append(img);}
+  else if(opened.type==='video'){const video=document.createElement('video');video.src=opened.url;protectChatMediaElement(video);video.controls=true;video.preload='metadata';video.playsInline=true;media.append(video);}
   else if(opened.type==='audio'){const audio=document.createElement('audio');audio.src=opened.url;audio.controls=true;audio.preload='metadata';media.append(audio);}
   button.replaceWith(media);const note=document.createElement('small');note.className='muted';note.textContent='Visualização única consumida.';container.append(note);
  }catch(error){button.disabled=false;alert(error.message||'Não foi possível abrir esta mídia.')}});
@@ -315,8 +320,8 @@ function addMessage(m){
  box.append(head,body);
  if(m.view_once){appendViewOnceAttachment(box,m);}else if(m.attachment_url&&typeof m.attachment_url==='string'&&m.attachment_url.startsWith('https://')){
   const media=document.createElement('div');media.className='message-attachment';
-  if(m.attachment_type==='image'){const img=document.createElement('img');img.src=m.attachment_url;img.alt='Imagem enviada na conversa';img.loading='lazy';media.append(img);}
-  else if(m.attachment_type==='video'){const video=document.createElement('video');video.controls=true;video.preload='metadata';video.playsInline=true;video.src=m.attachment_url;media.append(video);}
+  if(m.attachment_type==='image'){const img=document.createElement('img');img.src=m.attachment_url;protectChatMediaElement(img);img.alt='Imagem enviada na conversa';img.loading='lazy';media.append(img);}
+  else if(m.attachment_type==='video'){const video=document.createElement('video');video.controls=true;video.preload='metadata';video.playsInline=true;video.src=m.attachment_url;protectChatMediaElement(video);media.append(video);}
   else if(m.attachment_type==='audio'){const audio=document.createElement('audio');audio.controls=true;audio.preload='metadata';audio.src=m.attachment_url;media.append(audio);}
   else if(m.attachment_type==='document'){const link=document.createElement('a');link.href=m.attachment_url;link.target='_blank';link.rel='noopener noreferrer';link.download=m.attachment_name||'';link.className='document-attachment';link.textContent='📄 '+(m.attachment_name||'Abrir documento')+' • '+(Number(m.attachment_size||0)/1024/1024).toFixed(2)+' MB';media.append(link);}
   box.append(media);
