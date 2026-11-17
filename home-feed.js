@@ -1,4 +1,5 @@
 import {initSupabase,getCurrentSession,submitMyPost,getPostSocial,togglePostLike,addPostComment} from './supabase/auth.js';
+import {loadPostMusic,createPostMusicControl} from './post-music.js';
 const supabase=initSupabase();
 const $=id=>document.getElementById(id);
 const root=$('home-feed-list'),form=$('home-feed-composer'),status=$('home-feed-status'),fileInput=$('home-feed-media'),fileName=$('home-feed-media-name');
@@ -39,7 +40,7 @@ if(root&&form){
     supabase.from('artists').select('user_id').eq('status','published').in('user_id',authors)
    ]);
    if(mediaQ.error)throw mediaQ.error;if(profilesQ.error)throw profilesQ.error;
-   const urls=await signedMedia(mediaQ.data||[]);
+   const urls=await signedMedia(mediaQ.data||[]);const postMusic=await loadPostMusic(supabase,ids);
    const people=new Map((profilesQ.data||[]).map(p=>[p.user_id,p]));
    const verified=new Set((artistsQ.data||[]).map(a=>a.user_id));
    const media=new Map();
@@ -66,6 +67,7 @@ if(root&&form){
      if(item.media_type==='video'){observeFeedVideo(el)}else{el.alt=item.alt_text||post.content||'Foto publicada na comunidade';el.tabIndex=0;el.title='Toque para ampliar (opcional)';el.addEventListener('click',()=>{const viewer=document.createElement('div');viewer.style.cssText='position:fixed;inset:0;z-index:9999;background:#000e;display:grid;place-items:center;padding:16px';const image=document.createElement('img');image.src=item.url;image.alt=el.alt;image.style.cssText='max-width:100%;max-height:100%;object-fit:contain';const close=document.createElement('button');close.type='button';close.textContent='Fechar';close.style.cssText='position:absolute;top:16px;right:16px;padding:10px 14px;border:1px solid #fff;border-radius:22px;background:#111;color:#fff';close.addEventListener('click',()=>viewer.remove());viewer.addEventListener('click',event=>{if(event.target===viewer)viewer.remove()});viewer.append(image,close);document.body.append(viewer)});}
      card.append(el);
     }
+    if(postMusic.has(post.id))card.append(createPostMusicControl(postMusic.get(post.id)));
     const actions=document.createElement('div');actions.className='home-feed-actions';
     const like=document.createElement('button');like.type='button';like.textContent='♡ Curtir';
     const comments=document.createElement('button');comments.type='button';comments.textContent='💬 Comentários';
