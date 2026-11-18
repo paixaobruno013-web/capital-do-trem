@@ -480,3 +480,9 @@ header .logo{object-fit:contain;object-position:center;background:#fff;border-ra
 #published-song-catalog .music-track-row .music-play-button{grid-column:2;grid-row:1;min-width:36px;width:36px;padding:6px!important;border-radius:50%;font-size:15px!important}
 #published-song-catalog .music-track-row .music-add-to-playlist{grid-column:2;grid-row:2;justify-self:end;min-width:36px;width:36px;padding:5px!important;border-radius:50%;font-size:18px!important}
 #published-song-catalog .music-track-row .music-play-button+audio{display:none!important}
+
+
+/* Capa oficial da área Músicas: arte original integral, sem textos extras nem recorte. */
+.music-section-banner{margin:0 0 12px;padding:0;overflow:hidden;border:1px solid rgba(237,28,36,.42);border-radius:16px;background:#050505;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.music-section-banner img{display:block;width:100%;height:auto;max-height:205px;object-fit:contain;object-position:center;background:#050505}
+@media(min-width:700px){.music-section-banner img{max-height:230px}}
