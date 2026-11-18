@@ -293,8 +293,8 @@ if(view==='music'){
    if(!viewerPlaylists.length)add.title='Crie uma playlist na área AQUI A MÚSICA NÃO PARA! primeiro';
    add.addEventListener('click',async()=>{
     if(!viewerPlaylists.length){playlistStatus.textContent='Você ainda não tem playlists. Crie uma na área AQUI A MÚSICA NÃO PARA! e volte aqui para adicionar esta faixa.';return}
-    const choices=viewerPlaylists.map((item,index)=>(index+1)+'. '+item.name).join('\\n');
-    const choice=prompt('Escolha a playlist para adicionar esta música:\\n'+choices+'\\nDigite o número:');
+    const choices=viewerPlaylists.map((item,index)=>(index+1)+'. '+item.name).join('\n');
+    const choice=prompt('Escolha a playlist para adicionar esta música:\n'+choices+'\nDigite o número:');
     if(choice===null)return;
     const selected=viewerPlaylists[Number(choice)-1];
     if(!selected){playlistStatus.textContent='Escolha um número válido.';return}
