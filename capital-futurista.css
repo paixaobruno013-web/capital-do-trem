@@ -476,3 +476,7 @@ header .logo{object-fit:contain;object-position:center;background:#fff;border-ra
 #published-song-catalog .music-track-row .btn.primary{grid-column:2;grid-row:1}
 #published-song-catalog .music-track-row .btn[aria-label^="Guardar"]{grid-column:1/-1}
 @media(max-width:420px){.music-cover-stage img{height:clamp(105px,30vw,170px)!important}.music-catalog-panel>.home-section-heading{align-items:flex-start;flex-direction:column}}
+
+#published-song-catalog .music-track-row .music-play-button{grid-column:2;grid-row:1;min-width:36px;width:36px;padding:6px!important;border-radius:50%;font-size:15px!important}
+#published-song-catalog .music-track-row .music-add-to-playlist{grid-column:2;grid-row:2;justify-self:end;min-width:36px;width:36px;padding:5px!important;border-radius:50%;font-size:18px!important}
+#published-song-catalog .music-track-row .music-play-button+audio{display:none!important}
