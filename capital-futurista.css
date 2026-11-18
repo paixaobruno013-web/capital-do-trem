@@ -386,3 +386,47 @@ body.ct-player-fullscreen-open.ct-has-floating-player{padding-bottom:0!important
 }
 @media(hover:hover){#published-song-catalog .music-track-row:hover{transform:translateY(-2px);box-shadow:0 6px 0 #200008,0 10px 20px rgba(0,0,0,.85),0 0 17px rgba(255,0,35,.62)}}
 @media(prefers-reduced-motion:reduce){#published-song-catalog .music-track-row h3{animation:none}#published-song-catalog .music-track-row{transition:none}}
+
+
+/* HOME: Stories primeiro, Feed logo abaixo; identidade musical fica na aba Músicas */
+#inicio>.home-stories{
+  margin:0 0 12px!important;
+  padding:12px 12px 9px!important;
+  border:1px solid rgba(237,28,36,.32)!important;
+  border-radius:16px!important;
+  background:linear-gradient(120deg,rgba(237,28,36,.08),rgba(12,12,14,.96) 42%)!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+}
+#inicio>.home-stories .home-stories-heading{min-height:34px}
+#inicio>.home-stories .home-stories-heading h2{font-size:15px;letter-spacing:.2px}
+#inicio>.home-stories .home-stories-heading .eyebrow{display:block;margin-bottom:2px;font-size:9px;font-weight:900;letter-spacing:1.4px;color:#ff737a}
+#inicio>.home-stories .home-stories-heading button{
+  display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;
+  padding:0;border:0;border-radius:50%;background:#ed1c24;color:#fff;
+  font-size:25px;line-height:1;font-weight:500;box-shadow:0 0 14px rgba(237,28,36,.35);
+}
+#inicio>.home-stories .home-stories-list{gap:12px;padding:9px 2px 4px}
+#inicio>.home-stories .home-story-item{flex-basis:66px;width:66px;gap:5px}
+#inicio>.home-stories .home-story-ring{width:60px;height:60px}
+#inicio>.home-stories .home-story-name{font-size:10px}
+#inicio>.home-community-feed{margin-top:0}
+.page#musicas>.music-reference-banner{
+  display:flex!important;min-height:0!important;min-height:76px!important;
+  align-items:center;justify-content:space-between;gap:12px;
+  padding:11px 15px!important;margin:0 0 12px!important;
+  border-radius:14px!important;text-align:left;
+  background:linear-gradient(105deg,rgba(0,0,0,.97),rgba(26,8,11,.94)),radial-gradient(circle at 20% 50%,rgba(237,28,36,.24),transparent 65%),#111!important;
+}
+.music-reference-brand{min-width:0}
+.page#musicas>.music-reference-banner h2{
+  margin:0!important;font-size:clamp(17px,4.5vw,25px)!important;
+  line-height:1.05;letter-spacing:-.45px!important;text-align:left;
+}
+.page#musicas>.music-reference-banner h2 strong{color:#ff1828;font-style:italic;text-shadow:0 0 10px rgba(237,28,36,.45)}
+.page#musicas>.music-reference-banner p{margin:4px 0 0;font-size:9px;letter-spacing:.45px;color:#ddd}
+.page#musicas>.music-reference-banner>.btn{flex:0 0 auto;min-height:34px;padding:6px 10px;font-size:10px;white-space:nowrap}
+@media(max-width:380px){
+  .page#musicas>.music-reference-banner{padding:9px 10px!important;gap:7px}
+  .page#musicas>.music-reference-banner>.btn{font-size:9px;padding:5px 7px}
+  .page#musicas>.music-reference-banner p{font-size:8px}
+}
