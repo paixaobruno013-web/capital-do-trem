@@ -7,80 +7,46 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#080809",
-  "theme_color": "#080809",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "icons": [
     {
       "src": "./assets/capital-do-trem-logo.jpg",
-      "sizes": "96x96",
+      "sizes": "80x80",
       "type": "image/jpeg",
-      "purpose": "any"
-    },
-    {
-      "src": "./marca.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ],
   "lang": "pt-BR",
-  "categories": [
-    "music",
-    "social",
-    "entertainment"
-  ],
+  "categories": ["music", "social", "entertainment"],
   "shortcuts": [
     {
       "name": "Minha conta",
       "short_name": "Minha conta",
       "description": "Acesse seu perfil no Capital do Trem.",
       "url": "./conta.html",
-      "icons": [
-        {
-          "src": "./assets/capital-do-trem-logo.jpg",
-          "sizes": "96x96",
-          "type": "image/jpeg"
-        }
-      ]
+      "icons": [{ "src": "./assets/capital-do-trem-logo.jpg", "sizes": "80x80", "type": "image/jpeg" }]
     },
     {
       "name": "Capital do Trem",
       "short_name": "Capital do Trem",
       "description": "Abra o Capital do Trem e participe do Fala Trem, bate-papo da comunidade.",
       "url": "./bate-papo.html",
-      "icons": [
-        {
-          "src": "./assets/capital-do-trem-logo.jpg",
-          "sizes": "96x96",
-          "type": "image/jpeg"
-        }
-      ]
+      "icons": [{ "src": "./assets/capital-do-trem-logo.jpg", "sizes": "80x80", "type": "image/jpeg" }]
     },
     {
       "name": "Meu avatar",
       "short_name": "Meu avatar",
       "description": "Personalize sua foto ou personagem no Capital do Trem.",
       "url": "./avatar.html",
-      "icons": [
-        {
-          "src": "./assets/capital-do-trem-logo.jpg",
-          "sizes": "96x96",
-          "type": "image/jpeg"
-        }
-      ]
+      "icons": [{ "src": "./assets/capital-do-trem-logo.jpg", "sizes": "80x80", "type": "image/jpeg" }]
     },
     {
       "name": "Minhas conversas",
       "short_name": "Conversas",
       "description": "Acesse sua área de conversas privadas.",
       "url": "./mensagens.html",
-      "icons": [
-        {
-          "src": "./assets/capital-do-trem-logo.jpg",
-          "sizes": "96x96",
-          "type": "image/jpeg"
-        }
-      ]
+      "icons": [{ "src": "./assets/capital-do-trem-logo.jpg", "sizes": "80x80", "type": "image/jpeg" }]
     }
   ]
 }
