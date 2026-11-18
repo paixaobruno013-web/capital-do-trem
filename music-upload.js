@@ -1,4 +1,4 @@
-import { getCurrentSession, isCurrentUserArtistOrAdmin, uploadMySong } from './supabase/auth.js';
+import { getCurrentSession, isCurrentUserArtistOrAdmin, bootstrapFirstAdmin, uploadMySong } from './supabase/auth.js';
 
 const $ = id => document.getElementById(id);
 const form = $('music-upload-form');
@@ -39,13 +39,25 @@ if (form && access && status && fileInput && submit) {
         access.textContent = 'Entre na sua conta de MC/DJ para enviar músicas.';
         return;
       }
-      // A função só ativa o primeiro administrador para a conta proprietária
-      // confirmada e somente quando ainda não existe nenhum administrador.
-      if ((session.user.email || '').trim().toLowerCase() === 'capitaldotrem07@gmail.com') {
+      // A conta proprietária confirmada precisa executar o bootstrap do banco
+      // antes da checagem de papel. A função SQL valida o e-mail novamente.
+      const isOwner = (session.user.email || '').trim().toLowerCase() === 'capitaldotrem07@gmail.com';
+      let bootstrapError = null;
+      if (isOwner) {
+        try {
+          await withAccessTimeout(bootstrapFirstAdmin(), 'A ativação administrativa demorou mais que o esperado. Tente novamente.');
+        } catch (error) {
+          // Se a conta já tiver sido promovida, a checagem abaixo ainda libera
+          // o acesso. Caso contrário, mostramos a dependência da migração.
+          bootstrapError = error;
+        }
       }
       const allowed = await withAccessTimeout(isCurrentUserArtistOrAdmin(), 'A verificação de permissões demorou mais que o esperado. Atualize a página e tente novamente.');
       if (!allowed) {
-        access.textContent = 'A conta conectada ainda não foi reconhecida como Administrador ou Artista / MC / DJ. O envio permanece protegido; confira o tipo da conta e tente verificar novamente.';
+        access.textContent = isOwner
+          ? 'A conta proprietária ainda não recebeu a permissão administrativa. É necessário aplicar a atualização de permissões no Supabase e tocar em “Verificar acesso novamente”.'
+          : 'A conta conectada ainda não foi reconhecida como Administrador ou Artista / MC / DJ. O envio permanece protegido; confira o tipo da conta e tente verificar novamente.';
+        if (bootstrapError) console.warn('Bootstrap administrativo ainda não confirmado.', bootstrapError);
         retry.hidden = false;
         return;
       }
