@@ -2,7 +2,10 @@ import {initSupabase,getCurrentSession,submitMyPost,getPostSocial,togglePostLike
 import {loadPostMusic,createPostMusicControl} from './post-music.js';
 const supabase=initSupabase();
 const $=id=>document.getElementById(id);
-const root=$('home-feed-list'),form=$('home-feed-composer'),status=$('home-feed-status'),fileInput=$('home-feed-media'),fileName=$('home-feed-media-name');
+const root=$('home-feed-list'),form=$('home-feed-composer'),status=$('home-feed-status'),fileInput=$('home-feed-media'),fileName=$('home-feed-media-name'),preview=$('home-feed-preview'),previewStage=$('home-feed-preview-stage'),clearMedia=$('home-feed-clear-media'),caption=$('home-feed-text'),charCount=$('home-feed-char-count');
+let previewUrl='';
+function clearSelectedMedia(){if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl='';}if(fileInput)fileInput.value='';if(fileName)fileName.textContent='Nenhuma mídia selecionada';if(previewStage)previewStage.replaceChildren();if(preview)preview.hidden=true;}
+function renderSelectedMedia(file){clearSelectedMedia();if(!file)return;fileName.textContent=file.name+' • '+(file.size/1024/1024).toFixed(2)+' MB';previewUrl=URL.createObjectURL(file);const media=document.createElement(file.type.startsWith('video/')?'video':'img');media.src=previewUrl;media.className='home-feed-preview-media';if(media.tagName==='VIDEO'){media.controls=true;media.playsInline=true;}else media.alt='Prévia da foto que será publicada';previewStage.append(media);preview.hidden=false;}
 if(root&&form){
  let currentUser=null;
  const safe=(value)=>String(value??'');
@@ -85,7 +88,9 @@ if(root&&form){
    }
   }catch(error){root.textContent='Não foi possível carregar o Feed: '+(error.message||'verifique sua conexão.')}
  }
- fileInput?.addEventListener('change',()=>{fileName.textContent=fileInput.files?.[0]?.name||'Nenhuma mídia selecionada'});
+ fileInput?.addEventListener('change',()=>renderSelectedMedia(fileInput.files?.[0]));
+ clearMedia?.addEventListener('click',clearSelectedMedia);
+ caption?.addEventListener('input',()=>{if(charCount)charCount.textContent=caption.value.length+'/1500'});
  form.addEventListener('submit',async event=>{
   event.preventDefault();
   const text=$('home-feed-text').value.trim(),file=fileInput?.files?.[0];
@@ -103,7 +108,7 @@ if(root&&form){
     const row=await supabase.from('post_media').insert({post_id:post.id,owner_id:session.user.id,bucket_id:'capital-do-trem-social',storage_path:path,media_type:file.type.startsWith('video/')?'video':'image',mime_type:file.type,byte_size:file.size,alt_text:text.slice(0,200)});
     if(row.error)throw row.error;
    }
-   $('home-feed-text').value='';if(fileInput)fileInput.value='';fileName.textContent='Nenhuma mídia selecionada';status.textContent='Publicação compartilhada com os Maquinistas! ❤️';await load();
+   $('home-feed-text').value='';clearSelectedMedia();if(charCount)charCount.textContent='0/1500';status.textContent='Publicação compartilhada com os Maquinistas! ❤️';await load();
   }catch(error){status.textContent=error.message||'Não foi possível publicar.'}
   finally{button.disabled=false}
  });
