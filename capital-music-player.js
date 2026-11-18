@@ -8,7 +8,7 @@ export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null
  const top=document.createElement('div');top.className='ct-player-topline';const brand=document.createElement('span');brand.textContent='CAPITAL DO TREM • MUSIC EXPERIENCE';const live=document.createElement('span');live.className='ct-player-live';live.textContent='● PLAYER';top.append(brand,live);
  const stage=document.createElement('div');stage.className='ct-player-stage';
  const artWrap=document.createElement('div');artWrap.className='ct-player-art-wrap';
- const art=document.createElement('div');art.className='ct-player-artwork';art.innerHTML='<span class="ct-art-orbit ct-art-orbit-one"></span><span class="ct-art-orbit ct-art-orbit-two"></span><span class="ct-art-triangle">🔺</span><span class="ct-art-equalizer" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><strong class="ct-art-brand">CAPITAL<br>DO TREM</strong><small class="ct-art-caption">A MÚSICA NÃO PARA</small>';artWrap.append(art);
+ const art=document.createElement('div');art.className='ct-player-artwork';art.innerHTML='<span class="ct-art-orbit ct-art-orbit-one"></span><span class="ct-art-orbit ct-art-orbit-two"></span><img class="ct-art-mini-logo" src="./marca.svg" alt="Logo Capital do Trem"><span class="ct-art-triangle">🔺</span><span class="ct-art-equalizer" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><strong class="ct-art-brand">CAPITAL<br>DO TREM</strong><small class="ct-art-caption">A MÚSICA NÃO PARA</small>';artWrap.append(art);
  const disc=document.createElement('div');disc.className='ct-player-disc';disc.setAttribute('aria-hidden','true');artWrap.append(disc);
  const info=document.createElement('div');info.className='ct-player-info';
  const eyebrow=document.createElement('span');eyebrow.className='ct-player-eyebrow';eyebrow.textContent='TOCANDO AGORA';
@@ -42,7 +42,7 @@ export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null
   audio.pause();audio.src=url;audio.load();title.textContent=song.title||'Faixa sem título';artist.textContent=song.artist_name||'Artista da comunidade';producer.textContent=song.producer_name?'Produção: '+song.producer_name:'';producer.hidden=!song.producer_name;
   artTitle.textContent=song.title||'FAIXA MUSICAL';artArtist.textContent=(song.artist_name||'ARTISTA DA COMUNIDADE').toUpperCase();
   if(catalogSelect&&song.id)catalogSelect.value=song.id;
-  art.dataset.songId=song.id||'';art.style.setProperty('--art-hue',String((String(song.id||song.title||'trem').split('').reduce((n,ch)=>n+ch.charCodeAt(0),0)*7)%360));
+  art.dataset.songId=song.id||'';const trackHue=String((String(song.id||song.title||'trem').split('').reduce((n,ch)=>n+ch.charCodeAt(0),0)*7)%360);art.style.setProperty('--art-hue',trackHue);artWrap.style.setProperty('--art-hue',trackHue);
   range.value='0';elapsed.textContent='0:00';duration.textContent='0:00';play.textContent='▶';status.textContent='Faixa '+(index+1)+' de '+queue.length+' • pronta para tocar.';
   if('mediaSession' in navigator){try{navigator.mediaSession.metadata=new MediaMetadata({title:song.title||'Capital do Trem',artist:song.artist_name||'Artista da comunidade',album:'Capital do Trem',artwork:[{src:'./marca.svg',sizes:'any',type:'image/svg+xml'}]});}catch{}}
   if(autoplay)audio.play().catch(()=>{status.textContent='Toque em reproduzir para ouvir esta faixa.'});
