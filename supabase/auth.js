@@ -566,6 +566,21 @@ export async function getPublishedSongsForProfile(userId) {
   }));
 }
 
+// Busca perfis públicos pelo nome ou @ para localizar músicas diretamente na página do artista/usuário.
+export async function searchPublicMusicProfiles(query) {
+  const supabase = initSupabase();
+  const term = String(query || '').trim().replace(/[%,()_*]/g, ' ').replace(/\s+/g, ' ').slice(0, 60);
+  if (term.length < 2) throw new Error('Digite pelo menos 2 caracteres do nome ou @ do perfil.');
+  const pattern = '%' + term + '%';
+  const { data, error } = await supabase.from('profiles')
+    .select('user_id,display_name,username,account_type')
+    .eq('is_public', true)
+    .or('display_name.ilike.' + pattern + ',username.ilike.' + pattern)
+    .order('display_name', { ascending: true }).limit(30);
+  if (error) throw error;
+  return data || [];
+}
+
 export async function getPublishedSongs() {
   const supabase = initSupabase();
   // Busca o catálogo completo em páginas para que novas publicações não fiquem
