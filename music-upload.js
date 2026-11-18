@@ -13,12 +13,24 @@ const updateTitleCounter = () => { if(titleCounter && titleInput) titleCounter.t
 titleInput?.addEventListener('input',updateTitleCounter);updateTitleCounter();
 
 if (form && access && status && fileInput && submit) {
-  const withAccessTimeout = (promise, label) => Promise.race([
-    promise,
-    new Promise((_, reject) => window.setTimeout(() => reject(new Error(label)), 15000))
-  ]);
+  const retry = document.createElement('button');
+  retry.type = 'button';
+  retry.className = 'btn alt';
+  retry.textContent = '↻ Verificar acesso novamente';
+  retry.hidden = true;
+  access.insertAdjacentElement('afterend', retry);
+
+  const withAccessTimeout = (promise, label) => new Promise((resolve, reject) => {
+    const timer = window.setTimeout(() => reject(new Error(label)), 15000);
+    Promise.resolve(promise).then(
+      value => { window.clearTimeout(timer); resolve(value); },
+      error => { window.clearTimeout(timer); reject(error); }
+    );
+  });
 
   async function prepareUpload() {
+    retry.hidden = true;
+    form.hidden = true;
     access.hidden = false;
     access.textContent = 'Conferindo sua conta e suas permissões…';
     try {
@@ -32,7 +44,8 @@ if (form && access && status && fileInput && submit) {
       await withAccessTimeout(bootstrapFirstAdmin(), 'Não foi possível validar a configuração administrativa. Tente novamente.');
       const allowed = await withAccessTimeout(isCurrentUserArtistOrAdmin(), 'A verificação de permissões demorou mais que o esperado. Atualize a página e tente novamente.');
       if (!allowed) {
-        access.textContent = 'O envio está disponível para contas Artista / MC / DJ. Você pode continuar ouvindo todo o catálogo normalmente.';
+        access.textContent = 'A conta conectada ainda não foi reconhecida como Administrador ou Artista / MC / DJ. O envio permanece protegido; confira o tipo da conta e tente verificar novamente.';
+        retry.hidden = false;
         return;
       }
       access.hidden = true;
@@ -41,8 +54,11 @@ if (form && access && status && fileInput && submit) {
       form.hidden = true;
       access.hidden = false;
       access.textContent = error?.message || 'Não foi possível verificar sua permissão de envio.';
+      retry.hidden = false;
     }
   }
+
+  retry.addEventListener('click', prepareUpload);
 
   fileInput.addEventListener('change', () => {
     const file = fileInput.files?.[0];
