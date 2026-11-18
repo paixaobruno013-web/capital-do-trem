@@ -25,7 +25,8 @@ body.light #capital-music-player.ct-player-persistent .ct-player-shell{backgroun
 @media(prefers-reduced-motion:reduce){#capital-music-player.ct-player-persistent .ct-player-shell{backdrop-filter:none;-webkit-backdrop-filter:none}}
 
 #capital-music-player.ct-player-persistent{touch-action:pan-y}
-#capital-music-player .ct-player-float-tools{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:12px;min-height:22px;order:-1}
+#capital-music-player.ct-player-persistent .ct-player-shell{grid-template-areas:"tools tools" "info controls" "progress progress"}
+#capital-music-player .ct-player-float-tools{grid-area:tools;grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:12px;min-height:22px;order:-1}
 #capital-music-player .ct-player-drag-handle{width:52px;height:18px;border:0;border-radius:99px;background:transparent;display:grid;place-items:center;cursor:grab;touch-action:none;padding:0}
 #capital-music-player .ct-player-drag-handle:before{content:"";width:34px;height:4px;border-radius:9px;background:#aaa;box-shadow:0 0 7px rgba(237,28,36,.7)}
 #capital-music-player .ct-player-drag-handle:active{cursor:grabbing}
