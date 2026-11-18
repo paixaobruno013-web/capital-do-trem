@@ -42,7 +42,7 @@ export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null
   audio.pause();audio.src=url;audio.load();title.textContent=song.title||'Faixa sem título';artist.textContent=song.artist_name||'Artista da comunidade';producer.textContent=song.producer_name?'Produção: '+song.producer_name:'';producer.hidden=!song.producer_name;
   artTitle.textContent=song.title||'FAIXA MUSICAL';artArtist.textContent=(song.artist_name||'ARTISTA DA COMUNIDADE').toUpperCase();
   if(catalogSelect&&song.id)catalogSelect.value=song.id;
-  art.dataset.songId=song.id||'';art.style.setProperty('--art-hue',String((String(song.id||song.title||'trem').split('').reduce((n,ch)=>n+ch.charCodeAt(0),0)*7)%360));
+  art.dataset.songId=song.id||'';const trackHue=String((String(song.id||song.title||'trem').split('').reduce((n,ch)=>n+ch.charCodeAt(0),0)*7)%360);art.style.setProperty('--art-hue',trackHue);artWrap.style.setProperty('--art-hue',trackHue);
   range.value='0';elapsed.textContent='0:00';duration.textContent='0:00';play.textContent='▶';status.textContent='Faixa '+(index+1)+' de '+queue.length+' • pronta para tocar.';
   if('mediaSession' in navigator){try{navigator.mediaSession.metadata=new MediaMetadata({title:song.title||'Capital do Trem',artist:song.artist_name||'Artista da comunidade',album:'Capital do Trem',artwork:[{src:'./marca.svg',sizes:'any',type:'image/svg+xml'}]});}catch{}}
   if(autoplay)audio.play().catch(()=>{status.textContent='Toque em reproduzir para ouvir esta faixa.'});
