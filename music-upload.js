@@ -42,7 +42,6 @@ if (form && access && status && fileInput && submit) {
       // A função só ativa o primeiro administrador para a conta proprietária
       // confirmada e somente quando ainda não existe nenhum administrador.
       if ((session.user.email || '').trim().toLowerCase() === 'capitaldotrem07@gmail.com') {
-        await withAccessTimeout(bootstrapFirstAdmin(), 'Não foi possível validar a configuração administrativa. Tente novamente.');
       }
       const allowed = await withAccessTimeout(isCurrentUserArtistOrAdmin(), 'A verificação de permissões demorou mais que o esperado. Atualize a página e tente novamente.');
       if (!allowed) {

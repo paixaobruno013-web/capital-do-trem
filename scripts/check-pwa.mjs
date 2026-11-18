@@ -66,6 +66,5 @@ for (const icon of manifest.icons) {
     throw new Error('Ícone do manifesto não encontrado no pacote: ' + icon.src);
   }
 }
-}
 
 console.log('PWA aprovado: ' + entries.length + ' arquivos de pré-cache e ' + manifest.icons.length + ' ícone(s) do manifesto conferidos.');
