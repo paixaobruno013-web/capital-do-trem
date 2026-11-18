@@ -209,7 +209,27 @@ body.light .emoji-picker,body.light .emoji-full-panel,body.light .emoji-category
   background:radial-gradient(ellipse at 50% 0%,rgba(237,28,36,.14),#13090a 78%)!important;
 }
 
-.view-once-option{display:flex;align-items:center;gap:6px;flex:0 0 100%;font-size:11px;color:var(--muted);padding:4px 8px}.view-once-option input{width:16px;height:16px;flex:0 0 16px;accent-color:var(--red)}</style></head>
+.view-once-option{display:flex;align-items:center;gap:6px;flex:0 0 100%;font-size:11px;color:var(--muted);padding:4px 8px}.view-once-option input{width:16px;height:16px;flex:0 0 16px;accent-color:var(--red)}
+/* FALA UAI — caixa de entrada prioriza os acessos fixos e conversas privadas. */
+#private-layout{grid-template-columns:minmax(0,1fr)}
+#inbox-panel{border:1px solid #ed1c2455;background:linear-gradient(155deg,rgba(22,12,14,.97),rgba(8,8,9,.97));box-shadow:0 0 22px #ed1c241c}
+#inbox-panel>.section-title h2{letter-spacing:.04em}
+#inbox-panel>.small{margin:0 0 10px}
+#conversations{display:grid;gap:9px}
+#conversations .conversation{min-height:72px;border-radius:15px;padding:11px 14px;background:linear-gradient(110deg,#171719,#101012);border:1px solid #ffffff12;transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease}
+#conversations .conversation:active{transform:scale(.99)}
+#conversations .official-group{order:0;background:linear-gradient(105deg,#4b1018,#170b0e 72%)!important;border:1px solid #ed1c2488!important;box-shadow:0 0 18px #ed1c2428}
+#conversations .official-group .conversation-copy strong{color:#fff;font-size:15px}
+#conversations .location-shortcut{order:1;text-decoration:none;color:var(--fg);border-color:#ed1c2455;background:linear-gradient(105deg,#241014,#111)!important}
+.location-shortcut-icon{width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;border-radius:50%;background:#ed1c241c;border:1px solid #ed1c2477;font-size:21px}
+.location-shortcut .conversation-copy strong{color:#fff}
+.location-arrow{font-size:27px;color:#ff5961;margin-left:auto}
+#conversations .conversation:not(.official-group):not(.location-shortcut){order:2}
+#conversations .conversation:not(.official-group):not(.location-shortcut) .conversation-copy strong{font-size:14px}
+#conversation-search{margin:10px 0 12px!important;border:1px solid #ed1c2455;background:#090909}
+#sidebar-panel{margin-top:0}
+@media(max-width:680px){#private-layout{display:flex;flex-direction:column;gap:10px}#inbox-panel,#sidebar-panel{width:100%;padding:13px;border-radius:18px}#conversations .conversation{min-height:68px}}
+</style></head>
 <body><a class="skip" href="#main">Pular para o conteúdo</a>
 <header><img src="./marca.svg" alt="Capital do Trem"><h1>Minhas conversas</h1><p class="muted">Conversas individuais com convite e aceite antes de começar.</p><div class="actions"><a class="btn" href="./index.html">Início</a><a class="btn" href="./bate-papo.html">Fala Trem • Geral</a><a class="btn" href="./conta.html">Minha conta</a><button id="theme" type="button">☀️ Claro</button></div></header>
 <main id="main">
@@ -323,6 +343,9 @@ function drawConversations(){
  copy.append(name,meta);group.append(groupAvatarNode(),copy,tag);
  if(activeGroup)group.setAttribute('aria-current','true');
  group.addEventListener('click',()=>state.isGroupMember?openGroupConversation():joinGroupFromPrivate());box.append(group);
+ const locationShortcut=node('a','conversation location-shortcut');locationShortcut.href='./bate-papo.html#fazer-amigos';
+ const locationIcon=node('span','location-shortcut-icon','📍'),locationCopy=node('span','conversation-copy'),locationName=node('strong',null,'Fazer amizades por localização'),locationMeta=node('span','small','Encontre gente da comunidade perto de você');
+ locationCopy.append(locationName,locationMeta);locationShortcut.append(locationIcon,locationCopy,node('span','location-arrow','›'));box.append(locationShortcut);
  const list=state.conversations.filter(c=>c.status==='accepted'&&personName(partner(c)).toLocaleLowerCase('pt-BR').includes(term));
  if(!list.length){box.append(node('p','empty','Nenhuma conversa privada ainda. Escolha alguém na comunidade para iniciar uma conversa.'));return;}
  for(const c of list){
@@ -454,6 +477,17 @@ async function refresh(){
  if(active&&!activeGroup){const fresh=state.conversations.find(c=>c.id===active.id);if(fresh?.status==='accepted')active=fresh;else{active=null;clearSubscription();$('private-layout').classList.remove('chat-open');$('chat-title').textContent='Escolha uma conversa';$('compose').hidden=true;$('block').hidden=true;}}
  if(activeGroup&&!state.isGroupMember){clearSubscription();await openGroupConversation();}
 }
+function mountInboxSections(){
+ const sidebar=$('sidebar-panel'),layout=$('private-layout'),search=$('conversation-search');
+ if(!sidebar||!layout||!search||$('inbox-panel'))return;
+ const heading=search.previousElementSibling.previousElementSibling;
+ const description=heading?.nextElementSibling;
+ if(!heading||!description)return;
+ const panel=document.createElement('section');panel.className='panel inbox-panel';panel.id='inbox-panel';
+ panel.append(heading,description,search,$('conversations'));
+ layout.insertBefore(panel,sidebar);
+}
+mountInboxSections();
 $('search').addEventListener('input',drawPeople);$('conversation-search').addEventListener('input',drawConversations);$('refresh').addEventListener('click',async()=>{try{await refresh();$('status').textContent='Lista atualizada.';}catch(e){$('status').textContent=e.message;}});
 $('compose').addEventListener('submit',async e=>{
  e.preventDefault();if(!active&&!activeGroup)return;
