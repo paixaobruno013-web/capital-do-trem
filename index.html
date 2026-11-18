@@ -2058,8 +2058,10 @@ async function saveOfflineMusic(id,blob,title){
   const BRANDING_CACHE_KEY='capitaldotrem_public_branding_cache_v1';
   let cachedBranding=null;
   try{const saved=localStorage.getItem(BRANDING_CACHE_KEY);if(saved){const parsed=JSON.parse(saved);if(parsed&&typeof parsed==='object')cachedBranding=parsed;}}catch{}
+  const skipOpeningAfterFilePicker=document.documentElement.classList.contains('intro-smoke-skip');
   const openingScreenAtBoot=document.getElementById('intro-smoke');
-  if(openingScreenAtBoot){openingScreenAtBoot.classList.add('custom-opening-screen');document.documentElement.classList.remove('intro-brand-pending');}
+  if(skipOpeningAfterFilePicker){openingScreenAtBoot?.remove();}
+  else if(openingScreenAtBoot){openingScreenAtBoot.classList.add('custom-opening-screen');document.documentElement.classList.remove('intro-brand-pending');}
   const brandingRequest=auth.getPublicBranding().then(value=>{try{localStorage.setItem(BRANDING_CACHE_KEY,JSON.stringify(value||{}));}catch{}return value||{};});
   // A identidade visual nunca pode bloquear a entrada no aplicativo: limita a espera do banco.
   const brandingTimeout=new Promise((_,reject)=>window.setTimeout(()=>reject(new Error('Tempo limite ao carregar identidade visual.')),4500));
@@ -2070,7 +2072,7 @@ async function saveOfflineMusic(id,blob,title){
   // Manter a URL estável permite reutilizar o arquivo já baixado e reduz espera/rede móvel.
   const currentOpeningImage=opening,currentOpeningVideo=openingVideo;
   if(profile){const logo=document.getElementById('site-logo');if(logo)logo.src=profile;}
-  if(opening&&!openingVideo){
+  if(!skipOpeningAfterFilePicker&&opening&&!openingVideo){
   const intro=document.querySelector('.intro-smoke__brand img'),screen=document.getElementById('intro-smoke');
   if(intro&&screen){
    intro.style.visibility='hidden';intro.src=currentOpeningImage;
@@ -2092,7 +2094,7 @@ async function saveOfflineMusic(id,blob,title){
    else{intro.addEventListener('load',()=>settleOpeningImage(false),{once:true});intro.addEventListener('error',()=>settleOpeningImage(true),{once:true});}
   }
  }
-   if(!opening&&!openingVideo){const fallback=document.querySelector('.intro-smoke__brand img');if(fallback)fallback.style.visibility='visible';const brand=document.querySelector('.intro-smoke__brand');if(brand){brand.style.visibility='visible';brand.style.opacity='1';brand.style.animation='none';}document.documentElement.classList.remove('intro-brand-pending');}
+   if(!skipOpeningAfterFilePicker&&!opening&&!openingVideo){const fallback=document.querySelector('.intro-smoke__brand img');if(fallback)fallback.style.visibility='visible';const brand=document.querySelector('.intro-smoke__brand');if(brand){brand.style.visibility='visible';brand.style.opacity='1';brand.style.animation='none';}document.documentElement.classList.remove('intro-brand-pending');}
    const headerBgUrl=safeUrl(branding.headerBackgroundImageUrl);
   const appHeader=document.querySelector('body>header');
   if(appHeader&&headerBgUrl){
@@ -2111,7 +2113,7 @@ async function saveOfflineMusic(id,blob,title){
    homeBanner.style.setProperty('--home-bg-fit',branding.homeBackgroundFit==='contain'?'contain':'cover');
    homeBanner.classList.add('has-custom-background');
   }
-   if(openingVideo){
+   if(!skipOpeningAfterFilePicker&&openingVideo){
    const screen=document.getElementById('intro-smoke');
    if(screen){
     const brand=document.querySelector('.intro-smoke__brand');
