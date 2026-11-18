@@ -277,6 +277,9 @@ if(view==='music'){
   return;
  }
  const songs=await api.getPublishedSongsForProfile(userId);
+ let viewerSession=null,viewerPlaylists=[];
+ try{viewerSession=await api.getCurrentSession();if(viewerSession?.user)viewerPlaylists=await api.getMyPlaylists()}catch(error){console.warn('Não foi possível carregar as playlists para este perfil.',error)}
+ const playlistStatus=document.createElement('p');playlistStatus.className='status';playlistStatus.setAttribute('role','status');playlistStatus.setAttribute('aria-live','polite');grid.append(playlistStatus);
  for(const song of songs){
   const card=document.createElement('article');card.className='song-card profile-song-card';
   const cover=document.createElement('div');cover.className='song-cover';
@@ -284,9 +287,29 @@ if(view==='music'){
   const title=document.createElement('strong');title.className='song-title';title.textContent=song.title;
   const artist=document.createElement('p');artist.className='muted song-artist';artist.textContent=[song.artist_name,song.producer_name].filter(Boolean).join(' • ');
   const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=song.audio_url;
-  card.append(cover,title,artist,audio);grid.append(card);
+  card.append(cover,title,artist,audio);
+  if(viewerSession?.user){
+   const add=document.createElement('button');add.type='button';add.className='btn alt';add.textContent='＋ Adicionar à minha playlist';add.disabled=!viewerPlaylists.length;
+   if(!viewerPlaylists.length)add.title='Crie uma playlist na área AQUI A MÚSICA NÃO PARA! primeiro';
+   add.addEventListener('click',async()=>{
+    if(!viewerPlaylists.length){playlistStatus.textContent='Você ainda não tem playlists. Crie uma na área AQUI A MÚSICA NÃO PARA! e volte aqui para adicionar esta faixa.';return}
+    const choices=viewerPlaylists.map((item,index)=>(index+1)+'. '+item.name).join('\\n');
+    const choice=prompt('Escolha a playlist para adicionar esta música:\\n'+choices+'\\nDigite o número:');
+    if(choice===null)return;
+    const selected=viewerPlaylists[Number(choice)-1];
+    if(!selected){playlistStatus.textContent='Escolha um número válido.';return}
+    add.disabled=true;
+    try{const added=await api.addSongToMyPlaylist(selected.id,song.id);playlistStatus.textContent=added?'Música adicionada à playlist “'+selected.name+'”.':'Esta música já está nessa playlist.'}
+    catch(error){playlistStatus.textContent=error.message||'Não foi possível adicionar a música.'}
+    finally{add.disabled=false}
+   });
+   card.append(add);
+  }else{
+   const login=document.createElement('a');login.className='btn alt';login.href='./conta.html';login.textContent='Entre para adicionar à playlist';card.append(login);
+  }
+  grid.append(card);
  }
- if(!grid.children.length)grid.innerHTML='<p class="empty">As músicas publicadas por este artista aparecerão aqui.</p>';
+ if(!songs.length)grid.innerHTML='<p class="empty">As músicas publicadas por este artista aparecerão aqui.</p>';
  return;
 }
 let postsQ;if(view==='likes'){const liked=await supabase.from('post_likes').select('post_id').eq('user_id',userId).order('created_at',{ascending:false}).limit(100);if(liked.error)throw liked.error;const ids=(liked.data||[]).map(x=>x.post_id);postsQ=ids.length?await supabase.from('posts').select('id,content,created_at').in('id',ids).eq('status','published'):{data:[],error:null};}else postsQ=await supabase.from('posts').select('id,content,created_at').eq('author_id',userId).eq('status','published').order('created_at',{ascending:false}).limit(60);if(postsQ.error)throw postsQ.error;const data=postsQ.data||[];const ids=data.map(x=>x.id);let media=[];if(ids.length){const q=await supabase.from('post_media').select('post_id,storage_path,media_type,bucket_id').in('post_id',ids).order('sort_order');if(q.error)throw q.error;media=q.data||[]}const visibleMedia=media.filter(m=>view==='videos'?m.media_type==='video':view==='photos'?m.media_type!=='video':true);const urls=await resolveMediaUrls(visibleMedia);const postMusic=await loadPostMusic(supabase,ids);grid.replaceChildren();const mediaByPost=new Map();for(const item of visibleMedia){const list=mediaByPost.get(item.post_id)||[];list.push(item);mediaByPost.set(item.post_id,list)}for(const post of data){const postMedia=mediaByPost.get(post.id)||[];if(!postMedia.length)continue;for(let index=0;index<postMedia.length;index++){const item=postMedia[index],url=urls.get((item.bucket_id||'capital-do-trem-social')+':'+item.storage_path)||'',isVideo=item.media_type==='video';const card=document.createElement('article');card.className='profile-post-card profile-media-tile';const el=document.createElement(isVideo?'video':'img');el.src=url;if(isVideo){el.controls=false;el.muted=true;el.preload='metadata';el.playsInline=true}else el.alt=post.content||'Publicação';makeProfilePostMediaOpenable(el,isVideo?'video':'image',post.content||(isVideo?'Vídeo da publicação':'Foto da publicação'),buildProfileMediaActions(post,item,index,url));const kind=document.createElement('span');kind.className='profile-media-kind'+(isVideo?' is-video':postMedia.length>1?' is-carousel':'');kind.textContent=isVideo?'▶':postMedia.length>1?'▣':'▧';card.append(el,kind);grid.append(card)}}if(!grid.children.length)grid.innerHTML='<p class="empty">'+(view==='likes'?'As publicações curtidas aparecerão aqui.':view==='videos'?'Seus vídeos publicados aparecerão aqui.':'Suas fotos aparecerão aqui.')+'</p>'}
@@ -356,7 +379,7 @@ function renderPendingSongs(items){
   save.onclick=async()=>{save.disabled=true;try{await api.updateMySong(song.id,{title:titleInput.value,artistName:artistInput.value,producerName:producerInput.value,description:descriptionInput.value});notice('global-status','Informações da música atualizadas!');await loadMyPendingSongs();await loadSongs()}catch(e){notice('global-status',e.message||'Não foi possível editar a música.')}finally{save.disabled=false}};
   edit.append(summary,titleInput,artistInput,producerInput,descriptionInput,save);
   const remove=document.createElement('button');remove.type='button';remove.className='btn alt';remove.textContent='🗑️ Excluir minha música';
-  remove.onclick=async()=>{if(!confirm('Excluir esta música do seu catálogo? Esta ação não pode ser desfeita.'))return;remove.disabled=true;try{await api.deleteMySong(song.id);notice('global-status','Sua música foi excluída.');await loadMyPendingSongs();await loadSongs()}catch(e){notice('global-status',e.message||'Não foi possível excluir a música.')}finally{remove.disabled=false}};
+  remove.onclick=async()=>{if(!confirm('Você deseja mesmo excluir esse arquivo?'))return;remove.disabled=true;try{await api.deleteMySong(song.id);notice('global-status','Sua música foi excluída.');await loadMyPendingSongs();await loadSongs()}catch(e){notice('global-status',e.message||'Não foi possível excluir a música.')}finally{remove.disabled=false}};
   card.append(cover,title,artist,status,note,edit,remove);root.append(card);
  }
  if(!root.children.length)root.innerHTML='<p class="empty">Você ainda não enviou músicas.</p>';
