@@ -1266,7 +1266,7 @@ export async function getPublicBranding() {
   const supabase = initSupabase();
   const { data, error } = await supabase.from('site_settings')
     .select('setting_key, setting_value')
-    .in('setting_key', ['official_profile_image_url', 'app_opening_image_url', 'app_opening_video_url', 'app_opening_video_muted', 'app_opening_video_volume', 'app_opening_x', 'app_opening_y', 'app_opening_fit', 'app_home_background_image_url', 'app_home_background_x', 'app_home_background_y', 'app_home_background_blur', 'app_home_background_fit', 'app_header_background_image_url', 'app_header_background_x', 'app_header_background_y', 'app_header_background_blur', 'app_header_background_fit']);
+    .in('setting_key', ['official_profile_image_url', 'app_opening_image_url', 'app_opening_video_url', 'app_opening_video_muted', 'app_opening_video_volume', 'app_opening_x', 'app_opening_y', 'app_opening_fit', 'app_home_background_image_url', 'app_home_background_x', 'app_home_background_y', 'app_home_background_blur', 'app_home_background_fit', 'app_header_background_image_url', 'app_header_background_x', 'app_header_background_y', 'app_header_background_blur', 'app_header_background_fit', 'app_music_cover_image_url', 'app_music_cover_x', 'app_music_cover_y', 'app_music_cover_fit']);
   if (error) throw error;
   const settings = Object.fromEntries((data || []).map(row => [row.setting_key, row.setting_value]));
   return {
@@ -1287,8 +1287,57 @@ export async function getPublicBranding() {
     headerBackgroundX: Number(settings.app_header_background_x ?? 50),
     headerBackgroundY: Number(settings.app_header_background_y ?? 50),
     headerBackgroundBlur: Number(settings.app_header_background_blur ?? 0),
-    headerBackgroundFit: settings.app_header_background_fit === 'contain' ? 'contain' : 'cover'
+    headerBackgroundFit: settings.app_header_background_fit === 'contain' ? 'contain' : 'cover',
+    musicCoverUrl: settings.app_music_cover_image_url || '',
+    musicCoverX: Number(settings.app_music_cover_x ?? 50),
+    musicCoverY: Number(settings.app_music_cover_y ?? 50),
+    musicCoverFit: settings.app_music_cover_fit === 'contain' ? 'contain' : 'cover'
   };
+}
+
+/* Capa independente da biblioteca musical: somente administradores podem publicar e ajustar. */
+export async function saveAdminMusicCover(file, options = {}) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode alterar a capa da área Músicas.');
+  if (!(file instanceof File)) throw new Error('Escolha uma imagem para a capa.');
+  const format = await getBrandingUploadFormat(file, { jpg: true, jpeg: true, png: true, webp: true });
+  if (file.size < 1 || file.size > 8 * 1024 * 1024) throw new Error('A capa deve ter até 8 MB.');
+  const path = user.id + '/branding/music-cover-' + crypto.randomUUID() + '.' + format.extension;
+  const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path, file, {
+    contentType: format.contentType, cacheControl: '3600', upsert: false
+  });
+  if (uploadError) throw uploadError;
+  const { data: publicData } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
+  if (!publicData?.publicUrl) throw new Error('Não foi possível gerar o endereço público da capa.');
+  const now = new Date().toISOString();
+  const clamp = value => Math.max(0, Math.min(100, Number(value ?? 50)));
+  const { error: saveError } = await supabase.from('site_settings').upsert([
+    { setting_key: 'app_music_cover_image_url', setting_value: publicData.publicUrl, updated_at: now },
+    { setting_key: 'app_music_cover_x', setting_value: String(clamp(options.x)), updated_at: now },
+    { setting_key: 'app_music_cover_y', setting_value: String(clamp(options.y)), updated_at: now },
+    { setting_key: 'app_music_cover_fit', setting_value: options.fit === 'contain' ? 'contain' : 'cover', updated_at: now }
+  ], { onConflict: 'setting_key' });
+  if (saveError) throw saveError;
+  return publicData.publicUrl;
+}
+
+export async function saveAdminMusicCoverSettings(options = {}) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente um administrador pode ajustar a capa da área Músicas.');
+  const clamp = value => Math.max(0, Math.min(100, Number(value ?? 50)));
+  const now = new Date().toISOString();
+  const rows = [
+    { setting_key: 'app_music_cover_x', setting_value: String(clamp(options.x)), updated_at: now },
+    { setting_key: 'app_music_cover_y', setting_value: String(clamp(options.y)), updated_at: now },
+    { setting_key: 'app_music_cover_fit', setting_value: options.fit === 'contain' ? 'contain' : 'cover', updated_at: now }
+  ];
+  const { error } = await supabase.from('site_settings').upsert(rows, { onConflict: 'setting_key' });
+  if (error) throw error;
+  return true;
 }
 
 
