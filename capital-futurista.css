@@ -597,3 +597,22 @@ body.music-page-active #musicas>.music-section-banner{margin-top:0!important}
  .my-uploaded-song-name{font-size:13px!important}
  .my-song-menu>summary{width:40px;height:40px;min-height:40px}
 }
+
+
+/* Central de Músicas — painel de envio alinhado à identidade preta, vermelha e branca. */
+#music-upload-area{margin:14px 0!important;padding:clamp(16px,3.5vw,24px)!important;border:1px solid rgba(237,28,36,.72)!important;border-radius:18px!important;background:radial-gradient(ellipse at 50% 0%,rgba(237,28,36,.16),transparent 62%),#070707!important;box-shadow:0 0 16px rgba(237,28,36,.22),inset 0 0 18px rgba(237,28,36,.06)!important}
+#music-upload-area .home-section-heading{align-items:flex-start;margin-bottom:14px}
+#music-upload-area .eyebrow{color:#ff4a54;font-weight:950;letter-spacing:2px}
+#music-upload-area h3{margin:4px 0;font-size:clamp(19px,4vw,24px);color:#fff}
+#music-upload-area .muted{color:#c9c9c9}
+#music-upload-area form{display:grid;gap:9px}
+#music-upload-area form[hidden]{display:none!important}
+#music-upload-area label{margin-top:5px;color:#fff;font-size:13px;font-weight:800}
+#music-upload-area input,#music-upload-area textarea{width:100%;min-width:0;padding:12px 13px;border:1px solid #3b3031;border-radius:11px;background:#111;color:#fff;font:inherit;outline:none}
+#music-upload-area input:focus,#music-upload-area textarea:focus{border-color:#ed1c24;box-shadow:0 0 0 3px #ed1c2428}
+#music-upload-area input[type=file]{padding:13px;border:1px dashed #ed1c24;background:#10090a;color:#fff}
+#music-upload-area input[type=file]::file-selector-button{margin:0 12px 0 0;padding:10px 13px;border:1px solid #ed1c24;border-radius:9px;background:#ed1c24;color:#fff;font-weight:850}
+#music-upload-submit{width:100%;min-height:50px;border:1px solid #ff5961;background:linear-gradient(110deg,#ed1c24,#a90d15);color:#fff;font-weight:950;letter-spacing:.2px;box-shadow:0 0 13px #ed1c2440}
+#music-upload-access{padding:12px 14px;border:1px solid #ed1c2455;border-radius:12px;background:#11090a;color:#fff}
+#music-upload-area~#my-uploaded-songs-panel{border:1px solid #3a2022;background:#090909}
+@media(max-width:520px){#music-upload-area{padding:15px!important}#music-upload-area input[type=file]::file-selector-button{display:block;margin:0 0 9px}}
