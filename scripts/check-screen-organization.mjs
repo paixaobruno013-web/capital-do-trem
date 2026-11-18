@@ -6,9 +6,10 @@ const [home, profile, profileScript, chat] = await Promise.all([
  readFile(new URL('../bate-papo.html', import.meta.url), 'utf8')
 ]);
 const discovery = home.match(/<section class="page" id="pesquisa">[\s\S]*?<section class="page" id="eventos">/)?.[0] || '';
+const musicArea = home.match(/<section class="page" id="musicas">[\s\S]*?<section class="page" id="pesquisa">/)?.[0] || '';
 const checks = [
  ['Feed social é a página inicial e aparece na navegação', /data-page="inicio"[^>]*>⌂ Feed/.test(home) && /id="home-community-feed"/.test(home)],
- ['mensagem de boas-vindas aparece na entrada', /SEJA BEM-VINDO, MAQUINISTA DESSE TREM!/.test(home)],
+ ['área Músicas usa a arte original compacta sem textos sobre a capa', musicArea.includes('./assets/banner-speakers.webp') && !musicArea.includes('SUA CAPA, SEU ESTILO') && !musicArea.includes('SEJA BEM-VINDO, MAQUINISTA DESSE TREM!')],
  ['vídeos de descoberta ficam na Pesquisa, não misturados ao Feed', /home-youtube/.test(discovery) && !/<section class="card home-youtube"/.test(home.slice(home.indexOf('<section class="page active" id="inicio">'),home.indexOf('<section class="page" id="musicas">')))],
  ['atalho de amizades fica no Chat, sem duplicação na tela inicial', /id="fazer-amigos"/.test(chat) && !/class="card home-friends"/.test(home)],
  ['perfil oferece abas separadas para fotos e vídeos', /data-profile-view="photos"[^>]*aria-label="Fotos"/.test(profile) && /data-profile-view="videos"[^>]*aria-label="Vídeos"/.test(profile)],
