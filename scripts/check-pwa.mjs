@@ -41,7 +41,7 @@ for (const entry of entries) {
 
 const manifestPath = join(root, 'www', 'manifest.webmanifest');
 const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
-const iconSizes = new Set((manifest.icons || []).flatMap(icon => (icon.sizes || '').split(/\\s+/)));
+const iconSizes = new Set((manifest.icons || []).flatMap(icon => (icon.sizes || '').split(/\s+/)));
 for (const size of ['192x192','512x512']) {
   if (!iconSizes.has(size)) throw new Error('O manifesto precisa oferecer ícones de ' + size + '.');
 }
