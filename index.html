@@ -1870,7 +1870,7 @@ async function saveOfflineMusic(id,blob,title){
     const actions=document.createElement('div');actions.className='social';
     const playList=document.createElement('button');playList.type='button';playList.className='btn alt';playList.textContent='▶ Ouvir playlist';playList.addEventListener('click',()=>{musicPlayer.setPlaylists(userPlaylists);const picker=document.querySelector('#capital-music-player .ct-player-playlist');if(picker){picker.value=playlist.id;picker.dispatchEvent(new Event('change'));}document.getElementById('capital-music-player')?.scrollIntoView({behavior:'smooth',block:'center'});});
     const rename=document.createElement('button');rename.type='button';rename.className='btn alt';rename.textContent='✏️ Renomear';rename.addEventListener('click',async()=>{const value=prompt('Novo nome da playlist:',playlist.name);if(value===null)return;try{await api.renameMyPlaylist(playlist.id,value);await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível renomear a playlist.';}});
-    const remove=document.createElement('button');remove.type='button';remove.className='btn alt';remove.textContent='🗑️ Excluir';remove.addEventListener('click',async()=>{if(!confirm('Excluir a playlist “'+playlist.name+'”? As músicas originais não serão apagadas.'))return;try{await api.deleteMyPlaylist(playlist.id);await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível excluir a playlist.';}});
+    const remove=document.createElement('button');remove.type='button';remove.className='btn alt';remove.textContent='Excluir';remove.classList.add('music-action-button','music-delete-button');remove.addEventListener('click',async()=>{if(!confirm('Excluir a playlist “'+playlist.name+'”? As músicas originais não serão apagadas.'))return;try{await api.deleteMyPlaylist(playlist.id);await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível excluir a playlist.';}});
     actions.append(playList,rename,remove);row.append(name,count,actions);
     const tracks=document.createElement('p');tracks.className='muted';tracks.textContent=(playlist.songs||[]).map(entry=>songs.find(song=>song.id===entry.song_id)?.title).filter(Boolean).join(' • ')||'Adicione faixas pelo catálogo abaixo.';
     row.append(tracks);playlistList.append(row);
@@ -2528,19 +2528,30 @@ async function refreshMyUploads(){
   for(const song of songs){
    const row=document.createElement('article');row.className='my-uploaded-song';
    const main=document.createElement('div');main.className='my-uploaded-song-main';
-   const name=document.createElement('strong');name.textContent=(song.artist_name||'Artista')+' — '+(song.title||'Música');
+   const name=document.createElement('strong');name.textContent=(song.artist_name||'Artista')+' — '+(song.title||'Música');name.className='my-uploaded-song-name';
    const state=document.createElement('span');state.className='muted';state.textContent=song.status==='published'?'Publicado no catálogo':song.status==='rejected'?'Reprovado':'Aguardando aprovação';
    main.append(name,state);
    if(song.audio_url){const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=song.audio_url;audio.setAttribute('aria-label','Reproduzir '+song.title);main.append(audio);}
    const actions=document.createElement('div');actions.className='my-uploaded-song-actions';
-   const edit=document.createElement('button');edit.type='button';edit.className='btn alt';edit.textContent='✏️ Editar';
-   edit.addEventListener('click',async()=>{
-    const title=prompt('Nome da música:',song.title||'');if(title===null)return;
-    const artistName=prompt('Nome do artista / MC / DJ:',song.artist_name||'');if(artistName===null)return;
-    edit.disabled=true;
-    try{await updateMySong(song.id,{title,artistName,producerName:song.producer_name||'',description:song.description||''});if(status)status.textContent='Nome da música e artista atualizados.';await refreshMyUploads();}
-    catch(error){if(status)status.textContent=error.message||'Não foi possível editar a música.';}
-    finally{edit.disabled=false;}
+   const edit=document.createElement('button');edit.type='button';edit.className='btn alt music-action-button';edit.innerHTML='<span aria-hidden="true">✎</span> Editar';
+   const editor=document.createElement('form');editor.className='my-song-editor';editor.hidden=true;
+   const titleLabel=document.createElement('label');titleLabel.textContent='Nome da música';
+   const titleInput=document.createElement('input');titleInput.type='text';titleInput.maxLength=120;titleInput.required=true;titleInput.value=song.title||'';titleInput.autocomplete='off';
+   const artistLabel=document.createElement('label');artistLabel.textContent='Nome do artista';
+   const artistInput=document.createElement('input');artistInput.type='text';artistInput.maxLength=100;artistInput.required=true;artistInput.value=song.artist_name||'';artistInput.autocomplete='off';
+   const editorActions=document.createElement('div');editorActions.className='my-song-editor-actions';
+   const save=document.createElement('button');save.type='submit';save.className='btn primary';save.textContent='Salvar alterações';
+   const cancel=document.createElement('button');cancel.type='button';cancel.className='btn alt';cancel.textContent='Cancelar';cancel.addEventListener('click',()=>{editor.hidden=true;edit.hidden=false;});
+   editorActions.append(save,cancel);editor.append(titleLabel,titleInput,artistLabel,artistInput,editorActions);
+   edit.addEventListener('click',()=>{editor.hidden=false;edit.hidden=true;titleInput.focus();});
+   editor.addEventListener('submit',async event=>{
+    event.preventDefault();
+    const title=titleInput.value.trim(),artistName=artistInput.value.trim();
+    if(!title||title.length>120){if(status)status.textContent='O nome da música deve ter entre 1 e 120 caracteres.';titleInput.focus();return;}
+    if(artistName.length<2||artistName.length>100){if(status)status.textContent='O nome do artista deve ter entre 2 e 100 caracteres.';artistInput.focus();return;}
+    save.disabled=true;save.textContent='Salvando…';
+    try{await updateMySong(song.id,{title,artistName,producerName:song.producer_name||'',description:song.description||''});if(status)status.textContent='Artista e nome da música atualizados com sucesso.';await refreshMyUploads();}
+    catch(error){if(status)status.textContent=error.message||'Não foi possível salvar. Se o erro for de permissão, o banco Supabase precisa receber a migração de edição de músicas.';save.disabled=false;save.textContent='Salvar alterações';}
    });
    const remove=document.createElement('button');remove.type='button';remove.className='btn alt';remove.textContent='🗑️ Excluir';
    remove.addEventListener('click',async()=>{
@@ -2549,7 +2560,7 @@ async function refreshMyUploads(){
     try{await deleteMySong(song.id);if(status)status.textContent='Arquivo de áudio excluído.';await refreshMyUploads();}
     catch(error){if(status)status.textContent=error.message||'Não foi possível excluir o arquivo.';remove.disabled=false;}
    });
-   actions.append(edit,remove);row.append(main,actions);list.append(row);
+   actions.append(edit,remove);row.append(main,actions,editor);list.append(row);
   }
  }catch(error){const p=document.createElement('p');p.className='muted';p.textContent=error.message||'Não foi possível carregar suas músicas.';list.append(p);}
 }
