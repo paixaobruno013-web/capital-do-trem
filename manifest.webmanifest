@@ -11,9 +11,9 @@
   "theme_color": "#ffffff",
   "icons": [
     {
-      "src": "./assets/capital-do-trem-logo.jpg",
-      "sizes": "96x96",
-      "type": "image/jpeg",
+      "src": "./assets/icon-only.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ],
@@ -25,28 +25,28 @@
       "short_name": "Minha conta",
       "description": "Acesse seu perfil no Capital do Trem.",
       "url": "./conta.html",
-      "icons": [{ "src": "./assets/capital-do-trem-logo.jpg", "sizes": "96x96", "type": "image/jpeg" }]
+      "icons": [{ "src": "./assets/icon-only.png", "sizes": "1024x1024", "type": "image/png" }]
     },
     {
       "name": "Capital do Trem",
       "short_name": "Capital do Trem",
       "description": "Abra o Capital do Trem e participe do Fala Trem, bate-papo da comunidade.",
       "url": "./bate-papo.html",
-      "icons": [{ "src": "./assets/capital-do-trem-logo.jpg", "sizes": "96x96", "type": "image/jpeg" }]
+      "icons": [{ "src": "./assets/icon-only.png", "sizes": "1024x1024", "type": "image/png" }]
     },
     {
       "name": "Meu avatar",
       "short_name": "Meu avatar",
       "description": "Personalize sua foto ou personagem no Capital do Trem.",
       "url": "./avatar.html",
-      "icons": [{ "src": "./assets/capital-do-trem-logo.jpg", "sizes": "96x96", "type": "image/jpeg" }]
+      "icons": [{ "src": "./assets/icon-only.png", "sizes": "1024x1024", "type": "image/png" }]
     },
     {
       "name": "Minhas conversas",
       "short_name": "Conversas",
       "description": "Acesse sua área de conversas privadas.",
       "url": "./mensagens.html",
-      "icons": [{ "src": "./assets/capital-do-trem-logo.jpg", "sizes": "96x96", "type": "image/jpeg" }]
+      "icons": [{ "src": "./assets/icon-only.png", "sizes": "1024x1024", "type": "image/png" }]
     }
   ]
 }
