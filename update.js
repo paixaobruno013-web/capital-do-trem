@@ -301,9 +301,18 @@
   recoveryShown=true;
   const notice=document.createElement('aside');
   notice.setAttribute('role','status');
-  notice.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(90px + env(safe-area-inset-bottom,0px));z-index:10003;max-width:520px;margin:auto;padding:13px 15px;border:1px solid #ed1c24;border-radius:12px;background:#111;color:#fff;font:600 14px/1.45 system-ui,sans-serif;box-shadow:0 8px 28px #0009';
-  notice.textContent='O Capital do Trem identificou uma instabilidade. Seus dados não serão apagados nem a tela será reiniciada automaticamente. Consulte Verificar sistema quando terminar sua atividade.';
+  notice.setAttribute('aria-live','polite');
+  notice.style.cssText='position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:12px;right:12px;z-index:10003;max-width:560px;margin:0 auto;padding:12px 14px;border:1px solid #ed1c24;border-radius:12px;background:#111;color:#fff;font:600 13px/1.45 system-ui,sans-serif;box-shadow:0 8px 28px #0009;display:flex;align-items:flex-start;gap:12px';
+  const message=document.createElement('span');
+  message.style.flex='1';
+  message.textContent='O Capital do Trem detectou uma falha técnica. Seus dados estão preservados. Você pode continuar usando o app; consulte Verificar sistema quando puder.';
+  const close=document.createElement('button');
+  close.type='button';close.textContent='×';close.setAttribute('aria-label','Fechar aviso');
+  close.style.cssText='flex:0 0 34px;width:34px;height:34px;min-height:34px;border:1px solid #ffffff33;border-radius:50%;background:#222;color:#fff;font-size:22px;line-height:1;cursor:pointer';
+  close.addEventListener('click',()=>notice.remove(),{once:true});
+  notice.append(message,close);
   document.body.append(notice);
+  window.setTimeout(()=>notice.remove(),10000);
  }
  window.addEventListener('error',event=>{
   if(event.target&&event.target!==window){
