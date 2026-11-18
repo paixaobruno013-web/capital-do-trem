@@ -543,3 +543,16 @@ input[type="file"]::file-selector-button:hover{box-shadow:0 0 18px rgba(237,28,3
  #musicas .music-section-banner,
  #musicas .music-section-banner img{height:220px!important}
 }
+
+
+/* Capa Músicas: arte original integral, em largura total da tela, sem deformar nem recortar. */
+#musicas .music-section-banner{
+ display:block!important;position:relative!important;left:50%!important;
+ width:100vw!important;max-width:100vw!important;height:auto!important;aspect-ratio:auto!important;
+ margin:0 0 14px -50vw!important;padding:0!important;overflow:hidden!important;
+ border:0!important;border-radius:0!important;box-shadow:none!important;background:#000!important;line-height:0!important;
+}
+#musicas .music-section-banner img{
+ display:block!important;width:100%!important;height:auto!important;max-height:none!important;aspect-ratio:auto!important;
+ object-fit:contain!important;object-position:center!important;background:#000!important;
+}
