@@ -616,3 +616,27 @@ body.music-page-active #musicas>.music-section-banner{margin-top:0!important}
 #music-upload-access{padding:12px 14px;border:1px solid #ed1c2455;border-radius:12px;background:#11090a;color:#fff}
 #music-upload-area~#my-uploaded-songs-panel{border:1px solid #3a2022;background:#090909}
 @media(max-width:520px){#music-upload-area{padding:15px!important}#music-upload-area input[type=file]::file-selector-button{display:block;margin:0 0 9px}}
+
+
+/* Feed composer — publicação com prévia real antes do envio. */
+.home-feed-composer{display:grid;gap:12px;padding:clamp(14px,3vw,22px);border:1px solid rgba(255,38,56,.34);border-radius:20px;background:linear-gradient(145deg,rgba(18,19,27,.94),rgba(5,6,10,.96));box-shadow:0 14px 38px rgba(0,0,0,.3),0 0 24px rgba(255,38,56,.08)}
+.home-feed-composer textarea{min-height:112px;margin:0;padding:15px;border-radius:14px;background:rgba(0,0,0,.42)!important;border-color:rgba(255,255,255,.14)!important;resize:vertical}
+.home-feed-compose-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.home-feed-pick,.home-feed-publish{display:inline-flex;align-items:center;justify-content:center;min-height:46px;border-radius:12px;font-weight:900}
+.home-feed-publish{margin-left:auto}
+.home-feed-preview{overflow:hidden;border:1px solid rgba(255,38,56,.32);border-radius:15px;background:#050609}
+.home-feed-preview[hidden]{display:none}
+.home-feed-preview-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 13px;color:#fff;font-size:11px;letter-spacing:1.2px}
+.home-feed-clear-media{min-height:34px;padding:6px 10px;border:1px solid rgba(255,255,255,.18);border-radius:9px;background:#171717;color:#fff;font-size:12px;font-weight:800}
+.home-feed-preview-stage{display:grid;place-items:center;min-height:100px;max-height:440px;overflow:hidden;background:#000}
+.home-feed-preview-media{display:block;width:100%;max-height:440px;object-fit:contain}
+.home-feed-caption-meta{display:flex;justify-content:space-between;gap:10px;color:#aeb4c1;font-size:11px}
+.home-feed-post{overflow:hidden;border:1px solid rgba(255,255,255,.1);border-radius:18px;background:linear-gradient(145deg,rgba(19,20,28,.95),rgba(7,8,12,.96));box-shadow:0 12px 34px rgba(0,0,0,.24)}
+.home-feed-post-head{padding:14px 15px}
+.home-feed-media{display:block;width:100%;max-height:620px;object-fit:contain;background:#000}
+.home-feed-post-text{padding:0 15px;white-space:pre-wrap;overflow-wrap:anywhere}
+.home-feed-actions{display:flex;gap:8px;flex-wrap:wrap;padding:12px 15px;border-top:1px solid rgba(255,255,255,.08)}
+.home-feed-actions button{min-height:38px;padding:7px 11px;border:1px solid rgba(255,255,255,.13);border-radius:10px;background:#12141b;color:#fff;font-weight:750}
+@media(max-width:520px){.home-feed-compose-actions{display:grid;grid-template-columns:1fr 1fr}.home-feed-compose-actions .muted{grid-column:1/-1;order:3;overflow-wrap:anywhere}.home-feed-publish{margin:0}.home-feed-pick,.home-feed-publish{width:100%;font-size:13px}.home-feed-preview-stage{max-height:340px}.home-feed-preview-media{max-height:340px}}
+body.light .home-feed-composer,body.light .home-feed-post{background:#fff;color:#111}
+body.light .home-feed-preview-top{color:#fff}
