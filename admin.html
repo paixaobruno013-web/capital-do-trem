@@ -629,18 +629,24 @@ async function loadQueue(){
     const title=node('h3','',item.title);
     const detail=node('p','muted',item.detail);
     const status=node('p','notice','Aguardando aprovação');
+    const preview=item.audio_url?document.createElement('audio'):null;
+    if(preview){preview.controls=true;preview.preload='none';preview.src=item.audio_url;preview.style.cssText='display:block;width:100%;margin:10px 0';preview.setAttribute('aria-label','Ouvir música enviada para aprovação');}
     const actions=node('div','actions');
     const approve=node('button','', 'Aprovar');
     const reject=node('button','secondary','Rejeitar');
     for(const [button,next] of [[approve,'published'],[reject,'rejected']]){
      button.addEventListener('click',async()=>{
-      if(next==='rejected'&&!window.confirm('Tem certeza de que deseja rejeitar este item?'))return;
+      let reason='';
+      if(next==='rejected'){
+       if(!window.confirm('Tem certeza de que deseja rejeitar este item?'))return;
+       if(kind==='songs'){reason=window.prompt('Informe o motivo da recusa:')||'';if(!reason.trim())return;}
+      }
       button.disabled=true;reject.disabled=true;approve.disabled=true;
-      try{await auth.moderateItem(kind,item.id,next);await loadQueue();}
+      try{await auth.moderateItem(kind,item.id,next,reason);await loadQueue();}
       catch(error){queueStatus.textContent=error?.message||'Não foi possível atualizar. Verifique as permissões do banco.';button.disabled=false;reject.disabled=false;approve.disabled=false;}
      });
     }
-    actions.append(approve,reject);card.append(title,detail,status,actions);queue.append(card);
+    actions.append(approve,reject);card.append(title,detail);if(preview)card.append(preview);card.append(status,actions);queue.append(card);
    }
   }
   queueStatus.textContent=count+' item(ns) aguardando análise.';
