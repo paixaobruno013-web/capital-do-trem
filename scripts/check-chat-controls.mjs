@@ -47,7 +47,7 @@ const checks = [
 
   ['configurações públicas da abertura ignoram cache HTTP antigo', auth.includes('/rest/v1/site_settings') && auth.includes("cache: 'no-store'") && auth.includes('Cache-Control')],
   ['vídeo de abertura usa URL estável para reaproveitar cache do arquivo enviado', home.includes('const currentOpeningImage=opening,currentOpeningVideo=openingVideo') && !home.includes('cdt_opening') && !home.includes('randomUUID')],
-  ['arte padrão antiga fica oculta até confirmar a mídia atual', home.includes('<img src="marca.svg" alt="" style="visibility:hidden">') && home.includes("if(opening&&!openingVideo)")],
+  ['arte padrão antiga fica oculta até confirmar a mídia atual', home.includes('<img src="marca.svg" alt="" style="visibility:hidden">') && home.includes("if(!skipOpeningAfterFilePicker&&opening&&!openingVideo)") && home.includes("if(!skipOpeningAfterFilePicker&&openingVideo)")],
   ['vídeo de abertura aparece sem poster ou logo extra durante o carregamento', home.includes("video.removeAttribute('poster')") && !home.includes('video.poster=') && home.includes("video.style.opacity='1'")],
   ['vídeo usa pré-carregamento e velocidade normal', home.includes("video.preload='auto'") && home.includes('video.playbackRate=1')],
   ['relógio de 10 segundos começa imediatamente e não espera o vídeo reproduzir', home.includes('beginOpeningClock();') && home.indexOf('beginOpeningClock();') < home.indexOf("video.addEventListener('loadeddata'") && !home.includes("video.addEventListener('playing',beginOpeningClock")],
