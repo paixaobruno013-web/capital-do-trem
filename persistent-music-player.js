@@ -23,9 +23,33 @@ body.ct-has-floating-player{padding-bottom:190px!important}
 body.light #capital-music-player.ct-player-persistent .ct-player-shell{background:rgba(255,255,255,.97);color:#111;border-color:#ed1c24;box-shadow:0 8px 28px #0002,0 0 18px rgba(237,28,36,.14)}
 @media(min-width:760px){#capital-music-player.ct-player-persistent{left:242px;right:16px;bottom:14px;max-width:720px}body.ct-has-floating-player{padding-bottom:24px!important}}
 @media(prefers-reduced-motion:reduce){#capital-music-player.ct-player-persistent .ct-player-shell{backdrop-filter:none;-webkit-backdrop-filter:none}}
+
+#capital-music-player.ct-player-persistent{touch-action:pan-y}
+#capital-music-player .ct-player-float-tools{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:12px;min-height:22px;order:-1}
+#capital-music-player .ct-player-drag-handle{width:52px;height:18px;border:0;border-radius:99px;background:transparent;display:grid;place-items:center;cursor:grab;touch-action:none;padding:0}
+#capital-music-player .ct-player-drag-handle:before{content:"";width:34px;height:4px;border-radius:9px;background:#aaa;box-shadow:0 0 7px rgba(237,28,36,.7)}
+#capital-music-player .ct-player-drag-handle:active{cursor:grabbing}
+#capital-music-player .ct-player-compact-toggle{border:1px solid rgba(237,28,36,.65);border-radius:99px;background:#160609;color:#fff;padding:3px 10px;min-height:25px;font-size:11px;font-weight:800}
+#capital-music-player.ct-player-compact .ct-player-shell{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"info controls" "tools tools";gap:4px 8px;padding:6px 9px;border-radius:12px}
+#capital-music-player.ct-player-compact .ct-player-stage{display:block!important}
+#capital-music-player.ct-player-compact .ct-player-eyebrow,
+#capital-music-player.ct-player-compact .ct-player-artist,
+#capital-music-player.ct-player-compact .ct-player-progress-wrap{display:none!important}
+#capital-music-player.ct-player-compact .ct-player-title{font-size:12px;margin:0}
+#capital-music-player.ct-player-compact .ct-player-controls{gap:4px}
+#capital-music-player.ct-player-compact .ct-player-controls button{display:none!important}
+#capital-music-player.ct-player-compact .ct-player-controls .ct-player-play,
+#capital-music-player.ct-player-compact .ct-player-controls .ct-player-fullscreen{display:grid!important;width:34px;height:34px;min-width:34px;min-height:34px}
+#capital-music-player.ct-player-compact .ct-player-float-tools{grid-area:tools;min-height:16px}
+#capital-music-player.ct-player-compact .ct-player-drag-handle{height:15px}
+#capital-music-player.ct-player-compact .ct-player-drag-handle:before{height:3px}
+#capital-music-player.ct-player-compact .ct-player-compact-toggle{min-height:22px;padding:1px 9px}
+#capital-music-player.ct-player-persistent.ct-player-fullscreen .ct-player-float-tools{display:none!important}
+@media(min-width:760px){#capital-music-player.ct-player-compact{max-width:330px}}
+
 `;
   function installStyle(){if(document.getElementById(STYLE_ID))return;const style=document.createElement('style');style.id=STYLE_ID;style.textContent=css;document.head.append(style)}
-  function mount(){const root=document.getElementById(ROOT_ID);if(!root)return;installStyle();if(root.parentElement!==document.body)document.body.append(root);root.classList.add('ct-player-persistent');const audio=root.querySelector('audio');if(!audio||wired.has(audio))return;wired.add(audio);const reveal=()=>{root.classList.add('ct-player-ready');document.body.classList.add('ct-has-floating-player')};audio.addEventListener('loadedmetadata',reveal);audio.addEventListener('play',reveal);audio.addEventListener('pause',reveal);if(audio.currentSrc||audio.src)reveal();}
+  function mount(){const root=document.getElementById(ROOT_ID);if(!root)return;installStyle();if(root.parentElement!==document.body)document.body.append(root);root.classList.add('ct-player-persistent');const shell=root.querySelector('.ct-player-shell');if(shell&&!shell.querySelector('.ct-player-float-tools')){const tools=document.createElement('div');tools.className='ct-player-float-tools';const drag=document.createElement('button');drag.type='button';drag.className='ct-player-drag-handle';drag.setAttribute('aria-label','Arrastar painel de música para cima ou para baixo');drag.title='Segure e arraste para mover';const compact=document.createElement('button');compact.type='button';compact.className='ct-player-compact-toggle';compact.textContent='− Compactar';compact.setAttribute('aria-pressed','false');compact.addEventListener('click',()=>{const active=root.classList.toggle('ct-player-compact');compact.textContent=active?'+ Expandir':'− Compactar';compact.setAttribute('aria-pressed',String(active))});tools.append(drag,compact);shell.prepend(tools);let saved=null;try{saved=JSON.parse(localStorage.getItem('ct-player-position')||'null')}catch{}if(saved&&Number.isFinite(saved.top)){root.style.top=Math.max(8,Math.min(innerHeight-90,saved.top))+'px';root.style.bottom='auto'}drag.addEventListener('pointerdown',event=>{if(root.classList.contains('ct-player-fullscreen'))return;event.preventDefault();drag.setPointerCapture?.(event.pointerId);const startY=event.clientY,rect=root.getBoundingClientRect(),startTop=rect.top;const move=e=>{const top=Math.max(8,Math.min(innerHeight-root.offsetHeight-8,startTop+e.clientY-startY));root.style.top=top+'px';root.style.bottom='auto'};const end=()=>{drag.removeEventListener('pointermove',move);drag.removeEventListener('pointerup',end);drag.removeEventListener('pointercancel',end);try{localStorage.setItem('ct-player-position',JSON.stringify({top:root.getBoundingClientRect().top}))}catch{}};drag.addEventListener('pointermove',move);drag.addEventListener('pointerup',end);drag.addEventListener('pointercancel',end)});}const audio=root.querySelector('audio');if(!audio||wired.has(audio))return;wired.add(audio);const reveal=()=>{root.classList.add('ct-player-ready');document.body.classList.add('ct-has-floating-player')};audio.addEventListener('loadedmetadata',reveal);audio.addEventListener('play',reveal);audio.addEventListener('pause',reveal);if(audio.currentSrc||audio.src)reveal();}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
   const observer=new MutationObserver(mount);observer.observe(document.documentElement,{childList:true,subtree:true});
 })();
