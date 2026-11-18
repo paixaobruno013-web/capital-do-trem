@@ -493,6 +493,45 @@ drop policy if exists "songs_delete_own_pending_admin" on public.songs;
 create policy "songs_delete_own_pending_admin" on public.songs
   for delete to authenticated
   using ((user_id=(select auth.uid()) and status='pending') or (select private.is_admin()));
+-- Proprietários podem corrigir metadados, mas nunca alterar estado, arquivo ou auditoria.
+create or replace function private.protect_song_owner_metadata_update()
+returns trigger language plpgsql security invoker set search_path = ''
+as $
+begin
+  if (select auth.uid()) = old.user_id and not (select private.is_admin()) then
+    if new.id is distinct from old.id
+       or new.user_id is distinct from old.user_id
+       or new.status is distinct from old.status
+       or new.storage_path is distinct from old.storage_path
+       or new.mime_type is distinct from old.mime_type
+       or new.file_size is distinct from old.file_size
+       or new.created_at is distinct from old.created_at
+       or new.rights_confirmed_at is distinct from old.rights_confirmed_at
+       or new.moderated_at is distinct from old.moderated_at
+       or new.moderated_by is distinct from old.moderated_by
+       or new.moderation_note is distinct from old.moderation_note then
+      raise exception 'Somente a equipe pode alterar o status, o arquivo e os dados de auditoria.';
+    end if;
+  end if;
+  return new;
+end;
+$;
+revoke all on function private.protect_song_owner_metadata_update() from public, anon, authenticated;
+drop trigger if exists songs_protect_owner_metadata_update on public.songs;
+create trigger songs_protect_owner_metadata_update
+before update on public.songs
+for each row execute function private.protect_song_owner_metadata_update();
+
+
+drop policy if exists songs_update_own_or_admin on public.songs;
+create policy songs_update_own_or_admin on public.songs
+for update to authenticated
+using (user_id = (select auth.uid()) or (select private.is_admin()))
+with check (user_id = (select auth.uid()) or (select private.is_admin()));
+drop policy if exists songs_delete_own_or_admin on public.songs;
+create policy songs_delete_own_or_admin on public.songs
+for delete to authenticated
+using (user_id = (select auth.uid()) or (select private.is_admin()));
 
 insert into storage.buckets (id,name,public,file_size_limit,allowed_mime_types)
 values ('capital-do-trem-audio','capital-do-trem-audio',false,52428800,
