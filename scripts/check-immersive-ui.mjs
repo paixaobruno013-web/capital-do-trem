@@ -8,7 +8,7 @@ const [home,rede,chat,account,redeJs,player,css,prepare,sw,auth]=await Promise.a
 ]);
 const checks=[
  [home.includes('id="capital-music-player"')&&home.includes("createCapitalMusicPlayer('capital-music-player'"),'Central de músicas tem player 3D integrado'],
- [home.includes('Abrir reprodutor ampliado')&&home.includes('musicPlayer.playSong(song)')&&home.includes("querySelector('.ct-player-fullscreen')?.click()"),'Catálogo e biblioteca iniciam o player unificado'],
+ [home.includes('music-play-button')&&home.includes('musicPlayer.playSong(song)')&&home.includes("querySelector('.ct-player-fullscreen')?.click()"),'Catálogo e biblioteca iniciam o player unificado'],
  [rede.includes('id="rede-music-player"')&&redeJs.includes("createCapitalMusicPlayer('rede-music-player'"),'Rede social tem player 3D integrado'],
  [redeJs.includes('musicPlayer.playSong(song)'),'Faixas da rede social usam os controles do player'],
  [chat.includes('id="chat-topics"')&&chat.includes('Grupo CAPITAL DO TREM')&&!chat.includes('id="fala-uai-player"'),'Chat permanece dedicado às conversas e ao grupo CAPITAL DO TREM'],
@@ -24,6 +24,12 @@ const checks=[
  [home.includes('capital-futurista.css')&&rede.includes('capital-futurista.css')&&chat.includes('capital-futurista.css')&&account.includes('capital-futurista.css'),'Todas as quatro áreas carregam a identidade visual'],
  [prepare.includes("'capital-music-player.js'")&&sw.includes("'./capital-music-player.js'"),'Player é incluído nos pacotes nativos e cache PWA']
 ];
+checks.push(
+ [home.includes('music-catalog-panel')&&home.includes('id="published-song-catalog"')&&home.includes('id="create-music-playlist"'),'Catálogo musical aparece no início da área Músicas com criação de playlist'],
+ [home.includes('music-add-to-playlist')&&home.includes("addToPlaylist.textContent='＋'")&&home.includes("listen.textContent='▶'"),'Cada faixa oferece botões compactos de tocar e adicionar à playlist'],
+ [css.includes('object-fit:contain!important')&&css.includes('max-height:205px'),'Capa musical preserva a arte inteira em tamanho compacto'],
+ [home.includes('music-upload-disclosure')&&home.includes('music-upload-title')&&home.includes('music-upload-artist'),'Envio de música fica discreto e mantém os campos de identificação']
+);
 for(const [ok,label] of checks){console.log((ok?'OK  ':'ERRO ')+label);if(!ok)process.exitCode=1;}
 for(const [name,source] of [['rede.js',redeJs],['capital-music-player.js',player]]){
  const result=spawnSync(process.execPath,['--check','--input-type=module'],{input:source,encoding:'utf8'});

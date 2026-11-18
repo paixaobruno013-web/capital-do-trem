@@ -73,7 +73,7 @@ if (area && preview && empty && controls && fileInput && xInput && yInput && fit
       temporaryPreviewUrl = '';
       status.textContent = 'Capa publicada na área Músicas!';
     } catch (error) {
-      status.textContent = error?.message || 'Não foi possível publicar a capa. Tente novamente.';
+      status.textContent = error?.message || 'Não foi possível publicar a capa. Confira sua conexão e se a atualização de permissões do sistema já foi aplicada.';
     } finally {
       uploadButton.disabled = false;
       saveButton.disabled = false;
@@ -102,7 +102,7 @@ if (area && preview && empty && controls && fileInput && xInput && yInput && fit
       const [branding, admin] = await Promise.all([getPublicBranding(), isCurrentUserAdmin()]);
       xInput.value = String(branding.musicCoverX ?? 50);
       yInput.value = String(branding.musicCoverY ?? 50);
-      fitInput.value = branding.musicCoverFit === 'contain' ? 'contain' : 'cover';
+      fitInput.value = branding.musicCoverFit === 'cover' ? 'cover' : 'contain';
       showCover(branding.musicCoverUrl);
       controls.hidden = !admin;
       area.hidden = !admin && !branding.musicCoverUrl;
