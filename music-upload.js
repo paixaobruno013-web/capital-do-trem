@@ -35,14 +35,11 @@ if (form && access && status && fileInput && submit) {
   form.addEventListener('submit', async event => {
     event.preventDefault();
     const file = fileInput.files?.[0];
-    if (!$('music-upload-rights')?.checked) {
-      status.textContent = 'Confirme que você tem os direitos ou autorização necessários para disponibilizar esta música.';
-      return;
-    }
     if (!file) {
       status.textContent = 'Escolha um arquivo de áudio primeiro.';
       return;
     }
+    if (submit.disabled) return;
     submit.disabled = true;
     status.textContent = 'Enviando sua música…';
     try {
@@ -51,8 +48,7 @@ if (form && access && status && fileInput && submit) {
         title: $('music-upload-title').value,
         artistName: $('music-upload-artist').value,
         producerName: $('music-upload-producer').value,
-        description: $('music-upload-description').value,
-        rightsConfirmed: $('music-upload-rights').checked
+        description: $('music-upload-description').value
       });
       form.reset();
       status.textContent = song.status === 'published'
