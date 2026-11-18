@@ -50,7 +50,9 @@ if (form && access && status && fileInput && submit) {
         description: $('music-upload-description').value
       });
       form.reset();
-      status.textContent = 'Música publicada no catálogo! Ela também ficará vinculada ao seu perfil.';
+      status.textContent = song.status === 'published'
+        ? 'Música publicada no catálogo!'
+        : 'Música enviada! Ela ficará aguardando aprovação do administrador antes de aparecer no catálogo.';
       window.dispatchEvent(new CustomEvent('capital-do-trem:song-published', { detail: song }));
     } catch (error) {
       status.textContent = error?.message || 'Não foi possível enviar a música. Confira o arquivo e tente novamente.';
