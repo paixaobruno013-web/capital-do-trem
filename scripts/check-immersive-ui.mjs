@@ -28,8 +28,7 @@ checks.push(
  [home.includes('music-catalog-panel')&&home.includes('id="published-song-catalog"')&&home.includes('id="create-music-playlist"'),'Catálogo musical aparece no início da área Músicas com criação de playlist'],
  [home.includes('music-add-to-playlist')&&home.includes("addToPlaylist.textContent='＋'")&&home.includes("listen.textContent='▶'"),'Cada faixa oferece botões compactos de tocar e adicionar à playlist'],
  [css.includes('object-fit:contain!important')&&css.includes('max-height:205px'),'Capa musical preserva a arte inteira em tamanho compacto'],
- [home.includes('music-upload-disclosure')&&home.includes('music-upload-title')&&home.includes('music-upload-artist'),'Envio de música fica discreto e mantém os campos de identificação'],
- ['supabase/migrations/20261118150000_admin_music_cover_storage_policy.sql'].length===1,'Migração de permissão para capa musical está referenciada no pacote'
+ [home.includes('music-upload-disclosure')&&home.includes('music-upload-title')&&home.includes('music-upload-artist'),'Envio de música fica discreto e mantém os campos de identificação']
 );
 for(const [ok,label] of checks){console.log((ok?'OK  ':'ERRO ')+label);if(!ok)process.exitCode=1;}
 for(const [name,source] of [['rede.js',redeJs],['capital-music-player.js',player]]){
