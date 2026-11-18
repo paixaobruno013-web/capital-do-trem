@@ -2283,9 +2283,9 @@ export async function updateMySong(songId, { title, artistName, producerName = '
   const cleanArtist = String(artistName || '').trim();
   const cleanProducer = String(producerName || '').trim();
   const cleanDescription = String(description || '').trim();
-  if (!cleanTitle || cleanTitle.length > 120 || !cleanArtist || cleanArtist.length > 100 || cleanProducer.length > 100 || cleanDescription.length > 1000) {
-    throw new Error('Confira os campos da música antes de salvar.');
-  }
+  if (!cleanTitle || cleanTitle.length > 120) throw new Error(`O nome da música deve ter entre 1 e 120 caracteres. Você digitou ${cleanTitle.length}.`);
+  if (!cleanArtist || cleanArtist.length > 100) throw new Error('O nome do artista deve ter entre 1 e 100 caracteres.');
+  if (cleanProducer.length > 100 || cleanDescription.length > 1000) throw new Error('Confira os campos opcionais antes de salvar.');
   const { data, error } = await supabase.from('songs').update({
     title: cleanTitle, artist_name: cleanArtist, producer_name: cleanProducer, description: cleanDescription
   }).eq('id', songId).eq('user_id', user.id)
