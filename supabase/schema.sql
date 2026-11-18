@@ -461,23 +461,22 @@ create policy "songs_read_published_owner_admin" on public.songs
 drop policy if exists "songs_insert_own_pending" on public.songs;
 drop policy if exists "songs_insert_admin_only" on public.songs;
 drop policy if exists "songs_insert_artist_or_admin" on public.songs;
+drop policy if exists "songs_insert_admin_or_artist" on public.songs;
+drop policy if exists "songs_insert_artist_published_or_admin" on public.songs;
 drop policy if exists "songs_insert_artist_pending_or_admin" on public.songs;
-create policy "songs_insert_artist_published_or_admin" on public.songs
+create policy "songs_insert_artist_pending_or_admin" on public.songs
   for insert to authenticated
   with check (
     user_id = (select auth.uid())
     and (
-      (
-        status = 'published'
+      ((select private.is_admin()) and status = 'published')
+      or (
+        status = 'pending'
         and exists (
           select 1 from public.profiles p
           where p.user_id = (select auth.uid()) and p.account_type = 'artist'
         )
-        and exists (
-          select 1 from public.artists a where a.user_id = (select auth.uid())
-        )
       )
-      or (select private.is_admin())
     )
   );
 drop policy if exists "songs_update_own_pending_admin" on public.songs;
