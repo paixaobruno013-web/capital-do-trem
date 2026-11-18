@@ -1,4 +1,4 @@
-import { getCurrentSession, bootstrapFirstAdmin, isCurrentUserArtistOrAdmin, uploadMySong } from './supabase/auth.js';
+import { getCurrentSession, isCurrentUserArtistOrAdmin, uploadMySong } from './supabase/auth.js';
 
 const $ = id => document.getElementById(id);
 const form = $('music-upload-form');
