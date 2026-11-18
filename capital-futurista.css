@@ -451,3 +451,5 @@ body.ct-player-fullscreen-open.ct-has-floating-player{padding-bottom:0!important
 #music-cover-status{min-height:1.3em;margin:8px 0 0}
 header .logo{object-fit:contain;object-position:center;background:#fff;border-radius:0;padding:3px;box-shadow:0 0 18px rgba(237,28,36,.18)}
 @media(max-width:480px){.music-cover-adjustments{grid-template-columns:1fr}.music-cover-area{padding:11px}}
+
+.music-cover-welcome{margin:10px 4px 0;text-align:center;font-size:clamp(11px,2.8vw,14px);font-weight:900;letter-spacing:1.1px;color:#fff;text-shadow:0 0 12px rgba(237,28,36,.48)}
