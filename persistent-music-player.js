@@ -37,6 +37,7 @@
 #capital-music-player.ct-player-persistent.ct-player-compact .ct-player-controls{gap:6px}
 #capital-music-player.ct-player-persistent.ct-player-compact .ct-player-controls .ct-player-play{width:34px;height:34px;min-width:34px;min-height:34px}
 #capital-music-player.ct-player-persistent.ct-player-compact .ct-player-compact-toggle{width:28px;height:28px;min-width:28px;min-height:28px}
+#capital-music-player .ct-art-mini-logo{position:absolute;z-index:6;top:9%;right:9%;width:clamp(24px,6vw,38px);height:clamp(24px,6vw,38px);object-fit:contain;padding:3px;border:1px solid hsla(var(--art-hue,345),100%,78%,.8);border-radius:8px;background:rgba(0,0,0,.62);filter:drop-shadow(0 0 5px hsl(var(--art-hue,345) 100% 60% / .95))}
 #capital-music-player.ct-player-persistent .ct-player-art-wrap::after{content:"";position:absolute;inset:6%;z-index:5;pointer-events:none;border:2px solid hsl(var(--art-hue,345) 100% 64% / .95);border-radius:23px;box-shadow:0 0 7px hsl(var(--art-hue,345) 100% 60% / .9),0 0 17px hsl(var(--art-hue,345) 100% 55% / .65),0 0 34px hsl(var(--art-hue,345) 100% 55% / .42),inset 0 0 12px hsl(var(--art-hue,345) 100% 60% / .2);animation:ct-player-logo-halo 2.4s ease-in-out infinite alternate}
 @keyframes ct-player-logo-halo{from{opacity:.68;filter:brightness(.9)}to{opacity:1;filter:brightness(1.25)}}
 @media(prefers-reduced-motion:reduce){#capital-music-player.ct-player-persistent .ct-player-art-wrap::after{animation:none}}
