@@ -421,6 +421,10 @@ create table if not exists public.songs (
   mime_type text not null check (mime_type in ('audio/mpeg','audio/mp4','audio/aac','audio/wav','audio/ogg','audio/x-wav')),
   file_size bigint not null check (file_size > 0 and file_size <= 52428800),
   status text not null default 'pending' check (status in ('pending','published','rejected')),
+  rights_confirmed_at timestamptz,
+  moderated_at timestamptz,
+  moderated_by uuid references auth.users(id) on delete set null,
+  moderation_note text not null default '',
   created_at timestamptz not null default now()
 );
 alter table public.events
@@ -468,6 +472,7 @@ create policy "songs_insert_artist_pending_or_admin" on public.songs
   for insert to authenticated
   with check (
     user_id = (select auth.uid())
+    and rights_confirmed_at is not null
     and (
       ((select private.is_admin()) and status = 'published')
       or (
@@ -504,14 +509,9 @@ create policy "audio_upload_artist_own_folder_or_admin" on storage.objects
     and (storage.foldername(name))[1] = (select auth.uid())::text
     and (
       (select private.is_admin())
-      or (
-        exists (
-          select 1 from public.profiles p
-          where p.user_id = (select auth.uid()) and p.account_type = 'artist'
-        )
-        and exists (
-          select 1 from public.artists a where a.user_id = (select auth.uid())
-        )
+      or exists (
+        select 1 from public.profiles p
+        where p.user_id = (select auth.uid()) and p.account_type = 'artist'
       )
     )
   );
