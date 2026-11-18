@@ -35,6 +35,10 @@ if (form && access && status && fileInput && submit) {
   form.addEventListener('submit', async event => {
     event.preventDefault();
     const file = fileInput.files?.[0];
+    if (!$('music-upload-rights')?.checked) {
+      status.textContent = 'Confirme que você tem os direitos ou autorização necessários para disponibilizar esta música.';
+      return;
+    }
     if (!file) {
       status.textContent = 'Escolha um arquivo de áudio primeiro.';
       return;
@@ -47,10 +51,13 @@ if (form && access && status && fileInput && submit) {
         title: $('music-upload-title').value,
         artistName: $('music-upload-artist').value,
         producerName: $('music-upload-producer').value,
-        description: $('music-upload-description').value
+        description: $('music-upload-description').value,
+        rightsConfirmed: $('music-upload-rights').checked
       });
       form.reset();
-      status.textContent = 'Música publicada no catálogo! Ela também ficará vinculada ao seu perfil.';
+      status.textContent = song.status === 'published'
+        ? 'Música publicada no catálogo!'
+        : 'Música enviada! Ela ficará aguardando aprovação do administrador antes de aparecer no catálogo.';
       window.dispatchEvent(new CustomEvent('capital-do-trem:song-published', { detail: song }));
     } catch (error) {
       status.textContent = error?.message || 'Não foi possível enviar a música. Confira o arquivo e tente novamente.';

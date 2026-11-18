@@ -425,23 +425,43 @@ export async function getModerationQueue() {
     supabase.from('artists').select('id, artist_name, style, city, bio, status, created_at').eq('status','pending').order('created_at',{ascending:true}),
     supabase.from('events').select('id, title, event_date, event_time, address, category, description, status, created_at').eq('status','pending').order('created_at',{ascending:true}),
     supabase.from('posts').select('id, content, status, created_at').eq('status','pending').order('created_at',{ascending:true}),
-    supabase.from('songs').select('id,title,artist_name,producer_name,description,status,created_at').eq('status','pending').order('created_at',{ascending:true})
+    supabase.from('songs').select('id,title,artist_name,producer_name,description,status,created_at,storage_path,rights_confirmed_at').eq('status','pending').order('created_at',{ascending:true})
   ]);
   for (const result of [artists,events,posts,songs]) if (result.error) throw result.error;
+  const pendingSongs=songs.data||[];
+  const paths=pendingSongs.map(item=>item.storage_path).filter(Boolean);
+  let audioUrls=new Map();
+  if(paths.length){
+    const {data:signed,error}=await supabase.storage.from('capital-do-trem-audio').createSignedUrls(paths,60*60);
+    if(error)throw error;
+    audioUrls=new Map((signed||[]).map(item=>[item.path,item.signedUrl]));
+  }
   return {
     artists: (artists.data||[]).map(item=>({id:item.id,title:item.artist_name,detail:[item.style,item.city,item.bio].filter(Boolean).join(' • ')})),
     events: (events.data||[]).map(item=>({id:item.id,title:item.title,detail:[item.category,item.event_date,item.event_time,item.address,item.description].filter(Boolean).join(' • ')})),
     posts: (posts.data||[]).map(item=>({id:item.id,title:'Divulgação da comunidade',detail:item.content})),
-    songs: (songs.data||[]).map(item=>({id:item.id,title:item.title,detail:[item.artist_name,item.producer_name?'Produção: '+item.producer_name:'',item.description].filter(Boolean).join(' • ')}))
+    songs: pendingSongs.map(item=>({id:item.id,title:item.title,detail:[item.artist_name,item.producer_name?'Produção: '+item.producer_name:'',item.description,'Direitos declarados: '+(item.rights_confirmed_at?'sim':'não')].filter(Boolean).join(' • '),audio_url:audioUrls.get(item.storage_path)||null,created_at:item.created_at}))
   };
 }
 
-export async function moderateItem(table, id, status) {
+export async function moderateItem(table, id, status, reason = '') {
   const allowedTables = ['artists','events','posts','songs'];
   if (!allowedTables.includes(table)) throw new Error('Tipo de publicação inválido.');
   if (!['published','rejected'].includes(status)) throw new Error('Ação de moderação inválida.');
   const supabase = initSupabase();
   if (!(await isCurrentUserAdmin())) throw new Error('Acesso administrativo não autorizado.');
+  if (table === 'songs') {
+    const {data:{user},error:userError}=await supabase.auth.getUser();
+    if(userError)throw userError;
+    const cleanReason=String(reason||'').trim();
+    if(status==='rejected'&&!cleanReason)throw new Error('Informe o motivo da recusa.');
+    const {error}=await supabase.from('songs').update({
+      status,moderated_at:new Date().toISOString(),moderated_by:user.id,
+      moderation_note:status==='rejected'?cleanReason:''
+    }).eq('id',id);
+    if(error)throw error;
+    return;
+  }
   const { error } = await supabase.from(table).update({status}).eq('id',id);
   if (error) throw error;
 }
@@ -460,12 +480,12 @@ export async function isCurrentUserArtistOrAdmin() {
   return data?.account_type === 'artist';
 }
 
-export async function uploadMySong({ file, title, artistName, producerName = '', description = '' }) {
+export async function uploadMySong({ file, title, artistName, producerName = '', description = '', rightsConfirmed = false }) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para enviar uma música.');
-  // Artistas com ficha própria publicam diretamente no catálogo; a equipe não precisa aprovar cada envio.
+  // MCs/DJs enviam para revisão; somente o administrador publica diretamente.
   const isAdmin = await isCurrentUserAdmin();
   if (!isAdmin) {
     const { data: accountProfile, error: accountError } = await supabase.from('profiles')
@@ -473,6 +493,7 @@ export async function uploadMySong({ file, title, artistName, producerName = '',
     if (accountError) throw accountError;
     if (accountProfile?.account_type !== 'artist') throw new Error('Somente contas Artista / DJ podem publicar músicas.');
   }
+  if (rightsConfirmed !== true) throw new Error('Confirme que você tem autorização para disponibilizar esta música.');
   if (!(file instanceof File)) throw new Error('Selecione um arquivo de áudio.');
   // Alguns seletores de arquivo do Android informam aliases ou MIME genérico.
   // Aceita MIME conhecido ou extensão de áudio permitida e grava sempre o MIME canônico.
@@ -502,7 +523,7 @@ export async function uploadMySong({ file, title, artistName, producerName = '',
   if (uploadError) throw uploadError;
   const { data, error } = await supabase.from('songs').insert({
     user_id:user.id,title:cleanTitle,artist_name:cleanArtist,producer_name:cleanProducer,description:cleanDescription,
-    storage_path:path,mime_type:canonicalMime,file_size:file.size,status:'published'
+    storage_path:path,mime_type:canonicalMime,file_size:file.size,status:isAdmin?'published':'pending',rights_confirmed_at:new Date().toISOString()
   }).select('id,title,artist_name,producer_name,status,created_at').single();
   if (error) {
     await supabase.storage.from('capital-do-trem-audio').remove([path]);
