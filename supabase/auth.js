@@ -537,10 +537,21 @@ export async function getMySongs() {
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para consultar suas músicas.');
   const { data, error } = await supabase.from('songs')
-    .select('id,title,artist_name,producer_name,description,status,created_at')
+    .select('id,title,artist_name,producer_name,description,status,created_at,storage_path')
     .eq('user_id',user.id).order('created_at',{ascending:false});
   if (error) throw error;
-  return data || [];
+  const songs = data || [];
+  if (!songs.length) return [];
+  const paths = songs.map(song => song.storage_path).filter(Boolean);
+  const { data: signed, error: signedError } = paths.length
+    ? await supabase.storage.from('capital-do-trem-audio').createSignedUrls(paths, 60 * 60)
+    : { data: [], error: null };
+  if (signedError) throw signedError;
+  const urls = new Map((signed || []).map(item => [item.path, item.signedUrl]));
+  return songs.map(song => ({
+    ...song,
+    audio_url: song.storage_path ? (urls.get(song.storage_path) || '') : ''
+  }));
 }
 
 
