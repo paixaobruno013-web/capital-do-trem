@@ -7,6 +7,21 @@ const matches = [...serviceWorker.matchAll(/const\s+(?:CORE_FILES|OPTIONAL_FILES
 if (matches.length === 0) throw new Error('Não foi possível localizar as listas CORE_FILES/OPTIONAL_FILES do service worker.');
 
 const entries = matches.flatMap((match) => [...match[1].matchAll(/(['"])(.*?)\1/g)].map((item) => item[2]));
+const coreEntries = [...matches[0][1].matchAll(/(['"])(.*?)\1/g)].map((item) => item[2]);
+for (const entry of coreEntries) {
+  if (/^(https?:)?\/\//i.test(entry)) continue;
+  const pathname = decodeURIComponent(entry.split(/[?#]/, 1)[0]);
+  const relative = pathname === './' || pathname === '.' ? 'index.html' : pathname.replace(/^\.\//, '');
+  const target = resolve(root, relative);
+  if (!target.startsWith(resolve(root) + '/') && target !== resolve(root)) {
+    throw new Error('Caminho fora da raiz no cache principal: ' + entry);
+  }
+  try {
+    await access(target);
+  } catch {
+    throw new Error('Arquivo principal do service worker ausente na publicação pública: ' + entry);
+  }
+}
 if (entries.length === 0) throw new Error('As listas de arquivos pré-armazenados estão vazias.');
 
 for (const entry of entries) {
@@ -37,6 +52,12 @@ for (const icon of manifest.icons) {
     }
     continue;
   }
+  const rootIconPath = resolve(root, decodeURIComponent(icon.src.split(/[?#]/, 1)[0]));
+  try {
+    await access(rootIconPath);
+  } catch {
+    throw new Error('Ícone do manifesto não está disponível na raiz publicada: ' + icon.src);
+  }
   if (/^(?:data:|\/\/)/i.test(icon.src)) throw new Error('Origem de ícone não permitida: ' + icon.src);
   const iconPath = resolve(dirname(manifestPath), decodeURIComponent(icon.src.split(/[?#]/, 1)[0]));
   try {
@@ -44,6 +65,7 @@ for (const icon of manifest.icons) {
   } catch {
     throw new Error('Ícone do manifesto não encontrado no pacote: ' + icon.src);
   }
+}
 }
 
 console.log('PWA aprovado: ' + entries.length + ' arquivos de pré-cache e ' + manifest.icons.length + ' ícone(s) do manifesto conferidos.');
