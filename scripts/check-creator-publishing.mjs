@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [home, story, eventComposer, account, auth, musicUpload, uploadPolicy, prepare, eventPolicy, songPolicy, directSongPolicy, artistAccountPolicy, schema, androidConfig, iosConfig, youtubeFeed, videoPolicy] = await Promise.all([
+const [home, story, eventComposer, account, auth, musicUpload, uploadPolicy, prepare, eventPolicy, songPolicy, directSongPolicy, artistAccountPolicy, approvalPolicy, schema, androidConfig, iosConfig, youtubeFeed, videoPolicy] = await Promise.all([
   read('index.html'),
   read('home-story-composer.js'),
   read('event-social-composer.js'),
@@ -13,6 +13,7 @@ const [home, story, eventComposer, account, auth, musicUpload, uploadPolicy, pre
   read('supabase/migrations/20261111171633_artist_song_submissions_with_producer.sql'),
   read('supabase/migrations/20261111174525_artist_song_direct_publication.sql'),
   read('supabase/migrations/20261111174839_restrict_artist_music_to_artist_accounts.sql'),
+  read('supabase/migrations/20261118120000_admin_approval_for_artist_songs.sql'),
   read('supabase/schema.sql'),
   read('scripts/configure-android-media.py'),
   read('scripts/prepare-ios-info.py'),
@@ -42,9 +43,9 @@ const checks = [
   ['formulário de envio musical fica na Central de Músicas', ['music-upload-file','music-upload-title','music-upload-artist','music-upload-producer'].every(id => home.includes('id="'+id+'"')) && home.includes('id="music-upload-form"')],
   ['envio de áudio chama uploadMySong com nome do produtor', musicUpload.includes('uploadMySong({') && musicUpload.includes('producerName:') && musicUpload.includes('music-upload-producer')],
   ['envio musical não exige ficha artística preenchida', auth.includes("accountProfile?.account_type !== 'artist'") && !auth.includes('if (!artistProfile) throw new Error') && musicUpload.includes('isCurrentUserArtistOrAdmin')],
-  ['RLS permite envio pela conta Artista sem ficha e mantém upload restrito', uploadPolicy.includes('create policy songs_insert_admin_or_artist') && uploadPolicy.includes("p.account_type = 'artist'") && !uploadPolicy.includes('public.artists') && uploadPolicy.includes('create policy audio_upload_admin_or_artist') && directSongPolicy.includes('songs_insert_artist_published_or_admin') && songPolicy.includes('audio_upload_artist_own_folder_or_admin')],
+  ['RLS exige aprovação administrativa para músicas de MCs/DJs e mantém Storage restrito', uploadPolicy.includes('create policy songs_insert_admin_or_artist') && uploadPolicy.includes("p.account_type = 'artist'") && !uploadPolicy.includes('public.artists') && uploadPolicy.includes('create policy audio_upload_admin_or_artist') && approvalPolicy.includes('songs_insert_artist_pending_or_admin') && approvalPolicy.includes("status = 'pending'") && approvalPolicy.includes("status = 'published'") && songPolicy.includes('audio_upload_artist_own_folder_or_admin')],
   ['upload musical exige perfil Artista/DJ no cadastro e no Storage', auth.includes("accountProfile?.account_type !== 'artist'") && artistAccountPolicy.includes("p.account_type = 'artist'") && artistAccountPolicy.includes('audio_upload_artist_own_folder_or_admin') && schema.slice(schema.indexOf('create policy \"audio_upload_artist_own_folder_or_admin\"')).includes("p.account_type = 'artist'")],
-  ['música enviada pela Central é publicada diretamente e vinculada ao perfil', auth.includes("file_size:file.size,status:'published'") && home.includes('Cada envio é independente') && musicUpload.includes('Música publicada no catálogo') && !home.includes('music-playlists-area')],
+  ['MC/DJ envia para aprovação e administrador publica diretamente', auth.includes("file_size:file.size,status:isAdmin?'published':'pending'") && home.includes('Cada envio é independente') && musicUpload.includes('aguardando aprovação do administrador') && musicUpload.includes("song.status === 'published'")],
   ['pacote Android/iOS inclui os dois compositores', prepare.includes("'home-story-composer.js'") && prepare.includes("'event-social-composer.js'") && prepare.includes("'conta.html'")],
   ['GPS tem permissões nativas configuradas no Android e iOS', androidConfig.includes('android.permission.ACCESS_FINE_LOCATION') && androidConfig.includes('android.permission.ACCESS_COARSE_LOCATION') && iosConfig.includes('NSLocationWhenInUseUsageDescription')],
   ['Explorar reúne atalhos de humor, criadores, música, notícias e Funk Consciente', home.includes('id="radar-funk-consciente"') && home.includes('Explorar — vídeos e novidades') && home.includes('videos+engracados+brasil+shorts') && home.includes('criadores+influenciadores+brasil+shorts') && home.includes('funk+consciente+clipes+musica') && home.includes('news.google.com/search?q=funk') && home.includes('funk+consciente+entrevistas+projetos+sociais')],
