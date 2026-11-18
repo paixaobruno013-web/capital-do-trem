@@ -13,7 +13,7 @@ assert(manifest.name === 'Capital do Trem', 'Nome do PWA incorreto.');
 assert(manifest.display === 'standalone', 'PWA precisa abrir em modo standalone.');
 assert(manifest.start_url && manifest.scope, 'Manifesto sem start_url/scope.');
 assert(html.includes('apple-mobile-web-app-capable') && html.includes('apple-mobile-web-app-title'), 'Metadados Apple ausentes.');
-assert(html.includes('apple-touch-icon') && html.includes('./assets/capital-do-trem-logo.jpg'), 'Ícone Apple touch precisa apontar para a marca publicada.');
+assert(html.includes('rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png" type="image/png"'), 'Safari precisa de ícone Apple touch PNG 180x180.');
 assert(sw.includes("event.request.headers.has('Authorization')"), 'Service worker precisa ignorar requisições autenticadas.');
 assert(/url\.search\)\s*return;/.test(sw), 'Service worker precisa ignorar URLs com query string.');
 assert(sw.includes('private|no-store|no-cache'), 'Service worker precisa respeitar Cache-Control privado.');
