@@ -453,3 +453,26 @@ header .logo{object-fit:contain;object-position:center;background:#fff;border-ra
 @media(max-width:480px){.music-cover-adjustments{grid-template-columns:1fr}.music-cover-area{padding:11px}}
 
 .music-cover-welcome{margin:10px 4px 0;text-align:center;font-size:clamp(11px,2.8vw,14px);font-weight:900;letter-spacing:1.1px;color:#fff;text-shadow:0 0 12px rgba(237,28,36,.48)}
+
+
+/* Área Músicas: capa integral e compacta, catálogo visível logo no início. */
+.music-cover-area{padding:10px!important}
+.music-cover-stage{min-height:110px!important;max-height:210px!important;border-style:solid!important}
+.music-cover-stage img{width:100%;height:clamp(110px,28vw,205px)!important;max-height:205px;object-fit:contain!important;object-position:center!important;background:#050505!important}
+.music-cover-empty{min-height:110px!important;padding:14px!important}
+.music-catalog-panel{margin:12px 0!important;border:1px solid rgba(237,28,36,.48)!important;background:#080808!important}
+.music-catalog-panel>.home-section-heading{align-items:center;gap:8px}
+.music-catalog-panel .home-section-heading h3{margin:2px 0;font-size:17px}
+.music-upload-disclosure{margin:12px 0;border:1px solid rgba(237,28,36,.35);border-radius:13px;background:#080808;overflow:hidden}
+.music-upload-disclosure>summary{padding:12px 14px;cursor:pointer;color:#eee;font-weight:800;font-size:13px;list-style:none}
+.music-upload-disclosure>summary::-webkit-details-marker{display:none}
+.music-upload-disclosure>summary:before{content:'＋';display:inline-grid;place-items:center;width:24px;height:24px;margin-right:8px;border-radius:50%;background:#ed1c24;color:#fff}
+.music-upload-disclosure[open]>summary{border-bottom:1px solid rgba(237,28,36,.35)}
+.music-upload-disclosure #music-upload-area{margin:0;border:0;box-shadow:none}
+#published-song-catalog .music-track-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:7px 10px;padding:10px 12px!important}
+#published-song-catalog .music-track-row h3{grid-column:1;grid-row:1;margin:0!important;padding:7px 9px!important;font-size:13px!important;line-height:1.25!important}
+#published-song-catalog .music-track-row>p{grid-column:1/-1;margin:0;font-size:11px}
+#published-song-catalog .music-track-row .btn{min-height:34px;padding:6px 9px;font-size:11px}
+#published-song-catalog .music-track-row .btn.primary{grid-column:2;grid-row:1}
+#published-song-catalog .music-track-row .btn[aria-label^="Guardar"]{grid-column:1/-1}
+@media(max-width:420px){.music-cover-stage img{height:clamp(105px,30vw,170px)!important}.music-catalog-panel>.home-section-heading{align-items:flex-start;flex-direction:column}}
