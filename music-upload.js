@@ -1,4 +1,4 @@
-import { getCurrentSession, isCurrentUserArtistOrAdmin, uploadMySong } from './supabase/auth.js';
+import { getCurrentSession, bootstrapFirstAdmin, isCurrentUserArtistOrAdmin, uploadMySong } from './supabase/auth.js';
 
 const $ = id => document.getElementById(id);
 const form = $('music-upload-form');
@@ -13,14 +13,24 @@ const updateTitleCounter = () => { if(titleCounter && titleInput) titleCounter.t
 titleInput?.addEventListener('input',updateTitleCounter);updateTitleCounter();
 
 if (form && access && status && fileInput && submit) {
+  const withAccessTimeout = (promise, label) => Promise.race([
+    promise,
+    new Promise((_, reject) => window.setTimeout(() => reject(new Error(label)), 15000))
+  ]);
+
   async function prepareUpload() {
+    access.hidden = false;
+    access.textContent = 'Conferindo sua conta e suas permissões…';
     try {
-      const session = await getCurrentSession();
+      const session = await withAccessTimeout(getCurrentSession(), 'A verificação da conta demorou mais que o esperado. Confira sua conexão e atualize a página.');
       if (!session?.user) {
         access.textContent = 'Entre na sua conta de MC/DJ para enviar músicas.';
         return;
       }
-      const allowed = await isCurrentUserArtistOrAdmin();
+      // A função só ativa o primeiro administrador para a conta proprietária
+      // confirmada e somente quando ainda não existe nenhum administrador.
+      await withAccessTimeout(bootstrapFirstAdmin(), 'Não foi possível validar a configuração administrativa. Tente novamente.');
+      const allowed = await withAccessTimeout(isCurrentUserArtistOrAdmin(), 'A verificação de permissões demorou mais que o esperado. Atualize a página e tente novamente.');
       if (!allowed) {
         access.textContent = 'O envio está disponível para contas Artista / MC / DJ. Você pode continuar ouvindo todo o catálogo normalmente.';
         return;
@@ -28,6 +38,8 @@ if (form && access && status && fileInput && submit) {
       access.hidden = true;
       form.hidden = false;
     } catch (error) {
+      form.hidden = true;
+      access.hidden = false;
       access.textContent = error?.message || 'Não foi possível verificar sua permissão de envio.';
     }
   }
