@@ -480,7 +480,7 @@ export async function isCurrentUserArtistOrAdmin() {
   return data?.account_type === 'artist';
 }
 
-export async function uploadMySong({ file, title, artistName, producerName = '', description = '', rightsConfirmed = false }) {
+export async function uploadMySong({ file, title, artistName, producerName = '', description = '' }) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
@@ -493,7 +493,6 @@ export async function uploadMySong({ file, title, artistName, producerName = '',
     if (accountError) throw accountError;
     if (accountProfile?.account_type !== 'artist') throw new Error('Somente contas Artista / DJ podem publicar músicas.');
   }
-  if (rightsConfirmed !== true) throw new Error('Confirme que você tem autorização para disponibilizar esta música.');
   if (!(file instanceof File)) throw new Error('Selecione um arquivo de áudio.');
   // Alguns seletores de arquivo do Android informam aliases ou MIME genérico.
   // Aceita MIME conhecido ou extensão de áudio permitida e grava sempre o MIME canônico.
@@ -523,7 +522,7 @@ export async function uploadMySong({ file, title, artistName, producerName = '',
   if (uploadError) throw uploadError;
   const { data, error } = await supabase.from('songs').insert({
     user_id:user.id,title:cleanTitle,artist_name:cleanArtist,producer_name:cleanProducer,description:cleanDescription,
-    storage_path:path,mime_type:canonicalMime,file_size:file.size,status:isAdmin?'published':'pending',rights_confirmed_at:new Date().toISOString()
+    storage_path:path,mime_type:canonicalMime,file_size:file.size,status:isAdmin?'published':'pending'
   }).select('id,title,artist_name,producer_name,status,created_at').single();
   if (error) {
     await supabase.storage.from('capital-do-trem-audio').remove([path]);
