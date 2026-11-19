@@ -40,6 +40,8 @@ jobs:
           node --check event-social-composer.js
           node --check scripts/check-creator-publishing.mjs
           node scripts/check-creator-publishing.mjs
+      - name: Validar rollback de mídia no Feed
+        run: node scripts/check-feed-media-rollback.mjs
       - name: Validar migração mais recente de permissões musicais
         run: node scripts/check-latest-music-upload-migration.mjs
       - name: Verificar sintaxe do módulo Supabase
