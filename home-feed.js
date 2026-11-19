@@ -97,19 +97,24 @@ if(root&&form){
   if(!text&&!file){status.textContent='Escreva uma mensagem ou escolha uma foto/vídeo.';return}
   if(file){const allowed=['image/jpeg','image/png','image/webp','video/mp4','video/webm','video/quicktime'];if(!allowed.includes(file.type)){status.textContent='Formato não permitido.';return}const max=file.type.startsWith('image/')?10*1024*1024:50*1024*1024;if(file.size>max){status.textContent='Arquivo muito grande para publicar.';return}}
   const button=form.querySelector('button[type=submit]');button.disabled=true;status.textContent='Publicando…';
+  let createdPost=null,uploadedPath=null;
   try{
    const session=await getCurrentSession();if(!session?.user)throw new Error('Entre na sua conta para publicar no Feed.');
-   const post=await submitMyPost(text||'📸 Nova publicação na comunidade');
+   createdPost=await submitMyPost(text||'📸 Nova publicação na comunidade');
    if(file){
     const ext=({'image/jpeg':'jpg','image/png':'png','image/webp':'webp','video/mp4':'mp4','video/webm':'webm','video/quicktime':'mov'})[file.type];
-    const path=session.user.id+'/posts/'+crypto.randomUUID()+'.'+ext;
-    const uploaded=await supabase.storage.from('capital-do-trem-social').upload(path,file,{contentType:file.type,cacheControl:'3600',upsert:false});
+    uploadedPath=session.user.id+'/posts/'+crypto.randomUUID()+'.'+ext;
+    const uploaded=await supabase.storage.from('capital-do-trem-social').upload(uploadedPath,file,{contentType:file.type,cacheControl:'3600',upsert:false});
     if(uploaded.error)throw uploaded.error;
-    const row=await supabase.from('post_media').insert({post_id:post.id,owner_id:session.user.id,bucket_id:'capital-do-trem-social',storage_path:path,media_type:file.type.startsWith('video/')?'video':'image',mime_type:file.type,byte_size:file.size,alt_text:text.slice(0,200)});
+    const row=await supabase.from('post_media').insert({post_id:createdPost.id,owner_id:session.user.id,bucket_id:'capital-do-trem-social',storage_path:uploadedPath,media_type:file.type.startsWith('video/')?'video':'image',mime_type:file.type,byte_size:file.size,alt_text:text.slice(0,200)});
     if(row.error)throw row.error;
    }
    $('home-feed-text').value='';clearSelectedMedia();if(charCount)charCount.textContent='0/1500';status.textContent='Publicação compartilhada com os Maquinistas! ❤️';await load();
-  }catch(error){status.textContent=error.message||'Não foi possível publicar.'}
+  }catch(error){
+   if(uploadedPath){try{const {error:removeError}=await supabase.storage.from('capital-do-trem-social').remove([uploadedPath]);if(removeError)console.error('Falha ao remover mídia órfã do Feed.',removeError);}catch(cleanupError){console.error('Falha ao limpar mídia órfã do Feed.',cleanupError);}}
+   if(createdPost?.id){try{await deleteMyPost(createdPost.id);}catch(cleanupError){console.error('Falha ao reverter publicação incompleta.',cleanupError);}}
+   status.textContent=error.message||'Não foi possível publicar.';
+  }
   finally{button.disabled=false}
  });
  (async()=>{try{const session=await getCurrentSession();currentUser=session?.user||null;if(!currentUser){status.textContent='Entre ou crie sua conta para publicar, curtir e comentar.';form.querySelector('button[type=submit]').disabled=true}}catch{}await load()})();
