@@ -5,13 +5,13 @@ test('abre a página inicial e navega para Música e volta ao Feed', async ({ pa
   page.on('pageerror', error => pageErrors.push({ message: error.message, stack: error.stack }));
 
   await page.goto('/index.html');
-  await page.addStyleTag({ content: '#intro-smoke{display:none!important}' });
   await expect(page).toHaveTitle(/Capital do Trem/i);
   await expect(page.locator('#nav')).toBeVisible();
 
   await page.locator('#nav button[data-page="musicas"]').click();
   await expect(page.locator('#musicas')).toHaveClass(/active/);
-  await expect(page.locator('#music-upload-area')).toBeVisible();
+  // A área de envio pode ficar oculta para visitantes sem permissão; o catálogo público deve permanecer acessível.
+  await expect(page.locator('#music-catalog-heading')).toBeVisible();
 
   await page.locator('#nav button[data-page="inicio"]').click();
   await expect(page.locator('#inicio')).toHaveClass(/active/);
