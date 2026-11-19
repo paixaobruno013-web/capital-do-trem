@@ -4,11 +4,6 @@ test('abre a página inicial e navega para Música e volta ao Feed', async ({ pa
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push({ message: error.message, stack: error.stack }));
 
-  await page.addInitScript(() => {
-    const style = document.createElement('style');
-    style.textContent = '#intro-smoke{display:none!important}';
-    (document.head || document.documentElement).appendChild(style);
-  });
   await page.goto('/index.html');
   await expect(page).toHaveTitle(/Capital do Trem/i);
   await expect(page.locator('#nav')).toBeVisible();
