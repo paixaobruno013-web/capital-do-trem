@@ -993,3 +993,44 @@ body:has(#account-form) textarea:focus{
   .chat-panel,.chat-topics-panel{border-radius:16px}
   .chat-area-nav a{min-height:56px}
 }
+
+
+/* EXPERIÊNCIA MÚSICA — hierarquia visual inspirada na referência aprovada. */
+#musicas .music-brandbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 10px;padding:8px 2px;color:#fff}
+#musicas .music-brandbar strong{font-size:clamp(21px,5.6vw,34px);font-weight:950;letter-spacing:.035em;line-height:1.05;text-shadow:0 2px 16px rgba(255,255,255,.12)}
+#musicas .music-brandbar>span{display:inline-flex;align-items:center;gap:7px;flex:none;padding:7px 12px;border:1px solid rgba(237,28,36,.45);border-radius:999px;background:rgba(237,28,36,.13);color:#ff737a;font-size:12px;font-weight:950;letter-spacing:.08em}
+#musicas .music-brandbar>span i{width:7px;height:7px;border-radius:50%;background:#ed1c24;box-shadow:0 0 12px #ed1c24;animation:ct-live-pulse 1.6s ease-in-out infinite}
+@keyframes ct-live-pulse{50%{opacity:.45;box-shadow:0 0 3px #ed1c24}}
+#musicas .music-section-banner{width:100%;aspect-ratio:16/9;max-height:none!important;height:auto;margin:0 0 12px;border:1px solid rgba(237,28,36,.35);border-radius:15px;overflow:hidden;background:#050505;box-shadow:0 14px 32px rgba(0,0,0,.38),0 0 20px rgba(237,28,36,.08)}
+#musicas .music-section-banner img{width:100%!important;height:100%!important;max-height:none!important;aspect-ratio:16/9;object-fit:cover!important;object-position:center}
+#musicas .music-tagline{margin:0 0 15px;padding:2px 1px;color:#eee;font-size:clamp(14px,3.7vw,18px);line-height:1.45;font-weight:650}
+#musicas .music-quick-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0 0 19px}
+#musicas .music-quick-actions a{min-width:0;min-height:82px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;border:1px solid rgba(255,255,255,.09);border-radius:17px;background:linear-gradient(145deg,#252525,#171717);color:#fff;text-decoration:none;text-align:center;box-shadow:0 8px 22px rgba(0,0,0,.22);transition:transform .18s ease,border-color .18s ease,background .18s ease}
+#musicas .music-quick-actions a strong{font-size:clamp(12px,3.3vw,16px);line-height:1.1;font-weight:900}
+#musicas .music-quick-actions a span{color:#c9c9c9;font-size:clamp(11px,2.8vw,14px);font-weight:750}
+#musicas .music-quick-actions a:last-child{border-color:rgba(237,28,36,.24);background:linear-gradient(145deg,#2a1718,#171313)}
+#musicas .music-quick-actions a:active{transform:scale(.975);border-color:#ed1c24}
+#musicas .music-quick-actions a:focus-visible{outline:2px solid #ed1c24;outline-offset:3px}
+#musicas #music-upload-area,#musicas #my-uploaded-songs-panel,#musicas .music-catalog-panel,#musicas #music-library,#musicas .music-playlist-manager,#musicas .music-local-picker{border-radius:18px}
+#musicas #published-song-catalog{gap:10px}
+#musicas #published-song-catalog>.card,#musicas #published-song-catalog>.song-card{min-height:76px;display:flex;align-items:center;gap:12px;padding:12px;border:1px solid rgba(255,255,255,.09);border-radius:15px;background:linear-gradient(110deg,#1d1d1d,#101010)}
+#musicas #published-song-catalog img{border-radius:10px}
+#musicas .music-catalog-panel .home-section-heading{margin-bottom:12px}
+@media(max-width:380px){#musicas .music-quick-actions{gap:6px}#musicas .music-quick-actions a{min-height:74px;padding:8px 3px}}
+@media(prefers-reduced-motion:reduce){#musicas .music-brandbar>span i{animation:none}#musicas .music-quick-actions a{transition:none}}
+
+/* FALA UAI — acabamento da lista de conversas e do cabeçalho no Android. */
+body:has(#private-layout) header{padding:15px clamp(12px,3vw,22px);border-bottom:1px solid rgba(237,28,36,.28)!important}
+body:has(#private-layout) header h1{font-size:clamp(21px,5vw,29px);letter-spacing:-.025em}
+body:has(#private-layout) #private-layout{gap:14px}
+body:has(#private-layout) #sidebar-panel,body:has(#private-layout) #thread-panel{border:1px solid rgba(237,28,36,.25);border-radius:19px;background:linear-gradient(150deg,#171112,#090909 78%);box-shadow:0 14px 34px rgba(0,0,0,.28)}
+body:has(#private-layout) #conversations{gap:8px}
+body:has(#private-layout) #conversations .conversation{min-height:76px;padding:11px 12px;border:1px solid rgba(255,255,255,.075);border-radius:15px;background:linear-gradient(110deg,#1b1b1d,#101011)}
+body:has(#private-layout) #conversations .conversation[aria-current=true]{border-color:rgba(237,28,36,.58);background:linear-gradient(100deg,rgba(237,28,36,.22),rgba(22,15,16,.96));box-shadow:inset 3px 0 #ed1c24,0 6px 18px rgba(0,0,0,.2)}
+body:has(#private-layout) #conversations .official-group{border-color:rgba(237,28,36,.65)!important;background:linear-gradient(105deg,#451017,#180d0f 78%)!important}
+body:has(#private-layout) #conversations .location-shortcut{border-color:rgba(237,28,36,.38);background:linear-gradient(105deg,#281316,#121011)!important}
+body:has(#private-layout) #conversations .profile-avatar{width:52px;height:52px;flex-basis:52px;border:2px solid rgba(237,28,36,.62);box-shadow:0 0 0 3px rgba(237,28,36,.08),0 5px 14px #0008}
+body:has(#private-layout) #conversations .conversation-copy strong{color:#fff;font-size:14px;font-weight:850}
+body:has(#private-layout) #conversations .conversation-copy .small{color:#aaa}
+body:has(#private-layout) #conversation-search{min-height:48px;border:1px solid rgba(237,28,36,.35);border-radius:13px;background:#090909;color:#fff}
+@media(max-width:680px){body:has(#private-layout) #sidebar-panel{padding:13px}body:has(#private-layout) #conversations .conversation{min-height:72px}}
