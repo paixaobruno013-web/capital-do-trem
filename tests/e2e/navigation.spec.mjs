@@ -35,5 +35,5 @@ test('exibe o novo cabeçalho e os atalhos da experiência Música', async ({ pa
   await expect(page.locator('#musicas .music-brandbar')).toContainText('AO VIVO');
   await expect(page.locator('#musicas .music-tagline')).toContainText('Seu universo do Funk');
   await expect(page.locator('#musicas .music-quick-actions a')).toHaveCount(3);
-  await expect(page.locator('#musicas .music-quick-actions a[href="#music-local-picker"]')).toBeVisible();
+  await expect(page.locator('#musicas .music-quick-actions a[href="#audio"]')).toBeVisible();
 });
