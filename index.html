@@ -33,11 +33,11 @@
     return;
    }
   }
-  document.documentElement.classList.add('intro-smoke-skip');
+  document.documentElement?.classList?.add('intro-smoke-skip');
  }catch(error){}
 })();
 </script>
-<script>document.documentElement.classList.add('intro-brand-pending');</script>
+<script>document.documentElement?.classList?.add('intro-brand-pending');</script>
 <script src="./file-picker-guard.js"></script>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#000000" id="theme-color">
@@ -949,7 +949,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
   if(sessionStorage.getItem(INTRO_SESSION_KEY)==='1')show=false;
   else sessionStorage.setItem(INTRO_SESSION_KEY,'1');
  }catch(error){/* Mantém a navegação normal se o armazenamento estiver bloqueado. */}
- if(!show)document.documentElement.classList.add('intro-smoke-skip');
+ if(!show)document.documentElement?.classList?.add('intro-smoke-skip');
 })();
 </script>
 <div class="intro-smoke" id="intro-smoke" aria-hidden="true">
