@@ -9,7 +9,7 @@ const submit = $('music-upload-submit');
 const titleInput = $('music-upload-title');
 let titleCounter = $('music-upload-title-counter');
 if (titleInput && !titleCounter) { titleCounter = document.createElement('small'); titleCounter.className='muted music-title-counter'; titleCounter.id='music-upload-title-counter'; titleInput.insertAdjacentElement('afterend',titleCounter); }
-const updateTitleCounter = () => { if(titleCounter && titleInput) titleCounter.textContent = `${titleInput.value.length}/120 caracteres`; };
+const updateTitleCounter = () => { if(titleCounter && titleInput) titleCounter.textContent = `${String(titleInput.value ?? '').length}/120 caracteres`; };
 titleInput?.addEventListener('input',updateTitleCounter);updateTitleCounter();
 
 if (form && access && status && fileInput && submit) {

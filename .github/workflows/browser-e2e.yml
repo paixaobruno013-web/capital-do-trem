@@ -1,0 +1,59 @@
+name: Testes automáticos de navegação e Supabase
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-navigation:
+    name: Navegação real no Chromium
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Instalar dependências do projeto
+        run: npm install
+      - name: Preparar arquivos web
+        run: npm run build:web
+      - name: Instalar Playwright para esta execução
+        run: npm install --no-save @playwright/test
+      - name: Instalar navegador Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Executar testes de navegação
+        run: npx playwright test
+      - name: Guardar relatório e evidências
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-testes-navegacao
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  supabase-connectivity:
+    name: Conectividade com Supabase de teste
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verificar conexão com ambiente Supabase isolado
+        env:
+          SUPABASE_TEST_URL: ${{ secrets.SUPABASE_TEST_URL }}
+          SUPABASE_TEST_ANON_KEY: ${{ secrets.SUPABASE_TEST_ANON_KEY }}
+        run: node scripts/check-supabase-test-connection.mjs
