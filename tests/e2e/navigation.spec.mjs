@@ -1,16 +1,11 @@
 import { test, expect } from '@playwright/test';
 
-test.beforeEach(async ({ page }) => {
-  await page.addInitScript(() => {
-    document.documentElement.classList.add('intro-smoke-skip');
-  });
-});
-
 test('abre a página inicial e navega para Música e volta ao Feed', async ({ page }) => {
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push({ message: error.message, stack: error.stack }));
 
   await page.goto('/index.html');
+  await page.addStyleTag({ content: '#intro-smoke{display:none!important}' });
   await expect(page).toHaveTitle(/Capital do Trem/i);
   await expect(page.locator('#nav')).toBeVisible();
 
