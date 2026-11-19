@@ -19,6 +19,7 @@ assert(/url\.search\)\s*return;/.test(sw), 'Service worker precisa ignorar URLs 
 assert(sw.includes('private|no-store|no-cache'), 'Service worker precisa respeitar Cache-Control privado.');
 assert(sw.includes("response.headers.has('Set-Cookie')"), 'Service worker precisa evitar cache de respostas com cookie.');
 assert(info.includes('NSCameraUsageDescription') && info.includes('NSMicrophoneUsageDescription'), 'Descrições de câmera/microfone ausentes.');
+assert(/background_modes\\.append\\([\"']audio[\"']\\)/.test(info), 'Modo de áudio em segundo plano ausente na preparação nativa do iOS.');
 assert(info.includes('somente quando você toca'), 'Permissão de localização precisa explicar ação explícita do usuário.');
 
 console.log('iOS/PWA: manifesto, metadados Apple, consentimento e proteções básicas de cache verificados.');
