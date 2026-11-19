@@ -756,3 +756,42 @@ body.light .home-feed-preview-top{color:#fff}
  .home-feed-composer-v2 .home-feed-caption-meta{font-size:10px}
  #musicas .music-library-columns{grid-template-columns:1fr}
 }
+
+
+/* CAPITAL DO TREM — acabamento visual Android: identidade oficial vermelho, preto e branco.
+   Escopo restrito ao Feed para preservar as demais áreas e seus comportamentos. */
+#inicio .welcome-maquinista{
+  border:1px solid rgba(237,28,36,.48);
+  background:radial-gradient(ellipse at 50% 0%,rgba(237,28,36,.2),transparent 66%),linear-gradient(140deg,#191112,#080808 72%);
+  box-shadow:0 10px 30px rgba(0,0,0,.28),0 0 22px rgba(237,28,36,.08)
+}
+#inicio .welcome-maquinista span{color:#ff6870}
+#inicio .welcome-maquinista h1{
+  background:linear-gradient(90deg,#fff 0%,#fff 48%,#ff5963 100%);
+  background-clip:text;-webkit-background-clip:text;color:transparent
+}
+#inicio .welcome-maquinista p{color:#d0c7c8}
+#inicio .home-feed-composer{
+  border-color:rgba(237,28,36,.28);
+  background:linear-gradient(145deg,rgba(20,12,13,.78),rgba(5,5,5,.92))
+}
+#inicio .home-feed-composer textarea{border-color:rgba(237,28,36,.28);background:#080808}
+#inicio .home-feed-post{
+  border:1px solid rgba(237,28,36,.24);
+  background:linear-gradient(145deg,#171112,#090909 76%);
+  box-shadow:0 12px 30px rgba(0,0,0,.28)
+}
+#inicio .home-feed-avatar{background:linear-gradient(135deg,#ed1c24,#790b12)}
+#inicio .home-verified-seal{background:#ed1c24;box-shadow:0 0 10px rgba(237,28,36,.42)}
+#inicio .home-feed-actions button{
+  border-color:rgba(237,28,36,.3);background:#171011;color:#fff
+}
+#inicio .home-feed-actions button:hover{border-color:#ed1c24;background:#260b0e}
+#inicio .home-feed-media{background:#050505}
+#inicio .home-video-card{background:linear-gradient(145deg,#171112,#090909);border-color:rgba(237,28,36,.26)}
+#inicio .home-feed-post a:focus-visible,#inicio .home-feed-actions button:focus-visible{
+  outline:2px solid #ed1c24;outline-offset:3px
+}
+body.light #inicio .home-feed-post,
+body.light #inicio .home-video-card{color:#fff;background:linear-gradient(145deg,#241719,#111)}
+body.light #inicio .home-feed-actions button{color:#fff;background:#241719}
