@@ -795,3 +795,89 @@ body.light .home-feed-preview-top{color:#fff}
 body.light #inicio .home-feed-post,
 body.light #inicio .home-video-card{color:#fff;background:linear-gradient(145deg,#241719,#111)}
 body.light #inicio .home-feed-actions button{color:#fff;background:#241719}
+
+
+/* Direção de arte Android — identidade unificada em preto, vermelho e branco. */
+:root{
+  --ct-neon-red:#ed1c24;
+  --ct-neon-cyan:#f4f4f4;
+  --ct-neon-violet:#ed1c24;
+  --ct-line:rgba(255,255,255,.13);
+  --ct-glow:0 0 22px rgba(237,28,36,.12);
+}
+body{
+  background-color:#050505;
+  background-image:
+    radial-gradient(ellipse at 12% 0%,rgba(237,28,36,.16),transparent 36%),
+    radial-gradient(ellipse at 88% 16%,rgba(255,255,255,.035),transparent 30%),
+    linear-gradient(180deg,#080808 0%,#101010 48%,#050505 100%);
+}
+body:not(.light)::before{
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  opacity:.12
+}
+body:not(.light)::after{
+  background:linear-gradient(90deg,transparent,#ed1c24,#fff,transparent);
+  box-shadow:0 0 16px rgba(237,28,36,.4)
+}
+header{
+  border-color:rgba(237,28,36,.24)!important;
+  background:rgba(7,7,7,.94)!important;
+  box-shadow:0 12px 38px rgba(0,0,0,.38),inset 0 -1px rgba(237,28,36,.16)
+}
+header img,.logo{
+  filter:drop-shadow(0 0 12px rgba(237,28,36,.42))
+}
+button.primary,.btn.primary,.publish-button,.event-publish-button{
+  background:linear-gradient(115deg,#ed1c24 0%,#b80e18 58%,#790b12 100%);
+  box-shadow:0 8px 26px rgba(237,28,36,.2),inset 0 1px rgba(255,255,255,.18)
+}
+button:not(:disabled):hover,.btn:hover,.tabs button:hover{
+  box-shadow:0 0 0 1px rgba(237,28,36,.28),0 8px 24px rgba(237,28,36,.14)
+}
+input:focus,textarea:focus,select:focus{
+  border-color:#ed1c24!important;
+  box-shadow:0 0 0 3px rgba(237,28,36,.13),0 0 18px rgba(237,28,36,.08)!important
+}
+a:focus-visible,button:focus-visible{outline-color:#ed1c24}
+.tabs button.active,.profile-subtabs button.active{
+  border-color:rgba(237,28,36,.55);
+  box-shadow:0 0 0 1px rgba(237,28,36,.2),0 0 20px rgba(237,28,36,.2)
+}
+#nav{
+  border:1px solid rgba(237,28,36,.28);
+  border-radius:18px;
+  background:linear-gradient(110deg,rgba(24,9,10,.97),rgba(8,8,8,.97));
+  box-shadow:0 12px 28px rgba(0,0,0,.28)
+}
+#nav button,#nav a{
+  border-radius:12px;
+  transition:background .18s ease,border-color .18s ease,transform .18s ease
+}
+#nav button.active,#nav a.active{
+  background:linear-gradient(135deg,#ed1c24,#8f0c14);
+  color:#fff;
+  border-color:rgba(255,255,255,.16);
+  box-shadow:0 6px 18px rgba(237,28,36,.22)
+}
+#nav button:focus-visible,#nav a:focus-visible{outline:2px solid #ed1c24;outline-offset:3px}
+#inicio .home-stories{
+  border-color:rgba(237,28,36,.4)!important;
+  background:linear-gradient(120deg,rgba(237,28,36,.1),rgba(10,10,10,.98) 48%)!important
+}
+#inicio .home-section-heading h2,#inicio .home-section-heading h3{letter-spacing:-.025em}
+#musicas .music-section-banner{
+  border:1px solid rgba(237,28,36,.3);
+  border-radius:17px;overflow:hidden;
+  box-shadow:0 12px 28px rgba(0,0,0,.3)
+}
+#musicas .music-upload-area h3,#musicas .music-catalog-panel h3,#musicas .music-playlist-manager h3{
+  color:#fff;text-shadow:0 0 18px rgba(237,28,36,.14)
+}
+#musicas .music-upload-area .eyebrow,#musicas .music-playlist-manager .eyebrow{color:#ff737a}
+@media(max-width:560px){
+  header{padding-left:12px!important;padding-right:12px!important}
+  #nav{gap:6px;padding:7px}
+  #nav button,#nav a{min-height:42px;padding:9px 8px;font-size:12px}
+  #inicio .home-feed-composer-v2 textarea{min-height:100px;font-size:14px}
+}
