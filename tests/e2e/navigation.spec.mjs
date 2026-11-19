@@ -26,3 +26,15 @@ test('mantém as áreas prioritárias presentes na interface', async ({ page }) 
   await expect(page.locator('#home-feed-composer')).toHaveCount(1);
   await expect(page.locator('#music-upload-form')).toHaveCount(1);
 });
+
+test('exibe o novo cabeçalho e os atalhos da experiência Música', async ({ page }) => {
+  await page.goto('/index.html');
+  await page.locator('#nav button[data-page="musicas"]').click();
+
+  await expect(page.locator('#musicas .music-brandbar')).toContainText('CAPITAL DO TREM');
+  await expect(page.locator('#musicas .music-brandbar')).toContainText('AO VIVO');
+  await expect(page.locator('#musicas .music-tagline')).toContainText('Seu universo do Funk');
+  await expect(page.locator('#musicas .music-quick-actions a')).toHaveCount(3);
+  await expect(page.locator('#musicas .music-quick-actions a[href="#music-upload-file"]')).toHaveCount(1);
+  await expect(page.locator('#music-upload-file')).toHaveCount(1);
+});
