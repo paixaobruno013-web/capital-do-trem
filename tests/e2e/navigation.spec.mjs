@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
 
 test('abre a página inicial e navega para Música e volta ao Feed', async ({ page }) => {
   const pageErrors = [];
-  page.on('pageerror', error => pageErrors.push(error.message));
+  page.on('pageerror', error => pageErrors.push({ message: error.message, stack: error.stack }));
 
   await page.goto('/index.html');
   await expect(page).toHaveTitle(/Capital do Trem/i);
