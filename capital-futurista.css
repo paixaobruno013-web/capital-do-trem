@@ -881,3 +881,115 @@ a:focus-visible,button:focus-visible{outline-color:#ed1c24}
   #nav button,#nav a{min-height:42px;padding:9px 8px;font-size:12px}
   #inicio .home-feed-composer-v2 textarea{min-height:100px;font-size:14px}
 }
+
+
+/* FALA UAI — acabamento coerente com a identidade oficial, sem alterar fluxos do chat. */
+.chat-brand{
+  border-color:rgba(237,28,36,.58);
+  background:linear-gradient(110deg,rgba(237,28,36,.18),rgba(10,10,10,.92));
+  box-shadow:0 0 18px rgba(237,28,36,.1)
+}
+.chat-panel,.chat-topics-panel{
+  border:1px solid rgba(237,28,36,.3)!important;
+  background:linear-gradient(145deg,#171112,#090909 82%)!important;
+  box-shadow:0 12px 32px rgba(0,0,0,.28)
+}
+.chat-area-nav{
+  border-color:rgba(237,28,36,.3);
+  background:linear-gradient(120deg,rgba(31,10,12,.96),rgba(8,8,8,.96))
+}
+.chat-area-nav a{
+  border-color:rgba(237,28,36,.28);
+  background:linear-gradient(130deg,rgba(237,28,36,.12),rgba(20,20,20,.96));
+  color:#fff
+}
+.chat-area-nav a[href="#capital-do-trem-room"]{
+  background:linear-gradient(110deg,#4b1018,#170b0e 76%);
+  border-color:#ed1c24
+}
+.topic-create-form,.topic-room{
+  border-color:rgba(237,28,36,.24);
+  background:rgba(12,8,9,.82)
+}
+.topic-create-form input,.topic-create-form textarea,.topic-message-form input{
+  border-color:rgba(237,28,36,.28);
+  background:#080808;color:#fff
+}
+.topic-card,.topic-message{
+  border-color:rgba(237,28,36,.2);
+  background:linear-gradient(130deg,#1b1112,#0b0b0b)
+}
+.topic-card-copy small,.topic-message-head strong{color:#ff737a}
+body:has(#messages) #messages{
+  border-color:rgba(237,28,36,.28);
+  background:radial-gradient(ellipse at 50% 0%,rgba(237,28,36,.08),transparent 60%),rgba(5,5,5,.82)
+}
+body:has(#messages) .message{
+  border-color:rgba(237,28,36,.2);
+  background:linear-gradient(145deg,#1b1112,#0b0b0b)
+}
+body:has(#messages) .message strong{color:#ff737a}
+body:has(#messages) .composer{
+  border-color:rgba(237,28,36,.3);
+  background:rgba(8,8,8,.96);
+  box-shadow:0 0 22px rgba(237,28,36,.07)
+}
+body:has(#messages) .composer input{border-color:rgba(237,28,36,.28)}
+.chat-area-nav a:focus-visible,.topic-message-form button:focus-visible{outline-color:#ed1c24}
+
+/* Perfil público — valoriza capa, avatar, estatísticas e ações sem alterar a galeria. */
+.profile-overview-card{
+  border-color:rgba(237,28,36,.34)!important;
+  background:linear-gradient(150deg,#171112,#080808 72%)!important
+}
+.profile-overview-card .profile-cover{
+  border-bottom:1px solid rgba(237,28,36,.28);
+  box-shadow:inset 0 -28px 45px rgba(0,0,0,.24)
+}
+.profile-overview-card .profile-avatar-wrap .avatar{
+  border-color:#090909;
+  box-shadow:0 0 0 2px #ed1c24,0 8px 24px #0009
+}
+.profile-stats{
+  border-color:rgba(237,28,36,.22)
+}
+.profile-stats strong{color:#fff;text-shadow:0 0 14px rgba(237,28,36,.16)}
+.profile-dream-signature{
+  border-left:3px solid #ed1c24;
+  background:linear-gradient(100deg,rgba(237,28,36,.12),rgba(12,12,12,.2));
+  padding:10px 12px;border-radius:0 10px 10px 0
+}
+.profile-dream-line{color:#fff}
+.profile-actions .btn{min-height:42px}
+.profile-edit-details,.profile-content-card{
+  border-color:rgba(237,28,36,.22)!important
+}
+.profile-subtabs button.active{
+  color:#fff!important;border-bottom-color:#ed1c24!important
+}
+
+/* Minha conta — formulários e área pessoal com contraste e foco acessível. */
+body:has(#account-form) main>.card,
+body:has(#basic-profile-form) main>.card{
+  border-color:rgba(237,28,36,.22)
+}
+body:has(#account-form) input:focus,
+body:has(#account-form) select:focus,
+body:has(#account-form) textarea:focus{
+  border-color:#ed1c24!important;
+  box-shadow:0 0 0 3px rgba(237,28,36,.13)!important
+}
+.account-actions button[aria-pressed="true"],
+.account-actions button:disabled[aria-pressed="true"]{
+  border-color:rgba(237,28,36,.5);
+  background:linear-gradient(120deg,#ed1c24,#8f0c14);
+  color:#fff
+}
+.account-lock-card{border-color:#ed1c24}
+@media(max-width:520px){
+  .profile-overview-card .profile-hero{padding-left:12px;padding-right:12px}
+  .profile-stats{gap:4px;padding:11px 2px}
+  .profile-stats strong{font-size:17px}
+  .chat-panel,.chat-topics-panel{border-radius:16px}
+  .chat-area-nav a{min-height:56px}
+}
