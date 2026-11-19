@@ -1169,3 +1169,26 @@ body:has(#private-layout) #conversation-search{min-height:48px;border:1px solid 
   }
   #musicas #published-song-catalog>.music-track-row h3{font-size:13px!important}
 }
+
+
+/* Capa tipográfica para faixas sem arte de álbum cadastrada. */
+#musicas #published-song-catalog>.music-track-row>.music-track-cover{
+  display:grid!important;
+  place-items:center;
+  grid-column:2!important;
+  grid-row:1!important;
+  width:48px!important;
+  height:48px!important;
+  min-width:48px!important;
+  border-radius:5px!important;
+  background:linear-gradient(145deg,#ed1c24 0%,#6f0710 55%,#171717 100%)!important;
+  color:#fff!important;
+  font-size:25px;
+  font-weight:900;
+  box-shadow:inset 0 0 0 1px #ffffff24,0 3px 10px #0008;
+}
+@media(max-width:420px){
+  #musicas #published-song-catalog>.music-track-row>.music-track-cover{
+    width:44px!important;height:44px!important;min-width:44px!important;
+  }
+}
