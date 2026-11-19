@@ -24,6 +24,14 @@ info["NSPhotoLibraryUsageDescription"] = (
     "O Capital do Trem permite escolher fotos e vídeos da sua biblioteca para publicar Stories e outros conteúdos que você selecionar."
 )
 
+# O player musical precisa poder continuar durante o bloqueio de tela.
+background_modes = info.get("UIBackgroundModes", [])
+if not isinstance(background_modes, list):
+    raise SystemExit("UIBackgroundModes precisa ser uma lista no Info.plist.")
+if "audio" not in background_modes:
+    background_modes.append("audio")
+info["UIBackgroundModes"] = background_modes
+
 with path.open("wb") as stream:
     plistlib.dump(info, stream, sort_keys=False)
 
@@ -32,4 +40,6 @@ with path.open("rb") as stream:
 for key in ("NSMicrophoneUsageDescription", "NSLocationWhenInUseUsageDescription", "NSCameraUsageDescription", "NSPhotoLibraryUsageDescription"):
     if not checked.get(key):
         raise SystemExit(f"Permissão sem descrição: {key}")
-print("Info.plist iOS validado: microfone, localização e biblioteca de fotos.")
+if "audio" not in checked.get("UIBackgroundModes", []):
+    raise SystemExit("Modo de áudio em segundo plano ausente no Info.plist.")
+print("Info.plist iOS validado: permissões de mídia/localização e modo de áudio em segundo plano.")
