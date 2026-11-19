@@ -558,23 +558,43 @@ export async function getMySongs() {
 // Faixas publicadas vinculadas ao perfil público do artista/MC/DJ.
 export async function getPublishedSongsForProfile(userId) {
   const supabase = initSupabase();
-  const { data, error } = await supabase.from('songs')
-    .select('id,title,artist_name,producer_name,description,storage_path')
-    .eq('user_id', userId).eq('status', 'published')
-    .order('created_at', { ascending: false }).limit(100);
-  if (error) throw error;
-  const songs = data || [];
+  const songs = [];
+  const pageSize = 100;
+  // Pagina o perfil para não esconder faixas antigas quando o artista tiver
+  // mais de 100 publicações, mantendo a mesma ordenação do catálogo geral.
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await supabase.from('songs')
+      .select('id,title,artist_name,producer_name,description,storage_path')
+      .eq('user_id', userId).eq('status', 'published')
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: true })
+      .range(from, from + pageSize - 1);
+    if (error) throw error;
+    const page = data || [];
+    songs.push(...page);
+    if (page.length < pageSize) break;
+  }
   if (!songs.length) return [];
-  const paths = songs.map(song => song.storage_path);
-  const { data: signed, error: signedError } = await supabase.storage
-    .from('capital-do-trem-audio').createSignedUrls(paths, 60 * 60);
-  if (signedError) throw signedError;
-  const urls = new Map((signed || []).map(item => [item.path, item.signedUrl]));
-  return songs.filter(song => urls.has(song.storage_path)).map(song => ({
-    id: song.id, title: song.title, artist_name: song.artist_name,
-    producer_name: song.producer_name || '', description: song.description || '',
-    audio_url: urls.get(song.storage_path)
-  }));
+  const storage = supabase.storage.from('capital-do-trem-audio');
+  const available = [];
+  // Assina em lotes para respeitar os limites do Storage.
+  for (let from = 0; from < songs.length; from += pageSize) {
+    const batch = songs.slice(from, from + pageSize);
+    const { data: signed, error: signedError } = await storage
+      .createSignedUrls(batch.map(song => song.storage_path), 60 * 60);
+    if (signedError) throw signedError;
+    const urls = new Map((signed || []).map(item => [item.path, item.signedUrl]));
+    for (const song of batch) {
+      const audioUrl = urls.get(song.storage_path);
+      if (!audioUrl) continue;
+      available.push({
+        id: song.id, title: song.title, artist_name: song.artist_name,
+        producer_name: song.producer_name || '', description: song.description || '',
+        audio_url: audioUrl
+      });
+    }
+  }
+  return available;
 }
 
 // Busca perfis públicos pelo nome ou @ para localizar músicas diretamente na página do artista/usuário.
