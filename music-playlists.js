@@ -1,6 +1,8 @@
 import {getCurrentSession,getPublishedSongs,getPublishedSongsForProfile,searchPublicMusicProfiles,getMyPlaylists,createMyPlaylist,renameMyPlaylist,deleteMyPlaylist,addSongToMyPlaylist,removeSongFromMyPlaylist,moveSongInMyPlaylist} from './supabase/auth.js';
 const $=id=>document.getElementById(id);
 const root=$('music-playlists-list'),form=$('music-playlist-create'),status=$('music-playlist-status');
+const quickCreate=$('create-music-playlist');
+quickCreate?.addEventListener('click',()=>{form?.scrollIntoView({behavior:'smooth',block:'center'});$('music-playlist-name')?.focus({preventScroll:true});});
 if(root&&form){
  let songs=[], catalogSongs=[];
  const say=value=>{if(status)status.textContent=value||''};
