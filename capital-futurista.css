@@ -211,7 +211,7 @@ body:has(#messages) .composer input{border-color:rgba(84,233,255,.22)}
 body:has(.profile-only-tabs) .panel:not(#perfil){display:none!important}
 body:has(.profile-only-tabs) .profile-only-tabs [data-tab]:not([data-tab="perfil"]){display:none!important}
 body:has(.profile-only-tabs) #perfil .profile-view-tabs [data-profile-view="likes"]{display:none!important}
-body:has(#home-community-feed) #musicas .card:has(#audio){display:none!important}
+body:has(#home-community-feed) #musicas .music-local-picker:has(#audio){display:none!important}
 @media(max-width:520px){.home-feed-compose-actions>*{flex:1 1 auto}.home-feed-post{padding:12px}.home-video-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 .chat-area-nav{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px;padding:10px;border:1px solid rgba(84,233,255,.2);border-radius:16px;background:rgba(9,14,22,.9)}
