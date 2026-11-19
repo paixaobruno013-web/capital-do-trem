@@ -1018,7 +1018,14 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <div id="capital-music-player" aria-label="Player 3D Capital do Trem"></div>
 <section class="card music-playlist-manager" aria-labelledby="music-playlist-title">
  <div class="home-section-heading"><div><span class="eyebrow">SUA TRILHA</span><h3 id="music-playlist-title">♫ Minhas playlists</h3><p class="muted">Crie suas seleções e adicione as músicas do catálogo.</p></div></div>
- <div id="music-playlist-list" class="list" aria-live="polite"><p class="muted">Entre na sua conta para criar e organizar playlists.</p></div>
+ <form id="music-playlist-create" class="music-playlist-create">
+  <label for="music-playlist-name">Nome da nova playlist</label>
+  <div class="music-playlist-create-row">
+   <input id="music-playlist-name" name="playlist-name" type="text" maxlength="60" required autocomplete="off" placeholder="Ex.: Os sons da minha quebrada">
+   <button class="btn primary" type="submit">＋ Criar playlist</button>
+  </div>
+ </form>
+ <div id="music-playlists-list" class="list" aria-live="polite"><p class="muted">Entre na sua conta para criar e organizar playlists.</p></div>
  <p id="music-playlist-status" class="muted" role="status" aria-live="polite"></p>
 </section>
 
@@ -2574,5 +2581,6 @@ async function refreshMyUploads(){
 refreshMyUploads();
 window.addEventListener('capital-do-trem:song-published',refreshMyUploads);
 </script>
+<script type="module" src="./music-playlists.js"></script>
 <script src="./persistent-music-player.js" defer></script>
 </body></html>
