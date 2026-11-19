@@ -696,3 +696,63 @@ body.light .home-feed-preview-top{color:#fff}
  #inicio .home-feed-compose-actions{grid-template-columns:1fr}
  #inicio #home-community-feed>.home-section-heading{align-items:flex-start}
 }
+
+
+/* Capital do Trem — acabamento do compositor do Feed e da área Música */
+.home-feed-composer-v2{
+  position:relative;display:grid;gap:15px;padding:clamp(14px,3vw,22px);
+  border:1px solid rgba(237,28,36,.38);border-radius:20px;
+  background:radial-gradient(ellipse at 0 0,rgba(237,28,36,.13),transparent 48%),linear-gradient(145deg,#151112,#090909 72%);
+  box-shadow:0 18px 42px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.045)
+}
+.home-feed-composer-heading{display:flex;align-items:center;gap:12px;min-width:0}
+.home-feed-compose-mark{display:grid;place-items:center;flex:0 0 46px;width:46px;height:46px;border:1px solid rgba(237,28,36,.5);border-radius:15px;background:linear-gradient(145deg,#ed1c24,#790b12);font-size:22px;box-shadow:0 8px 22px rgba(237,28,36,.2)}
+.home-feed-compose-intro{display:grid;gap:2px;min-width:0;flex:1}
+.home-feed-compose-intro .eyebrow{font-size:10px;letter-spacing:1.3px;color:#ff6870;font-weight:900}
+.home-feed-compose-intro strong{font-size:16px;line-height:1.25;color:#fff}
+.home-feed-compose-intro small{font-size:12px;line-height:1.4;color:#aaa}
+.home-feed-public-pill{flex:0 0 auto;padding:5px 9px;border:1px solid rgba(255,255,255,.14);border-radius:999px;color:#ddd;font-size:10px;font-weight:900;letter-spacing:1px}
+.home-feed-composer-v2 textarea{width:100%;min-height:112px;padding:15px;border:1px solid #383033;border-radius:15px;background:rgba(0,0,0,.42);color:#fff;font-size:15px;line-height:1.55;resize:vertical}
+.home-feed-composer-v2 textarea:focus{outline:2px solid rgba(237,28,36,.58);outline-offset:2px;border-color:#ed1c24}
+.home-feed-compose-actions-v2{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px}
+.home-feed-pick-v2{display:flex;align-items:center;gap:9px;min-height:48px;padding:7px 12px;border:1px solid rgba(237,28,36,.42);border-radius:13px;background:rgba(237,28,36,.09);color:#fff;cursor:pointer}
+.home-feed-pick-v2>span:first-child{display:grid;place-items:center;width:28px;height:28px;border-radius:9px;background:#ed1c24;font-size:20px;line-height:1}
+.home-feed-pick-v2>span:last-child{display:grid;gap:0}
+.home-feed-pick-v2 strong{font-size:12px;line-height:1.25}
+.home-feed-pick-v2 small{font-size:10px;color:#aaa}
+.home-feed-media-name{min-width:0;overflow-wrap:anywhere;font-size:11px}
+.home-feed-publish-v2{min-height:48px;padding:10px 16px;border-radius:13px;font-weight:900;white-space:nowrap;box-shadow:0 8px 20px rgba(237,28,36,.2)}
+.home-feed-publish-v2 span{margin-right:5px;font-size:17px}
+.home-feed-composer-v2 .home-feed-caption-meta{display:flex;justify-content:space-between;gap:10px;color:#999;font-size:11px}
+.home-feed-composer-v2 .home-feed-preview{padding:12px;border:1px solid rgba(237,28,36,.32);border-radius:15px;background:#090909}
+#musicas .music-upload-area,#musicas #my-uploaded-songs-panel,#musicas .music-catalog-panel,#musicas #music-library,#musicas .music-playlist-manager,#musicas .music-local-picker{
+  border:1px solid rgba(237,28,36,.3);border-radius:19px;
+  background:radial-gradient(ellipse at 100% 0,rgba(237,28,36,.09),transparent 48%),linear-gradient(145deg,#141112,#090909);
+  box-shadow:0 14px 34px rgba(0,0,0,.2)
+}
+#musicas .music-upload-area{border-color:rgba(237,28,36,.58);box-shadow:0 14px 38px rgba(237,28,36,.08),0 12px 30px #0006}
+#musicas .music-upload-area .eyebrow,#musicas .music-catalog-panel .eyebrow,#musicas .music-playlist-manager .eyebrow{color:#ff6971;letter-spacing:1.35px;font-weight:950}
+#musicas .music-upload-area h3,#musicas .music-catalog-panel h3,#musicas .music-playlist-manager h3{letter-spacing:-.02em}
+#musicas #music-upload-form{gap:11px;padding-top:8px}
+#musicas #music-upload-form input:not([type=file]),#musicas #music-upload-form textarea,#musicas .music-playlist-create input,#musicas #song-catalog-search{
+  min-height:48px;border:1px solid #393033;border-radius:12px;background:#080808;color:#fff;padding:11px 13px
+}
+#musicas #music-upload-form input:focus,#musicas #music-upload-form textarea:focus,#musicas .music-playlist-create input:focus,#musicas #song-catalog-search:focus{outline:2px solid rgba(237,28,36,.58);outline-offset:2px}
+#musicas #music-upload-form button[type=submit],#musicas .music-playlist-create button{min-height:49px;border-radius:13px;font-weight:900}
+#musicas #published-song-catalog>.card,#musicas #published-song-catalog>.song-card{border:1px solid rgba(255,255,255,.09);border-radius:15px;background:linear-gradient(145deg,#191516,#0b0b0b);margin:9px 0;padding:13px}
+#musicas .music-library-columns section{padding:13px;border:1px solid rgba(255,255,255,.08);border-radius:15px;background:rgba(0,0,0,.2)}
+#musicas .music-playlist-create-row{gap:9px}
+#musicas .music-playlist-manager #music-playlists-list{display:grid;gap:9px;margin-top:14px}
+#musicas .music-local-picker audio{border-radius:12px}
+@media(max-width:560px){
+ .home-feed-composer-v2{gap:12px;padding:13px;border-radius:17px}
+ .home-feed-compose-mark{flex-basis:40px;width:40px;height:40px;border-radius:13px}
+ .home-feed-compose-intro strong{font-size:14px}
+ .home-feed-compose-intro small{font-size:11px}
+ .home-feed-compose-actions-v2{grid-template-columns:minmax(0,1fr) auto}
+ .home-feed-pick-v2{grid-column:1;grid-row:1}
+ .home-feed-media-name{grid-column:1/-1;grid-row:2}
+ .home-feed-publish-v2{grid-column:2;grid-row:1;padding:9px 12px}
+ .home-feed-composer-v2 .home-feed-caption-meta{font-size:10px}
+ #musicas .music-library-columns{grid-template-columns:1fr}
+}
