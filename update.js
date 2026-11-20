@@ -110,8 +110,9 @@
   clearTimeout(connectionDebounceTimer);
   connectionDebounceTimer=null;
   if(!confirmedOffline){markOnline();return;}
-  clearTimeout(reconnectTimer);
+  if(reconnectTimer)return;
   reconnectTimer=window.setTimeout(()=>{
+   reconnectTimer=null;
    confirmedOffline=false;
    displayOnline();
   },7000);
