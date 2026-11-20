@@ -399,7 +399,7 @@ async function publishStory() {
     const file = await preparePhotoForExport(selectedFile);
     const saved = await auth.createMyStory({
       file,
-      caption: [el('home-story-caption').value.trim(), [...(el('home-story-friends')?.selectedOptions || [])].map(option => option.dataset.tag || option.textContent).filter(Boolean).length ? 'Marcando: '+[...(el('home-story-friends')?.selectedOptions || [])].map(option => option.dataset.tag || option.textContent).filter(Boolean).join(', ') : '', el('home-story-link')?.value.trim() ? 'Divulgação: '+el('home-story-link').value.trim() : ''].filter(Boolean).join(' | ').slice(0,280),
+      caption: [el('home-story-caption').value.trim().slice(0,80), [...(el('home-story-friends')?.selectedOptions || [])].map(option => option.dataset.tag || option.textContent).filter(Boolean).length ? 'Marcando: '+[...(el('home-story-friends')?.selectedOptions || [])].map(option => option.dataset.tag || option.textContent).filter(Boolean).join(', ').slice(0,60) : '', el('home-story-link')?.value.trim() ? 'Divulgação: '+el('home-story-link').value.trim().slice(0,120) : ''].filter(Boolean).join(' | ').slice(0,280),
       musicSongId: selectedStoryMusicId
     });
     say('Story publicado! Ele ficará disponível por 24 horas.');
