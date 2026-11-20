@@ -59,6 +59,11 @@ legacy = Image.new("RGBA", (SIZE, SIZE), BACKGROUND)
 legacy.alpha_composite(legacy_art, ((SIZE - legacy_art.width) // 2, (SIZE - legacy_art.height) // 2))
 legacy.convert("RGB").save(out / "icon-only.png", optimize=True)
 
+# Ícones PWA rasterizados da mesma arte ampliada; evitam usar uma miniatura antiga.
+for icon_size in (192, 512):
+    pwa_icon = legacy.resize((icon_size, icon_size), Image.Resampling.LANCZOS)
+    pwa_icon.convert("RGB").save(out / f"pwa-icon-{icon_size}.png", optimize=True)
+
 # Foreground adaptativo: conserva área segura para máscaras dos launchers.
 adaptive_art = art.copy()
 adaptive_art.thumbnail((820, 820), Image.Resampling.LANCZOS)
