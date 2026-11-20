@@ -19,7 +19,7 @@ assert.match(html, /getOfflineMusic\(cachedSong\.id\)/, 'o catálogo offline dev
 assert.match(html, /audio_url:URL\.createObjectURL\(saved\.blob\)/, 'o player deve receber a URL local do áudio guardado');
 assert.match(html, /musicPlayer\.setCatalog\(songs\)/, 'o catálogo local deve alimentar o player e a fila da playlist');
 assert.match(html, /userPlaylists=readOfflineJson\(OFFLINE_MUSIC_PLAYLISTS_KEY,\[\]\)/, 'playlists locais devem carregar mesmo sem sessão de rede');
-assert.match(html, /Apenas músicas baixadas podem tocar/, 'a interface deve explicar o requisito de salvar as faixas antes');
+assert.match(html, /O player vai usar as faixas que conseguiu preparar automaticamente/, 'a interface deve explicar o cache automático');
 assert.match(player, /const songs=\(selected\?\.songs\|\|\[\]\)\.map\(entry=>catalog\.find\(song=>song\.id===entry\.song_id\)\)\.filter\(Boolean\)/, 'a playlist deve montar a fila a partir do catálogo local disponível');
 
 assert.match(html, /OFFLINE_MUSIC_MAX_BYTES=120\*1024\*1024/, 'cache automático deve ter limite de 120 MB');
