@@ -37,7 +37,9 @@ let chunks = [];
 let selectedFile = null;
 let previewUrl = '';
 let recordLimit = null;
-let busy = false;\nlet selectedStoryMusicId = '';\nlet storySongsLoaded = false;
+let busy = false;
+let selectedStoryMusicId = '';
+let storySongsLoaded = false;
 let cameraRequestId = 0;
 let recordingAudioStream = null;
 function stopRecordingAudio() {
@@ -396,7 +398,8 @@ async function publishStory() {
     const file = await preparePhotoForExport(selectedFile);
     const saved = await auth.createMyStory({
       file,
-      caption: [el('home-story-caption').value.trim(), el('home-story-friends')?.value.trim() ? 'Marcando: '+el('home-story-friends').value.trim() : '', el('home-story-link')?.value.trim() ? 'Divulgação: '+el('home-story-link').value.trim() : ''].filter(Boolean).join(' | ').slice(0,280),\n      musicSongId: selectedStoryMusicId
+      caption: [el('home-story-caption').value.trim(), el('home-story-friends')?.value.trim() ? 'Marcando: '+el('home-story-friends').value.trim() : '', el('home-story-link')?.value.trim() ? 'Divulgação: '+el('home-story-link').value.trim() : ''].filter(Boolean).join(' | ').slice(0,280),
+      musicSongId: selectedStoryMusicId
     });
     say('Story publicado! Ele ficará disponível por 24 horas.');
     document.dispatchEvent(new CustomEvent('capital:stories-updated', { detail: { id: saved.id } }));
@@ -433,7 +436,8 @@ musicToggle?.addEventListener('click', async () => {
 musicSelect?.addEventListener('change', () => { selectedStoryMusicId = musicSelect.value; });
 el('home-story-friends-toggle')?.addEventListener('click', () => { const panel=el('home-story-friends-panel'); panel.hidden=!panel.hidden; if(!panel.hidden)el('home-story-friends')?.focus(); });
 el('home-story-link-toggle')?.addEventListener('click', () => { const panel=el('home-story-link-panel'); panel.hidden=!panel.hidden; if(!panel.hidden)el('home-story-link')?.focus(); });
-\naddButton?.addEventListener('click', openComposer);
+
+addButton?.addEventListener('click', openComposer);
 el('home-story-close')?.addEventListener('click', closeComposer);
 el('home-story-album-button')?.addEventListener('click', () => album.click());
 album?.addEventListener('change', () => {
