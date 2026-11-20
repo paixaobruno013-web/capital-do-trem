@@ -34,6 +34,8 @@ jobs:
           node --check home-story-composer.js
           node --check admin-stories.js
           node --check account-stories.js
+          node --input-type=module --check < capital-ai.js
+          node scripts/check-ai-command-center.mjs
       - name: Verificar fluxos prioritários de publicação
         run: |
           node --check home-story-composer.js
