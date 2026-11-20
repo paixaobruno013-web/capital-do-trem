@@ -79,6 +79,8 @@ jobs:
         run: sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
       - name: Instalar dependências web e Capacitor
         run: npm install
+      - name: Verificar catálogo, player, playlists e envio de músicas
+        run: node scripts/check-music-experience.mjs
       - name: Preparar arquivos web
         run: npm run build:web
       - name: Criar projeto Android
