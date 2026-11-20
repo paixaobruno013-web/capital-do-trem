@@ -6,7 +6,7 @@
   nav.className = 'cdt-mobile-bottom-nav';
   nav.setAttribute('aria-label', 'Navegação principal');
   const items = [
-    { id: 'chat', label: 'Chat', icon: '💬', href: './bate-papo.html' },
+    { id: 'chat', label: 'Chat', icon: '💬', href: './mensagens.html' },
     { id: 'musicas', label: 'Músicas', icon: '♫', href: './index.html#musicas' },
     { id: 'pesquisa', label: 'Pesquisa', icon: '⌕', href: './index.html#pesquisa' },
     { id: 'perfil', label: 'Perfil', icon: '👤', href: './rede.html' }
