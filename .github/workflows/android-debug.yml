@@ -3,7 +3,7 @@ name: Gerar APK de teste do Capital do Trem
 on:
   workflow_dispatch:
   push:
-    branches: [main, melhorias-stories-navegacao-icone]
+    branches: [main, melhorias-stories-navegacao-icone, correcoes-alertas-offline-playlist]
     paths:
       - '**.html'
       - '**.js'
@@ -81,6 +81,10 @@ jobs:
         run: npm install
       - name: Verificar catálogo, player, playlists e envio de músicas
         run: node scripts/check-music-experience.mjs
+      - name: Verificar alertas de conexão e reprodução de playlists offline
+        run: node scripts/check-offline-experience.mjs
+      - name: Verificar monitoramento de falhas
+        run: node scripts/check-health-monitor.mjs
       - name: Preparar arquivos web
         run: npm run build:web
       - name: Criar projeto Android
