@@ -170,8 +170,8 @@
    lastProbeAt=Date.now();
    consecutiveProbeFailures++;
    // Uma falha isolada ou resposta lenta não deve disparar falso alerta.
-   // Sem rede no aparelho: alerta imediato. Com Wi-Fi/dados ativos: confirma em duas falhas seguidas.
-   if(!navigator.onLine||consecutiveProbeFailures>=2||document.documentElement.classList.contains('app-offline')){
+   // A primeira falha inicia a confirmação de 7 segundos; uma resposta válida cancela o aviso pendente.
+   if(!navigator.onLine||consecutiveProbeFailures>=1||document.documentElement.classList.contains('app-offline')){
     lastProbeOnline=false;
     showOffline();
    }
@@ -194,8 +194,8 @@
  navigator.connection?.addEventListener?.('change',verifyRealConnection);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)verifyRealConnection();});
  window.setTimeout(verifyRealConnection,500);
- // Eventos online/offline continuam imediatos; a sondagem periódica fica em 60 s para poupar bateria e dados móveis.
- window.setInterval(verifyRealConnection,60*1000);
+ // Verifica a internet a cada 7 segundos enquanto o app está visível; cada transição ainda exige 7 segundos estáveis.
+ window.setInterval(verifyRealConnection,7*1000);
  if(!supportsServiceWorkerUpdates||!('serviceWorker' in navigator))return;
  let registration=null,reloading=false;
  const banner=document.createElement('aside');
