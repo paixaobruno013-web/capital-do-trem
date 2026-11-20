@@ -12,7 +12,7 @@ const corsFor = (origin: string) => ({
   'Vary': 'Origin'
 });
 
-const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
+const json = (body: unknown, status = 200, corsHeaders: Record<string, string> = {}) => new Response(JSON.stringify(body), {
   status, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
 });
 
@@ -22,7 +22,8 @@ const allowedModes = new Set(['assistant', 'caption', 'describe']);
 Deno.serve(async (request) => {
   const origin = request.headers.get('Origin') || '';
   const corsHeaders = corsFor(origin);
-  if (origin && !allowedOrigins.has(origin)) return json({ error: 'Origem não autorizada.' }, 403);
+  const reply = (body: unknown, status = 200) => json(body, status, corsHeaders);
+  if (origin && !allowedOrigins.has(origin)) return reply({ error: 'Origem não autorizada.' }, 403);
   if (request.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (request.method !== 'POST') return json({ error: 'Método não permitido.' }, 405);
 
@@ -92,5 +93,5 @@ Deno.serve(async (request) => {
     .filter((item: any) => item.type === 'output_text')
     .map((item: any) => item.text || '').join('\n').trim();
   if (!answer) return json({ error: 'A IA não retornou uma resposta.' }, 502);
-  return json({ answer: answer.slice(0, 5000) });
+  return reply({ answer: answer.slice(0, 5000) });
 });
