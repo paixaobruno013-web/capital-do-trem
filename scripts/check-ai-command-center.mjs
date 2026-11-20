@@ -9,7 +9,7 @@ const [ai, camera, index, sw, edge, built, profile, groupChat, privateChat, priv
 ]);
 const checks = [
   [ai.includes("functions.invoke('capital-ai-assistant'") && ai.includes("getSession()"), 'Assistente chama IA somente com sessão autenticada'],
-  [ai.includes('data-cdt-go') && ai.includes('data-cdt-href') && ai.includes('cdt-command-center'), 'Central oferece atalhos para áreas principais'],
+  [!ai.includes('data-cdt-go') && !ai.includes('data-cdt-href') && !ai.includes('cdt-command-center'), 'IA permanece interna, sem botão ou central visível'],
   [camera.includes('runCapitalAI') && camera.includes('createAIImageDataUrl') && camera.includes("mode: 'caption'"), 'Câmera permite análise explícita de foto e sugestão de legenda'],
   [index.includes('home-story-ai-button') && index.includes('capital-ai.js'), 'Interface da câmera e assistente carregados'],
   [index.includes('A foto será enviada ao serviço de IA') && index.includes('Analisar foto e criar legenda'), 'Aviso de privacidade antes da análise da imagem'],
@@ -18,7 +18,7 @@ const checks = [
   [edge.includes('recent.length >= 12') && edge.includes('5_500_000') && edge.includes('allowedModes'), 'Limite básico de uso, payload e ações permitidas'],
   [!/(sk-[A-Za-z0-9]{20,}|OPENAI_API_KEY\s*[:=]\s*['"][^'"]+)/.test(ai + edge), 'Nenhuma chave de IA gravada no código'],
   [/const CACHE='capital-do-trem-v(\d+)'/.test(sw) && Number(sw.match(/const CACHE='capital-do-trem-v(\d+)'/)?.[1] || 0) >= 306, 'Cache atualizado para a nova experiência'],
-  [built.includes('functions.invoke') && built.includes('cdt-command-center'), 'Módulo IA incluído no pacote web/Android'],
+  [built.includes('functions.invoke') && !built.includes('cdt-command-center'), 'Serviço interno de IA incluído no pacote web/Android, sem interface flutuante'],
   [profile.includes('src="./capital-ai.js"') && groupChat.includes('src="./capital-ai.js"') && privateChat.includes('src="./capital-ai.js"'), 'Assistente e atalhos disponíveis também no perfil e conversas'],
   [privacy.includes('Assistente de inteligência artificial e câmera') && privacy.includes('custos de API'), 'Política de privacidade informa envio opcional de imagens e custos da IA'],
   [update.includes('},13000);') && update.includes('13 segundos contínuos sem internet'), 'Alerta offline dispara após 13 segundos contínuos'],
