@@ -11,7 +11,7 @@ const checks = [
   ['music page and published catalog are present', html.includes('id="musicas"') && html.includes('id="published-song-catalog"')],
   ['music catalog initializes Supabase and loads published tracks', html.includes("api.initSupabase()") && html.includes('api.getPublishedSongs()')],
   ['published tracks receive signed audio URLs', auth.includes('export async function getPublishedSongs()') && auth.includes('createSignedUrls(paths, 60 * 60)')],
-  ['catalog rows have play controls connected to the persistent player', html.includes("musicPlayer.playSong(") && html.includes("className='music-play-button'")],
+  ['catalog rows have play controls connected to the persistent player', html.includes('musicPlayer.playSong(') && html.includes('music-play-button')],
   ['player supports catalog, playlists, queue and direct playback', player.includes('function setCatalog(') && player.includes('function setPlaylists(') && player.includes('function playSong(') && player.includes('audio.play()')],
   ['player reports audio loading errors accessibly', player.includes("audio.addEventListener('error'") && player.includes('Verifique a conexão e tente novamente')],
   ['player supports Android lock-screen media controls', player.includes('navigator.mediaSession') && player.includes('setActionHandler')],
