@@ -40,6 +40,7 @@ on:
       - 'manifest.webmanifest'
       - 'sw.js'
       - 'update.js'
+      - 'update.js'
       - 'supabase/**'
       - 'supabase/auth.js'
       - 'scripts/**'
