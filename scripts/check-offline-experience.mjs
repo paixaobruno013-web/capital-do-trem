@@ -22,4 +22,14 @@ assert.match(html, /userPlaylists=readOfflineJson\(OFFLINE_MUSIC_PLAYLISTS_KEY,\
 assert.match(html, /Apenas músicas baixadas podem tocar/, 'a interface deve explicar o requisito de salvar as faixas antes');
 assert.match(player, /const songs=\(selected\?\.songs\|\|\[\]\)\.map\(entry=>catalog\.find\(song=>song\.id===entry\.song_id\)\)\.filter\(Boolean\)/, 'a playlist deve montar a fila a partir do catálogo local disponível');
 
-console.log('Offline e playlists: 11/11 verificações aprovadas.');
+assert.match(html, /OFFLINE_MUSIC_MAX_BYTES=120\*1024\*1024/, 'cache automático deve ter limite de 120 MB');
+assert.match(html, /OFFLINE_MUSIC_MAX_TRACK_BYTES=25\*1024\*1024/, 'faixas muito grandes não devem ocupar o cache automático');
+assert.match(html, /OFFLINE_MUSIC_MAX_TRACKS=12/, 'cache automático deve limitar a quantidade de faixas');
+assert.match(html, /async function cacheOfflineSong\(song\)/, 'deve existir cache automático de faixas');
+assert.match(html, /fetch\(song\.audio_url,\{cache:'no-store'\}\)/, 'o áudio deve ser armazenado enquanto houver conexão');
+assert.match(html, /cacheOfflineSongsInBackground\(songs,2\)/, 'as primeiras músicas devem ser preparadas em segundo plano');
+assert.match(html, /cacheOfflineSongsInBackground\(songs\.slice\(index,index\+3\),3\)/, 'a música atual e as próximas faixas devem ser preparadas automaticamente');
+assert.match(html, /cacheOfflineSongsInBackground\(playlistSongs,6\)/, 'a playlist escolhida deve preparar até seis faixas automaticamente');
+assert.match(html, /while\(\(total\+blob\.size>OFFLINE_MUSIC_MAX_BYTES\|\|count>=OFFLINE_MUSIC_MAX_TRACKS\)/, 'o cache deve remover faixas antigas ao atingir o limite');
+
+console.log('Offline, playlists e cache automático: 20/20 verificações aprovadas.');
