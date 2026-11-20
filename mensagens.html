@@ -89,7 +89,10 @@ body.light .messages{background:linear-gradient(180deg,#fff8f8,#f4f4f4)}
 #status{padding:3px 5px}
 .empty{padding:22px 12px}
 #search,#conversation-search{border-radius:999px;padding:12px 15px;background:var(--bg);border-color:#ed1c2438}
-#incoming .person{background:#ed1c2410;border:1px solid #ed1c2428}\n.official-group{background:linear-gradient(100deg,#ed1c2425,#ed1c2408)!important;border:1px solid #ed1c2477!important;box-shadow:0 0 14px #ed1c241c}\n.group-avatar{box-shadow:0 0 15px #ed1c2455!important}\n.group-message-head{display:flex;align-items:center;gap:7px;margin-bottom:5px}.group-message-head .profile-avatar{box-shadow:none}
+#incoming .person{background:#ed1c2410;border:1px solid #ed1c2428}
+.official-group{background:linear-gradient(100deg,#ed1c2425,#ed1c2408)!important;border:1px solid #ed1c2477!important;box-shadow:0 0 14px #ed1c241c}
+.group-avatar{box-shadow:0 0 15px #ed1c2455!important}
+.group-message-head{display:flex;align-items:center;gap:7px;margin-bottom:5px}.group-message-head .profile-avatar{box-shadow:none}
 @media(max-width:680px){
  main{padding:10px 9px 28px}
  .layout{display:block}
@@ -229,6 +232,35 @@ body.light .emoji-picker,body.light .emoji-full-panel,body.light .emoji-category
 #conversation-search{margin:10px 0 12px!important;border:1px solid #ed1c2455;background:#090909}
 #sidebar-panel{margin-top:0}
 @media(max-width:680px){#private-layout{display:flex;flex-direction:column;gap:10px}#inbox-panel,#sidebar-panel{width:100%;padding:13px;border-radius:18px}#conversations .conversation{min-height:68px}}
+
+/* FALA UAI — lista de conversas no formato da referência enviada, com identidade Capital do Trem. */
+header{padding:12px 14px 10px;text-align:left;display:flex;align-items:center;gap:12px;background:rgba(5,5,6,.98);border-bottom:1px solid #ed1c2444}
+header img{width:48px;height:48px;flex:0 0 48px;border-radius:50%;border:2px solid #ed1c24;background:#050505}
+header h1{margin:0;font-size:clamp(19px,4.5vw,25px);font-weight:950;letter-spacing:.2px;text-transform:uppercase}
+header p{display:none}
+header .actions{margin-left:auto;gap:5px;justify-content:flex-end}
+header .actions .btn,header .actions button{min-height:36px;padding:6px 9px;font-size:11px;border-radius:999px}
+#private-layout{grid-template-columns:1fr!important;max-width:760px;margin:0 auto}
+#sidebar-panel{padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
+#sidebar-panel>.section-title:first-child{padding:8px 4px 5px}
+#sidebar-panel>.section-title:first-child h2{font-size:21px!important;font-weight:900;letter-spacing:.01em}
+#sidebar-panel>p.small{margin:0 4px 8px;line-height:1.35}
+#search{margin:8px 0 12px!important}
+#people{gap:2px!important}
+#people .person{min-height:70px;padding:9px 10px;border-bottom:1px solid #ffffff17;border-radius:0;background:rgba(8,8,9,.82)}
+#conversations{gap:0!important;border-top:1px solid #ffffff18}
+#conversations .conversation{min-height:82px!important;padding:10px 9px!important;border:0!important;border-bottom:1px solid #ffffff1b!important;border-radius:0!important;background:rgba(8,8,9,.88)!important;box-shadow:none!important}
+#conversations .conversation-copy{gap:3px}
+#conversations .conversation-copy strong{font-size:15px!important;font-weight:900;letter-spacing:.015em;color:#fff}
+#conversations .conversation-copy .small{font-size:12px;color:#b8b8b8}
+#conversations .profile-avatar,#conversations .location-shortcut-icon{width:60px;height:60px;flex:0 0 60px;border-radius:50%;border:2px solid #ed1c24;background:#090909;box-shadow:0 0 10px #ed1c2422}
+#conversations .profile-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+#conversations .official-group{background:linear-gradient(100deg,#27090d,#090909 82%)!important;border-left:4px solid #ed1c24!important}
+#conversations .official-group .conversation-copy strong{font-size:16px!important}
+#conversations .location-shortcut{background:rgba(8,8,9,.88)!important}
+#conversations .pill{margin-left:auto;border-color:#ed1c2477;color:#ff7078;font-weight:900}
+#thread-panel{min-width:0}
+@media(max-width:680px){header{flex-wrap:wrap}header .actions{width:100%;margin:0;justify-content:space-between}header .actions .btn,header .actions button{flex:1}#sidebar-panel>.section-title:first-child{padding-top:4px}#conversations .conversation{min-height:78px!important}}
 </style></head>
 <body><a class="skip" href="#main">Pular para o conteúdo</a>
 <header><img src="./marca.svg" alt="Capital do Trem"><h1>Minhas conversas</h1><p class="muted">Conversas individuais com convite e aceite antes de começar.</p><div class="actions"><a class="btn" href="./index.html">Início</a><a class="btn" href="./bate-papo.html">Fala Trem • Geral</a><a class="btn" href="./conta.html">Minha conta</a><button id="theme" type="button">☀️ Claro</button></div></header>
@@ -339,7 +371,7 @@ function drawConversations(){
  const box=$('conversations');box.replaceChildren();
  const term=$('conversation-search').value.trim().toLocaleLowerCase('pt-BR');
  const group=node('button','conversation');group.type='button';group.classList.add('official-group');
- const copy=node('span','conversation-copy'),name=node('strong',null,'Fala Trem • Grupo Capital do Trem'),meta=node('span','small',state.isGroupMember?'Conversa coletiva • você participa':'Entre no grupo para ver as mensagens'),tag=node('span','pill',state.isGroupMember?'GRUPO':'ENTRAR');
+ const copy=node('span','conversation-copy'),name=node('strong',null,'GRUPO: CAPITAL DO TREM'),meta=node('span','small',state.isGroupMember?'Grupo oficial • você participa':'Entre no grupo para ver as mensagens'),tag=node('span','pill',state.isGroupMember?'GRUPO':'ENTRAR');
  copy.append(name,meta);group.append(groupAvatarNode(),copy,tag);
  if(activeGroup)group.setAttribute('aria-current','true');
  group.addEventListener('click',()=>state.isGroupMember?openGroupConversation():joinGroupFromPrivate());box.append(group);
@@ -527,4 +559,4 @@ window.setInterval(async()=>{
  try{onlineIds=await getOnlineUserIds();drawPeople();drawConversations();}catch(error){}
 },45000);
 window.addEventListener('pagehide',clearSubscription);
-</script><script src="./emoji-picker.js" defer></script><script src="./update.js" defer></script></body></html>
+</script><script src="./emoji-picker.js" defer></script><script src="./update.js" defer></script><script src="./mobile-bottom-nav.js" defer></script></body></html>

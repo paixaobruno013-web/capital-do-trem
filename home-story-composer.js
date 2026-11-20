@@ -38,6 +38,9 @@ let selectedFile = null;
 let previewUrl = '';
 let recordLimit = null;
 let busy = false;
+let selectedStoryMusicId = '';
+let storyProfilesLoaded = false;
+let storySongsLoaded = false;
 let cameraRequestId = 0;
 let recordingAudioStream = null;
 function stopRecordingAudio() {
@@ -396,7 +399,8 @@ async function publishStory() {
     const file = await preparePhotoForExport(selectedFile);
     const saved = await auth.createMyStory({
       file,
-      caption: el('home-story-caption').value.trim()
+      caption: [el('home-story-caption').value.trim().slice(0,65), [...(el('home-story-friends')?.selectedOptions || [])].map(option => option.dataset.tag || option.textContent).filter(Boolean).length ? 'Marcando: '+[...(el('home-story-friends')?.selectedOptions || [])].map(option => option.dataset.tag || option.textContent).filter(Boolean).join(', ').slice(0,50) : '', el('home-story-link')?.value.trim() ? 'Divulgação: '+el('home-story-link').value.trim().slice(0,110) : ''].filter(Boolean).join(' | ').slice(0,280),
+      musicSongId: selectedStoryMusicId
     });
     say('Story publicado! Ele ficará disponível por 24 horas.');
     document.dispatchEvent(new CustomEvent('capital:stories-updated', { detail: { id: saved.id } }));
@@ -409,6 +413,54 @@ async function publishStory() {
     busy = false;
   }
 }
+
+
+const musicToggle = el('home-story-music-toggle');
+const musicPanel = el('home-story-music-panel');
+const musicSelect = el('home-story-music-select');
+const musicStatus = el('home-story-music-status');
+musicToggle?.addEventListener('click', async () => {
+  musicPanel.hidden = !musicPanel.hidden;
+  if (musicPanel.hidden || storySongsLoaded) return;
+  musicToggle.disabled = true;
+  if (musicStatus) musicStatus.textContent = 'Carregando músicas publicadas…';
+  try {
+    const songs = await auth.getPublishedSongs();
+    musicSelect.replaceChildren(new Option('Sem música', ''));
+    for (const song of songs) musicSelect.add(new Option(song.title + ' — ' + song.artist_name, song.id));
+    storySongsLoaded = true;
+    if (musicStatus) musicStatus.textContent = songs.length ? 'Escolha a trilha do seu Story.' : 'Ainda não há músicas publicadas no catálogo.';
+  } catch (error) {
+    if (musicStatus) musicStatus.textContent = error?.message || 'Não foi possível carregar as músicas.';
+  } finally { musicToggle.disabled = false; }
+});
+musicSelect?.addEventListener('change', () => { selectedStoryMusicId = musicSelect.value; });
+el('home-story-friends-toggle')?.addEventListener('click', async () => {
+  const panel=el('home-story-friends-panel'); panel.hidden=!panel.hidden;
+  if(panel.hidden) return;
+  const select=el('home-story-friends');
+  if(storyProfilesLoaded){select?.focus();return;}
+  if(select) select.replaceChildren(new Option('Carregando perfis públicos…',''));
+  try {
+    const profiles=await auth.getPublicProfiles();
+    if(select){
+      select.replaceChildren();
+      for(const profile of profiles){
+        const handle=String(profile.username||'').replace(/^@/,'');
+        const label=String(profile.display_name||'Maquinista')+(handle?' (@'+handle+')':'');
+        const option=new Option(label,profile.user_id);
+        option.dataset.tag=handle?'@'+handle:String(profile.display_name||'Maquinista');
+        select.add(option);
+      }
+      if(!profiles.length) select.add(new Option('Nenhum perfil público disponível',''));
+    }
+    storyProfilesLoaded=true;
+  } catch(error) {
+    if(select) select.replaceChildren(new Option(error?.message||'Não foi possível carregar os perfis.',''));
+  }
+  select?.focus();
+});
+el('home-story-link-toggle')?.addEventListener('click', () => { const panel=el('home-story-link-panel'); panel.hidden=!panel.hidden; if(!panel.hidden)el('home-story-link')?.focus(); });
 
 addButton?.addEventListener('click', openComposer);
 el('home-story-close')?.addEventListener('click', closeComposer);

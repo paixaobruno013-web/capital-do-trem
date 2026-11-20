@@ -682,7 +682,7 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
 
 
 /* Instagram: identidade visual em degradê rosa e roxo */
-.instagram-button{background:linear-gradient(110deg,#feda75 0%,#fa7e1e 18%,#d62976 48%,#962fbf 76%,#4f5bd5 100%)!important;color:#fff!important;border:1px solid rgba(255,255,255,.22)!important;box-shadow:0 3px 14px rgba(214,41,118,.28)!important;text-shadow:0 1px 2px rgba(0,0,0,.18)}
+.instagram-button{background:linear-gradient(120deg,#ff4fa3 0%,#d629a7 45%,#8b35d6 100%)!important;color:#fff!important;border:1px solid rgba(255,255,255,.22)!important;box-shadow:0 3px 14px rgba(214,41,118,.28)!important;text-shadow:0 1px 2px rgba(0,0,0,.18)}
 .instagram-button:hover,.instagram-button:focus-visible{filter:brightness(1.08);box-shadow:0 4px 18px rgba(150,47,191,.42)!important}
 
 
@@ -933,7 +933,9 @@ body.light header.header-has-custom-background::before{
 // Se o Android encerrar o processo enquanto a câmera nativa está aberta, retoma a conversa em vez de reiniciar na página inicial.
 try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(localStorage.getItem(key)||0);if(started&&Date.now()-started<3*60*1000){localStorage.removeItem(key);location.replace('./bate-papo.html?retorno-camera=1');}}catch(error){}
 </script>
-<link rel="stylesheet" href="./capital-futurista.css?v=5">\n<style>.music-section-banner{width:100%;margin:0 0 14px;aspect-ratio:16/9;background:#000;overflow:hidden;border-radius:14px}.music-section-banner img{display:block;width:100%;height:100%;aspect-ratio:16/9;object-fit:contain;background:#000}.music-upload-area{display:block;margin:0 0 14px;border:1px solid rgba(237,28,36,.42);background:linear-gradient(155deg,#171012,#090909);box-shadow:0 10px 28px rgba(0,0,0,.25)}.music-upload-area .home-section-heading{margin-bottom:10px}.music-upload-area form{display:grid;gap:9px}.music-upload-area form[hidden]{display:none!important}.music-upload-area input[type=file]{display:block;width:100%;min-height:48px;padding:10px;border:1px dashed rgba(237,28,36,.65);border-radius:12px;background:#100d0e;color:#fff}.music-upload-area button[type=submit]{width:100%;min-height:48px;border-radius:13px;font-weight:800;letter-spacing:.02em}.music-section-banner{aspect-ratio:auto;max-height:none;overflow:visible;border-radius:12px}.music-section-banner img{width:100%;height:auto;max-height:190px;object-fit:contain;object-position:center;background:#000}.my-uploaded-song{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;margin:8px 0}.my-uploaded-song-main{min-width:0;flex:1}.my-uploaded-song-main strong{display:block;overflow-wrap:anywhere}.my-uploaded-song-actions{display:flex;gap:7px;flex-wrap:wrap}.my-uploaded-song audio{width:100%;max-width:380px;margin-top:8px}.my-uploaded-song-actions button{min-height:38px;padding:7px 10px}</style></head>
+<link rel="stylesheet" href="./capital-futurista.css?v=5">
+<style>.music-section-banner{width:100%;margin:0 0 14px;aspect-ratio:16/9;background:#000;overflow:hidden;border-radius:14px}.music-section-banner img{display:block;width:100%;height:100%;aspect-ratio:16/9;object-fit:contain;background:#000}.music-upload-area{display:block;margin:0 0 14px;border:1px solid rgba(237,28,36,.42);background:linear-gradient(155deg,#171012,#090909);box-shadow:0 10px 28px rgba(0,0,0,.25)}.music-upload-area .home-section-heading{margin-bottom:10px}.music-upload-area form{display:grid;gap:9px}.music-upload-area form[hidden]{display:none!important}.music-upload-area input[type=file]{display:block;width:100%;min-height:48px;padding:10px;border:1px dashed rgba(237,28,36,.65);border-radius:12px;background:#100d0e;color:#fff}.music-upload-area button[type=submit]{width:100%;min-height:48px;border-radius:13px;font-weight:800;letter-spacing:.02em}.music-section-banner{aspect-ratio:auto;max-height:none;overflow:visible;border-radius:12px}.music-section-banner img{width:100%;height:auto;max-height:190px;object-fit:contain;object-position:center;background:#000}.my-uploaded-song{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;margin:8px 0}.my-uploaded-song-main{min-width:0;flex:1}.my-uploaded-song-main strong{display:block;overflow-wrap:anywhere}.my-uploaded-song-actions{display:flex;gap:7px;flex-wrap:wrap}.my-uploaded-song audio{width:100%;max-width:380px;margin-top:8px}.my-uploaded-song-actions button{min-height:38px;padding:7px 10px}</style><style>.home-story-extra-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:10px 0}.home-story-extra-actions button{min-width:0;padding:9px 5px;border:1px solid #ed1c2466;border-radius:10px;background:#171717;color:#fff;font-weight:750;font-size:12px}.home-story-extra-actions button:focus-visible{outline:2px solid #fff;outline-offset:2px}#home-story-music-panel,#home-story-friends-panel,#home-story-link-panel{padding:10px;margin:7px 0;border:1px solid #ed1c244d;border-radius:10px;background:#111}#home-story-music-panel select,#home-story-friends-panel input,#home-story-friends-panel select,#home-story-link-panel input{width:100%;min-height:42px;margin-top:6px;padding:9px;border-radius:8px;border:1px solid #444;background:#080808;color:#fff}</style>
+</head>
 <body>
 <script>
 (function(){
@@ -964,7 +966,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <p id="connection-status" class="connection-status" role="status" aria-live="polite" hidden></p>
 <nav id="nav" aria-label="Navegação principal">
 <button class="active" data-page="inicio" aria-controls="inicio" aria-current="page">⌂ Feed</button>
-<a class="nav-chat" href="./bate-papo.html" aria-label="Abrir chat">💬 Chat</a>
+<a class="nav-chat" href="./mensagens.html" aria-label="Abrir chat">💬 Chat</a>
 <button data-page="musicas" aria-controls="musicas">♫ Músicas</button>
 <button data-page="pesquisa" aria-controls="pesquisa">⌕ Pesquisa</button>
 <a class="nav-profile" href="./rede.html" aria-label="Abrir meu perfil">👤 Perfil</a>
@@ -2505,6 +2507,14 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
   </section>
   <label for="home-story-caption">Mensagem (opcional)</label>
   <textarea id="home-story-caption" maxlength="280" placeholder="O que você quer compartilhar?"></textarea>
+  <div class="home-story-extra-actions" aria-label="Recursos do Story">
+   <button id="home-story-music-toggle" type="button">♫ Colocar música</button>
+   <button id="home-story-friends-toggle" type="button">＠ Marcar amigos</button>
+   <button id="home-story-link-toggle" type="button">↗ Adicionar link</button>
+  </div>
+  <div id="home-story-music-panel" hidden><label for="home-story-music-select">Escolha uma música publicada</label><select id="home-story-music-select"><option value="">Sem música</option></select><p class="muted" id="home-story-music-status" role="status"></p></div>
+  <div id="home-story-friends-panel" hidden><label for="home-story-friends">Escolha amigos para marcar</label><select id="home-story-friends" multiple size="4" aria-label="Selecionar amigos públicos para marcar"><option value="">Carregando perfis públicos…</option></select><p class="muted">Selecione um ou mais perfis. Os nomes aparecerão na legenda do Story.</p></div>
+  <div id="home-story-link-panel" hidden><label for="home-story-link">Link de divulgação</label><input id="home-story-link" type="url" maxlength="110" inputmode="url" placeholder="https://..."></div>
   <button id="home-story-publish" class="home-story-publish" type="button" disabled>Publicar Story</button>
   <p id="home-story-status" role="status" aria-live="polite">Escolha uma foto ou grave um vídeo para publicar.</p>
  </section>
