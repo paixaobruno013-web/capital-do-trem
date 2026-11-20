@@ -2,7 +2,7 @@ name: Verificar preparação do aplicativo
 
 on:
   push:
-    branches: [main]
+    branches: [main, melhorias-stories-navegacao-icone, correcoes-alertas-offline-playlist]
   pull_request:
     branches: [main]
   workflow_dispatch:
