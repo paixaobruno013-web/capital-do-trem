@@ -1,9 +1,16 @@
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+const allowedOrigins = new Set([
+  'https://paixaobruno013-web.github.io',
+  'capacitor://localhost',
+  'http://localhost',
+  'https://localhost',
+  ...(Deno.env.get('AI_ALLOWED_ORIGINS') || '').split(',').map(value => value.trim()).filter(Boolean)
+]);
+const corsFor = (origin: string) => ({
+  'Access-Control-Allow-Origin': allowedOrigins.has(origin) ? origin : 'null',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Vary': 'Origin'
-};
+});
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
   status, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
@@ -13,6 +20,9 @@ const recentRequests = new Map<string, number[]>();
 const allowedModes = new Set(['assistant', 'caption', 'describe']);
 
 Deno.serve(async (request) => {
+  const origin = request.headers.get('Origin') || '';
+  const corsHeaders = corsFor(origin);
+  if (origin && !allowedOrigins.has(origin)) return json({ error: 'Origem não autorizada.' }, 403);
   if (request.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (request.method !== 'POST') return json({ error: 'Método não permitido.' }, 405);
 
@@ -24,7 +34,7 @@ Deno.serve(async (request) => {
   if (!token || token === authorization) return json({ error: 'Entre na sua conta para continuar.' }, 401);
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL');
-  const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
+  const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || Deno.env.get('SUPABASE_PUBLISHABLE_KEY');
   if (!supabaseUrl || !anonKey) return json({ error: 'Configuração segura indisponível.' }, 503);
 
   const userResponse = await fetch(supabaseUrl + '/auth/v1/user', {
@@ -39,11 +49,11 @@ Deno.serve(async (request) => {
   if (recent.length >= 12) return json({ error: 'Limite temporário atingido. Aguarde alguns minutos.' }, 429);
   recent.push(now); recentRequests.set(user.id, recent);
 
-  const length = Number(request.headers.get('content-length') || 0);
-  if (length > 5_500_000) return json({ error: 'A imagem é muito grande. Escolha uma foto menor.' }, 413);
-
+  let rawBody = '';
+  try { rawBody = await request.text(); } catch { return json({ error: 'Pedido inválido.' }, 400); }
+  if (new TextEncoder().encode(rawBody).byteLength > 5_500_000) return json({ error: 'A imagem é muito grande. Escolha uma foto menor.' }, 413);
   let body: { prompt?: unknown; image?: unknown; mode?: unknown };
-  try { body = await request.json(); } catch { return json({ error: 'Pedido inválido.' }, 400); }
+  try { body = JSON.parse(rawBody); } catch { return json({ error: 'Pedido inválido.' }, 400); }
   const prompt = String(body.prompt || '').trim().slice(0, 1800);
   const image = String(body.image || '');
   const mode = String(body.mode || 'assistant');
@@ -66,7 +76,7 @@ Deno.serve(async (request) => {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'gpt-4.1-mini',
+      model: 'gpt-5.4-mini',
       store: false,
       max_output_tokens: 500,
       input: [{ role: 'user', content }]
