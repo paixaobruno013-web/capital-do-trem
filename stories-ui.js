@@ -198,7 +198,27 @@ function renderStory(index) {
   mediaBox.append(media);
   const author = story.author_id ? (story.display_name || 'Usuário Uai') + (story.username ? ' • @' + story.username : '') : 'Capital do Trem • Oficial';
   const caption = document.createElement('div');
-  caption.textContent = author + (story.caption ? ' — ' + story.caption : '');
+  const captionText = author + (story.caption ? ' — ' + story.caption : '');
+  // Links https/http são exibidos como links reais, sem interpretar HTML enviado por usuários.
+  const captionParts = captionText.split(/(https?:\\/\\/[^\\s]+)/gi);
+  for (const part of captionParts) {
+    if (/^https?:\\/\\//i.test(part)) {
+      try {
+        const safeUrl = new URL(part);
+        if (safeUrl.protocol === 'https:' || safeUrl.protocol === 'http:') {
+          const link = document.createElement('a');
+          link.href = safeUrl.href;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.textContent = part;
+          link.style.cssText = 'color:#ff7078;text-decoration:underline;overflow-wrap:anywhere';
+          caption.append(link);
+          continue;
+        }
+      } catch {}
+    }
+    caption.append(document.createTextNode(part));
+  }
   captionBox.append(caption);
   if (story.music_url && /^https:\/\//i.test(story.music_url)) {
     const music = document.createElement('audio');
