@@ -32,4 +32,6 @@ assert.match(html, /cacheOfflineSongsInBackground\(songs\.slice\(index,index\+3\
 assert.match(html, /cacheOfflineSongsInBackground\(playlistSongs,6\)/, 'a playlist escolhida deve preparar até seis faixas automaticamente');
 assert.match(html, /while\(\(total\+blob\.size>OFFLINE_MUSIC_MAX_BYTES\|\|count>=OFFLINE_MUSIC_MAX_TRACKS\)/, 'o cache deve remover faixas antigas ao atingir o limite');
 
-console.log('Offline, playlists e cache automático: 20/20 verificações aprovadas.');
+assert.match(html, /window\.addEventListener\('offline',async\(\)=>\{[\s\S]*?getOfflineMusic\(song\.id\)[\s\S]*?musicPlayer\.setQueue\(/, 'ao perder a conexão, o player deve montar uma fila com as faixas locais');
+assert.match(html, /O player vai usar as faixas que conseguiu preparar automaticamente/, 'a interface deve explicar o cache automático');
+console.log('Offline, playlists e cache automático: 22/22 verificações aprovadas.');
