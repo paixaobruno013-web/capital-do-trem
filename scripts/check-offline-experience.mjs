@@ -7,11 +7,12 @@ const [update, html, player] = await Promise.all([
   readFile('capital-music-player.js', 'utf8')
 ]);
 
-assert.match(update, /connectionDebounceTimer=window\.setTimeout\([\s\S]*?\},7000\)/, 'alerta offline deve aguardar 7 segundos contínuos');
-assert.match(update, /reconnectTimer=window\.setTimeout\([\s\S]*?displayOnline\(\)[\s\S]*?\},7000\)/, 'alerta online deve aguardar 7 segundos estáveis');
+assert.match(update, /connectionDebounceTimer=window\.setTimeout\([\s\S]*?\},13000\)/, 'alerta offline deve aguardar 13 segundos contínuos');
+assert.match(update, /function showOnline\(\)[\s\S]*?displayOnline\(\);/, 'alerta online deve disparar imediatamente ao detectar o retorno');
 assert.match(update, /if\(confirmedOffline\|\|connectionDebounceTimer\)return/, 'eventos offline repetidos devem ser deduplicados');
 assert.match(update, /clearTimeout\(connectionDebounceTimer\)/, 'a recuperação rápida deve cancelar o alerta offline pendente');
-assert.match(update, /if\(reconnectTimer\)return/, 'sondagens online repetidas não devem reiniciar a contagem de 7 segundos');
+assert.match(update, /setInterval\(verifyRealConnection,1000\)/, 'a conexão deve ser monitorada automaticamente a cada segundo');
+assert.match(update, /setTimeout\(\(\)=>\{alertBox\.style\.display='none';\},13000\)/, 'alerta de retorno deve permanecer visível por 13 segundos');
 
 assert.match(html, /OFFLINE_MUSIC_CATALOG_KEY/, 'metadados do catálogo devem ser guardados localmente');
 assert.match(html, /OFFLINE_MUSIC_PLAYLISTS_KEY/, 'playlists devem ser guardadas localmente');
