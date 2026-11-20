@@ -1971,7 +1971,7 @@ function readOfflineJson(key,fallback=[]){
      playlistList.replaceChildren();
      if(!userPlaylists.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Entre na sua conta e carregue suas playlists enquanto estiver online.';playlistList.append(empty);}
     }
-    if(playlistStatus&&userPlaylists.length)playlistStatus.textContent='Modo offline: playlists guardadas neste aparelho. Apenas músicas baixadas podem tocar.';
+    if(playlistStatus&&userPlaylists.length)playlistStatus.textContent='Modo offline: playlists guardadas aqui. O player vai usar as faixas que conseguiu preparar automaticamente.';
     return;
    }
    try{
@@ -1979,7 +1979,7 @@ function readOfflineJson(key,fallback=[]){
     try{localStorage.setItem(OFFLINE_MUSIC_PLAYLISTS_KEY,JSON.stringify(userPlaylists));}catch{}
    }catch(networkError){
     userPlaylists=readOfflineJson(OFFLINE_MUSIC_PLAYLISTS_KEY,[]);
-    if(playlistStatus)playlistStatus.textContent=userPlaylists.length?'Sem internet: playlists e faixas salvas neste aparelho continuam disponíveis.':'Conecte-se para carregar suas playlists. Salve as faixas antes de ficar offline.';
+    if(playlistStatus)playlistStatus.textContent=userPlaylists.length?'Sem internet: playlists e faixas salvas neste aparelho continuam disponíveis.':'Conecte-se para sincronizar suas playlists. Enquanto estiver online, o app prepara algumas faixas automaticamente.';
    }
    musicPlayer.setPlaylists(userPlaylists);
    if(!playlistList)return;
@@ -2000,6 +2000,20 @@ function readOfflineJson(key,fallback=[]){
   };
   if(createPlaylistButton)createPlaylistButton.addEventListener('click',async()=>{if(!session){if(playlistStatus)playlistStatus.textContent='Entre na sua conta para criar uma playlist.';return;}const name=prompt('Nome da nova playlist:');if(name===null)return;createPlaylistButton.disabled=true;try{await api.createMyPlaylist(name);if(playlistStatus)playlistStatus.textContent='Playlist criada! Agora adicione músicas pelo catálogo.';await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível criar a playlist.';}finally{createPlaylistButton.disabled=false;}});
   try{await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível carregar suas playlists.';}
+  window.addEventListener('offline',async()=>{
+   const offlineSongs=[];
+   for(const song of songs){
+    try{const saved=await getOfflineMusic(song.id);if(saved?.blob)offlineSongs.push({...song,audio_url:URL.createObjectURL(saved.blob),offline_saved:true});}catch(error){/* Uma faixa indisponível não bloqueia as demais. */}
+   }
+   if(offlineSongs.length){
+    musicPlayer.setCatalog(offlineSongs);
+    const picker=document.querySelector('#capital-music-player .ct-player-playlist');
+    const selected=userPlaylists.find(item=>item.id===picker?.value);
+    const playlistQueue=(selected?.songs||[]).map(entry=>offlineSongs.find(song=>song.id===entry.song_id)).filter(Boolean);
+    musicPlayer.setQueue(playlistQueue.length?playlistQueue:offlineSongs);
+    if(playlistStatus)playlistStatus.textContent='Sem internet: '+offlineSongs.length+' faixa(s) preparadas neste aparelho. Aperte play para ouvir.';
+   }else if(playlistStatus){playlistStatus.textContent='Sem internet: o app ainda não conseguiu preparar nenhuma faixa neste aparelho.';}
+  });
   const mySongsById=new Map();
   if(session){try{for(const owned of await api.getMySongs())mySongsById.set(owned.id,owned);}catch(error){console.warn('Não foi possível consultar as músicas próprias para edição.',error);}}
   const libraryPanel=document.getElementById('music-library');
