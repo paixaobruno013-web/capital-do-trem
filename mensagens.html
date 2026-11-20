@@ -368,7 +368,7 @@ function drawConversations(){
  const box=$('conversations');box.replaceChildren();
  const term=$('conversation-search').value.trim().toLocaleLowerCase('pt-BR');
  const group=node('button','conversation');group.type='button';group.classList.add('official-group');
- const copy=node('span','conversation-copy'),name=node('strong',null,'Fala Trem • Grupo Capital do Trem'),meta=node('span','small',state.isGroupMember?'Conversa coletiva • você participa':'Entre no grupo para ver as mensagens'),tag=node('span','pill',state.isGroupMember?'GRUPO':'ENTRAR');
+ const copy=node('span','conversation-copy'),name=node('strong',null,'GRUPO: CAPITAL DO TREM'),meta=node('span','small',state.isGroupMember?'Grupo oficial • você participa':'Entre no grupo para ver as mensagens'),tag=node('span','pill',state.isGroupMember?'GRUPO':'ENTRAR');
  copy.append(name,meta);group.append(groupAvatarNode(),copy,tag);
  if(activeGroup)group.setAttribute('aria-current','true');
  group.addEventListener('click',()=>state.isGroupMember?openGroupConversation():joinGroupFromPrivate());box.append(group);
