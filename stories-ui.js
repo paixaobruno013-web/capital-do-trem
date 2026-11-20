@@ -200,9 +200,9 @@ function renderStory(index) {
   const caption = document.createElement('div');
   const captionText = author + (story.caption ? ' — ' + story.caption : '');
   // Links https/http são exibidos como links reais, sem interpretar HTML enviado por usuários.
-  const captionParts = captionText.split(/(https?:\\/\\/[^\\s]+)/gi);
+  const captionParts = captionText.split(/(https?:\/\/[^\s]+)/gi);
   for (const part of captionParts) {
-    if (/^https?:\\/\\//i.test(part)) {
+    if (/^https?:\/\//i.test(part)) {
       try {
         const safeUrl = new URL(part);
         if (safeUrl.protocol === 'https:' || safeUrl.protocol === 'http:') {
