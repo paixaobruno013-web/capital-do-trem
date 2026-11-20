@@ -1,7 +1,7 @@
 (() => {
   if (document.querySelector('.cdt-mobile-bottom-nav')) return;
   const path = location.pathname.toLowerCase();
-  const active = path.endsWith('/bate-papo.html') ? 'chat' : path.endsWith('/rede.html') ? 'perfil' : '';
+  const active = (path.endsWith('/bate-papo.html') || path.endsWith('/mensagens.html')) ? 'chat' : path.endsWith('/rede.html') ? 'perfil' : '';
   const nav = document.createElement('nav');
   nav.className = 'cdt-mobile-bottom-nav';
   nav.setAttribute('aria-label', 'Navegação principal');
