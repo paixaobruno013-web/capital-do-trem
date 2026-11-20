@@ -1,3 +1,4 @@
+declare const Deno: any;
 const allowedOrigins = new Set([
   'https://paixaobruno013-web.github.io',
   'capacitor://localhost',
