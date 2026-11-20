@@ -36,6 +36,7 @@ jobs:
           node --check account-stories.js
           node --input-type=module --check < capital-ai.js
           node scripts/check-ai-command-center.mjs
+          npx tsc --noEmit --target ES2022 --module ESNext --lib ES2022,DOM --skipLibCheck supabase/functions/capital-ai-assistant/index.ts
       - name: Verificar fluxos prioritários de publicação
         run: |
           node --check home-story-composer.js
