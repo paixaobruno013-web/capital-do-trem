@@ -38,7 +38,7 @@ let selectedFile = null;
 let previewUrl = '';
 let recordLimit = null;
 let busy = false;
-let selectedStoryMusicId = '';
+let selectedStoryMusicId = '';\nlet storyProfilesLoaded = false;
 let storySongsLoaded = false;
 let cameraRequestId = 0;
 let recordingAudioStream = null;
@@ -398,7 +398,7 @@ async function publishStory() {
     const file = await preparePhotoForExport(selectedFile);
     const saved = await auth.createMyStory({
       file,
-      caption: [el('home-story-caption').value.trim(), el('home-story-friends')?.value.trim() ? 'Marcando: '+el('home-story-friends').value.trim() : '', el('home-story-link')?.value.trim() ? 'Divulgação: '+el('home-story-link').value.trim() : ''].filter(Boolean).join(' | ').slice(0,280),
+      caption: [el('home-story-caption').value.trim(), [...(el('home-story-friends')?.selectedOptions || [])].map(option => option.dataset.tag || option.textContent).filter(Boolean).length ? 'Marcando: '+[...(el('home-story-friends')?.selectedOptions || [])].map(option => option.dataset.tag || option.textContent).filter(Boolean).join(', ') : '', el('home-story-link')?.value.trim() ? 'Divulgação: '+el('home-story-link').value.trim() : ''].filter(Boolean).join(' | ').slice(0,280),
       musicSongId: selectedStoryMusicId
     });
     say('Story publicado! Ele ficará disponível por 24 horas.');
@@ -434,7 +434,31 @@ musicToggle?.addEventListener('click', async () => {
   } finally { musicToggle.disabled = false; }
 });
 musicSelect?.addEventListener('change', () => { selectedStoryMusicId = musicSelect.value; });
-el('home-story-friends-toggle')?.addEventListener('click', () => { const panel=el('home-story-friends-panel'); panel.hidden=!panel.hidden; if(!panel.hidden)el('home-story-friends')?.focus(); });
+el('home-story-friends-toggle')?.addEventListener('click', async () => {
+  const panel=el('home-story-friends-panel'); panel.hidden=!panel.hidden;
+  if(panel.hidden) return;
+  const select=el('home-story-friends');
+  if(storyProfilesLoaded){select?.focus();return;}
+  if(select) select.replaceChildren(new Option('Carregando perfis públicos…',''));
+  try {
+    const profiles=await auth.getPublicProfiles();
+    if(select){
+      select.replaceChildren();
+      for(const profile of profiles){
+        const handle=String(profile.username||'').replace(/^@/,'');
+        const label=String(profile.display_name||'Maquinista')+(handle?' (@'+handle+')':'');
+        const option=new Option(label,profile.user_id);
+        option.dataset.tag=handle?'@'+handle:String(profile.display_name||'Maquinista');
+        select.add(option);
+      }
+      if(!profiles.length) select.add(new Option('Nenhum perfil público disponível',''));
+    }
+    storyProfilesLoaded=true;
+  } catch(error) {
+    if(select) select.replaceChildren(new Option(error?.message||'Não foi possível carregar os perfis.',''));
+  }
+  select?.focus();
+});
 el('home-story-link-toggle')?.addEventListener('click', () => { const panel=el('home-story-link-panel'); panel.hidden=!panel.hidden; if(!panel.hidden)el('home-story-link')?.focus(); });
 
 addButton?.addEventListener('click', openComposer);
