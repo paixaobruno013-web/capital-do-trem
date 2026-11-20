@@ -11,6 +11,7 @@ assert.match(update, /connectionDebounceTimer=window\.setTimeout\([\s\S]*?\},700
 assert.match(update, /reconnectTimer=window\.setTimeout\([\s\S]*?displayOnline\(\)[\s\S]*?\},7000\)/, 'alerta online deve aguardar 7 segundos estáveis');
 assert.match(update, /if\(confirmedOffline\|\|connectionDebounceTimer\)return/, 'eventos offline repetidos devem ser deduplicados');
 assert.match(update, /clearTimeout\(connectionDebounceTimer\)/, 'a recuperação rápida deve cancelar o alerta offline pendente');
+assert.match(update, /if\(reconnectTimer\)return/, 'sondagens online repetidas não devem reiniciar a contagem de 7 segundos');
 
 assert.match(html, /OFFLINE_MUSIC_CATALOG_KEY/, 'metadados do catálogo devem ser guardados localmente');
 assert.match(html, /OFFLINE_MUSIC_PLAYLISTS_KEY/, 'playlists devem ser guardadas localmente');
@@ -21,4 +22,4 @@ assert.match(html, /userPlaylists=readOfflineJson\(OFFLINE_MUSIC_PLAYLISTS_KEY,\
 assert.match(html, /Apenas músicas baixadas podem tocar/, 'a interface deve explicar o requisito de salvar as faixas antes');
 assert.match(player, /const songs=\(selected\?\.songs\|\|\[\]\)\.map\(entry=>catalog\.find\(song=>song\.id===entry\.song_id\)\)\.filter\(Boolean\)/, 'a playlist deve montar a fila a partir do catálogo local disponível');
 
-console.log('Offline e playlists: 10/10 verificações aprovadas.');
+console.log('Offline e playlists: 11/11 verificações aprovadas.');
