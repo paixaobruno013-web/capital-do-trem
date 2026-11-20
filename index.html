@@ -1314,7 +1314,7 @@ function go(id){
 }
 tabs.forEach(tab=>tab.addEventListener('click',()=>go(tab.dataset.page)));
 document.querySelectorAll('[data-go]').forEach(button=>button.addEventListener('click',()=>go(button.dataset.go)));
-function openPageFromHash(){const id=decodeURIComponent(location.hash.slice(1));if(['inicio','musicas','eventos','artistas','amigos','comunidade','social','parcerias','divulgue','duvidas'].includes(id))go(id);}
+function openPageFromHash(){const id=decodeURIComponent(location.hash.slice(1));if(['inicio','musicas','pesquisa','eventos','artistas','amigos','comunidade','social','parcerias','divulgue','duvidas'].includes(id))go(id);}
 if(location.hash)openPageFromHash();window.addEventListener('hashchange',openPageFromHash);
 const themeButton=document.getElementById('theme');
 const THEME_KEY='capitaldotrem_theme_v1';
