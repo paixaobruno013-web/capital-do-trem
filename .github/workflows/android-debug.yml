@@ -89,6 +89,8 @@ jobs:
           base64 --decode assets/capital-do-trem-logo.jpg.b64 > /tmp/capital-do-trem-logo.jpg
           python -m pip install --quiet Pillow
           python scripts/prepare-app-icons.py /tmp/capital-do-trem-logo.jpg assets
+          mkdir -p www/assets
+          cp assets/pwa-icon-192.png assets/pwa-icon-512.png www/assets/
           npx --yes @capacitor/assets@3.0.0 generate --android --assetPath assets --iconBackgroundColor '#ffffff' --iconBackgroundColorDark '#ffffff'
       - name: Sincronizar Capacitor
         run: npx cap sync android
