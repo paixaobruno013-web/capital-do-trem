@@ -93,29 +93,27 @@
   }
   if(!playedThisOutage&&audioUnlocked){playedThisOutage=true;playTrainHorn();}
   // O aviso fica visível por 5 segundos; o estado offline permanece ativo para as áreas que funcionam sem rede.
-  offlineTimer=window.setTimeout(()=>{alertBox.style.display='none';},5000);
+  offlineTimer=window.setTimeout(()=>{alertBox.style.display='none';},13000);
  }
  function showOffline(){
-  // Só confirma a queda após 7 segundos contínuos sem internet.
+  // Só confirma a queda após 13 segundos contínuos sem internet.
   clearTimeout(reconnectTimer);
   if(confirmedOffline||connectionDebounceTimer)return;
   connectionDebounceTimer=window.setTimeout(()=>{
    connectionDebounceTimer=null;
    confirmedOffline=true;
    displayOffline();
-  },7000);
+  },13000);
  }
  function showOnline(){
-  // A recuperação também precisa permanecer estável por 7 segundos.
+  // Ao detectar o retorno real da internet, avisa imediatamente, sem toque na tela.
   clearTimeout(connectionDebounceTimer);
   connectionDebounceTimer=null;
+  clearTimeout(reconnectTimer);
+  reconnectTimer=null;
   if(!confirmedOffline){markOnline();return;}
-  if(reconnectTimer)return;
-  reconnectTimer=window.setTimeout(()=>{
-   reconnectTimer=null;
-   confirmedOffline=false;
-   displayOnline();
-  },7000);
+  confirmedOffline=false;
+  displayOnline();
  }
  function displayOnline(){
   markOnline();
@@ -134,7 +132,7 @@
    alertBox.style.boxShadow='0 8px 30px #000b,0 0 20px #269b6577';
    alertBox.style.display='flex';
   clearTimeout(reconnectTimer);clearTimeout(offlineTimer);
-  reconnectTimer=window.setTimeout(()=>{alertBox.style.display='none';},5000);
+  reconnectTimer=window.setTimeout(()=>{alertBox.style.display='none';},13000);
  }
  hornButton.addEventListener('click',async()=>{
   hornEnabled=!hornEnabled;
@@ -195,8 +193,8 @@
  navigator.connection?.addEventListener?.('change',verifyRealConnection);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)verifyRealConnection();});
  window.setTimeout(verifyRealConnection,500);
- // Verifica a internet a cada 7 segundos enquanto o app está visível; cada transição ainda exige 7 segundos estáveis.
- window.setInterval(verifyRealConnection,7*1000);
+ // Verifica a internet a cada segundo enquanto o app está visível; a queda exige 13 segundos contínuos e o retorno avisa imediatamente.
+ window.setInterval(verifyRealConnection,1000);
  if(!supportsServiceWorkerUpdates||!('serviceWorker' in navigator))return;
  let registration=null,reloading=false;
  const banner=document.createElement('aside');
