@@ -1908,7 +1908,16 @@ function readOfflineJson(key,fallback=[]){
   const playlistStatus=document.getElementById('music-playlist-status');
   const createPlaylistButton=document.getElementById('create-music-playlist');
   const refreshPlaylists=async()=>{
-   if(!session){if(playlistList)playlistList.innerHTML='<p class="muted">Entre na sua conta para criar playlists.</p>';return;}
+   if(!session){
+    userPlaylists=readOfflineJson(OFFLINE_MUSIC_PLAYLISTS_KEY,[]);
+    musicPlayer.setPlaylists(userPlaylists);
+    if(playlistList){
+     playlistList.replaceChildren();
+     if(!userPlaylists.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Entre na sua conta e carregue suas playlists enquanto estiver online.';playlistList.append(empty);}
+    }
+    if(playlistStatus&&userPlaylists.length)playlistStatus.textContent='Modo offline: playlists guardadas neste aparelho. Apenas músicas baixadas podem tocar.';
+    return;
+   }
    try{
     userPlaylists=await api.getMyPlaylists();
     try{localStorage.setItem(OFFLINE_MUSIC_PLAYLISTS_KEY,JSON.stringify(userPlaylists));}catch{}
@@ -1934,7 +1943,7 @@ function readOfflineJson(key,fallback=[]){
    }
   };
   if(createPlaylistButton)createPlaylistButton.addEventListener('click',async()=>{if(!session){if(playlistStatus)playlistStatus.textContent='Entre na sua conta para criar uma playlist.';return;}const name=prompt('Nome da nova playlist:');if(name===null)return;createPlaylistButton.disabled=true;try{await api.createMyPlaylist(name);if(playlistStatus)playlistStatus.textContent='Playlist criada! Agora adicione músicas pelo catálogo.';await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível criar a playlist.';}finally{createPlaylistButton.disabled=false;}});
-  if(session){try{await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível carregar suas playlists.';}}
+  try{await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível carregar suas playlists.';}
   const mySongsById=new Map();
   if(session){try{for(const owned of await api.getMySongs())mySongsById.set(owned.id,owned);}catch(error){console.warn('Não foi possível consultar as músicas próprias para edição.',error);}}
   const libraryPanel=document.getElementById('music-library');
