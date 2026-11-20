@@ -3,7 +3,7 @@ name: Gerar APK de teste do Capital do Trem
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, melhorias-stories-navegacao-icone]
     paths:
       - '**.html'
       - '**.js'
