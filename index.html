@@ -1864,6 +1864,62 @@ async function getOfflineMusic(id){
   request.onerror=()=>{db.close();reject(request.error);};
  });
 }
+const OFFLINE_MUSIC_MAX_BYTES=120*1024*1024;
+const OFFLINE_MUSIC_MAX_TRACK_BYTES=25*1024*1024;
+const OFFLINE_MUSIC_MAX_TRACKS=12;
+const offlineCachingIds=new Set();
+async function listOfflineMusic(){
+ const db=await openOfflineMusicDB();
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction('tracks','readonly'),request=tx.objectStore('tracks').getAll();
+  request.onsuccess=()=>{db.close();resolve(request.result||[]);};
+  request.onerror=()=>{db.close();reject(request.error);};
+ });
+}
+async function deleteOfflineMusic(id){
+ const db=await openOfflineMusicDB();
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction('tracks','readwrite');
+  tx.objectStore('tracks').delete(String(id));
+  tx.oncomplete=()=>{db.close();resolve(true);};
+  tx.onerror=()=>{const error=tx.error;db.close();reject(error);};
+ });
+}
+async function cacheOfflineSong(song){
+ if(!song?.id||!song.audio_url||!navigator.onLine||offlineCachingIds.has(String(song.id)))return false;
+ if(String(song.audio_url).startsWith('blob:'))return false;
+ offlineCachingIds.add(String(song.id));
+ try{
+  if(await getOfflineMusic(song.id))return false;
+  const response=await fetch(song.audio_url,{cache:'no-store'});
+  if(!response.ok)throw new Error('Faixa indisponível para cache');
+  const blob=await response.blob();
+  if(!blob.size||blob.size>OFFLINE_MUSIC_MAX_TRACK_BYTES)return false;
+  const stored=await listOfflineMusic();
+  let total=stored.reduce((sum,item)=>sum+(item.blob?.size||0),0);
+  let count=stored.length;
+  const oldest=stored.slice().sort((a,b)=>(a.savedAt||0)-(b.savedAt||0));
+  while((total+blob.size>OFFLINE_MUSIC_MAX_BYTES||count>=OFFLINE_MUSIC_MAX_TRACKS)&&oldest.length){
+   const remove=oldest.shift();
+   await deleteOfflineMusic(remove.id);
+   total-=remove.blob?.size||0;
+   count--;
+  }
+  if(total+blob.size>OFFLINE_MUSIC_MAX_BYTES)return false;
+  await saveOfflineMusic(song.id,blob,song.title);
+  return true;
+ }catch(error){
+  console.warn('Cache automático da música não concluído:',song.title,error);
+  return false;
+ }finally{offlineCachingIds.delete(String(song.id));}
+}
+async function cacheOfflineSongsInBackground(items,limit=3){
+ if(!navigator.onLine||!Array.isArray(items))return;
+ for(const song of items.slice(0,limit)){
+  if(!navigator.onLine)break;
+  await cacheOfflineSong(song);
+ }
+}
 async function saveOfflineMusic(id,blob,title){
  if(!id||!blob?.size)throw new Error('Arquivo de áudio vazio ou sem identificador');
  const db=await openOfflineMusicDB();
@@ -1887,7 +1943,7 @@ function readOfflineJson(key,fallback=[]){
   const api=await import('./supabase/auth.js');api.initSupabase();
   const playerModule=await import('./capital-music-player.js');
   const session=await api.getCurrentSession().catch(()=>null);
-  const musicPlayer=playerModule.createCapitalMusicPlayer('capital-music-player',{showPlaylists:true,onPlay:song=>{if(session)api.recordSongPlay(song.id).catch(()=>{});}});window.capitalMusicPlayer=musicPlayer;
+  const musicPlayer=playerModule.createCapitalMusicPlayer('capital-music-player',{showPlaylists:true,onPlay:song=>{if(session)api.recordSongPlay(song.id).catch(()=>{});const index=songs.findIndex(item=>item.id===song?.id);if(index>=0)setTimeout(()=>cacheOfflineSongsInBackground(songs.slice(index,index+3),3),900);}});window.capitalMusicPlayer=musicPlayer;
   let songs=[];
   try{
    songs=await api.getPublishedSongs();
@@ -1934,7 +1990,7 @@ function readOfflineJson(key,fallback=[]){
     const name=document.createElement('strong');name.textContent=playlist.name;
     const count=document.createElement('span');count.className='muted';count.textContent=(playlist.songs?.length||0)+' faixa(s)';
     const actions=document.createElement('div');actions.className='social';
-    const playList=document.createElement('button');playList.type='button';playList.className='btn alt';playList.textContent='▶ Ouvir playlist';playList.addEventListener('click',()=>{musicPlayer.setPlaylists(userPlaylists);const picker=document.querySelector('#capital-music-player .ct-player-playlist');if(picker){picker.value=playlist.id;picker.dispatchEvent(new Event('change'));}document.getElementById('capital-music-player')?.scrollIntoView({behavior:'smooth',block:'center'});});
+    const playList=document.createElement('button');playList.type='button';playList.className='btn alt';playList.textContent='▶ Ouvir playlist';playList.addEventListener('click',()=>{const playlistSongs=(playlist.songs||[]).map(entry=>songs.find(song=>song.id===entry.song_id)).filter(Boolean);if(navigator.onLine)setTimeout(()=>cacheOfflineSongsInBackground(playlistSongs,6),900);musicPlayer.setPlaylists(userPlaylists);const picker=document.querySelector('#capital-music-player .ct-player-playlist');if(picker){picker.value=playlist.id;picker.dispatchEvent(new Event('change'));}document.getElementById('capital-music-player')?.scrollIntoView({behavior:'smooth',block:'center'});});
     const rename=document.createElement('button');rename.type='button';rename.className='btn alt';rename.textContent='✏️ Renomear';rename.addEventListener('click',async()=>{const value=prompt('Novo nome da playlist:',playlist.name);if(value===null)return;try{await api.renameMyPlaylist(playlist.id,value);await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível renomear a playlist.';}});
     const remove=document.createElement('button');remove.type='button';remove.className='btn alt';remove.textContent='Excluir';remove.classList.add('music-action-button','music-delete-button');remove.addEventListener('click',async()=>{if(!confirm('Excluir a playlist “'+playlist.name+'”? As músicas originais não serão apagadas.'))return;try{await api.deleteMyPlaylist(playlist.id);await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível excluir a playlist.';}});
     actions.append(playList,rename,remove);row.append(name,count,actions);
@@ -1983,7 +2039,7 @@ function readOfflineJson(key,fallback=[]){
   const searchInput=document.getElementById('song-catalog-search');
   const countLabel=document.getElementById('song-catalog-count');
   if(session)renderMusicLibrary();
-  musicPlayer.setCatalog(songs);
+  musicPlayer.setCatalog(songs);if(navigator.onLine)setTimeout(()=>cacheOfflineSongsInBackground(songs,2),1800);
   if(!songs.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='As músicas publicadas pela comunidade aparecerão aqui.';container.append(empty);return;}
   for(const song of songs){
    const card=document.createElement('article');card.className='item music-track-row';card.style.margin='10px 0';card.dataset.songId=song.id;songCards.set(song.id,card);card.dataset.searchText=[song.title,song.artist_name,song.description].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
