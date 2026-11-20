@@ -1,4 +1,5 @@
 import * as auth from './supabase/auth.js';
+import { runCapitalAI } from './capital-ai.js';
 
 const el = id => document.getElementById(id);
 const modal = el('home-story-composer');
@@ -82,6 +83,10 @@ function clearPreview() {
 }
 function setSelected(file) {
   selectedFile = file || null;
+  modal?.classList.toggle('has-selection', Boolean(file));
+  const aiResult = el('home-story-ai-result'); if (aiResult) aiResult.textContent = 'A análise só acontece quando você tocar no botão. A foto será enviada ao serviço de IA para processamento e não será salva pelo app.';
+  const aiUse = el('home-story-ai-use'); if (aiUse) aiUse.hidden = true;
+  const aiButton = el('home-story-ai-button'); if (aiButton) aiButton.disabled = !file?.type?.startsWith('image/');
   publish.disabled = !selectedFile || busy;
   if (saveButton) saveButton.disabled = !selectedFile || busy;
   clearPreview();
@@ -389,6 +394,47 @@ async function saveToGallery() {
     if (error?.name !== 'AbortError') say('Não foi possível salvar automaticamente. Tente compartilhar o arquivo ou verificar as permissões.');
   }
 }
+
+async function createAIImageDataUrl(file) {
+  if (!file?.type?.startsWith('image/')) throw new Error('A análise por câmera funciona com fotos, não com vídeos.');
+  const url = URL.createObjectURL(file);
+  try {
+    const image = new Image();
+    await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = reject; image.src = url; });
+    const scale = Math.min(1, 1280 / Math.max(image.naturalWidth, image.naturalHeight));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.78));
+    if (!blob) throw new Error('Não foi possível preparar a foto.');
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(blob);
+    });
+  } finally { URL.revokeObjectURL(url); }
+}
+let lastAISuggestion = '';
+el('home-story-ai-button')?.addEventListener('click', async event => {
+  const button = event.currentTarget, output = el('home-story-ai-result'), use = el('home-story-ai-use');
+  if (!selectedFile || !selectedFile.type.startsWith('image/')) { say('Escolha ou capture uma foto para usar a IA.'); return; }
+  button.disabled = true; if (use) use.hidden = true;
+  if (output) output.textContent = 'Preparando foto e consultando a IA…';
+  try {
+    const image = await createAIImageDataUrl(selectedFile);
+    lastAISuggestion = await runCapitalAI({ mode: 'caption', imageDataUrl: image, prompt: 'Observe a foto e sugira três legendas curtas e criativas em português brasileiro para um Story do Capital do Trem. Não identifique pessoas nem invente fatos.' });
+    if (output) output.textContent = lastAISuggestion;
+    if (use) use.hidden = false;
+  } catch (error) {
+    if (output) output.textContent = error?.message || 'A IA não está disponível agora.';
+  } finally { button.disabled = false; }
+});
+el('home-story-ai-use')?.addEventListener('click', () => {
+  const first = lastAISuggestion.split(/\n+/).map(line => line.replace(/^\s*(?:[-*•]|\d+[.)])\s*/, '').trim()).find(Boolean);
+  if (!first) return;
+  const caption = el('home-story-caption'); caption.value = first.slice(0, 280); caption.focus();
+  say('Sugestão da IA adicionada. Revise antes de publicar.');
+});
+
 async function publishStory() {
   if (!selectedFile || busy) return;
   busy = true;
