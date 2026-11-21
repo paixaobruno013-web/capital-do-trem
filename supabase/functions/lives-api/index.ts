@@ -36,7 +36,8 @@ Deno.serve(async (req: Request) => {
     if (authError || !auth.user) return json({ error: "Sessão inválida ou expirada." }, 401);
     const user = auth.user;
     const admin = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false, autoRefreshToken: false } });
-    const rooms = new RoomServiceClient(livekitUrl, apiKey, apiSecret);
+    const livekitHttpUrl = livekitUrl.replace(/^wss:/, "https:").replace(/^ws:/, "http:");
+    const rooms = new RoomServiceClient(livekitHttpUrl, apiKey, apiSecret);
     const body = await req.json();
     const action = body?.action;
 
