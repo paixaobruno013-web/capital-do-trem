@@ -17,6 +17,7 @@ const flipButton = el('home-story-flip-button');
 const zoomControl = el('home-story-zoom');
 const zoomValue = el('home-story-zoom-value');
 let cameraZoom = 1;
+let hardwareZoomActive = false;
 let holdRecording = false;
 const effectButtons = [...document.querySelectorAll('[data-story-effect]')];
 const toolsToggle = el('home-story-tools-toggle');
@@ -151,8 +152,8 @@ async function startCamera() {
     cameraZoom = 1;
     if (zoomControl) zoomControl.value = '1';
     if (zoomValue) zoomValue.textContent = '1×';
-    const hardwareZoom = await applyZoomToTrack();
-    live.style.transform = hardwareZoom ? 'none' : 'scale(1)';
+    hardwareZoomActive = await applyZoomToTrack();
+    live.style.transform = hardwareZoomActive ? 'none' : 'scale(1)';
     live.muted = true;
     live.autoplay = true;
     live.playsInline = true;
@@ -252,8 +253,9 @@ function capturePhoto() {
   // sem travar o aparelho ao codificar quadros 4K muito pesados.
   const sourceWidth = live.videoWidth;
   const sourceHeight = live.videoHeight;
-  const cropWidth = sourceWidth / cameraZoom;
-  const cropHeight = sourceHeight / cameraZoom;
+  const captureZoom = hardwareZoomActive ? 1 : cameraZoom;
+  const cropWidth = sourceWidth / captureZoom;
+  const cropHeight = sourceHeight / captureZoom;
   const scale = Math.min(1, 2048 / Math.max(cropWidth, cropHeight));
   const canvas = document.createElement('canvas');
   canvas.width = Math.max(1, Math.round(cropWidth * scale));
@@ -286,8 +288,9 @@ function startFilteredRecording() {
       return;
     }
     context.filter = effectCss();
-    const cropWidth = width / cameraZoom;
-    const cropHeight = height / cameraZoom;
+    const recordingZoom = hardwareZoomActive ? 1 : cameraZoom;
+    const cropWidth = width / recordingZoom;
+    const cropHeight = height / recordingZoom;
     context.drawImage(live, (width-cropWidth)/2, (height-cropHeight)/2, cropWidth, cropHeight, 0, 0, width, height);
     renderFrame = requestAnimationFrame(draw);
   };
@@ -625,8 +628,8 @@ async function setCameraZoom(value) {
   cameraZoom = Math.max(1, Math.min(3, Number(value) || 1));
   if (zoomControl) zoomControl.value = String(cameraZoom);
   if (zoomValue) zoomValue.textContent = cameraZoom.toFixed(1).replace('.0','') + '×';
-  const hardwareZoom = await applyZoomToTrack();
-  if (live) live.style.transform = hardwareZoom ? 'none' : 'scale(' + cameraZoom + ')';
+  hardwareZoomActive = await applyZoomToTrack();
+  if (live) live.style.transform = hardwareZoomActive ? 'none' : 'scale(' + cameraZoom + ')';
 }
 zoomControl?.addEventListener('input', () => setCameraZoom(zoomControl.value));
 window.addEventListener('capital:volume-key', event => {
