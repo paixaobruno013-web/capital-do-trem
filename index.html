@@ -2720,7 +2720,7 @@ async function refreshMyUploads(){
    const name=document.createElement('strong');name.textContent=(song.artist_name||'Artista')+' — '+(song.title||'Música');name.className='my-uploaded-song-name';
    const state=document.createElement('span');state.className='muted';state.textContent=song.status==='published'?'Publicado no catálogo':song.status==='rejected'?'Reprovado':'Aguardando aprovação';
    main.append(name,state);
-   if(song.audio_url){const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=song.audio_url;audio.setAttribute('aria-label','Reproduzir '+song.title);main.append(audio);}
+   if(song.audio_url){const play=document.createElement('button');play.type='button';play.className='my-uploaded-song-play';play.textContent='▶ Ouvir faixa';play.setAttribute('aria-label','Ouvir '+(song.artist_name||'')+' — '+(song.title||''));play.addEventListener('click',()=>{const player=window.capitalMusicPlayer;if(!player?.playSong){status.textContent='O player ainda está carregando. Tente novamente em instantes.';return;}player.playSong(song);const root=document.getElementById('capital-music-player');root?.scrollIntoView({behavior:'smooth',block:'center'});});main.append(play);}
    const actions=document.createElement('div');actions.className='my-uploaded-song-actions';
    const menu=document.createElement('details');menu.className='my-song-menu';
    const menuTrigger=document.createElement('summary');menuTrigger.textContent='⋮';menuTrigger.setAttribute('aria-label','Mais opções para '+(song.title||'música'));menuTrigger.title='Mais opções';
