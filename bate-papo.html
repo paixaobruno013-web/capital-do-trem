@@ -189,6 +189,21 @@ main>#chat-topics{order:4}
 #private-conversations-shortcut p{margin:4px 0 0;color:var(--muted)}
 #private-conversations-shortcut .btn{white-space:nowrap}
 @media(min-width:620px){.chat-area-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.chat-area-nav a{min-height:68px}}
+
+/* Correção definitiva de arrasto lateral no chat em telas estreitas. */
+html,body{width:100%;max-width:100%;overflow-x:clip}
+body{overscroll-behavior-x:none}
+main,.panel,.conversation,#capital-do-trem-room,#fazer-amigos,#private-conversations-shortcut,#chat-topics,.chat-area-nav,.message-list,#messages{min-width:0;max-width:100%}
+main>*{min-width:0;max-width:100%}
+.chat-area-nav{grid-template-columns:repeat(2,minmax(0,1fr))}
+.chat-area-nav a,.friend-person,.friend-copy{min-width:0;max-width:100%;overflow-wrap:anywhere}
+#messages{width:100%;overflow-x:hidden;overscroll-behavior-x:contain}
+.message{max-width:min(88%,680px);min-width:0;overflow-wrap:anywhere;word-break:break-word}
+.message img,.message video,.message audio,.message a{max-width:100%}
+.composer{width:100%;max-width:100%;min-width:0}
+.composer>*{min-width:0;max-width:100%}
+.composer input#message,.composer textarea{width:100%;min-width:0;max-width:100%}
+@media(max-width:480px){.chat-area-nav{grid-template-columns:minmax(0,1fr)}.message{max-width:94%}}
 </style><link rel="stylesheet" href="./capital-futurista.css?v=5"><style>
 /* Correção de largura no FALA UAI: a conversa não deve arrastar a página inteira para os lados. */
 html,body{width:100%;max-width:100%;overflow-x:hidden}
