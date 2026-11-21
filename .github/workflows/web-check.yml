@@ -178,6 +178,11 @@ jobs:
         run: node scripts/check-artist-verification.mjs
       - name: Verificar monitoramento local de falhas
         run: node scripts/check-health-monitor.mjs
+      - name: Verificar infraestrutura segura de transmissões ao vivo
+        run: |
+          node --check scripts/check-live-infrastructure.mjs
+          node scripts/check-live-infrastructure.mjs
+          npx tsc --noEmit --target ES2022 --module ESNext --lib ES2022,DOM --skipLibCheck supabase/functions/lives-api/index.ts
       - name: Verificar área de apoiadores
         run: node scripts/check-supporters.mjs
       - name: Verificar fluxo de exclusão de conta
