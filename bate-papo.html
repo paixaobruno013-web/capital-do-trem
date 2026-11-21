@@ -498,28 +498,25 @@ window.addEventListener('pagehide',()=>{saveChatState();if(unsubscribe)unsubscri
 <script type="module" src="./capital-ai.js"></script>
 
 <style id="cdt-chat-mobile-layout-fix">
-/* FALA UAI: manter toda a interface dentro da largura real do celular. */
-html,body{width:100%;max-width:100%;min-width:0;margin:0;overflow-x:clip!important}
-#main-content{display:block;width:100%;max-width:760px;min-width:0;margin-inline:auto;padding-inline:12px;overflow-x:clip}
-#main-content>*{min-width:0;max-width:100%}
-.chat-area-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%;min-width:0}
-.chat-area-nav>*{min-width:0;max-width:100%;overflow-wrap:anywhere}
-.chat-panel,.friends-panel,.membership-card,.panel{width:100%;min-width:0;max-width:100%;margin-inline:0}
+/* FALA UAI: travar a composição na largura do aparelho, sem deslocamento lateral. */
+html,body{width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important;overflow-x:hidden!important;overscroll-behavior-x:none}
+body{position:relative!important;left:0!important;transform:none!important}
+*,*::before,*::after{box-sizing:border-box}
+header{width:100%!important;max-width:100%!important;overflow:hidden}
+header .actions{width:100%;max-width:100%;padding-inline:8px}
+main#main-content{display:block!important;position:relative!important;left:0!important;transform:none!important;width:100%!important;max-width:760px!important;min-width:0!important;margin:0 auto!important;padding:14px 10px 32px!important;overflow-x:hidden!important}
+#main-content>*{min-width:0!important;max-width:100%!important}
+.chat-area-nav{display:grid!important;grid-template-columns:minmax(0,1fr)!important;width:100%!important;max-width:100%!important;padding:0!important;margin:12px 0!important;gap:8px}
+.chat-area-nav a{min-width:0!important;width:100%!important;overflow-wrap:anywhere}
+#capital-do-trem-room,#fazer-amigos,#private-conversations-shortcut,#chat-topics,.chat-panel,.friends-panel,.membership-card,.panel{width:100%!important;min-width:0!important;max-width:100%!important;margin-inline:0!important}
 .room-heading{min-width:0;flex-wrap:wrap;align-items:flex-start}
 .room-heading>*,.room-heading>div{min-width:0;max-width:100%}
-#messages{width:100%;min-width:0;max-width:100%;overflow-x:hidden}
-.message{min-width:0;max-width:94%;overflow-wrap:anywhere;word-break:break-word}
-.message img,.message video,.message audio,.message iframe{max-width:100%;height:auto}
-.composer{display:flex;width:100%;min-width:0;max-width:100%;gap:6px;flex-wrap:nowrap}
-.composer>*{min-width:0;max-width:100%}
-.composer input#message{flex:1 1 0;width:1%;min-width:0}
-@media(max-width:520px){
- #main-content{padding-inline:10px}
- .chat-area-nav{grid-template-columns:minmax(0,1fr)}
- .chat-panel,.friends-panel{padding:10px}
- .room-heading h2{font-size:18px;overflow-wrap:anywhere}
- .room-tag{font-size:9px}
- .composer{gap:4px}
-}
+#messages,.message-list{width:100%!important;min-width:0!important;max-width:100%!important;overflow-x:hidden!important;overscroll-behavior-x:none;touch-action:pan-y}
+.message,.message *,.friend-person,.friend-copy{min-width:0;max-width:100%;overflow-wrap:anywhere;word-break:break-word}
+.message img,.message video,.message audio,.message-attachment{height:auto;max-width:100%}
+#composer.composer{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;width:100%!important;min-width:0!important;max-width:100%!important;gap:6px!important}
+#composer>*{min-width:0!important;max-width:100%!important}
+#composer input#message{flex:1 1 120px!important;width:auto!important;min-width:0!important}
+@media(max-width:480px){.chat-panel,.friends-panel{padding:10px!important}.room-heading h2{font-size:18px;overflow-wrap:anywhere}#composer.composer{gap:4px!important}}
 </style>
 </body></html>
