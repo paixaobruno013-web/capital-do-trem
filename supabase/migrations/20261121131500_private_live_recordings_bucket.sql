@@ -21,6 +21,3 @@ for all
 to service_role
 using (bucket_id = 'live-recordings')
 with check (bucket_id = 'live-recordings');
-
-comment on table storage.buckets is
-  'Bucket live-recordings é privado; acesso às gravações deve ocorrer apenas via backend autenticado.';
