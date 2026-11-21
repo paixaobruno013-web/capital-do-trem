@@ -222,6 +222,21 @@ main{width:100%;overflow-x:clip}
 .chat-attachment-options button{min-width:0;overflow-wrap:anywhere}
 @media(max-width:480px){main{padding-left:10px;padding-right:10px}.panel{padding:12px}.composer{grid-template-columns:36px minmax(0,1fr) 36px 36px 56px;gap:4px;padding:6px}.composer button{min-width:0;max-width:100%;padding:7px 3px}.composer input#message{font-size:16px}.chat-area-nav{width:100%;max-width:100%;padding-left:0;padding-right:0}}
 </style>
+
+<style>
+/* FALA UAI: impede que conteúdo interno aumente a largura da página no celular. */
+html,body{width:100%;max-width:100%;overflow-x:hidden!important;overscroll-behavior-x:none}
+#main-content{width:100%;max-width:100%;min-width:0;box-sizing:border-box;overflow-x:clip}
+#main-content>*{min-width:0;max-width:100%;box-sizing:border-box}
+#capital-do-trem-room,#fazer-amigos,#private-conversations-shortcut,#chat-topics,.chat-area-nav,.chat-panel,.friends-panel{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+#messages,.message-list{width:100%;min-width:0;max-width:100%;overflow-x:hidden!important;overscroll-behavior-x:none;touch-action:pan-y}
+.message,.message *,.friend-person,.friend-copy,.chat-area-nav a{min-width:0;max-width:100%;overflow-wrap:anywhere;word-break:break-word}
+.message img,.message video,.message audio,.message-attachment{height:auto;max-width:100%}
+.composer{width:100%;min-width:0;max-width:100%;box-sizing:border-box;grid-template-columns:36px minmax(0,1fr) 36px 36px 56px}
+.composer>*{min-width:0;max-width:100%;box-sizing:border-box}
+.composer input#message{width:100%;min-width:0;max-width:100%}
+@media(max-width:480px){#main-content{padding-left:10px;padding-right:10px}.chat-panel,.friends-panel{padding:10px}.composer{gap:3px;padding:5px}.composer button{min-width:0;padding:6px 2px}}
+</style>
 </head><body>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
 <header><img src="./marca.svg" alt="Capital do Trem"><div class="chat-brand"><span class="chat-live-dot" aria-hidden="true"></span><span>FALA UAI</span><small>O ponto de encontro da comunidade</small></div><h1>FALA UAI da quebrada</h1><p class="muted">Artistas e Usuários Uai, juntos na mesma conversa.</p><div class="actions"><a class="btn alt" href="./index.html">Início</a><a class="btn alt" href="./conta.html">Minha conta</a><a class="btn alt" href="./avatar.html">Meu avatar</a><a class="btn" href="./mensagens.html">✉️ Minhas conversas</a><button class="alt" id="theme" type="button">☀️ Claro</button></div></header>

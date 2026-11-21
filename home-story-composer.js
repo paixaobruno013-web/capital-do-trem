@@ -128,9 +128,9 @@ async function startCamera() {
       cameraStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: { ideal: facingMode },
-          width: { ideal: 720 },
-          height: { ideal: 1280 },
-          frameRate: { ideal: 20, max: 24 }
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+          frameRate: { ideal: 24, max: 30 }
         },
         audio: false
       });
@@ -147,9 +147,12 @@ async function startCamera() {
       return false;
     }
     stream = cameraStream;
-    cameraZoom = Number(zoomControl?.value || 1);
-    if (zoomValue) zoomValue.textContent = cameraZoom.toFixed(1).replace('.0','') + '×';
-    live.style.transform = 'scale(' + cameraZoom + ')';
+    // Sempre iniciar sem zoom digital; ele pode reduzir a nitidez e cortar o enquadramento.
+    cameraZoom = 1;
+    if (zoomControl) zoomControl.value = '1';
+    if (zoomValue) zoomValue.textContent = '1×';
+    const hardwareZoom = await applyZoomToTrack();
+    live.style.transform = hardwareZoom ? 'none' : 'scale(1)';
     live.muted = true;
     live.autoplay = true;
     live.playsInline = true;
@@ -189,6 +192,10 @@ function openComposer() {
   if (saveButton) saveButton.disabled = true;
   el('home-story-caption').value = '';
   activeEffect = 'natural';
+  cameraZoom = 1;
+  if (zoomControl) zoomControl.value = '1';
+  if (zoomValue) zoomValue.textContent = '1×';
+  if (live) live.style.transform = 'none';
   applyEffect();
   clearPreview();
   message.textContent = 'Abrindo sua câmera…';
@@ -241,20 +248,30 @@ function capturePhoto() {
     say('A câmera ainda não está pronta. Aguarde ou escolha uma mídia do álbum.');
     return;
   }
+  // Limita a imagem final a 2048 px no lado maior: mantém boa definição para Stories
+  // sem travar o aparelho ao codificar quadros 4K muito pesados.
+  const sourceWidth = live.videoWidth;
+  const sourceHeight = live.videoHeight;
+  const cropWidth = sourceWidth / cameraZoom;
+  const cropHeight = sourceHeight / cameraZoom;
+  const scale = Math.min(1, 2048 / Math.max(cropWidth, cropHeight));
   const canvas = document.createElement('canvas');
-  canvas.width = live.videoWidth;
-  canvas.height = live.videoHeight;
-  const context = canvas.getContext('2d');
-  context.filter = 'none';
-  const cropWidth = canvas.width / cameraZoom;
-  const cropHeight = canvas.height / cameraZoom;
-  context.drawImage(live, (canvas.width-cropWidth)/2, (canvas.height-cropHeight)/2, cropWidth, cropHeight, 0, 0, canvas.width, canvas.height);
+  canvas.width = Math.max(1, Math.round(cropWidth * scale));
+  canvas.height = Math.max(1, Math.round(cropHeight * scale));
+  const context = canvas.getContext('2d', { alpha: false });
+  if (!context) { say('Não foi possível preparar a foto. Tente novamente.'); return; }
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = 'high';
+  context.drawImage(live,
+    (sourceWidth - cropWidth) / 2, (sourceHeight - cropHeight) / 2, cropWidth, cropHeight,
+    0, 0, canvas.width, canvas.height);
+  say('Foto capturada • preparando a prévia…');
   canvas.toBlob(blob => {
     if (!blob) { say('Não foi possível capturar a foto. Tente novamente.'); return; }
     setSelected(new File([blob], 'capital-do-trem-story.jpg', { type: 'image/jpeg' }));
     applyEffect();
-    say('Foto pronta com o efeito selecionado. Você pode salvar na galeria ou publicar.');
-  }, 'image/jpeg', 0.94);
+    say('Foto pronta. Você pode salvar na galeria ou publicar.');
+  }, 'image/jpeg', 0.92);
 }
 function startFilteredRecording() {
   const canvas = document.createElement('canvas');
@@ -593,19 +610,23 @@ recordButton?.addEventListener('click', event => {
 async function applyZoomToTrack() {
   const track = stream?.getVideoTracks?.()[0];
   const capabilities = track?.getCapabilities?.();
-  if (!capabilities || !('zoom' in capabilities)) return;
+  if (!capabilities || !('zoom' in capabilities)) return false;
   const min = capabilities.zoom.min ?? 1;
-  const max = capabilities.zoom.max ?? 1;
+  const max = capabilities.zoom.max ?? min;
   const value = min + ((cameraZoom - 1) / 2) * (max - min);
-  try { await track.applyConstraints({ advanced: [{ zoom: Math.min(max, Math.max(min, value)) }] }); }
-  catch (error) { /* O zoom digital continua funcionando como alternativa. */ }
+  try {
+    await track.applyConstraints({ advanced: [{ zoom: Math.min(max, Math.max(min, value)) }] });
+    return true;
+  } catch (error) {
+    return false; // Só usa zoom digital quando o aparelho não oferece zoom óptico/nativo.
+  }
 }
-function setCameraZoom(value) {
+async function setCameraZoom(value) {
   cameraZoom = Math.max(1, Math.min(3, Number(value) || 1));
   if (zoomControl) zoomControl.value = String(cameraZoom);
   if (zoomValue) zoomValue.textContent = cameraZoom.toFixed(1).replace('.0','') + '×';
-  if (live) live.style.transform = 'scale(' + cameraZoom + ')';
-  applyZoomToTrack();
+  const hardwareZoom = await applyZoomToTrack();
+  if (live) live.style.transform = hardwareZoom ? 'none' : 'scale(' + cameraZoom + ')';
 }
 zoomControl?.addEventListener('input', () => setCameraZoom(zoomControl.value));
 window.addEventListener('capital:volume-key', event => {
