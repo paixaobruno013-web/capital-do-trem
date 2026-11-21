@@ -19,5 +19,6 @@ if(area&&preview&&empty){
   uploadButton.addEventListener('click',async()=>{const file=fileInput.files?.[0];if(!file){status.textContent='Escolha uma imagem antes de enviar.';return;}uploadButton.disabled=true;saveButton.disabled=true;status.textContent='Enviando e salvando sua capa…';try{const url=await saveAdminMusicCover(file,readControls());showCover(url);fileInput.value='';if(temporaryPreviewUrl)URL.revokeObjectURL(temporaryPreviewUrl);temporaryPreviewUrl='';status.textContent='Capa publicada na área Músicas!';}catch(error){status.textContent=error?.message||'Não foi possível publicar a capa. Confira a conexão e as permissões.';}finally{uploadButton.disabled=false;saveButton.disabled=false;}});
   saveButton.addEventListener('click',async()=>{if(temporaryPreviewUrl){status.textContent='Publique a nova imagem antes de salvar o enquadramento definitivo.';return;}if(!currentCoverUrl){status.textContent='Envie uma capa antes de salvar o enquadramento.';return;}saveButton.disabled=true;status.textContent='Salvando os ajustes…';try{await saveAdminMusicCoverSettings(readControls());status.textContent='Enquadramento salvo para todos os usuários.';}catch(error){status.textContent=error?.message||'Não foi possível salvar os ajustes.';}finally{saveButton.disabled=false;}});
  }catch(error){if(adminMode)area.hidden=true;console.warn('Não foi possível carregar a capa da área Músicas.',error);}}
- initialize();
+ window.addEventListener('capital-admin-ready', initialize);
+ if (!document.getElementById('dashboard')?.hidden) initialize();
 }
