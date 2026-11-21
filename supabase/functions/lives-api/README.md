@@ -28,6 +28,7 @@ O Supabase fornece `SUPABASE_URL`, `SUPABASE_ANON_KEY` e `SUPABASE_SERVICE_ROLE_
 
 ## Contrato da função
 POST autenticado:
+- `{ "action": "list" }` — lista até 30 transmissões ativas.
 - `{ "action": "start", "title": "...", "description": "..." }`
 - `{ "action": "join", "live_id": "uuid" }`
 - `{ "action": "end", "live_id": "uuid" }`
