@@ -19,6 +19,9 @@ const zoomValue = el('home-story-zoom-value');
 let cameraZoom = 1;
 let holdRecording = false;
 const effectButtons = [...document.querySelectorAll('[data-story-effect]')];
+const toolsToggle = el('home-story-tools-toggle');
+const toolsRail = el('home-story-tools-rail');
+const effectsToggle = el('home-story-effects-toggle');
 const effects = {
   natural: { label: 'Natural', css: 'none' },
   day: { label: 'Dia', css: 'brightness(1.12) contrast(1.04) saturate(1.12)' },
@@ -121,9 +124,9 @@ async function startCamera() {
       cameraStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: { ideal: facingMode },
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          frameRate: { ideal: 24, max: 30 }
+          width: { ideal: 720 },
+          height: { ideal: 1280 },
+          frameRate: { ideal: 20, max: 24 }
         },
         audio: false
       });
@@ -436,6 +439,33 @@ el('home-story-ai-use')?.addEventListener('click', () => {
   say('Sugestão da IA adicionada. Revise antes de publicar.');
 });
 
+
+async function publishToFeed() {
+  if (!selectedFile || busy) return;
+  const input = el('home-feed-media');
+  const form = el('home-feed-composer');
+  const caption = el('home-feed-text');
+  if (!input || !form || !caption || !window.DataTransfer) {
+    say('Não foi possível preparar a publicação no Feed neste aparelho.');
+    return;
+  }
+  try {
+    const file = await preparePhotoForExport(selectedFile);
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    input.files = transfer.files;
+    const currentCaption = el('home-story-caption')?.value.trim() || '';
+    caption.value = currentCaption || '📸 Publicação compartilhada pelo Estúdio de Câmera';
+    caption.dispatchEvent(new Event('input', { bubbles: true }));
+    closeComposer();
+    document.querySelector('[data-page="inicio"]')?.click();
+    form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    form.requestSubmit();
+  } catch (error) {
+    say(error?.message || 'Não foi possível preparar a mídia para o Feed.');
+  }
+}
+
 async function publishStory() {
   if (!selectedFile || busy) return;
   busy = true;
@@ -510,6 +540,12 @@ el('home-story-friends-toggle')?.addEventListener('click', async () => {
 el('home-story-link-toggle')?.addEventListener('click', () => { const panel=el('home-story-link-panel'); panel.hidden=!panel.hidden; if(!panel.hidden)el('home-story-link')?.focus(); });
 
 addButton?.addEventListener('click', openComposer);
+toolsToggle?.addEventListener('click', () => { const collapsed = modal?.classList.toggle('tools-collapsed'); toolsToggle.setAttribute('aria-expanded', String(!collapsed)); });
+effectsToggle?.addEventListener('click', () => { const collapsed = modal?.classList.toggle('effects-collapsed'); effectsToggle.setAttribute('aria-expanded', String(!collapsed)); });
+el('home-story-tool-text')?.addEventListener('click', () => { const field=el('home-story-caption'); field.hidden=false; field.focus(); });
+el('home-story-tool-music')?.addEventListener('click', () => musicToggle?.click());
+el('home-story-tool-tag')?.addEventListener('click', () => el('home-story-friends-toggle')?.click());
+el('home-story-tool-save')?.addEventListener('click', saveToGallery);
 el('home-story-close')?.addEventListener('click', closeComposer);
 el('home-story-album-button')?.addEventListener('click', () => album.click());
 album?.addEventListener('change', () => {
@@ -594,6 +630,7 @@ effectButtons.forEach(button => button.addEventListener('click', () => {
   say('Efeito ' + effects[activeEffect].label + ' selecionado.');
 }));
 publish?.addEventListener('click', publishStory);
+el('home-story-feed-publish')?.addEventListener('click', publishToFeed);
 modal?.addEventListener('click', event => { if (event.target === modal) closeComposer(); });
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && modal?.classList.contains('is-open')) closeComposer();
