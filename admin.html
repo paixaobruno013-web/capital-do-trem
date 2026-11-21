@@ -346,6 +346,7 @@ async function enterDashboard(user){
  const allowed=await auth.isCurrentUserAdmin();
  if(!allowed){await auth.signOutAccount();showLoggedOut();loginStatus.textContent='Esta conta não está autorizada para administrar o Capital do Trem.';return;}
  loginPanel.hidden=true;dashboard.hidden=false;
+ window.dispatchEvent(new Event('capital-admin-ready'));
  document.getElementById('admin-welcome').textContent='Acesso autorizado: '+user.email;
  await loadBranding();
  await loadCasaPanelBranding();
