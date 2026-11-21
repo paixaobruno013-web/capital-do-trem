@@ -81,6 +81,10 @@ if (area && preview && empty && controls && fileInput && xInput && yInput && fit
   });
 
   saveButton.addEventListener('click', async () => {
+    if (temporaryPreviewUrl) {
+      status.textContent = 'Publique a nova imagem antes de salvar o enquadramento definitivo.';
+      return;
+    }
     if (!currentCoverUrl) {
       status.textContent = 'Envie uma capa antes de salvar o enquadramento.';
       return;
