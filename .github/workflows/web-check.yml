@@ -47,6 +47,8 @@ jobs:
         run: node scripts/check-feed-media-rollback.mjs
       - name: Validar migração mais recente de permissões musicais
         run: node scripts/check-latest-music-upload-migration.mjs
+      - name: Verificar capa personalizável da área Músicas
+        run: node scripts/check-music-cover.mjs
       - name: Verificar sintaxe do módulo Supabase
         run: node --input-type=module --check < supabase/auth.js
       - name: Verificar sintaxe e presença do gravador de áudio do chat
