@@ -1245,3 +1245,30 @@ body:has(#private-layout) #conversation-search{min-height:48px;border:1px solid 
   #musicas #published-song-catalog>.music-track-row h3{font-size:12px!important}
   #musicas #published-song-catalog>.music-track-row .music-play-button{width:36px!important;height:36px!important;min-width:36px!important}
 }
+
+/* Correção visual mobile do catálogo: nunca mostrar os controles nativos do áudio oculto. */
+#musicas #published-song-catalog .music-track-row audio[hidden],
+#musicas #published-song-catalog .music-track-row audio:not([controls]){
+ display:none!important;width:0!important;height:0!important;visibility:hidden!important
+}
+#musicas #published-song-catalog .music-track-row{
+ min-width:0!important;max-width:100%!important;overflow:hidden!important;
+}
+#musicas #published-song-catalog .music-track-row>*{min-width:0;max-width:100%;box-sizing:border-box}
+#musicas #published-song-catalog .music-track-row h3{overflow-wrap:anywhere;word-break:break-word}
+#musicas #published-song-catalog .music-track-row .music-play-button{align-self:center}
+#musicas #published-song-catalog .music-track-row .music-add-to-playlist{align-self:center}
+#musicas #published-song-catalog .music-track-row audio{display:none!important}
+#musicas #published-song-catalog .music-track-row .music-track-cover{
+ display:grid;place-items:center;border-radius:10px;background:radial-gradient(circle at 35% 25%,#ff5360,#5a0710 48%,#090909 78%);
+ color:#fff;text-shadow:0 0 12px #ff2638;box-shadow:inset 0 0 0 1px #ff667766,0 4px 12px #0008
+}
+@media(max-width:520px){
+ #musicas #published-song-catalog{width:100%;min-width:0;overflow-x:clip}
+ #musicas #published-song-catalog .music-track-row{padding:10px!important;border-radius:12px}
+ #musicas #published-song-catalog .music-track-row h3{font-size:13px!important;line-height:1.3}
+ #capital-music-player.ct-player-persistent .ct-player-shell{padding:8px 10px;gap:4px 8px}
+ #capital-music-player.ct-player-persistent .ct-player-controls{gap:5px}
+ #capital-music-player.ct-player-persistent .ct-player-controls button{width:36px;height:36px;min-width:36px}
+ #capital-music-player.ct-player-persistent .ct-player-controls .ct-player-play{width:46px;height:46px;min-width:46px}
+}
