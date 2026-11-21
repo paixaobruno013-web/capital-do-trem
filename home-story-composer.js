@@ -267,12 +267,26 @@ function capturePhoto() {
   context.drawImage(live,
     (sourceWidth - cropWidth) / 2, (sourceHeight - cropHeight) / 2, cropWidth, cropHeight,
     0, 0, canvas.width, canvas.height);
-  say('Foto capturada • preparando a prévia…');
+  // Congela e mostra o quadro imediatamente; a codificação do arquivo acontece em paralelo.
+  // Assim a pessoa vê o resultado do clique sem esperar o JPEG terminar de ser criado.
+  live.pause();
+  live.hidden = true;
+  photoPreview.hidden = false;
+  photoPreview.src = canvas.toDataURL('image/jpeg', 0.86);
+  photoPreview.style.filter = effectCss();
+  message.textContent = 'Sua foto';
+  say('Foto capturada • preparando o arquivo…');
   canvas.toBlob(blob => {
-    if (!blob) { say('Não foi possível capturar a foto. Tente novamente.'); return; }
+    if (!blob) {
+      live.hidden = false;
+      photoPreview.hidden = true;
+      live.play().catch(() => {});
+      say('Não foi possível preparar a foto. Tente novamente.');
+      return;
+    }
     setSelected(new File([blob], 'capital-do-trem-story.jpg', { type: 'image/jpeg' }));
     applyEffect();
-    say('Foto pronta. Você pode salvar na galeria ou publicar.');
+    say('Foto pronta! Veja como ficou e escolha publicar ou salvar.');
   }, 'image/jpeg', 0.92);
 }
 function startFilteredRecording() {
