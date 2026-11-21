@@ -189,7 +189,25 @@ main>#chat-topics{order:4}
 #private-conversations-shortcut p{margin:4px 0 0;color:var(--muted)}
 #private-conversations-shortcut .btn{white-space:nowrap}
 @media(min-width:620px){.chat-area-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.chat-area-nav a{min-height:68px}}
-</style><link rel="stylesheet" href="./capital-futurista.css?v=5"></head><body>
+</style><link rel="stylesheet" href="./capital-futurista.css?v=5"><style>
+/* Correção de largura no FALA UAI: a conversa não deve arrastar a página inteira para os lados. */
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+body{overflow-x:clip}
+main,.panel,.chat-panel,.room-heading,#messages,.composer,.membership-card,.friends-panel{min-width:0;max-width:100%}
+main{width:100%;overflow-x:clip}
+#messages{width:100%;overflow-x:hidden;overscroll-behavior-x:none;touch-action:pan-y;}
+.message{min-width:0;max-width:min(92%,520px);overflow-wrap:anywhere;word-break:break-word}
+.message *{max-width:100%;min-width:0}
+.message-attachment,.message-attachment img,.message-attachment video,.message-attachment audio{max-width:100%;}
+.composer{width:100%;grid-template-columns:38px minmax(0,1fr) 38px 38px 60px;overflow:hidden}
+.composer input#message{width:100%;min-width:0;max-width:100%}
+.emoji-picker,.emoji-full-panel,.emoji-category-grid{min-width:0;max-width:100%}
+.chat-attachment-menu{left:12px;right:12px;width:auto;max-width:calc(100vw - 24px)}
+.chat-attachment-options{min-width:0}
+.chat-attachment-options button{min-width:0;overflow-wrap:anywhere}
+@media(max-width:480px){main{padding-left:10px;padding-right:10px}.panel{padding:12px}.composer{grid-template-columns:36px minmax(0,1fr) 36px 36px 56px;gap:4px;padding:6px}.composer button{min-width:0;max-width:100%;padding:7px 3px}.composer input#message{font-size:16px}.chat-area-nav{width:100%;max-width:100%;padding-left:0;padding-right:0}}
+</style>
+</head><body>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
 <header><img src="./marca.svg" alt="Capital do Trem"><div class="chat-brand"><span class="chat-live-dot" aria-hidden="true"></span><span>FALA UAI</span><small>O ponto de encontro da comunidade</small></div><h1>FALA UAI da quebrada</h1><p class="muted">Artistas e Usuários Uai, juntos na mesma conversa.</p><div class="actions"><a class="btn alt" href="./index.html">Início</a><a class="btn alt" href="./conta.html">Minha conta</a><a class="btn alt" href="./avatar.html">Meu avatar</a><a class="btn" href="./mensagens.html">✉️ Minhas conversas</a><button class="alt" id="theme" type="button">☀️ Claro</button></div></header>
 <main id="main-content"><nav class="chat-area-nav" aria-label="Áreas principais do FALA UAI"><a href="#capital-do-trem-room">👥 Grupo CAPITAL DO TREM</a><a href="#fazer-amigos">🤝 Fazer amizades por localização</a></nav>
