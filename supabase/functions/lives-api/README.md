@@ -21,10 +21,12 @@ O Supabase fornece `SUPABASE_URL`, `SUPABASE_ANON_KEY` e `SUPABASE_SERVICE_ROLE_
 2. Criar/configurar projeto LiveKit Cloud e confirmar cotas, limites e política de cobrança. Não cadastrar cartão, fazer upgrade ou ativar cobrança sem autorização expressa.
 3. Implantar `lives-api` com verificação JWT habilitada.
 4. Integrar SDK LiveKit no aplicativo e implementar tela de anfitrião/espectador.
-5. Configurar LiveKit Egress e armazenamento de gravações (bucket privado, credenciais server-side, política de retenção e custos).
-6. Implementar webhook assinado para atualizar `recording_status` e caminho do arquivo.
-7. Criar publicação no Feed somente após gravação concluída e validada; nunca expor arquivo temporário ou URL administrativa.
-8. Testar rede móvel/Wi-Fi, permissões, reconexão, encerramento, espectadores simultâneos, limites de uso e falhas de gravação.
+5. Aplicar também a migration `20261121131500_private_live_recordings_bucket.sql`, que cria o bucket privado `live-recordings` (até 500 MB por arquivo; vídeos MP4/WebM). O bucket não é público e o aplicativo não recebe credenciais de armazenamento.
+6. Configurar LiveKit Egress com destino S3 compatível do Supabase Storage, usando endpoint, access key e secret key exclusivamente em secrets server-side. Confirmar compatibilidade e cotas no projeto antes de ativar.
+7. Definir política de retenção, limites de gravação e orçamento de armazenamento/tráfego.
+8. Implementar webhook assinado para atualizar `recording_status` e caminho do arquivo.
+9. Criar publicação no Feed somente após gravação concluída e validada; nunca expor arquivo temporário ou URL administrativa.
+10. Testar rede móvel/Wi-Fi, permissões, reconexão, encerramento, espectadores simultâneos, limites de uso e falhas de gravação.
 
 ## Contrato da função
 POST autenticado:
