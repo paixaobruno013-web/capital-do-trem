@@ -41,6 +41,19 @@ Deno.serve(async (req: Request) => {
     const body = await req.json();
     const action = body?.action;
 
+    if (action === "list") {
+      const { data: lives, error } = await admin.from("live_broadcasts")
+        .select("id, title, description, status, started_at, recording_status")
+        .eq("status", "live")
+        .order("started_at", { ascending: false })
+        .limit(30);
+      if (error) {
+        console.error("lives-api list failed", error.message);
+        return json({ error: "Não foi possível carregar as transmissões." }, 500);
+      }
+      return json({ lives: lives ?? [] });
+    }
+
     if (action === "start") {
       const title = typeof body.title === "string" ? body.title.trim() : "";
       const description = typeof body.description === "string" ? body.description.trim() : "";
