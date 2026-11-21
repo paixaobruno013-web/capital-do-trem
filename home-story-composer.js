@@ -29,7 +29,10 @@ const effects = {
   warm: { label: 'Quente', css: 'sepia(.18) saturate(1.25) brightness(1.04)' },
   bw: { label: 'P&B', css: 'grayscale(1) contrast(1.12)' },
   neon: { label: 'Neon', css: 'saturate(1.55) contrast(1.12) hue-rotate(8deg)' },
-  beauty: { label: 'Beleza suave', css: 'brightness(1.06) saturate(1.08) contrast(.96)' }
+  beauty: { label: 'Beleza suave', css: 'brightness(1.07) saturate(1.12) contrast(.94)' },
+  portrait: { label: 'Retrato Pro', css: 'contrast(1.1) saturate(1.14) brightness(1.04)' },
+  cinematic: { label: 'Cinema', css: 'contrast(1.22) saturate(.88) sepia(.1)' },
+  funny: { label: 'Divertido', css: 'hue-rotate(34deg) saturate(1.8) contrast(1.12)' }
 };
 let activeEffect = 'natural';
 let facingMode = 'environment';
@@ -91,6 +94,7 @@ function setSelected(file) {
   const aiUse = el('home-story-ai-use'); if (aiUse) aiUse.hidden = true;
   const aiButton = el('home-story-ai-button'); if (aiButton) aiButton.disabled = !file?.type?.startsWith('image/');
   publish.disabled = !selectedFile || busy;
+  const feedPublish = el('home-story-feed-publish'); if (feedPublish) feedPublish.disabled = !selectedFile || busy;
   if (saveButton) saveButton.disabled = !selectedFile || busy;
   clearPreview();
   if (!file) return;
@@ -181,6 +185,7 @@ function openComposer() {
   selectedFile = null;
   album.value = '';
   publish.disabled = true;
+  const feedPublish = el('home-story-feed-publish'); if (feedPublish) feedPublish.disabled = true;
   if (saveButton) saveButton.disabled = true;
   el('home-story-caption').value = '';
   activeEffect = 'natural';
@@ -542,7 +547,7 @@ el('home-story-link-toggle')?.addEventListener('click', () => { const panel=el('
 addButton?.addEventListener('click', openComposer);
 toolsToggle?.addEventListener('click', () => { const collapsed = modal?.classList.toggle('tools-collapsed'); toolsToggle.setAttribute('aria-expanded', String(!collapsed)); });
 effectsToggle?.addEventListener('click', () => { const collapsed = modal?.classList.toggle('effects-collapsed'); effectsToggle.setAttribute('aria-expanded', String(!collapsed)); });
-el('home-story-tool-text')?.addEventListener('click', () => { const field=el('home-story-caption'); field.hidden=false; field.focus(); });
+el('home-story-tool-text')?.addEventListener('click', () => { const field=el('home-story-caption'); if (!selectedFile) { say('Capture uma foto ou escolha um vídeo para adicionar texto.'); return; } field.focus(); });
 el('home-story-tool-music')?.addEventListener('click', () => musicToggle?.click());
 el('home-story-tool-tag')?.addEventListener('click', () => el('home-story-friends-toggle')?.click());
 el('home-story-tool-save')?.addEventListener('click', saveToGallery);
