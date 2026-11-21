@@ -7,7 +7,7 @@ const checks=[
 [musicHeader.includes('id="music-cover-area"')&&musicHeader.includes('id="music-cover-preview"'),'Capa pública continua visível na área Músicas'],
 [!musicHeader.includes('music-cover-controls')&&!musicHeader.includes('music-cover-file'),'Controles administrativos removidos da tela pública'],
 [adminCovers.includes('id="music-cover-controls"')&&['music-cover-file','music-cover-x','music-cover-y','music-cover-fit','music-cover-upload','music-cover-save','music-cover-status'].every(id=>adminCovers.includes('id="'+id+'"')),'Controles da capa musical centralizados no painel admin'],
-[admin.includes('src="./music-cover.js"'),'Módulo de capas carregado no painel administrativo'],
+[admin.includes('src="./music-cover.js"')&&admin.includes("new Event('capital-admin-ready')")&&cover.includes("addEventListener('capital-admin-ready', initialize)"),'Módulo de capas inicializa somente após acesso autorizado'],
 [cover.includes('const adminMode=Boolean(controls&&fileInput')&&cover.includes('area.hidden=!admin')&&cover.includes('area.hidden=!branding.musicCoverUrl'),'Visualização pública separada da gestão administrativa'],
 [auth.includes('export async function saveAdminMusicCover')&&auth.includes("!(await isCurrentUserAdmin())")&&auth.includes('file.size > 8 * 1024 * 1024'),'Backend exige administrador e limita imagem a 8 MB'],
 [auth.includes('app_music_cover_image_url')&&auth.includes('app_music_cover_x')&&auth.includes('app_music_cover_y')&&auth.includes('app_music_cover_fit'),'URL e enquadramento persistidos'],
