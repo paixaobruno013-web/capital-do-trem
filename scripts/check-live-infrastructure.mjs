@@ -1,0 +1,16 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+const migration = await readFile(new URL("../supabase/migrations/20261121130000_live_broadcasts.sql", import.meta.url), "utf8");
+const api = await readFile(new URL("../supabase/functions/lives-api/index.ts", import.meta.url), "utf8");
+const guide = await readFile(new URL("../supabase/functions/lives-api/README.md", import.meta.url), "utf8");
+assert.match(migration, /enable row level security/i);
+assert.match(migration, /revoke all privileges.*anon, authenticated/is);
+assert.match(migration, /live_broadcasts_one_active_per_host/);
+assert.match(api, /auth\.getUser\(\)/);
+assert.match(api, /canPublish: true/);
+assert.match(api, /canPublish: false/);
+assert.match(api, /host_user_id !== user\.id/);
+assert.match(api, /recording_status: "not_configured"/);
+assert.match(guide, /Gravação automática ainda não está habilitada/);
+assert.match(guide, /Não cadastrar cartão, fazer upgrade ou ativar cobrança sem autorização expressa/);
+console.log("Infraestrutura de Live: verificações estáticas aprovadas; gravação continua explicitamente desativada.");
