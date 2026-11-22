@@ -88,6 +88,7 @@ if (form && access && status && fileInput && submit) {
     }
     if (submit.disabled) return;
     submit.disabled = true;
+    form.setAttribute('aria-busy','true');
     submit.dataset.originalLabel = submit.textContent; submit.textContent = 'Enviando…'; submit.setAttribute('aria-busy','true');
     status.textContent = 'Enviando sua música…';
     try {
@@ -98,7 +99,7 @@ if (form && access && status && fileInput && submit) {
         producerName: $('music-upload-producer').value,
         description: $('music-upload-description').value
       });
-      form.reset();updateTitleCounter();
+      fileInput.value='';titleInput.value='';$('music-upload-artist').value='';$('music-upload-producer').value='';$('music-upload-description').value='';updateTitleCounter();
       status.textContent = song.status === 'published'
         ? 'Música publicada no catálogo!'
         : 'Música enviada! Ela ficará aguardando aprovação do administrador antes de aparecer no catálogo.';
@@ -106,7 +107,7 @@ if (form && access && status && fileInput && submit) {
     } catch (error) {
       status.textContent = error?.message || 'Não foi possível enviar a música. Confira o arquivo e tente novamente.';
     } finally {
-      submit.disabled = false;submit.textContent = submit.dataset.originalLabel || 'Enviar música para o catálogo';submit.removeAttribute('aria-busy');
+      submit.disabled = false;submit.textContent = submit.dataset.originalLabel || 'Enviar música para o catálogo';submit.removeAttribute('aria-busy');form.removeAttribute('aria-busy');
     }
   });
 
