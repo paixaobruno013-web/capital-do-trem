@@ -1043,7 +1043,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <section id="music-upload-area" class="card music-upload-area" aria-labelledby="music-upload-heading">
  <div class="home-section-heading"><div><span class="eyebrow">ENVIE SEU SOM</span><h3 id="music-upload-heading">＋ Publicar música</h3><p class="muted">MCs e DJs podem enviar suas faixas diretamente por aqui. Cada envio é independente, mesmo quando a música já existe no catálogo.</p></div></div>
  <p id="music-upload-access" class="notice" role="status" aria-live="polite">Verificando acesso para envio…</p>
- <form id="music-upload-form" hidden>
+ <form id="music-upload-form" hidden onsubmit="event.preventDefault(); return false" action="#" method="post" aria-describedby="music-upload-status">
   <label for="music-upload-file">Arquivo de áudio (MP3, M4A, AAC, WAV ou OGG • até 50 MB)</label>
   <input id="music-upload-file" type="file" accept="audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/x-wav,audio/ogg,.mp3,.m4a,.aac,.wav,.ogg" required>
   <label for="music-upload-title">Nome da música</label><input id="music-upload-title" maxlength="120" required placeholder="Título da faixa">
