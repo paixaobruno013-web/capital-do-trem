@@ -240,7 +240,26 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important;overscroll-behav
 </head><body>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
 <header><img src="./marca.svg" alt="Capital do Trem"><div class="chat-brand"><span class="chat-live-dot" aria-hidden="true"></span><span>FALA UAI</span><small>O ponto de encontro da comunidade</small></div><h1>FALA UAI da quebrada</h1><p class="muted">Artistas e Usuários Uai, juntos na mesma conversa.</p><div class="actions"><a class="btn alt" href="./index.html">Início</a><a class="btn alt" href="./conta.html">Minha conta</a><a class="btn alt" href="./avatar.html">Meu avatar</a><a class="btn" href="./mensagens.html">✉️ Minhas conversas</a><button class="alt" id="theme" type="button">☀️ Claro</button></div></header>
-<main id="main-content"><nav class="chat-area-nav" aria-label="Áreas principais do FALA UAI"><a href="#capital-do-trem-room">👥 Grupo CAPITAL DO TREM</a><a href="#fazer-amigos">🤝 Fazer amizades por localização</a></nav>
+<main id="main-content">
+<section id="cdt-chat-inbox" aria-label="Lista de conversas">
+ <div class="cdt-inbox-top"><span>FALA UAI</span><a href="./mensagens.html" aria-label="Nova conversa">✎</a></div>
+ <div class="cdt-inbox-tabs"><span class="active">Todas as conversas</span></div>
+ <div class="cdt-inbox-list">
+  <button class="cdt-chat-row" type="button" data-open-view="capital-do-trem-room">
+   <span class="cdt-chat-avatar logo"><img src="./marca.svg" alt=""></span><span class="cdt-chat-copy"><strong>GRUPO: CAPITAL DO TREM</strong><small>O ponto de encontro da comunidade</small></span><span class="cdt-chat-meta"><small>FALA UAI</small><b>›</b></span>
+  </button>
+  <button class="cdt-chat-row" type="button" data-open-view="fazer-amigos">
+   <span class="cdt-chat-avatar friends">🤝</span><span class="cdt-chat-copy"><strong>FAZER AMIZADES POR LOCALIZAÇÃO</strong><small>Encontre pessoas da comunidade</small></span><span class="cdt-chat-meta"><small>COMUNIDADE</small><b>›</b></span>
+  </button>
+  <a class="cdt-chat-row" href="./mensagens.html">
+   <span class="cdt-chat-avatar private">✉</span><span class="cdt-chat-copy"><strong>PRIVADO</strong><small>Suas conversas particulares</small></span><span class="cdt-chat-meta"><small>ABRIR</small><b>›</b></span>
+  </a>
+  <button class="cdt-chat-row" type="button" data-open-view="chat-topics">
+   <span class="cdt-chat-avatar topics">💬</span><span class="cdt-chat-copy"><strong>BATE-PAPO POR ASSUNTOS</strong><small>Conversas criadas pela comunidade</small></span><span class="cdt-chat-meta"><small>ASSUNTOS</small><b>›</b></span>
+  </button>
+ </div>
+</section>
+<nav class="chat-area-nav" aria-label="Áreas principais do FALA UAI"> aria-label="Áreas principais do FALA UAI"><a href="#capital-do-trem-room">👥 Grupo CAPITAL DO TREM</a><a href="#fazer-amigos">🤝 Fazer amizades por localização</a></nav>
 <section id="capital-do-trem-room" class="panel chat-panel"><div class="room-heading"><div><span class="eyebrow">CAPITAL DO TREM • COMUNIDADE</span><h2>💬 Sala geral</h2></div><div style="display:flex;align-items:center;gap:8px"><span class="room-tag">FALA UAI</span><button id="leave-group" class="alt" type="button" hidden>Sair do grupo</button></div></div><div class="security-seal" role="note">
   <div class="security-seal-title"><span aria-hidden="true">🔒</span><span>Conexão criptografada</span><small>HTTPS</small></div>
   <p>Seus dados são protegidos durante a transmissão por HTTPS. Esta versão ainda não oferece criptografia ponta a ponta.</p>
@@ -519,4 +538,61 @@ main#main-content{display:block!important;position:relative!important;left:0!imp
 #composer input#message{flex:1 1 120px!important;width:auto!important;min-width:0!important}
 @media(max-width:480px){.chat-panel,.friends-panel{padding:10px!important}.room-heading h2{font-size:18px;overflow-wrap:anywhere}#composer.composer{gap:4px!important}}
 </style>
-</body></html>
+<style id="cdt-inbox-redesign">
+/* Caixa de conversas inspirada na referência: largura travada e lista vertical. */
+html,body{width:100%!important;max-width:100%!important;min-width:0!important;overflow-x:clip!important;overscroll-behavior-x:none!important}
+body{position:relative!important;left:auto!important;right:auto!important;transform:none!important}
+#main-content{width:100%!important;max-width:760px!important;min-width:0!important;margin:0 auto!important;padding:0 0 28px!important;overflow-x:clip!important}
+#main-content>*{min-width:0!important;max-width:100%!important}
+#cdt-chat-inbox{display:block;width:100%;min-width:0;background:#080808;color:#fff}
+.cdt-inbox-top{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid #292929;font-size:19px;font-weight:900;letter-spacing:1.3px}
+.cdt-inbox-top span{border-left:4px solid #ed1c24;padding-left:10px}
+.cdt-inbox-top a{display:grid;place-items:center;width:40px;height:40px;border:1px solid #ed1c2466;border-radius:50%;color:#fff;text-decoration:none;font-size:24px}
+.cdt-inbox-tabs{height:48px;display:flex;align-items:center;padding:0 18px;border-bottom:1px solid #303030}
+.cdt-inbox-tabs span{height:100%;display:flex;align-items:center;position:relative;font-size:14px;font-weight:800;color:#fff}
+.cdt-inbox-tabs span:after{content:"";position:absolute;bottom:0;left:0;width:100%;height:3px;border-radius:3px;background:#ed1c24;box-shadow:0 0 9px #ed1c24}
+.cdt-inbox-list{width:100%;display:block}
+.cdt-chat-row{appearance:none;-webkit-appearance:none;display:flex;align-items:center;gap:13px;width:100%;min-width:0;min-height:96px;padding:13px 15px;border:0;border-bottom:1px solid #292929;border-radius:0;background:linear-gradient(90deg,#101010,#080808);color:#fff;text-align:left;text-decoration:none;cursor:pointer}
+.cdt-chat-row:active{background:#211012}
+.cdt-chat-avatar{width:66px;height:66px;flex:0 0 66px;display:grid;place-items:center;overflow:hidden;border:1px solid #ed1c2477;border-radius:50%;background:#050505;color:#fff;font-size:27px;box-shadow:0 0 12px #ed1c2418}
+.cdt-chat-avatar img{display:block;width:100%;height:100%;object-fit:contain;padding:5px}
+.cdt-chat-avatar.friends{background:radial-gradient(circle,#351116,#080808 72%)}
+.cdt-chat-avatar.private{background:radial-gradient(circle,#351116,#080808 72%);color:#ff3943}
+.cdt-chat-avatar.topics{background:radial-gradient(circle,#351116,#080808 72%)}
+.cdt-chat-copy{display:flex;flex:1;flex-direction:column;gap:5px;min-width:0}
+.cdt-chat-copy strong{font-size:14px;line-height:1.25;font-weight:900;letter-spacing:.25px;overflow-wrap:anywhere}
+.cdt-chat-copy small{font-size:12px;color:#999;line-height:1.3;overflow-wrap:anywhere}
+.cdt-chat-meta{display:flex;flex:0 0 auto;align-items:flex-end;flex-direction:column;gap:8px;color:#aaa}
+.cdt-chat-meta small{font-size:9px;letter-spacing:.6px;color:#ed6268;font-weight:800}
+.cdt-chat-meta b{font-size:25px;line-height:1;color:#ed1c24;font-weight:500}
+#main-content>.chat-area-nav{display:none!important}
+.cdt-view-hidden{display:none!important}
+.cdt-view-back{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;margin:0 0 10px;padding:8px 4px;border:0;background:transparent;color:#fff;font-weight:850;text-align:left}
+.cdt-view-back span{color:#ed1c24;font-size:22px}
+@media(max-width:480px){
+ header{padding:10px 12px!important}
+ header img{width:48px!important;height:48px!important}
+ header h1{font-size:20px!important}
+ header .actions{gap:5px!important}
+ header .actions .btn,header .actions button{min-height:36px;padding:7px 9px;font-size:12px}
+ .cdt-chat-row{min-height:88px;padding:11px 12px;gap:11px}
+ .cdt-chat-avatar{width:58px;height:58px;flex-basis:58px}
+ .cdt-chat-copy strong{font-size:12px}
+ .cdt-chat-copy small{font-size:11px}
+ .cdt-chat-meta small{font-size:8px}
+}
+</style>
+<script id="cdt-inbox-navigation">
+(()=>{
+ const inbox=document.getElementById('cdt-chat-inbox');
+ if(!inbox)return;
+ const ids=['capital-do-trem-room','fazer-amigos','private-conversations-shortcut','chat-topics'];
+ const views=ids.map(id=>document.getElementById(id)).filter(Boolean);
+ const nav=document.querySelector('#main-content>.chat-area-nav');
+ const showInbox=()=>{inbox.hidden=false;views.forEach(v=>v.classList.add('cdt-view-hidden'));if(nav)nav.classList.add('cdt-view-hidden');window.scrollTo({top:0,behavior:'instant'});};
+ const showView=id=>{inbox.hidden=true;views.forEach(v=>v.classList.toggle('cdt-view-hidden',v.id!==id));if(nav)nav.classList.add('cdt-view-hidden');const target=document.getElementById(id);if(target){target.classList.remove('cdt-view-hidden');target.scrollIntoView({block:'start'});}};
+ views.forEach(view=>{const back=document.createElement('button');back.type='button';back.className='cdt-view-back';back.innerHTML='<span aria-hidden="true">‹</span> Todas as conversas';back.addEventListener('click',showInbox);view.insertBefore(back,view.firstChild);});
+ inbox.querySelectorAll('[data-open-view]').forEach(button=>button.addEventListener('click',()=>showView(button.dataset.openView)));
+ showInbox();
+})();
+</script></body></html>
