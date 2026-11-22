@@ -251,9 +251,9 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important;overscroll-behav
   <button class="cdt-chat-row" type="button" data-open-view="fazer-amigos">
    <span class="cdt-chat-avatar friends">🤝</span><span class="cdt-chat-copy"><strong>FAZER AMIZADES POR LOCALIZAÇÃO</strong><small>Encontre pessoas da comunidade</small></span><span class="cdt-chat-meta"><small>COMUNIDADE</small><b>›</b></span>
   </button>
-  <a class="cdt-chat-row" href="./mensagens.html">
+  <button class="cdt-chat-row" type="button" data-open-view="private-conversations-shortcut">
    <span class="cdt-chat-avatar private">✉</span><span class="cdt-chat-copy"><strong>PRIVADO</strong><small>Suas conversas particulares</small></span><span class="cdt-chat-meta"><small>ABRIR</small><b>›</b></span>
-  </a>
+  </button>
   <button class="cdt-chat-row" type="button" data-open-view="chat-topics">
    <span class="cdt-chat-avatar topics">💬</span><span class="cdt-chat-copy"><strong>BATE-PAPO POR ASSUNTOS</strong><small>Conversas criadas pela comunidade</small></span><span class="cdt-chat-meta"><small>ASSUNTOS</small><b>›</b></span>
   </button>
@@ -547,7 +547,7 @@ body{position:relative!important;left:auto!important;right:auto!important;transf
 #cdt-chat-inbox{display:block;width:100%;min-width:0;background:#080808;color:#fff}
 body.cdt-inbox-mode>header{display:none!important}
 body.cdt-view-mode>header{display:block!important}
-.cdt-inbox-top{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid #292929;font-size:19px;font-weight:900;letter-spacing:1.3px}
+.cdt-inbox-top{height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid #292929;border-top:3px solid #ed1c24;background:linear-gradient(105deg,#16090b 0%,#090909 58%,#050505 100%);font-size:19px;font-weight:900;letter-spacing:1.3px;box-shadow:0 5px 18px #0008}
 .cdt-inbox-top span{border-left:4px solid #ed1c24;padding-left:10px}
 .cdt-inbox-top a{display:grid;place-items:center;width:40px;height:40px;border:1px solid #ed1c2466;border-radius:50%;color:#fff;text-decoration:none;font-size:24px}
 .cdt-inbox-tabs{height:48px;display:flex;align-items:center;padding:0 18px;border-bottom:1px solid #303030}
@@ -574,6 +574,10 @@ body.cdt-inbox-mode #main-content,body.cdt-inbox-mode #main-content *{box-sizing
 
 .cdt-chat-row{appearance:none;-webkit-appearance:none;display:flex;align-items:center;gap:13px;width:100%;min-width:0;min-height:96px;padding:13px 15px;border:0;border-bottom:1px solid #292929;border-radius:0;background:linear-gradient(90deg,#101010,#080808);color:#fff;text-align:left;text-decoration:none;cursor:pointer}
 .cdt-chat-row:active{background:#211012}
+ .cdt-chat-row:focus-visible{outline:2px solid #ed1c24;outline-offset:-3px;background:#19090c}
+ .cdt-chat-row:nth-child(odd){background:linear-gradient(90deg,#111 0%,#080808 100%)}
+ .cdt-chat-row:nth-child(even){background:linear-gradient(90deg,#0c0c0c 0%,#060606 100%)}
+ .cdt-chat-row:active .cdt-chat-avatar{border-color:#ed1c24;box-shadow:0 0 15px #ed1c2455}
 .cdt-chat-avatar{width:66px;height:66px;flex:0 0 66px;display:grid;place-items:center;overflow:hidden;border:1px solid #ed1c2477;border-radius:50%;background:#050505;color:#fff;font-size:27px;box-shadow:0 0 12px #ed1c2418}
 .cdt-chat-avatar img{display:block;width:100%;height:100%;object-fit:contain;padding:5px}
 .cdt-chat-avatar.friends{background:radial-gradient(circle,#351116,#080808 72%)}
@@ -610,7 +614,7 @@ body.cdt-inbox-mode #main-content,body.cdt-inbox-mode #main-content *{box-sizing
  const views=ids.map(id=>document.getElementById(id)).filter(Boolean);
  const nav=document.querySelector('#main-content>.chat-area-nav');
  const showInbox=()=>{document.body.classList.add("cdt-inbox-mode");document.body.classList.remove("cdt-view-mode");inbox.hidden=false;views.forEach(v=>v.classList.add('cdt-view-hidden'));if(nav)nav.classList.add('cdt-view-hidden');window.scrollTo({top:0,behavior:'instant'});};
- const showView=id=>{document.body.classList.remove("cdt-inbox-mode");document.body.classList.add("cdt-view-mode");inbox.hidden=true;views.forEach(v=>v.classList.toggle('cdt-view-hidden',v.id!==id));if(nav)nav.classList.add('cdt-view-hidden');const target=document.getElementById(id);if(target){target.classList.remove('cdt-view-hidden');target.scrollIntoView({block:'start'});}};
+ const showView=id=>{const target=views.find(view=>view.id===id);if(!target)return;document.body.classList.remove("cdt-inbox-mode");document.body.classList.add("cdt-view-mode");inbox.hidden=true;views.forEach(view=>view.classList.toggle('cdt-view-hidden',view!==target));if(nav)nav.classList.add('cdt-view-hidden');target.classList.remove('cdt-view-hidden');target.scrollIntoView({block:'start',behavior:'instant'});const heading=target.querySelector('h2');if(heading){heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true});}};
  views.forEach(view=>{const back=document.createElement('button');back.type='button';back.className='cdt-view-back';back.innerHTML='<span aria-hidden="true">‹</span> Todas as conversas';back.addEventListener('click',showInbox);view.insertBefore(back,view.firstChild);});
  inbox.querySelectorAll('[data-open-view]').forEach(button=>button.addEventListener('click',()=>showView(button.dataset.openView)));
  showInbox();
