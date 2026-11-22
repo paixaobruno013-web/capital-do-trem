@@ -545,6 +545,8 @@ body{position:relative!important;left:auto!important;right:auto!important;transf
 #main-content{width:100%!important;max-width:760px!important;min-width:0!important;margin:0 auto!important;padding:0 0 28px!important;overflow-x:clip!important}
 #main-content>*{min-width:0!important;max-width:100%!important}
 #cdt-chat-inbox{display:block;width:100%;min-width:0;background:#080808;color:#fff}
+body.cdt-inbox-mode>header{display:none!important}
+body.cdt-view-mode>header{display:block!important}
 .cdt-inbox-top{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid #292929;font-size:19px;font-weight:900;letter-spacing:1.3px}
 .cdt-inbox-top span{border-left:4px solid #ed1c24;padding-left:10px}
 .cdt-inbox-top a{display:grid;place-items:center;width:40px;height:40px;border:1px solid #ed1c2466;border-radius:50%;color:#fff;text-decoration:none;font-size:24px}
@@ -589,8 +591,8 @@ body{position:relative!important;left:auto!important;right:auto!important;transf
  const ids=['capital-do-trem-room','fazer-amigos','private-conversations-shortcut','chat-topics'];
  const views=ids.map(id=>document.getElementById(id)).filter(Boolean);
  const nav=document.querySelector('#main-content>.chat-area-nav');
- const showInbox=()=>{inbox.hidden=false;views.forEach(v=>v.classList.add('cdt-view-hidden'));if(nav)nav.classList.add('cdt-view-hidden');window.scrollTo({top:0,behavior:'instant'});};
- const showView=id=>{inbox.hidden=true;views.forEach(v=>v.classList.toggle('cdt-view-hidden',v.id!==id));if(nav)nav.classList.add('cdt-view-hidden');const target=document.getElementById(id);if(target){target.classList.remove('cdt-view-hidden');target.scrollIntoView({block:'start'});}};
+ const showInbox=()=>{document.body.classList.add("cdt-inbox-mode");document.body.classList.remove("cdt-view-mode");inbox.hidden=false;views.forEach(v=>v.classList.add('cdt-view-hidden'));if(nav)nav.classList.add('cdt-view-hidden');window.scrollTo({top:0,behavior:'instant'});};
+ const showView=id=>{document.body.classList.remove("cdt-inbox-mode");document.body.classList.add("cdt-view-mode");inbox.hidden=true;views.forEach(v=>v.classList.toggle('cdt-view-hidden',v.id!==id));if(nav)nav.classList.add('cdt-view-hidden');const target=document.getElementById(id);if(target){target.classList.remove('cdt-view-hidden');target.scrollIntoView({block:'start'});}};
  views.forEach(view=>{const back=document.createElement('button');back.type='button';back.className='cdt-view-back';back.innerHTML='<span aria-hidden="true">‹</span> Todas as conversas';back.addEventListener('click',showInbox);view.insertBefore(back,view.firstChild);});
  inbox.querySelectorAll('[data-open-view]').forEach(button=>button.addEventListener('click',()=>showView(button.dataset.openView)));
  showInbox();
