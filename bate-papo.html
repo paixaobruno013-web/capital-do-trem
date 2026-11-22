@@ -554,6 +554,24 @@ body.cdt-view-mode>header{display:block!important}
 .cdt-inbox-tabs span{height:100%;display:flex;align-items:center;position:relative;font-size:14px;font-weight:800;color:#fff}
 .cdt-inbox-tabs span:after{content:"";position:absolute;bottom:0;left:0;width:100%;height:3px;border-radius:3px;background:#ed1c24;box-shadow:0 0 9px #ed1c24}
 .cdt-inbox-list{width:100%;display:block}
+/* Layout de caixa de entrada: fixa a página no eixo horizontal sem bloquear rolagem vertical. */
+body.cdt-inbox-mode{width:100%;max-width:100%;min-width:0;overflow-x:hidden;overscroll-behavior-x:none;touch-action:pan-y}
+body.cdt-inbox-mode #main-content{display:block!important;width:100%!important;max-width:760px!important;min-width:0!important;margin:0 auto!important;padding:0!important;overflow-x:hidden!important}
+body.cdt-inbox-mode #main-content>section,body.cdt-inbox-mode #main-content>nav{width:100%!important;max-width:100%!important;min-width:0!important}
+body.cdt-inbox-mode .cdt-inbox-top{position:relative;min-height:68px;background:#090909}
+body.cdt-inbox-mode .cdt-inbox-top:after{content:"CONVERSAS";position:absolute;left:18px;bottom:7px;color:#999;font-size:9px;font-weight:750;letter-spacing:1.4px}
+body.cdt-inbox-mode .cdt-chat-row{overflow:hidden;touch-action:pan-y}
+body.cdt-inbox-mode .cdt-chat-copy{overflow:hidden}
+body.cdt-inbox-mode .cdt-chat-copy strong{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+body.cdt-inbox-mode .cdt-chat-copy small{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+body.cdt-inbox-mode #main-content,body.cdt-inbox-mode #main-content *{box-sizing:border-box}
+@media(max-width:380px){
+ body.cdt-inbox-mode .cdt-chat-row{gap:9px;padding:10px}
+ body.cdt-inbox-mode .cdt-chat-avatar{width:52px;height:52px;flex-basis:52px}
+ body.cdt-inbox-mode .cdt-chat-copy strong{font-size:11px}
+ body.cdt-inbox-mode .cdt-chat-meta small{max-width:58px;text-align:right;overflow-wrap:anywhere}
+}
+
 .cdt-chat-row{appearance:none;-webkit-appearance:none;display:flex;align-items:center;gap:13px;width:100%;min-width:0;min-height:96px;padding:13px 15px;border:0;border-bottom:1px solid #292929;border-radius:0;background:linear-gradient(90deg,#101010,#080808);color:#fff;text-align:left;text-decoration:none;cursor:pointer}
 .cdt-chat-row:active{background:#211012}
 .cdt-chat-avatar{width:66px;height:66px;flex:0 0 66px;display:grid;place-items:center;overflow:hidden;border:1px solid #ed1c2477;border-radius:50%;background:#050505;color:#fff;font-size:27px;box-shadow:0 0 12px #ed1c2418}
