@@ -74,9 +74,7 @@ jobs:
       - name: Verificar controles e regressões do chat
         run: node scripts/check-chat-controls.mjs
       - name: Verificar mídia de visualização única no chat
-        run: |
-          node scripts/check-view-once-chat.mjs
-          deno check supabase/functions/open-view-once-chat-media/index.ts
+        run: node scripts/check-view-once-chat.mjs
       - name: Verificar bloqueio de download nativo de mídias do chat
         run: node scripts/check-chat-media-download-guard.mjs
       - name: Verificar anexos seguros e envio moderno do chat
@@ -190,6 +188,7 @@ jobs:
           node scripts/check-live-infrastructure.mjs
           deno check --config supabase/functions/lives-api/deno.json supabase/functions/lives-api/index.ts
           deno check --config supabase/functions/lives-webhook/deno.json supabase/functions/lives-webhook/index.ts
+          deno check supabase/functions/open-view-once-chat-media/index.ts
       - name: Verificar área de apoiadores
         run: node scripts/check-supporters.mjs
       - name: Verificar fluxo de exclusão de conta
