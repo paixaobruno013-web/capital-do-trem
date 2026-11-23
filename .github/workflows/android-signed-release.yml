@@ -101,13 +101,13 @@ jobs:
           set -euo pipefail
           mkdir -p assets
           python -m pip install --quiet Pillow
-          python scripts/prepare-app-icons.py assets/apple-touch-icon.png assets
+          python scripts/prepare-app-icons.py assets/apple-touch-icon.png assets/pwa-icon-512.png assets/capital-do-trem-logo.jpg assets
           mkdir -p www/assets
           cp assets/pwa-icon-192.png assets/pwa-icon-512.png www/assets/
           npx --yes @capacitor/assets@3.0.0 generate --android --assetPath assets --iconBackgroundColor '#ffffff' --iconBackgroundColorDark '#ffffff'
           python - <<'PY'
           from PIL import Image
-          expected = {'assets/icon-only.png': (1024, 1024), 'assets/pwa-icon-192.png': (192, 192), 'assets/pwa-icon-512.png': (512, 512), 'assets/icon-foreground.png': (1024, 1024)}
+          expected = {'assets/icon-only.png': (1024, 1024), 'assets/pwa-icon-192.png': (192, 192), 'assets/pwa-icon-512.png': (512, 512), 'assets/icon-foreground.png': (820, 820)}
           for path, size in expected.items():
               with Image.open(path) as image:
                   if image.size != size:
