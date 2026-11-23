@@ -2,7 +2,7 @@ name: Verificar preparação do aplicativo
 
 on:
   push:
-    branches: [main, melhorias-stories-navegacao-icone, correcoes-alertas-offline-playlist, ia-camera-comandos-rapidos]
+    branches: [main, melhorias-stories-navegacao-icone, correcoes-alertas-offline-playlist, ia-camera-comandos-rapidos, fix/fala-uai-view-once-server]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -74,7 +74,9 @@ jobs:
       - name: Verificar controles e regressões do chat
         run: node scripts/check-chat-controls.mjs
       - name: Verificar mídia de visualização única no chat
-        run: node scripts/check-view-once-chat.mjs
+        run: |
+          node scripts/check-view-once-chat.mjs
+          deno check supabase/functions/open-view-once-chat-media/index.ts
       - name: Verificar bloqueio de download nativo de mídias do chat
         run: node scripts/check-chat-media-download-guard.mjs
       - name: Verificar anexos seguros e envio moderno do chat
