@@ -126,6 +126,7 @@ jobs:
           APP_KEYSTORE_BASE64: ${{ secrets.ANDROID_APP_SIGNING_KEYSTORE_BASE64 }}
           APP_STORE_PASSWORD: ${{ secrets.ANDROID_APP_SIGNING_STORE_PASSWORD }}
           APP_KEY_ALIAS: ${{ secrets.ANDROID_APP_SIGNING_KEY_ALIAS }}
+          APP_KEY_PASSWORD: ${{ secrets.ANDROID_APP_SIGNING_KEY_PASSWORD }}
         run: |
           set -euo pipefail
           umask 077
@@ -148,7 +149,31 @@ jobs:
             exit 1
           fi
           keytool -list -keystore "$KEYSTORE_FILE" -storepass "$APP_STORE_PASSWORD" -alias "$APP_KEY_ALIAS" >/dev/null
-          echo "Arquivo de assinatura, senha de armazenamento e alias validados sem expor credenciais."
+          STORE_TYPE="$(awk -F': ' '/Keystore type/ {print $2; exit}' "$RUNNER_TEMP/keystore-list.txt")"
+          cat > "$RUNNER_TEMP/VerifySigningKey.java" <<'JAVA'
+          import java.io.FileInputStream;
+          import java.security.Key;
+          import java.security.KeyStore;
+          public class VerifySigningKey {
+            public static void main(String[] args) throws Exception {
+              KeyStore store = KeyStore.getInstance(args[1]);
+              try (FileInputStream input = new FileInputStream(args[0])) {
+                store.load(input, System.getenv("APP_STORE_PASSWORD").toCharArray());
+              }
+              Key key = store.getKey(System.getenv("APP_KEY_ALIAS"), System.getenv("APP_KEY_PASSWORD").toCharArray());
+              if (!(key instanceof java.security.PrivateKey)) {
+                throw new IllegalStateException("A entrada não contém uma chave privada válida.");
+              }
+              System.out.println("Senha da chave privada validada.");
+            }
+          }
+          JAVA
+          javac "$RUNNER_TEMP/VerifySigningKey.java"
+          if ! java -cp "$RUNNER_TEMP" VerifySigningKey "$KEYSTORE_FILE" "$STORE_TYPE"; then
+            echo "::error::A senha da chave privada não confere. Confira ANDROID_APP_SIGNING_KEY_PASSWORD sem compartilhar a senha."
+            exit 1
+          fi
+          echo "Arquivo, senha de armazenamento, alias e senha da chave privada validados."
 
       - name: Gerar APK Release assinado para distribuição direta
         working-directory: android
