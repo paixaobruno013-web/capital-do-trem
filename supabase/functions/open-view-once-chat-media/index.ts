@@ -73,6 +73,12 @@ Deno.serve(async (req: Request) => {
   if (downloadError || !file) return jsonError("Media unavailable", 404);
   if (file.size < 1 || file.size > 20 * 1024 * 1024) return jsonError("Media size is not allowed", 413);
 
+  const mime = String(message.attachment_mime || file.type || "").toLowerCase();
+  const allowedMime = message.attachment_type === "image" ? /^image\/(jpeg|png|webp|gif)$/
+    : message.attachment_type === "video" ? /^video\/(mp4|webm)$/
+    : /^audio\/(mpeg|mp4|aac|ogg|wav|x-wav|webm)$/;
+  if (!allowedMime.test(mime)) return jsonError("Unsupported media format", 415);
+
   const { error: consumeError } = await userClient.from(viewsTable)
     .insert({ message_id: messageId, viewer_id: user.id });
   if (consumeError) {
@@ -81,12 +87,6 @@ Deno.serve(async (req: Request) => {
   }
 
   const bytes = await file.arrayBuffer();
-  const mime = String(message.attachment_mime || file.type || "").toLowerCase();
-  const allowedMime = message.attachment_type === "image" ? /^image\/(jpeg|png|webp|gif)$/
-    : message.attachment_type === "video" ? /^video\/(mp4|webm)$/
-    : /^audio\/(mpeg|mp4|aac|ogg|wav|x-wav|webm)$/;
-  if (!allowedMime.test(mime)) return jsonError("Unsupported media format", 415);
-
   return new Response(bytes, {
     status: 200,
     headers: {
