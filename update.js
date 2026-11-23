@@ -96,14 +96,17 @@
   offlineTimer=window.setTimeout(()=>{alertBox.style.display='none';},13000);
  }
  function showOffline(){
-  // Só confirma a queda após 13 segundos contínuos sem internet.
+  // Se o próprio sistema operacional informou que o aparelho ficou sem rede,
+  // exibe o alerta imediatamente. Se o Wi-Fi continua conectado mas a internet
+  // falhou, usa uma confirmação curta para evitar falsos positivos.
   clearTimeout(reconnectTimer);
   if(confirmedOffline||connectionDebounceTimer)return;
+  const confirmationDelay=navigator.onLine?1500:0;
   connectionDebounceTimer=window.setTimeout(()=>{
    connectionDebounceTimer=null;
    confirmedOffline=true;
    displayOffline();
-  },13000);
+  },confirmationDelay);
  }
  function showOnline(){
   // Ao detectar o retorno real da internet, avisa imediatamente, sem toque na tela.
@@ -193,7 +196,7 @@
  navigator.connection?.addEventListener?.('change',verifyRealConnection);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)verifyRealConnection();});
  window.setTimeout(verifyRealConnection,500);
- // Verifica a internet a cada segundo enquanto o app está visível; a queda exige 13 segundos contínuos e o retorno avisa imediatamente.
+ // Verifica a internet a cada segundo enquanto o app está visível; perda de rede do aparelho gera alerta imediato e falha do acesso à internet recebe confirmação curta.
  window.setInterval(verifyRealConnection,1000);
  if(!supportsServiceWorkerUpdates||!('serviceWorker' in navigator))return;
  let registration=null,reloading=false;
