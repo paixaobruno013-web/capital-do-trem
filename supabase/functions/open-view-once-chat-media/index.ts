@@ -56,7 +56,10 @@ Deno.serve(async (req: Request) => {
     .eq("id", messageId)
     .single();
   if (readError || !message) return jsonError("Message not found or access denied", 404);
-  if (message[ownerField] === user.id) return jsonError("Sender cannot open their own one-time media", 403);
+  const senderId = group
+    ? ("author_id" in message ? message.author_id : null)
+    : ("sender_id" in message ? message.sender_id : null);
+  if (senderId === user.id) return jsonError("Sender cannot open their own one-time media", 403);
   if (!message.view_once || !message.attachment_path || !["image", "video", "audio"].includes(message.attachment_type)) {
     return jsonError("Message does not contain valid one-time media", 422);
   }
