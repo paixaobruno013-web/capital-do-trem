@@ -2,7 +2,7 @@ name: Verificar preparação do aplicativo
 
 on:
   push:
-    branches: [main]
+    branches: [main, melhorias-stories-navegacao-icone, correcoes-alertas-offline-playlist, ia-camera-comandos-rapidos, fix/fala-uai-view-once-server]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -34,6 +34,9 @@ jobs:
           node --check home-story-composer.js
           node --check admin-stories.js
           node --check account-stories.js
+          node --input-type=module --check < capital-ai.js
+          node scripts/check-ai-command-center.mjs
+          npx tsc --noEmit --target ES2022 --module ESNext --lib ES2022,DOM --skipLibCheck supabase/functions/capital-ai-assistant/index.ts
       - name: Verificar fluxos prioritários de publicação
         run: |
           node --check home-story-composer.js
@@ -44,6 +47,8 @@ jobs:
         run: node scripts/check-feed-media-rollback.mjs
       - name: Validar migração mais recente de permissões musicais
         run: node scripts/check-latest-music-upload-migration.mjs
+      - name: Verificar capa personalizável da área Músicas
+        run: node scripts/check-music-cover.mjs
       - name: Verificar sintaxe do módulo Supabase
         run: node --input-type=module --check < supabase/auth.js
       - name: Verificar sintaxe e presença do gravador de áudio do chat
@@ -173,6 +178,17 @@ jobs:
         run: node scripts/check-artist-verification.mjs
       - name: Verificar monitoramento local de falhas
         run: node scripts/check-health-monitor.mjs
+      - name: Configurar Deno para validar Edge Functions
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Verificar infraestrutura segura de transmissões ao vivo
+        run: |
+          node --check scripts/check-live-infrastructure.mjs
+          node scripts/check-live-infrastructure.mjs
+          deno check --config supabase/functions/lives-api/deno.json supabase/functions/lives-api/index.ts
+          deno check --config supabase/functions/lives-webhook/deno.json supabase/functions/lives-webhook/index.ts
+          deno check --config supabase/functions/open-view-once-chat-media/deno.json supabase/functions/open-view-once-chat-media/index.ts
       - name: Verificar área de apoiadores
         run: node scripts/check-supporters.mjs
       - name: Verificar fluxo de exclusão de conta

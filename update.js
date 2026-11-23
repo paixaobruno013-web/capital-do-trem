@@ -7,9 +7,6 @@
  (document.head||document.documentElement).append(offlineStyle);
  const markOffline=()=>document.documentElement.classList.add('app-offline');
  const markOnline=()=>document.documentElement.classList.remove('app-offline');
- window.addEventListener('offline',markOffline);
- window.addEventListener('online',markOnline);
- if(!navigator.onLine)markOffline();
  // Alerta característico do Capital do Trem quando a conexão cai.
  // O som é uma corneta eletrônica original, sintetizada localmente; não baixa áudio externo.
  const alertBox=document.createElement('aside');
@@ -37,7 +34,7 @@
  hornButton.style.cssText='min-height:44px;padding:9px 16px;border:1px solid #ed1c24;border-radius:10px;background:#ed1c24;color:#fff;font-weight:800;cursor:pointer';
  const preferenceKey='capitaldotrem_train_horn_v1';
  // Não depende de baixar bibliotecas pela internet: o alerta também precisa funcionar offline.
- let hornEnabled=true,audioContext=null,audioUnlocked=false,playedThisOutage=false,offlineFeedbackSent=false,reconnectTimer=null,offlineTimer=null;
+ let hornEnabled=true,audioContext=null,audioUnlocked=false,playedThisOutage=false,offlineFeedbackSent=false,reconnectTimer=null,offlineTimer=null,connectionDebounceTimer=null,confirmedOffline=false;
  try{hornEnabled=localStorage.getItem(preferenceKey)!=='off';}catch{}
  function updateHornButton(){hornButton.textContent=hornEnabled?'🔊 Corneta ligada':'🔇 Corneta desligada';hornButton.setAttribute('aria-pressed',String(hornEnabled));}
  function playTrainHorn(){
@@ -73,7 +70,8 @@
  }
  document.addEventListener('pointerdown',unlockHorn,{once:true,passive:true});
  document.addEventListener('keydown',unlockHorn,{once:true});
- function showOffline(){
+ function displayOffline(){
+  markOffline();
   const fallbackStatus=document.getElementById('connection-status');if(fallbackStatus)fallbackStatus.hidden=true;
   clearTimeout(reconnectTimer);clearTimeout(offlineTimer);document.documentElement.classList.add('app-offline');
   alertTitle.textContent='ALERTA';
@@ -95,9 +93,30 @@
   }
   if(!playedThisOutage&&audioUnlocked){playedThisOutage=true;playTrainHorn();}
   // O aviso fica visível por 5 segundos; o estado offline permanece ativo para as áreas que funcionam sem rede.
-  offlineTimer=window.setTimeout(()=>{alertBox.style.display='none';},5000);
+  offlineTimer=window.setTimeout(()=>{alertBox.style.display='none';},13000);
+ }
+ function showOffline(){
+  // Só confirma a queda após 13 segundos contínuos sem internet.
+  clearTimeout(reconnectTimer);
+  if(confirmedOffline||connectionDebounceTimer)return;
+  connectionDebounceTimer=window.setTimeout(()=>{
+   connectionDebounceTimer=null;
+   confirmedOffline=true;
+   displayOffline();
+  },13000);
  }
  function showOnline(){
+  // Ao detectar o retorno real da internet, avisa imediatamente, sem toque na tela.
+  clearTimeout(connectionDebounceTimer);
+  connectionDebounceTimer=null;
+  clearTimeout(reconnectTimer);
+  reconnectTimer=null;
+  if(!confirmedOffline){markOnline();return;}
+  confirmedOffline=false;
+  displayOnline();
+ }
+ function displayOnline(){
+  markOnline();
   const fallbackStatus=document.getElementById('connection-status');if(fallbackStatus)fallbackStatus.hidden=true;
   document.documentElement.classList.remove('app-offline');
   // Reinicia o ciclo mesmo se a conexão voltar antes de o alerta entrar no DOM.
@@ -113,7 +132,7 @@
    alertBox.style.boxShadow='0 8px 30px #000b,0 0 20px #269b6577';
    alertBox.style.display='flex';
   clearTimeout(reconnectTimer);clearTimeout(offlineTimer);
-  reconnectTimer=window.setTimeout(()=>{alertBox.style.display='none';},5000);
+  reconnectTimer=window.setTimeout(()=>{alertBox.style.display='none';},13000);
  }
  hornButton.addEventListener('click',async()=>{
   hornEnabled=!hornEnabled;
@@ -145,13 +164,13 @@
    if(!response.ok)throw new Error('A internet não respondeu ao teste de conexão');
    const wasOffline=document.documentElement.classList.contains('app-offline')||lastProbeOnline===false;
    consecutiveProbeFailures=0;lastProbeOnline=true;lastProbeAt=Date.now();
-   if(wasOffline)showOnline();else markOnline();
+   if(wasOffline)showOnline();else{clearTimeout(connectionDebounceTimer);connectionDebounceTimer=null;markOnline();}
   }catch(error){
    lastProbeAt=Date.now();
    consecutiveProbeFailures++;
    // Uma falha isolada ou resposta lenta não deve disparar falso alerta.
-   // Sem rede no aparelho: alerta imediato. Com Wi-Fi/dados ativos: confirma em duas falhas seguidas.
-   if(!navigator.onLine||consecutiveProbeFailures>=2||document.documentElement.classList.contains('app-offline')){
+   // A primeira falha inicia a confirmação de 7 segundos; uma resposta válida cancela o aviso pendente.
+   if(!navigator.onLine||consecutiveProbeFailures>=1||document.documentElement.classList.contains('app-offline')){
     lastProbeOnline=false;
     showOffline();
    }
@@ -174,8 +193,8 @@
  navigator.connection?.addEventListener?.('change',verifyRealConnection);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)verifyRealConnection();});
  window.setTimeout(verifyRealConnection,500);
- // Eventos online/offline continuam imediatos; a sondagem periódica fica em 60 s para poupar bateria e dados móveis.
- window.setInterval(verifyRealConnection,60*1000);
+ // Verifica a internet a cada segundo enquanto o app está visível; a queda exige 13 segundos contínuos e o retorno avisa imediatamente.
+ window.setInterval(verifyRealConnection,1000);
  if(!supportsServiceWorkerUpdates||!('serviceWorker' in navigator))return;
  let registration=null,reloading=false;
  const banner=document.createElement('aside');

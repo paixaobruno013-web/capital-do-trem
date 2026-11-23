@@ -1,4 +1,5 @@
 import * as auth from './supabase/auth.js';
+import { runCapitalAI } from './capital-ai.js';
 
 const el = id => document.getElementById(id);
 const modal = el('home-story-composer');
@@ -16,8 +17,12 @@ const flipButton = el('home-story-flip-button');
 const zoomControl = el('home-story-zoom');
 const zoomValue = el('home-story-zoom-value');
 let cameraZoom = 1;
+let hardwareZoomActive = false;
 let holdRecording = false;
 const effectButtons = [...document.querySelectorAll('[data-story-effect]')];
+const toolsToggle = el('home-story-tools-toggle');
+const toolsRail = el('home-story-tools-rail');
+const effectsToggle = el('home-story-effects-toggle');
 const effects = {
   natural: { label: 'Natural', css: 'none' },
   day: { label: 'Dia', css: 'brightness(1.12) contrast(1.04) saturate(1.12)' },
@@ -25,7 +30,10 @@ const effects = {
   warm: { label: 'Quente', css: 'sepia(.18) saturate(1.25) brightness(1.04)' },
   bw: { label: 'P&B', css: 'grayscale(1) contrast(1.12)' },
   neon: { label: 'Neon', css: 'saturate(1.55) contrast(1.12) hue-rotate(8deg)' },
-  beauty: { label: 'Beleza suave', css: 'brightness(1.06) saturate(1.08) contrast(.96)' }
+  beauty: { label: 'Beleza suave', css: 'brightness(1.07) saturate(1.12) contrast(.94)' },
+  portrait: { label: 'Retrato Pro', css: 'contrast(1.1) saturate(1.14) brightness(1.04)' },
+  cinematic: { label: 'Cinema', css: 'contrast(1.22) saturate(.88) sepia(.1)' },
+  funny: { label: 'Divertido', css: 'hue-rotate(34deg) saturate(1.8) contrast(1.12)' }
 };
 let activeEffect = 'natural';
 let facingMode = 'environment';
@@ -38,6 +46,9 @@ let selectedFile = null;
 let previewUrl = '';
 let recordLimit = null;
 let busy = false;
+let selectedStoryMusicId = '';
+let storyProfilesLoaded = false;
+let storySongsLoaded = false;
 let cameraRequestId = 0;
 let recordingAudioStream = null;
 function stopRecordingAudio() {
@@ -79,7 +90,12 @@ function clearPreview() {
 }
 function setSelected(file) {
   selectedFile = file || null;
+  modal?.classList.toggle('has-selection', Boolean(file));
+  const aiResult = el('home-story-ai-result'); if (aiResult) aiResult.textContent = 'A análise só acontece quando você tocar no botão. A foto será enviada ao serviço de IA para processamento e não será salva pelo app.';
+  const aiUse = el('home-story-ai-use'); if (aiUse) aiUse.hidden = true;
+  const aiButton = el('home-story-ai-button'); if (aiButton) aiButton.disabled = !file?.type?.startsWith('image/');
   publish.disabled = !selectedFile || busy;
+  const feedPublish = el('home-story-feed-publish'); if (feedPublish) feedPublish.disabled = !selectedFile || busy;
   if (saveButton) saveButton.disabled = !selectedFile || busy;
   clearPreview();
   if (!file) return;
@@ -113,8 +129,8 @@ async function startCamera() {
       cameraStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: { ideal: facingMode },
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
           frameRate: { ideal: 24, max: 30 }
         },
         audio: false
@@ -132,9 +148,12 @@ async function startCamera() {
       return false;
     }
     stream = cameraStream;
-    cameraZoom = Number(zoomControl?.value || 1);
-    if (zoomValue) zoomValue.textContent = cameraZoom.toFixed(1).replace('.0','') + '×';
-    live.style.transform = 'scale(' + cameraZoom + ')';
+    // Sempre iniciar sem zoom digital; ele pode reduzir a nitidez e cortar o enquadramento.
+    cameraZoom = 1;
+    if (zoomControl) zoomControl.value = '1';
+    if (zoomValue) zoomValue.textContent = '1×';
+    hardwareZoomActive = await applyZoomToTrack();
+    live.style.transform = hardwareZoomActive ? 'none' : 'scale(1)';
     live.muted = true;
     live.autoplay = true;
     live.playsInline = true;
@@ -163,15 +182,21 @@ async function startCamera() {
 }
 function openComposer() {
   if (!modal || busy) return;
+  modal.classList.remove('has-selection');
   modal.classList.add('is-open');
   modal.setAttribute('aria-hidden', 'false');
   window.CapitalVolumeBridge?.setStoryCameraOpen?.(true);
   selectedFile = null;
   album.value = '';
   publish.disabled = true;
+  const feedPublish = el('home-story-feed-publish'); if (feedPublish) feedPublish.disabled = true;
   if (saveButton) saveButton.disabled = true;
   el('home-story-caption').value = '';
   activeEffect = 'natural';
+  cameraZoom = 1;
+  if (zoomControl) zoomControl.value = '1';
+  if (zoomValue) zoomValue.textContent = '1×';
+  if (live) live.style.transform = 'none';
   applyEffect();
   clearPreview();
   message.textContent = 'Abrindo sua câmera…';
@@ -224,20 +249,45 @@ function capturePhoto() {
     say('A câmera ainda não está pronta. Aguarde ou escolha uma mídia do álbum.');
     return;
   }
+  // Limita a imagem final a 2048 px no lado maior: mantém boa definição para Stories
+  // sem travar o aparelho ao codificar quadros 4K muito pesados.
+  const sourceWidth = live.videoWidth;
+  const sourceHeight = live.videoHeight;
+  const captureZoom = hardwareZoomActive ? 1 : cameraZoom;
+  const cropWidth = sourceWidth / captureZoom;
+  const cropHeight = sourceHeight / captureZoom;
+  const scale = Math.min(1, 2048 / Math.max(cropWidth, cropHeight));
   const canvas = document.createElement('canvas');
-  canvas.width = live.videoWidth;
-  canvas.height = live.videoHeight;
-  const context = canvas.getContext('2d');
-  context.filter = 'none';
-  const cropWidth = canvas.width / cameraZoom;
-  const cropHeight = canvas.height / cameraZoom;
-  context.drawImage(live, (canvas.width-cropWidth)/2, (canvas.height-cropHeight)/2, cropWidth, cropHeight, 0, 0, canvas.width, canvas.height);
+  canvas.width = Math.max(1, Math.round(cropWidth * scale));
+  canvas.height = Math.max(1, Math.round(cropHeight * scale));
+  const context = canvas.getContext('2d', { alpha: false });
+  if (!context) { say('Não foi possível preparar a foto. Tente novamente.'); return; }
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = 'high';
+  context.drawImage(live,
+    (sourceWidth - cropWidth) / 2, (sourceHeight - cropHeight) / 2, cropWidth, cropHeight,
+    0, 0, canvas.width, canvas.height);
+  // Congela e mostra o quadro imediatamente; a codificação do arquivo acontece em paralelo.
+  // Assim a pessoa vê o resultado do clique sem esperar o JPEG terminar de ser criado.
+  live.pause();
+  live.hidden = true;
+  photoPreview.hidden = false;
+  photoPreview.src = canvas.toDataURL('image/jpeg', 0.86);
+  photoPreview.style.filter = effectCss();
+  message.textContent = 'Sua foto';
+  say('Foto capturada • preparando o arquivo…');
   canvas.toBlob(blob => {
-    if (!blob) { say('Não foi possível capturar a foto. Tente novamente.'); return; }
+    if (!blob) {
+      live.hidden = false;
+      photoPreview.hidden = true;
+      live.play().catch(() => {});
+      say('Não foi possível preparar a foto. Tente novamente.');
+      return;
+    }
     setSelected(new File([blob], 'capital-do-trem-story.jpg', { type: 'image/jpeg' }));
     applyEffect();
-    say('Foto pronta com o efeito selecionado. Você pode salvar na galeria ou publicar.');
-  }, 'image/jpeg', 0.94);
+    say('Foto pronta! Veja como ficou e escolha publicar ou salvar.');
+  }, 'image/jpeg', 0.92);
 }
 function startFilteredRecording() {
   const canvas = document.createElement('canvas');
@@ -252,8 +302,9 @@ function startFilteredRecording() {
       return;
     }
     context.filter = effectCss();
-    const cropWidth = width / cameraZoom;
-    const cropHeight = height / cameraZoom;
+    const recordingZoom = hardwareZoomActive ? 1 : cameraZoom;
+    const cropWidth = width / recordingZoom;
+    const cropHeight = height / recordingZoom;
     context.drawImage(live, (width-cropWidth)/2, (height-cropHeight)/2, cropWidth, cropHeight, 0, 0, width, height);
     renderFrame = requestAnimationFrame(draw);
   };
@@ -386,6 +437,74 @@ async function saveToGallery() {
     if (error?.name !== 'AbortError') say('Não foi possível salvar automaticamente. Tente compartilhar o arquivo ou verificar as permissões.');
   }
 }
+
+async function createAIImageDataUrl(file) {
+  if (!file?.type?.startsWith('image/')) throw new Error('A análise por câmera funciona com fotos, não com vídeos.');
+  const url = URL.createObjectURL(file);
+  try {
+    const image = new Image();
+    await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = reject; image.src = url; });
+    const scale = Math.min(1, 1280 / Math.max(image.naturalWidth, image.naturalHeight));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.78));
+    if (!blob) throw new Error('Não foi possível preparar a foto.');
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(blob);
+    });
+  } finally { URL.revokeObjectURL(url); }
+}
+let lastAISuggestion = '';
+el('home-story-ai-button')?.addEventListener('click', async event => {
+  const button = event.currentTarget, output = el('home-story-ai-result'), use = el('home-story-ai-use');
+  if (!selectedFile || !selectedFile.type.startsWith('image/')) { say('Escolha ou capture uma foto para usar a IA.'); return; }
+  button.disabled = true; if (use) use.hidden = true;
+  if (output) output.textContent = 'Preparando foto e consultando a IA…';
+  try {
+    const image = await createAIImageDataUrl(selectedFile);
+    lastAISuggestion = await runCapitalAI({ mode: 'caption', imageDataUrl: image, prompt: 'Observe a foto e sugira três legendas curtas e criativas em português brasileiro para um Story do Capital do Trem. Não identifique pessoas nem invente fatos.' });
+    if (output) output.textContent = lastAISuggestion;
+    if (use) use.hidden = false;
+  } catch (error) {
+    if (output) output.textContent = error?.message || 'A IA não está disponível agora.';
+  } finally { button.disabled = false; }
+});
+el('home-story-ai-use')?.addEventListener('click', () => {
+  const first = lastAISuggestion.split(/\n+/).map(line => line.replace(/^\s*(?:[-*•]|\d+[.)])\s*/, '').trim()).find(Boolean);
+  if (!first) return;
+  const caption = el('home-story-caption'); caption.value = first.slice(0, 280); caption.focus();
+  say('Sugestão da IA adicionada. Revise antes de publicar.');
+});
+
+
+async function publishToFeed() {
+  if (!selectedFile || busy) return;
+  const input = el('home-feed-media');
+  const form = el('home-feed-composer');
+  const caption = el('home-feed-text');
+  if (!input || !form || !caption || !window.DataTransfer) {
+    say('Não foi possível preparar a publicação no Feed neste aparelho.');
+    return;
+  }
+  try {
+    const file = await preparePhotoForExport(selectedFile);
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    input.files = transfer.files;
+    const currentCaption = el('home-story-caption')?.value.trim() || '';
+    caption.value = currentCaption || '📸 Publicação compartilhada pelo Estúdio de Câmera';
+    caption.dispatchEvent(new Event('input', { bubbles: true }));
+    closeComposer();
+    document.querySelector('[data-page="inicio"]')?.click();
+    form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    form.requestSubmit();
+  } catch (error) {
+    say(error?.message || 'Não foi possível preparar a mídia para o Feed.');
+  }
+}
+
 async function publishStory() {
   if (!selectedFile || busy) return;
   busy = true;
@@ -396,7 +515,8 @@ async function publishStory() {
     const file = await preparePhotoForExport(selectedFile);
     const saved = await auth.createMyStory({
       file,
-      caption: el('home-story-caption').value.trim()
+      caption: [el('home-story-caption').value.trim().slice(0,65), [...(el('home-story-friends')?.selectedOptions || [])].map(option => option.dataset.tag || option.textContent).filter(Boolean).length ? 'Marcando: '+[...(el('home-story-friends')?.selectedOptions || [])].map(option => option.dataset.tag || option.textContent).filter(Boolean).join(', ').slice(0,50) : '', el('home-story-link')?.value.trim() ? 'Divulgação: '+el('home-story-link').value.trim().slice(0,110) : ''].filter(Boolean).join(' | ').slice(0,280),
+      musicSongId: selectedStoryMusicId
     });
     say('Story publicado! Ele ficará disponível por 24 horas.');
     document.dispatchEvent(new CustomEvent('capital:stories-updated', { detail: { id: saved.id } }));
@@ -410,7 +530,61 @@ async function publishStory() {
   }
 }
 
+
+const musicToggle = el('home-story-music-toggle');
+const musicPanel = el('home-story-music-panel');
+const musicSelect = el('home-story-music-select');
+const musicStatus = el('home-story-music-status');
+musicToggle?.addEventListener('click', async () => {
+  musicPanel.hidden = !musicPanel.hidden;
+  if (musicPanel.hidden || storySongsLoaded) return;
+  musicToggle.disabled = true;
+  if (musicStatus) musicStatus.textContent = 'Carregando músicas publicadas…';
+  try {
+    const songs = await auth.getPublishedSongs();
+    musicSelect.replaceChildren(new Option('Sem música', ''));
+    for (const song of songs) musicSelect.add(new Option(song.title + ' — ' + song.artist_name, song.id));
+    storySongsLoaded = true;
+    if (musicStatus) musicStatus.textContent = songs.length ? 'Escolha a trilha do seu Story.' : 'Ainda não há músicas publicadas no catálogo.';
+  } catch (error) {
+    if (musicStatus) musicStatus.textContent = error?.message || 'Não foi possível carregar as músicas.';
+  } finally { musicToggle.disabled = false; }
+});
+musicSelect?.addEventListener('change', () => { selectedStoryMusicId = musicSelect.value; });
+el('home-story-friends-toggle')?.addEventListener('click', async () => {
+  const panel=el('home-story-friends-panel'); panel.hidden=!panel.hidden;
+  if(panel.hidden) return;
+  const select=el('home-story-friends');
+  if(storyProfilesLoaded){select?.focus();return;}
+  if(select) select.replaceChildren(new Option('Carregando perfis públicos…',''));
+  try {
+    const profiles=await auth.getPublicProfiles();
+    if(select){
+      select.replaceChildren();
+      for(const profile of profiles){
+        const handle=String(profile.username||'').replace(/^@/,'');
+        const label=String(profile.display_name||'Maquinista')+(handle?' (@'+handle+')':'');
+        const option=new Option(label,profile.user_id);
+        option.dataset.tag=handle?'@'+handle:String(profile.display_name||'Maquinista');
+        select.add(option);
+      }
+      if(!profiles.length) select.add(new Option('Nenhum perfil público disponível',''));
+    }
+    storyProfilesLoaded=true;
+  } catch(error) {
+    if(select) select.replaceChildren(new Option(error?.message||'Não foi possível carregar os perfis.',''));
+  }
+  select?.focus();
+});
+el('home-story-link-toggle')?.addEventListener('click', () => { const panel=el('home-story-link-panel'); panel.hidden=!panel.hidden; if(!panel.hidden)el('home-story-link')?.focus(); });
+
 addButton?.addEventListener('click', openComposer);
+toolsToggle?.addEventListener('click', () => { const collapsed = modal?.classList.toggle('tools-collapsed'); toolsToggle.setAttribute('aria-expanded', String(!collapsed)); });
+effectsToggle?.addEventListener('click', () => { const collapsed = modal?.classList.toggle('effects-collapsed'); effectsToggle.setAttribute('aria-expanded', String(!collapsed)); });
+el('home-story-tool-text')?.addEventListener('click', () => { const field=el('home-story-caption'); if (!selectedFile) { say('Capture uma foto ou escolha um vídeo para adicionar texto.'); return; } field.focus(); });
+el('home-story-tool-music')?.addEventListener('click', () => musicToggle?.click());
+el('home-story-tool-tag')?.addEventListener('click', () => el('home-story-friends-toggle')?.click());
+el('home-story-tool-save')?.addEventListener('click', saveToGallery);
 el('home-story-close')?.addEventListener('click', closeComposer);
 el('home-story-album-button')?.addEventListener('click', () => album.click());
 album?.addEventListener('change', () => {
@@ -453,19 +627,23 @@ recordButton?.addEventListener('click', event => {
 async function applyZoomToTrack() {
   const track = stream?.getVideoTracks?.()[0];
   const capabilities = track?.getCapabilities?.();
-  if (!capabilities || !('zoom' in capabilities)) return;
+  if (!capabilities || !('zoom' in capabilities)) return false;
   const min = capabilities.zoom.min ?? 1;
-  const max = capabilities.zoom.max ?? 1;
+  const max = capabilities.zoom.max ?? min;
   const value = min + ((cameraZoom - 1) / 2) * (max - min);
-  try { await track.applyConstraints({ advanced: [{ zoom: Math.min(max, Math.max(min, value)) }] }); }
-  catch (error) { /* O zoom digital continua funcionando como alternativa. */ }
+  try {
+    await track.applyConstraints({ advanced: [{ zoom: Math.min(max, Math.max(min, value)) }] });
+    return true;
+  } catch (error) {
+    return false; // Só usa zoom digital quando o aparelho não oferece zoom óptico/nativo.
+  }
 }
-function setCameraZoom(value) {
+async function setCameraZoom(value) {
   cameraZoom = Math.max(1, Math.min(3, Number(value) || 1));
   if (zoomControl) zoomControl.value = String(cameraZoom);
   if (zoomValue) zoomValue.textContent = cameraZoom.toFixed(1).replace('.0','') + '×';
-  if (live) live.style.transform = 'scale(' + cameraZoom + ')';
-  applyZoomToTrack();
+  hardwareZoomActive = await applyZoomToTrack();
+  if (live) live.style.transform = hardwareZoomActive ? 'none' : 'scale(' + cameraZoom + ')';
 }
 zoomControl?.addEventListener('input', () => setCameraZoom(zoomControl.value));
 window.addEventListener('capital:volume-key', event => {
@@ -495,6 +673,7 @@ effectButtons.forEach(button => button.addEventListener('click', () => {
   say('Efeito ' + effects[activeEffect].label + ' selecionado.');
 }));
 publish?.addEventListener('click', publishStory);
+el('home-story-feed-publish')?.addEventListener('click', publishToFeed);
 modal?.addEventListener('click', event => { if (event.target === modal) closeComposer(); });
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && modal?.classList.contains('is-open')) closeComposer();

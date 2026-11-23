@@ -1005,28 +1005,36 @@ async function hydrateChatMessages(messages, kind = 'group') {
 }
 export async function openViewOnceChatMedia(messageId, kind = 'private') {
   const supabase = initSupabase();
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError) throw userError;
-  if (!user) throw new Error('Entre na sua conta para abrir esta mídia.');
-  const isGroup = kind === 'group';
-  const table = isGroup ? 'chat_messages' : 'private_messages';
-  const ownerField = isGroup ? 'author_id' : 'sender_id';
-  const viewTable = isGroup ? 'chat_message_views' : 'private_message_views';
-  const { data: message, error: readError } = await supabase.from(table)
-    .select('id,' + ownerField + ',attachment_path,attachment_type,view_once')
-    .eq('id', messageId).single();
-  if (readError) throw readError;
-  if (!message.view_once || !message.attachment_path || !['image','video','audio'].includes(message.attachment_type)) {
-    throw new Error('Esta mensagem não contém mídia de visualização única válida.');
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError) throw sessionError;
+  if (!session?.access_token) throw new Error('Entre na sua conta para abrir esta mídia.');
+  if (!['group','private'].includes(kind)) throw new Error('Tipo de conversa inválido.');
+
+  // A Edge Function valida a participação, consome a visualização com chave única
+  // no banco e só então devolve os bytes. Nenhum URL reutilizável é emitido ao cliente.
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/open-view-once-chat-media`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${session.access_token}`,
+      'apikey': SUPABASE_PUBLISHABLE_KEY,
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store'
+    },
+    body: JSON.stringify({ message_id: messageId, kind }),
+    cache: 'no-store'
+  });
+  if (!response.ok) {
+    let detail = '';
+    try { detail = (await response.text()).slice(0, 300); } catch {}
+    if (response.status === 409) throw new Error('Você já visualizou esta mídia. Ela não pode ser aberta novamente.');
+    if (response.status === 401 || response.status === 403) throw new Error('Você não tem autorização para abrir esta mídia.');
+    throw new Error(detail || 'Não foi possível abrir esta mídia agora.');
   }
-  if (message[ownerField] === user.id) throw new Error('Quem enviou esta mídia não pode visualizá-la.');
-  const url = await signChatAttachment(message.attachment_path, 300);
-  const { error: viewError } = await supabase.from(viewTable).insert({ message_id: messageId, viewer_id: user.id });
-  if (viewError) {
-    if (viewError.code === '23505') throw new Error('Você já visualizou esta mídia. Ela não pode ser aberta novamente.');
-    throw viewError;
-  }
-  return { url, type: message.attachment_type };
+  const type = response.headers.get('X-Chat-Media-Type');
+  if (!['image','video','audio'].includes(type)) throw new Error('O servidor retornou um formato de mídia inválido.');
+  const blob = await response.blob();
+  if (!blob.size) throw new Error('A mídia está vazia ou indisponível.');
+  return { url: URL.createObjectURL(blob), type };
 }
 
 // Bate-papo geral em tempo real para todos os usuários autenticados.

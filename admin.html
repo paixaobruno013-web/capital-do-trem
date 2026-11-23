@@ -278,7 +278,7 @@ audio{width:100%;}
 </section>
 
 
-<section class="command-section" id="private-gallery-section">
+<section class="command-section" id="admin-covers-section"><h2>🎨 Central de capas • administrador</h2><p class="muted">Todas as capas oficiais do aplicativo são gerenciadas aqui. As alterações publicadas aparecem para os usuários.</p><div class="item" id="admin-music-cover-manager"><h3>Capa da área Músicas</h3><div id="music-cover-area" class="music-cover-area"><div id="music-cover-stage" style="position:relative;overflow:hidden;display:grid;place-items:center;min-height:110px;max-height:230px;border:1px solid #ed1c2466;border-radius:14px;background:#050505"><img id="music-cover-preview" alt="Prévia da capa da área Músicas" hidden style="display:block;width:100%;max-height:230px;object-position:50% 50%;object-fit:contain"><p id="music-cover-empty" class="muted" style="margin:22px;text-align:center">Nenhuma capa publicada.</p></div><div id="music-cover-controls" style="margin-top:12px"><label for="music-cover-file">Escolher imagem (JPG, PNG ou WebP • até 8 MB)</label><input id="music-cover-file" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"><label for="music-cover-x">Posição horizontal</label><input id="music-cover-x" type="range" min="0" max="100" value="50"><label for="music-cover-y">Posição vertical</label><input id="music-cover-y" type="range" min="0" max="100" value="50"><label for="music-cover-fit">Enquadramento</label><select id="music-cover-fit"><option value="contain">Mostrar imagem inteira</option><option value="cover">Preencher a capa</option></select><div class="actions"><button id="music-cover-upload" type="button">Publicar / trocar capa</button><button class="secondary" id="music-cover-save" type="button">Salvar enquadramento</button></div><p id="music-cover-status" class="status" role="status" aria-live="polite">Escolha uma imagem para atualizar a capa pública.</p></div></div></div><div class="item"><h3>Demais capas do aplicativo</h3><p class="muted">Cabeceira do perfil, capa principal e imagens da abertura são administradas no painel “Painel da casa • identidade e abertura” acima. Esta central reúne os controles sem duplicar configurações.</p></div></section><section class="command-section" id="private-gallery-section">
  <div class="actions" style="justify-content:space-between;align-items:center">
   <h2>🔒 Álbum privado do administrador</h2>
   <button id="private-gallery-refresh" class="secondary" type="button">Atualizar álbum</button>
@@ -346,6 +346,7 @@ async function enterDashboard(user){
  const allowed=await auth.isCurrentUserAdmin();
  if(!allowed){await auth.signOutAccount();showLoggedOut();loginStatus.textContent='Esta conta não está autorizada para administrar o Capital do Trem.';return;}
  loginPanel.hidden=true;dashboard.hidden=false;
+ window.dispatchEvent(new Event('capital-admin-ready'));
  document.getElementById('admin-welcome').textContent='Acesso autorizado: '+user.email;
  await loadBranding();
  await loadCasaPanelBranding();
@@ -764,6 +765,7 @@ try{
 }catch(error){loginStatus.textContent='Painel ainda indisponível: configure as credenciais do Supabase e aplique o banco de dados.';}
 
 </script>
+<script type="module" src="./music-cover.js"></script>
 <script type="module" src="./admin-stories.js"></script>
 <script src="./update.js" defer></script>
 <script type="module" src="./admin-media.js"></script>

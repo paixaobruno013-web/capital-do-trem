@@ -75,6 +75,13 @@ jobs:
       - name: Preparar aplicativo e projeto Android
         run: |
           npm install --no-audit --no-fund
+          node scripts/check-music-experience.mjs
+          node scripts/check-music-upload-stability.mjs
+          node scripts/check-view-once-chat.mjs
+          node scripts/check-offline-experience.mjs
+          node scripts/check-screen-organization.mjs
+          node scripts/check-chat-controls.mjs
+          node scripts/check-chat-attachments.mjs
           npm run build:web
           npx cap add android
 
@@ -82,10 +89,20 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p assets
-          base64 --decode assets/capital-do-trem-logo.jpg.b64 > /tmp/capital-do-trem-logo.jpg
           python -m pip install --quiet Pillow
-          python scripts/prepare-app-icons.py /tmp/capital-do-trem-logo.jpg assets
+          python scripts/prepare-app-icons.py assets/apple-touch-icon.png assets
+          mkdir -p www/assets
+          cp assets/pwa-icon-192.png assets/pwa-icon-512.png www/assets/
           npx --yes @capacitor/assets@3.0.0 generate --android --assetPath assets --iconBackgroundColor '#ffffff' --iconBackgroundColorDark '#ffffff'
+          python - <<'PY'
+          from PIL import Image
+          expected = {'assets/icon-only.png': (1024, 1024), 'assets/pwa-icon-192.png': (192, 192), 'assets/pwa-icon-512.png': (512, 512), 'assets/icon-foreground.png': (1024, 1024)}
+          for path, size in expected.items():
+              with Image.open(path) as image:
+                  if image.size != size:
+                      raise SystemExit(f'Ícone inválido: {path} tem {image.size}, esperado {size}')
+          print('Ícones oficiais Android/PWA validados em todas as resoluções.')
+          PY
 
       - name: Sincronizar Capacitor e preparar mídia
         run: |
@@ -134,6 +151,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
+          target_commitish: ${{ github.sha }}
           name: "CAPITAL DO TREM Android ${{ inputs.release_version }}"
           body: |
             Lançamento Android do CAPITAL DO TREM para instalação direta.

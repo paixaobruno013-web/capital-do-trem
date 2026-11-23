@@ -18,6 +18,13 @@ const [room, enhancements, emoji, privateChat, worker, stories, home, auth, admi
 ]);
 
 const checks = [
+  ['FALA UAI abre primeiro uma caixa de conversas em lista vertical', /id="cdt-chat-inbox"/.test(room) && /class="cdt-chat-row"/.test(room) && /Todas as conversas/.test(room)],
+  ['caixa de entrada apresenta grupo oficial, amizades, privado e assuntos dentro do painel', /data-open-view="capital-do-trem-room"/.test(room) && /data-open-view="fazer-amigos"/.test(room) && /data-open-view="private-conversations-shortcut"/.test(room) && /data-open-view="chat-topics"/.test(room) && /const ids=\['capital-do-trem-room','fazer-amigos','private-conversations-shortcut','chat-topics'\]/.test(room)],
+  ['logo oficial é usada no avatar do grupo da Capital do Trem', /cdt-chat-avatar logo[^>]*>[\s\S]*?src="\.\/marca\.svg"/.test(room)],
+  ['navegação da caixa abre áreas existentes e oferece retorno à lista', /const ids=\['capital-do-trem-room','fazer-amigos','private-conversations-shortcut','chat-topics'\]/.test(room) && /Todas as conversas/.test(room) && /showInbox\(\)/.test(room)],
+  ['caixa de entrada trava o eixo horizontal e preserva rolagem vertical em celulares', /body\.cdt-inbox-mode\{[^}]*overflow-x:hidden/.test(room) && /body\.cdt-inbox-mode\{[^}]*touch-action:pan-y/.test(room) && /body\.cdt-inbox-mode #main-content\{display:block!important/.test(room)],
+  ['linhas e textos da caixa se adaptam a telas estreitas sem estourar largura', /cdt-chat-row\{overflow:hidden;touch-action:pan-y\}/.test(room) && /@media\(max-width:380px\)/.test(room) && /overflow-wrap:anywhere/.test(room)],
+
   ['chat geral possui formulário e campo de mensagem', /id="composer"/.test(room) && /id="message"/.test(room)],
   ['chat geral possui área do seletor de emojis', /id="emoji-tray"[^>]*data-emoji-picker/.test(room)],
   ['botão de emojis é inserido no formulário', /emojiButton\.type\s*=\s*['"]button['"][\s\S]*?emojiButton\.id\s*=\s*['"]emoji-toggle['"]/.test(enhancements) && /form\.insertBefore\(tools,input\)/.test(enhancements)],

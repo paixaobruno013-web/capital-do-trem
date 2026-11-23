@@ -33,6 +33,8 @@ const files = [
   'emoji-picker.js',
   'stories-ui.js',
   'home-story-composer.js',
+  'capital-ai.js',
+  'mobile-bottom-nav.js',
   'event-social-composer.js',
   'account-stories.js',
   'admin-stories.js',

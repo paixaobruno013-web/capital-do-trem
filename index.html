@@ -682,7 +682,7 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
 
 
 /* Instagram: identidade visual em degradê rosa e roxo */
-.instagram-button{background:linear-gradient(110deg,#feda75 0%,#fa7e1e 18%,#d62976 48%,#962fbf 76%,#4f5bd5 100%)!important;color:#fff!important;border:1px solid rgba(255,255,255,.22)!important;box-shadow:0 3px 14px rgba(214,41,118,.28)!important;text-shadow:0 1px 2px rgba(0,0,0,.18)}
+.instagram-button{background:linear-gradient(120deg,#ff4fa3 0%,#d629a7 45%,#8b35d6 100%)!important;color:#fff!important;border:1px solid rgba(255,255,255,.22)!important;box-shadow:0 3px 14px rgba(214,41,118,.28)!important;text-shadow:0 1px 2px rgba(0,0,0,.18)}
 .instagram-button:hover,.instagram-button:focus-visible{filter:brightness(1.08);box-shadow:0 4px 18px rgba(150,47,191,.42)!important}
 
 
@@ -929,11 +929,43 @@ body.light header.header-has-custom-background::before{
 #capital-story-progress{overflow:hidden;border-radius:999px}
 @media(prefers-reduced-motion:reduce){#home-story-composer *,#capital-story-viewer *{transition:none!important;animation:none!important}}
 
+
+/* Estúdio de câmera: ferramentas laterais recolhíveis e ações de destino. */
+.home-story-tools-toggle{position:absolute;z-index:12;right:8px;top:50%;transform:translateY(-50%);width:34px;height:54px;border:1px solid #ffffff55;border-radius:20px 0 0 20px;background:#111d;color:#fff;font-size:24px}
+.home-story-tools-rail{position:absolute;z-index:11;right:8px;top:18%;display:flex;flex-direction:column;gap:8px;max-height:60%;overflow:auto;scrollbar-width:none;transition:transform .2s ease,opacity .2s ease}
+.home-story-tools-rail button{display:flex;align-items:center;gap:7px;min-width:86px;min-height:42px;padding:7px 9px;border:1px solid #ffffff44;border-radius:24px;background:#111c;color:#fff;font-weight:800;box-shadow:0 3px 14px #0008;backdrop-filter:blur(8px)}
+.home-story-tools-rail button span{font-size:11px}
+#home-story-composer.tools-collapsed .home-story-tools-rail{transform:translateX(115%);opacity:0;pointer-events:none}
+#home-story-composer.tools-collapsed .home-story-tools-toggle{right:0}
+#home-story-composer.tools-collapsed .home-story-tools-toggle{border-radius:20px 0 0 20px}
+#home-story-composer.effects-collapsed .home-story-effects{transform:translateY(120%);opacity:0;pointer-events:none}
+.home-story-effects{transition:transform .2s ease,opacity .2s ease}
+.home-story-publish-actions{position:absolute;z-index:10;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 70px);display:none;grid-template-columns:1fr 1fr;gap:8px}
+#home-story-composer.has-selection .home-story-publish-actions{display:grid}
+.home-story-publish-actions button{position:static!important;left:auto!important;right:auto!important;width:100%!important;min-width:0;min-height:42px;padding:8px 5px;border:0;border-radius:22px;background:linear-gradient(110deg,#ed1c24,#9d1018);color:#fff;font-weight:900;font-size:12px}
+.home-story-publish-actions .home-story-feed-publish{background:linear-gradient(110deg,#292929,#101010);border:1px solid #ed1c24}
+#home-story-composer.has-selection .home-story-save{bottom:calc(env(safe-area-inset-bottom,0px) + 250px)}
+@media(max-width:390px){.home-story-tools-rail{right:5px;gap:5px}.home-story-tools-rail button{min-width:74px;min-height:36px;padding:5px 7px}.home-story-tools-rail button span{font-size:10px}.home-story-publish-actions{gap:5px}.home-story-publish-actions button{font-size:11px}}
+
 </style><script>
 // Se o Android encerrar o processo enquanto a câmera nativa está aberta, retoma a conversa em vez de reiniciar na página inicial.
 try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(localStorage.getItem(key)||0);if(started&&Date.now()-started<3*60*1000){localStorage.removeItem(key);location.replace('./bate-papo.html?retorno-camera=1');}}catch(error){}
 </script>
-<link rel="stylesheet" href="./capital-futurista.css?v=5">\n<style>.music-section-banner{width:100%;margin:0 0 14px;aspect-ratio:16/9;background:#000;overflow:hidden;border-radius:14px}.music-section-banner img{display:block;width:100%;height:100%;aspect-ratio:16/9;object-fit:contain;background:#000}.music-upload-area{display:block;margin:0 0 14px;border:1px solid rgba(237,28,36,.42);background:linear-gradient(155deg,#171012,#090909);box-shadow:0 10px 28px rgba(0,0,0,.25)}.music-upload-area .home-section-heading{margin-bottom:10px}.music-upload-area form{display:grid;gap:9px}.music-upload-area form[hidden]{display:none!important}.music-upload-area input[type=file]{display:block;width:100%;min-height:48px;padding:10px;border:1px dashed rgba(237,28,36,.65);border-radius:12px;background:#100d0e;color:#fff}.music-upload-area button[type=submit]{width:100%;min-height:48px;border-radius:13px;font-weight:800;letter-spacing:.02em}.music-section-banner{aspect-ratio:auto;max-height:none;overflow:visible;border-radius:12px}.music-section-banner img{width:100%;height:auto;max-height:190px;object-fit:contain;object-position:center;background:#000}.my-uploaded-song{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;margin:8px 0}.my-uploaded-song-main{min-width:0;flex:1}.my-uploaded-song-main strong{display:block;overflow-wrap:anywhere}.my-uploaded-song-actions{display:flex;gap:7px;flex-wrap:wrap}.my-uploaded-song audio{width:100%;max-width:380px;margin-top:8px}.my-uploaded-song-actions button{min-height:38px;padding:7px 10px}</style></head>
+<link rel="stylesheet" href="./capital-futurista.css?v=5">
+<style>.music-section-banner{width:100%;margin:0 0 14px;aspect-ratio:16/9;background:#000;overflow:hidden;border-radius:14px}.music-section-banner img{display:block;width:100%;height:100%;aspect-ratio:16/9;object-fit:contain;background:#000}.music-upload-area{display:block;margin:0 0 14px;border:1px solid rgba(237,28,36,.42);background:linear-gradient(155deg,#171012,#090909);box-shadow:0 10px 28px rgba(0,0,0,.25)}.music-upload-area .home-section-heading{margin-bottom:10px}.music-upload-area form{display:grid;gap:9px}.music-upload-area form[hidden]{display:none!important}.music-upload-area input[type=file]{display:block;width:100%;min-height:48px;padding:10px;border:1px dashed rgba(237,28,36,.65);border-radius:12px;background:#100d0e;color:#fff}.music-upload-area button[type=submit]{width:100%;min-height:48px;border-radius:13px;font-weight:800;letter-spacing:.02em}.music-section-banner{aspect-ratio:auto;max-height:none;overflow:visible;border-radius:12px}.music-section-banner img{width:100%;height:auto;max-height:190px;object-fit:contain;object-position:center;background:#000}.my-uploaded-song{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;margin:8px 0}.my-uploaded-song-main{min-width:0;flex:1}.my-uploaded-song-main strong{display:block;overflow-wrap:anywhere}.my-uploaded-song-actions{display:flex;gap:7px;flex-wrap:wrap}.my-uploaded-song audio{width:100%;max-width:380px;margin-top:8px}.my-uploaded-song-actions button{min-height:38px;padding:7px 10px}</style><style>.home-story-extra-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:10px 0}.home-story-extra-actions button{min-width:0;padding:9px 5px;border:1px solid #ed1c2466;border-radius:10px;background:#171717;color:#fff;font-weight:750;font-size:12px}.home-story-extra-actions button:focus-visible{outline:2px solid #fff;outline-offset:2px}#home-story-music-panel,#home-story-friends-panel,#home-story-link-panel{padding:10px;margin:7px 0;border:1px solid #ed1c244d;border-radius:10px;background:#111}#home-story-music-panel select,#home-story-friends-panel input,#home-story-friends-panel select,#home-story-link-panel input{width:100%;min-height:42px;margin-top:6px;padding:9px;border-radius:8px;border:1px solid #444;background:#080808;color:#fff}</style>
+<style>
+/* Catálogo de músicas: manter a organização existente e dar destaque às faixas já publicadas. */
+.music-library-columns{align-items:start;gap:16px}
+.music-library-columns section{padding:13px;border:1px solid rgba(237,28,36,.28);border-radius:16px;background:linear-gradient(145deg,rgba(22,13,15,.94),rgba(7,7,8,.96));box-shadow:0 10px 26px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.04)}
+.music-library-columns h4{display:flex;align-items:center;gap:8px;margin:2px 0 11px;color:#fff;font-size:14px;letter-spacing:.7px;text-transform:uppercase}
+.music-library-row{position:relative;min-width:0;min-height:68px;align-items:center;gap:10px;margin:8px 0;padding:10px 11px;border:1px solid rgba(237,28,36,.22);border-radius:13px;background:linear-gradient(110deg,#191416,#0b0b0d 72%);box-shadow:0 5px 14px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.035);transition:border-color .18s,box-shadow .18s,transform .18s}
+.music-library-row:before{content:"♫";display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border:1px solid rgba(237,28,36,.5);border-radius:10px;background:radial-gradient(circle at 35% 25%,rgba(237,28,36,.32),transparent 70%),#090909;color:#fff;font-size:23px;text-shadow:0 0 12px #ed1c24;box-shadow:inset 0 0 12px rgba(237,28,36,.12),0 0 10px rgba(237,28,36,.12)}
+.music-library-row strong{display:block;flex:1;min-width:0;overflow-wrap:anywhere;font-size:13px;line-height:1.35;color:#fff}
+.music-library-row button{flex:0 0 auto;min-width:40px;min-height:40px;padding:7px 11px;border:1px solid rgba(237,28,36,.48);border-radius:10px;background:linear-gradient(145deg,#211014,#090909);color:#fff;font-weight:850;box-shadow:0 0 10px rgba(237,28,36,.12)}
+.music-library-row button:active{transform:scale(.96);box-shadow:0 0 14px rgba(237,28,36,.3)}
+@media(max-width:560px){.music-library-columns{grid-template-columns:minmax(0,1fr);gap:10px}.music-library-columns section{padding:11px}.music-library-row{min-height:64px;padding:9px}.music-library-row:before{flex-basis:38px;width:38px;height:38px}.music-library-row strong{font-size:12px}.music-library-row button{min-width:38px;padding:6px 9px}}
+</style>
+</head>
 <body>
 <script>
 (function(){
@@ -964,7 +996,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <p id="connection-status" class="connection-status" role="status" aria-live="polite" hidden></p>
 <nav id="nav" aria-label="Navegação principal">
 <button class="active" data-page="inicio" aria-controls="inicio" aria-current="page">⌂ Feed</button>
-<a class="nav-chat" href="./bate-papo.html" aria-label="Abrir chat">💬 Chat</a>
+<a class="nav-chat" href="./mensagens.html" aria-label="Abrir chat">💬 Chat</a>
 <button data-page="musicas" aria-controls="musicas">♫ Músicas</button>
 <button data-page="pesquisa" aria-controls="pesquisa">⌕ Pesquisa</button>
 <a class="nav-profile" href="./rede.html" aria-label="Abrir meu perfil">👤 Perfil</a>
@@ -1001,7 +1033,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <div class="home-shortcuts reference-shortcuts" aria-label="Atalhos principais"><button type="button" data-go="musicas"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="music-note-stem" d="M10 17V5.2L21 3v12"/><circle cx="7" cy="18" r="3.2"/><circle cx="18" cy="16" r="3.2"/></svg>Músicas</button><button type="button" data-go="comunidade"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zm8 0a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM8 13c-3.5 0-6 1.8-6 4v3h11v-3c0-2.2-2.5-4-5-4zm8 0c-.6 0-1.2.1-1.8.2 1.7 1 2.8 2.3 2.8 3.8v3h5v-3c0-2.2-2.5-4-6-4z"/></svg>Comunidade</button><button type="button" data-go="eventos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h2v3h6V2h2v3h3v17H4V5h3V2zm-1 8v10h12V10H6zm2 2h3v3H8v-3z"/></svg>Eventos</button><button type="button" data-go="artistas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v3h4v3a5 5 0 0 1-5 5 5 5 0 0 1-3 2.8V20h5v2H6v-2h5v-3.2A5 5 0 0 1 8 14a5 5 0 0 1-5-5V6h4V3zm10 5v4a3 3 0 0 0 2-3V8h-2zM5 8v1a3 3 0 0 0 2 3V8H5z"/></svg>Ranking</button><a href="./conta.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 13a7.8 7.8 0 0 0 0-2l2-1.5-2-3.5-2.4 1a7.8 7.8 0 0 0-1.7-1L15 3H9l-.4 3a7.8 7.8 0 0 0-1.7 1l-2.4-1-2 3.5 2 1.5a7.8 7.8 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a7.8 7.8 0 0 0 1.7 1L9 21h6l.4-3a7.8 7.8 0 0 0 1.7-1l2.4 1 2-3.5-2.1-1.5zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>Configurações</a></div><div class="grid"><article class="card"><h3>🎧 Música independente</h3><p class="muted">Espaço para lançamentos, artistas e sons da cena.</p></article><article class="card"><h3>📅 Cultura e eventos</h3><p class="muted">Divulgação de encontros, bailes e atividades culturais.</p></article><article class="card"><h3>🤝 Comunidade</h3><p class="muted">Ações sociais, parcerias e informação para fortalecer a comunidade.</p></article></div><div class="card reference-trending"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap"><h3>🔥 Publicações recentes da comunidade</h3><a class="btn alt" href="./rede.html">Abrir rede social →</a></div><p class="muted">Novidades, lançamentos e recados da comunidade em um mural visual para compartilhar.</p><div id="public-posts" class="list" aria-live="polite"><p class="muted">Carregando publicações da comunidade…</p></div><section class="saved-publications card" aria-labelledby="saved-publications-title"><h3 id="saved-publications-title">🔖 Publicações salvas</h3><p class="muted">Sua coleção particular, como os itens salvos do Instagram. Só você pode ver o que guardou.</p><div id="saved-publications-login" class="muted">Entre na sua conta para acessar seus itens salvos.</div><div id="saved-publications-list" class="list" aria-live="polite" hidden></div><p id="saved-publications-status" class="muted" role="status" aria-live="polite"></p></section></div><div class="card reference-extra-links"><h3>Mais do Capital do Trem</h3><p><a href="https://youtube.com/@capitaldotrem" target="_blank" rel="noopener">YouTube</a> · <a href="https://www.instagram.com/capital.do.trem" target="_blank" rel="noopener">Instagram</a> · <a href="./conta.html">Minha conta</a> · <a href="./mensagens.html">Minhas conversas</a> · <a href="./apoiadores.html">🤝 Apoiadores</a></p></div><div class="card"><h3>📣 Mural da comunidade</h3><p class="muted">Publicações aprovadas pela equipe do Capital do Trem.</p><p class="muted">As publicações da comunidade aparecem na área “Em Alta na Comunidade” acima.</p></div><div class="notice">O mural mostra somente divulgações aprovadas pela equipe. Para enviar uma publicação, entre na sua conta e use a área de divulgação. <a href="./conta.html">Acessar minha conta</a>.</div></section>
 <section class="page" id="musicas">
 <div class="music-brandbar" aria-label="Capital do Trem ao vivo"><strong>CAPITAL DO TREM</strong><span><i aria-hidden="true"></i> AO VIVO</span></div>
-<figure class="music-section-banner" aria-label="AQUI A MÚSICA NÃO PARA"><img src="./assets/banner-speakers.webp" alt="Arte original com alto-falantes e a frase AQUI A MÚSICA NÃO PARA!" width="1536" height="1024" style="display:block;width:100%;height:auto;max-height:190px;object-fit:contain;object-position:center;background:#000" loading="eager" decoding="async"></figure>
+<section id="music-cover-area" class="card music-cover-area" aria-label="Capa da área Músicas" hidden><div id="music-cover-stage" style="position:relative;overflow:hidden;display:grid;place-items:center;min-height:110px;max-height:230px;border:1px solid #ed1c2466;border-radius:14px;background:#050505"><img id="music-cover-preview" alt="Capa personalizada da área Músicas" hidden style="display:block;width:100%;max-height:230px;object-position:50% 50%;object-fit:contain"><p id="music-cover-empty" class="muted" style="margin:22px;text-align:center">AQUI A MÚSICA NÃO PARA!</p></div></section>
 <p class="music-tagline">Seu universo do Funk. Sua comunidade. Seu som.</p>
 <nav class="music-quick-actions" aria-label="Atalhos da área de música">
 <a href="#song-catalog-search"><strong>Nome das</strong><span>músicas</span></a>
@@ -1011,7 +1043,7 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <section id="music-upload-area" class="card music-upload-area" aria-labelledby="music-upload-heading">
  <div class="home-section-heading"><div><span class="eyebrow">ENVIE SEU SOM</span><h3 id="music-upload-heading">＋ Publicar música</h3><p class="muted">MCs e DJs podem enviar suas faixas diretamente por aqui. Cada envio é independente, mesmo quando a música já existe no catálogo.</p></div></div>
  <p id="music-upload-access" class="notice" role="status" aria-live="polite">Verificando acesso para envio…</p>
- <form id="music-upload-form" hidden>
+ <form id="music-upload-form" hidden onsubmit="event.preventDefault(); return false" action="#" method="post" aria-describedby="music-upload-status">
   <label for="music-upload-file">Arquivo de áudio (MP3, M4A, AAC, WAV ou OGG • até 50 MB)</label>
   <input id="music-upload-file" type="file" accept="audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/x-wav,audio/ogg,.mp3,.m4a,.aac,.wav,.ogg" required>
   <label for="music-upload-title">Nome da música</label><input id="music-upload-title" maxlength="120" required placeholder="Título da faixa">
@@ -1312,7 +1344,7 @@ function go(id){
 }
 tabs.forEach(tab=>tab.addEventListener('click',()=>go(tab.dataset.page)));
 document.querySelectorAll('[data-go]').forEach(button=>button.addEventListener('click',()=>go(button.dataset.go)));
-function openPageFromHash(){const id=decodeURIComponent(location.hash.slice(1));if(['inicio','musicas','eventos','artistas','amigos','comunidade','social','parcerias','divulgue','duvidas'].includes(id))go(id);}
+function openPageFromHash(){const id=decodeURIComponent(location.hash.slice(1));if(['inicio','musicas','pesquisa','eventos','artistas','amigos','comunidade','social','parcerias','divulgue','duvidas'].includes(id))go(id);}
 if(location.hash)openPageFromHash();window.addEventListener('hashchange',openPageFromHash);
 const themeButton=document.getElementById('theme');
 const THEME_KEY='capitaldotrem_theme_v1';
@@ -1862,6 +1894,62 @@ async function getOfflineMusic(id){
   request.onerror=()=>{db.close();reject(request.error);};
  });
 }
+const OFFLINE_MUSIC_MAX_BYTES=120*1024*1024;
+const OFFLINE_MUSIC_MAX_TRACK_BYTES=25*1024*1024;
+const OFFLINE_MUSIC_MAX_TRACKS=12;
+const offlineCachingIds=new Set();
+async function listOfflineMusic(){
+ const db=await openOfflineMusicDB();
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction('tracks','readonly'),request=tx.objectStore('tracks').getAll();
+  request.onsuccess=()=>{db.close();resolve(request.result||[]);};
+  request.onerror=()=>{db.close();reject(request.error);};
+ });
+}
+async function deleteOfflineMusic(id){
+ const db=await openOfflineMusicDB();
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction('tracks','readwrite');
+  tx.objectStore('tracks').delete(String(id));
+  tx.oncomplete=()=>{db.close();resolve(true);};
+  tx.onerror=()=>{const error=tx.error;db.close();reject(error);};
+ });
+}
+async function cacheOfflineSong(song){
+ if(!song?.id||!song.audio_url||!navigator.onLine||offlineCachingIds.has(String(song.id)))return false;
+ if(String(song.audio_url).startsWith('blob:'))return false;
+ offlineCachingIds.add(String(song.id));
+ try{
+  if(await getOfflineMusic(song.id))return false;
+  const response=await fetch(song.audio_url,{cache:'no-store'});
+  if(!response.ok)throw new Error('Faixa indisponível para cache');
+  const blob=await response.blob();
+  if(!blob.size||blob.size>OFFLINE_MUSIC_MAX_TRACK_BYTES)return false;
+  const stored=await listOfflineMusic();
+  let total=stored.reduce((sum,item)=>sum+(item.blob?.size||0),0);
+  let count=stored.length;
+  const oldest=stored.slice().sort((a,b)=>(a.savedAt||0)-(b.savedAt||0));
+  while((total+blob.size>OFFLINE_MUSIC_MAX_BYTES||count>=OFFLINE_MUSIC_MAX_TRACKS)&&oldest.length){
+   const remove=oldest.shift();
+   await deleteOfflineMusic(remove.id);
+   total-=remove.blob?.size||0;
+   count--;
+  }
+  if(total+blob.size>OFFLINE_MUSIC_MAX_BYTES)return false;
+  await saveOfflineMusic(song.id,blob,song.title);
+  return true;
+ }catch(error){
+  console.warn('Cache automático da música não concluído:',song.title,error);
+  return false;
+ }finally{offlineCachingIds.delete(String(song.id));}
+}
+async function cacheOfflineSongsInBackground(items,limit=3){
+ if(!navigator.onLine||!Array.isArray(items))return;
+ for(const song of items.slice(0,limit)){
+  if(!navigator.onLine)break;
+  await cacheOfflineSong(song);
+ }
+}
 async function saveOfflineMusic(id,blob,title){
  if(!id||!blob?.size)throw new Error('Arquivo de áudio vazio ou sem identificador');
  const db=await openOfflineMusicDB();
@@ -1873,22 +1961,56 @@ async function saveOfflineMusic(id,blob,title){
   tx.onabort=()=>{const error=tx.error;db.close();reject(error||new Error('Armazenamento offline interrompido'));};
  });
 }
+const OFFLINE_MUSIC_CATALOG_KEY='capitaldotrem_offline_music_catalog_v1';
+const OFFLINE_MUSIC_PLAYLISTS_KEY='capitaldotrem_offline_music_playlists_v1';
+function readOfflineJson(key,fallback=[]){
+ try{const value=JSON.parse(localStorage.getItem(key)||'null');return Array.isArray(value)?value:fallback;}catch{return fallback;}
+}
 // Catálogo musical compartilhado com reprodução, download, curtidas e comentários.
 (async()=>{
  const container=document.getElementById('published-song-catalog');
  try{
   const api=await import('./supabase/auth.js');api.initSupabase();
   const playerModule=await import('./capital-music-player.js');
-  const session=await api.getCurrentSession();
-  const musicPlayer=playerModule.createCapitalMusicPlayer('capital-music-player',{showPlaylists:true,onPlay:song=>{if(session)api.recordSongPlay(song.id).catch(()=>{});}});window.capitalMusicPlayer=musicPlayer;
-  const songs=await api.getPublishedSongs();container.replaceChildren();
+  const session=await api.getCurrentSession().catch(()=>null);
+  const musicPlayer=playerModule.createCapitalMusicPlayer('capital-music-player',{showPlaylists:true,onPlay:song=>{if(session)api.recordSongPlay(song.id).catch(()=>{});const index=songs.findIndex(item=>item.id===song?.id);if(index>=0)setTimeout(()=>cacheOfflineSongsInBackground(songs.slice(index,index+3),3),900);}});window.capitalMusicPlayer=musicPlayer;
+  let songs=[];
+  try{
+   songs=await api.getPublishedSongs();
+   try{localStorage.setItem(OFFLINE_MUSIC_CATALOG_KEY,JSON.stringify(songs.map(song=>({id:song.id,title:song.title,artist_name:song.artist_name,description:song.description,producer_name:song.producer_name,download_url:song.download_url||''}))));}catch{}
+  }catch(networkError){
+   // Sem internet: monta o catálogo local apenas com faixas que já foram baixadas.
+   const cachedCatalog=readOfflineJson(OFFLINE_MUSIC_CATALOG_KEY,[]);
+   for(const cachedSong of cachedCatalog){
+    try{
+     const saved=await getOfflineMusic(cachedSong.id);
+     if(saved?.blob)songs.push({...cachedSong,audio_url:URL.createObjectURL(saved.blob),offline_saved:true});
+    }catch(error){/* Uma faixa corrompida não impede as demais de tocar. */}
+   }
+  }
+  container.replaceChildren();
   let userPlaylists=[];
   const playlistList=document.getElementById('music-playlist-list');
   const playlistStatus=document.getElementById('music-playlist-status');
   const createPlaylistButton=document.getElementById('create-music-playlist');
   const refreshPlaylists=async()=>{
-   if(!session){if(playlistList)playlistList.innerHTML='<p class="muted">Entre na sua conta para criar playlists.</p>';return;}
-   userPlaylists=await api.getMyPlaylists();
+   if(!session){
+    userPlaylists=readOfflineJson(OFFLINE_MUSIC_PLAYLISTS_KEY,[]);
+    musicPlayer.setPlaylists(userPlaylists);
+    if(playlistList){
+     playlistList.replaceChildren();
+     if(!userPlaylists.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Entre na sua conta e carregue suas playlists enquanto estiver online.';playlistList.append(empty);}
+    }
+    if(playlistStatus&&userPlaylists.length)playlistStatus.textContent='Modo offline: playlists guardadas aqui. O player vai usar as faixas que conseguiu preparar automaticamente.';
+    return;
+   }
+   try{
+    userPlaylists=await api.getMyPlaylists();
+    try{localStorage.setItem(OFFLINE_MUSIC_PLAYLISTS_KEY,JSON.stringify(userPlaylists));}catch{}
+   }catch(networkError){
+    userPlaylists=readOfflineJson(OFFLINE_MUSIC_PLAYLISTS_KEY,[]);
+    if(playlistStatus)playlistStatus.textContent=userPlaylists.length?'Sem internet: playlists e faixas salvas neste aparelho continuam disponíveis.':'Conecte-se para sincronizar suas playlists. Enquanto estiver online, o app prepara algumas faixas automaticamente.';
+   }
    musicPlayer.setPlaylists(userPlaylists);
    if(!playlistList)return;
    playlistList.replaceChildren();
@@ -1898,7 +2020,7 @@ async function saveOfflineMusic(id,blob,title){
     const name=document.createElement('strong');name.textContent=playlist.name;
     const count=document.createElement('span');count.className='muted';count.textContent=(playlist.songs?.length||0)+' faixa(s)';
     const actions=document.createElement('div');actions.className='social';
-    const playList=document.createElement('button');playList.type='button';playList.className='btn alt';playList.textContent='▶ Ouvir playlist';playList.addEventListener('click',()=>{musicPlayer.setPlaylists(userPlaylists);const picker=document.querySelector('#capital-music-player .ct-player-playlist');if(picker){picker.value=playlist.id;picker.dispatchEvent(new Event('change'));}document.getElementById('capital-music-player')?.scrollIntoView({behavior:'smooth',block:'center'});});
+    const playList=document.createElement('button');playList.type='button';playList.className='btn alt';playList.textContent='▶ Ouvir playlist';playList.addEventListener('click',()=>{const playlistSongs=(playlist.songs||[]).map(entry=>songs.find(song=>song.id===entry.song_id)).filter(Boolean);if(navigator.onLine)setTimeout(()=>cacheOfflineSongsInBackground(playlistSongs,6),900);musicPlayer.setPlaylists(userPlaylists);const picker=document.querySelector('#capital-music-player .ct-player-playlist');if(picker){picker.value=playlist.id;picker.dispatchEvent(new Event('change'));}document.getElementById('capital-music-player')?.scrollIntoView({behavior:'smooth',block:'center'});});
     const rename=document.createElement('button');rename.type='button';rename.className='btn alt';rename.textContent='✏️ Renomear';rename.addEventListener('click',async()=>{const value=prompt('Novo nome da playlist:',playlist.name);if(value===null)return;try{await api.renameMyPlaylist(playlist.id,value);await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível renomear a playlist.';}});
     const remove=document.createElement('button');remove.type='button';remove.className='btn alt';remove.textContent='Excluir';remove.classList.add('music-action-button','music-delete-button');remove.addEventListener('click',async()=>{if(!confirm('Excluir a playlist “'+playlist.name+'”? As músicas originais não serão apagadas.'))return;try{await api.deleteMyPlaylist(playlist.id);await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível excluir a playlist.';}});
     actions.append(playList,rename,remove);row.append(name,count,actions);
@@ -1907,7 +2029,21 @@ async function saveOfflineMusic(id,blob,title){
    }
   };
   if(createPlaylistButton)createPlaylistButton.addEventListener('click',async()=>{if(!session){if(playlistStatus)playlistStatus.textContent='Entre na sua conta para criar uma playlist.';return;}const name=prompt('Nome da nova playlist:');if(name===null)return;createPlaylistButton.disabled=true;try{await api.createMyPlaylist(name);if(playlistStatus)playlistStatus.textContent='Playlist criada! Agora adicione músicas pelo catálogo.';await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível criar a playlist.';}finally{createPlaylistButton.disabled=false;}});
-  if(session){try{await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível carregar suas playlists.';}}
+  try{await refreshPlaylists();}catch(error){if(playlistStatus)playlistStatus.textContent=error.message||'Não foi possível carregar suas playlists.';}
+  window.addEventListener('offline',async()=>{
+   const offlineSongs=[];
+   for(const song of songs){
+    try{const saved=await getOfflineMusic(song.id);if(saved?.blob)offlineSongs.push({...song,audio_url:URL.createObjectURL(saved.blob),offline_saved:true});}catch(error){/* Uma faixa indisponível não bloqueia as demais. */}
+   }
+   if(offlineSongs.length){
+    musicPlayer.setCatalog(offlineSongs);
+    const picker=document.querySelector('#capital-music-player .ct-player-playlist');
+    const selected=userPlaylists.find(item=>item.id===picker?.value);
+    const playlistQueue=(selected?.songs||[]).map(entry=>offlineSongs.find(song=>song.id===entry.song_id)).filter(Boolean);
+    musicPlayer.setQueue(playlistQueue.length?playlistQueue:offlineSongs);
+    if(playlistStatus)playlistStatus.textContent='Sem internet: '+offlineSongs.length+' faixa(s) preparadas neste aparelho. Aperte play para ouvir.';
+   }else if(playlistStatus){playlistStatus.textContent='Sem internet: o app ainda não conseguiu preparar nenhuma faixa neste aparelho.';}
+  });
   const mySongsById=new Map();
   if(session){try{for(const owned of await api.getMySongs())mySongsById.set(owned.id,owned);}catch(error){console.warn('Não foi possível consultar as músicas próprias para edição.',error);}}
   const libraryPanel=document.getElementById('music-library');
@@ -1947,7 +2083,7 @@ async function saveOfflineMusic(id,blob,title){
   const searchInput=document.getElementById('song-catalog-search');
   const countLabel=document.getElementById('song-catalog-count');
   if(session)renderMusicLibrary();
-  musicPlayer.setCatalog(songs);
+  musicPlayer.setCatalog(songs);if(navigator.onLine)setTimeout(()=>cacheOfflineSongsInBackground(songs,2),1800);
   if(!songs.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='As músicas publicadas pela comunidade aparecerão aqui.';container.append(empty);return;}
   for(const song of songs){
    const card=document.createElement('article');card.className='item music-track-row';card.style.margin='10px 0';card.dataset.songId=song.id;songCards.set(song.id,card);card.dataset.searchText=[song.title,song.artist_name,song.description].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
@@ -2001,6 +2137,7 @@ async function saveOfflineMusic(id,blob,title){
       if(!blob.size)throw new Error('O arquivo recebido está vazio');
       await saveOfflineMusic(song.id,blob,song.title);
       offlineTrack={blob,title:song.title,url:URL.createObjectURL(blob)};
+      song.audio_url=offlineTrack.url;song.offline_saved=true;musicPlayer.setCatalog(songs);
       audio.src=offlineTrack.url;audio.dataset.offlineReady='true';audio.load();
       offlineButton.textContent='✓ Salva para ouvir offline';offlineStatus.textContent='Música guardada neste aparelho. Agora pode tocar sem internet.';
      }catch(error){offlineStatus.textContent='Não foi possível guardar offline. Verifique a conexão e tente novamente.';}
@@ -2472,6 +2609,14 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
    <img id="home-story-photo-preview" alt="Prévia da foto selecionada" hidden>
    <video id="home-story-selected-video" controls playsinline hidden></video>
    <div id="home-story-camera-message">Abrindo sua câmera…</div>
+   <button id="home-story-tools-toggle" class="home-story-tools-toggle" type="button" aria-expanded="true" aria-label="Minimizar ferramentas">‹</button>
+   <nav id="home-story-tools-rail" class="home-story-tools-rail" aria-label="Ferramentas da câmera">
+    <button id="home-story-tool-text" type="button">Aa <span>Texto</span></button>
+    <button id="home-story-tool-music" type="button">♫ <span>Músicas</span></button>
+    <button id="home-story-tool-tag" type="button">@ <span>Marcar</span></button>
+    <button id="home-story-tool-save" type="button">↓ <span>Salvar</span></button>
+    <button id="home-story-effects-toggle" type="button" aria-expanded="true">✧ <span>Efeitos</span></button>
+   </nav>
   </div>
   <input id="home-story-album" type="file" accept="image/*,video/mp4,video/webm,video/quicktime,.mov" hidden>
   <label class="home-story-zoom" for="home-story-zoom"><span>−</span><input id="home-story-zoom" type="range" min="1" max="3" step="0.1" value="1" aria-label="Zoom da câmera"><output id="home-story-zoom-value">1×</output><span>＋</span></label>
@@ -2490,7 +2635,10 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
     <button type="button" data-story-effect="warm" aria-pressed="false">Quente</button>
     <button type="button" data-story-effect="bw" aria-pressed="false">P&amp;B</button>
     <button type="button" data-story-effect="neon" aria-pressed="false">Neon</button>
-    <button type="button" data-story-effect="beauty" aria-pressed="false">Beleza suave</button>
+    <button type="button" data-story-effect="beauty" aria-pressed="false">Beleza</button>
+    <button type="button" data-story-effect="portrait" aria-pressed="false">Retrato Pro</button>
+    <button type="button" data-story-effect="cinematic" aria-pressed="false">Cinema</button>
+    <button type="button" data-story-effect="funny" aria-pressed="false">Divertido</button>
    </div>
    <p>Os efeitos são aplicados à captura de fotos e à gravação feita pela câmera. “Beleza suave” é um ajuste visual, ainda não é IA generativa.</p>
   </div>
@@ -2505,7 +2653,16 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
   </section>
   <label for="home-story-caption">Mensagem (opcional)</label>
   <textarea id="home-story-caption" maxlength="280" placeholder="O que você quer compartilhar?"></textarea>
-  <button id="home-story-publish" class="home-story-publish" type="button" disabled>Publicar Story</button>
+   
+  <div class="home-story-extra-actions" aria-label="Recursos do Story">
+   <button id="home-story-music-toggle" type="button">♫ Colocar música</button>
+   <button id="home-story-friends-toggle" type="button">＠ Marcar amigos</button>
+   <button id="home-story-link-toggle" type="button">↗ Adicionar link</button>
+  </div>
+  <div id="home-story-music-panel" hidden><label for="home-story-music-select">Escolha uma música publicada</label><select id="home-story-music-select"><option value="">Sem música</option></select><p class="muted" id="home-story-music-status" role="status"></p></div>
+  <div id="home-story-friends-panel" hidden><label for="home-story-friends">Escolha amigos para marcar</label><select id="home-story-friends" multiple size="4" aria-label="Selecionar amigos públicos para marcar"><option value="">Carregando perfis públicos…</option></select><p class="muted">Selecione um ou mais perfis. Os nomes aparecerão na legenda do Story.</p></div>
+  <div id="home-story-link-panel" hidden><label for="home-story-link">Link de divulgação</label><input id="home-story-link" type="url" maxlength="110" inputmode="url" placeholder="https://..."></div>
+  <div class="home-story-publish-actions"><button id="home-story-publish" class="home-story-publish" type="button" disabled>Publicar Story</button><button id="home-story-feed-publish" class="home-story-feed-publish" type="button" disabled>Publicar no Feed</button></div>
   <p id="home-story-status" role="status" aria-live="polite">Escolha uma foto ou grave um vídeo para publicar.</p>
  </section>
 </div>
@@ -2540,6 +2697,7 @@ document.querySelectorAll('.home-youtube-load[data-youtube-id]').forEach(button=
 </section>
 <script type="module" src="./event-social-composer.js"></script>
 <script type="module" src="./home-story-composer.js"></script>
+<script type="module" src="./capital-ai.js"></script>
 <script type="module" src="./stories-ui.js"></script>
 <script type="module" src="./home-feed.js"></script>
 <script type="module" src="./music-cover.js"></script>
@@ -2562,7 +2720,7 @@ async function refreshMyUploads(){
    const name=document.createElement('strong');name.textContent=(song.artist_name||'Artista')+' — '+(song.title||'Música');name.className='my-uploaded-song-name';
    const state=document.createElement('span');state.className='muted';state.textContent=song.status==='published'?'Publicado no catálogo':song.status==='rejected'?'Reprovado':'Aguardando aprovação';
    main.append(name,state);
-   if(song.audio_url){const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=song.audio_url;audio.setAttribute('aria-label','Reproduzir '+song.title);main.append(audio);}
+   if(song.audio_url){const play=document.createElement('button');play.type='button';play.className='my-uploaded-song-play';play.textContent='▶ Ouvir faixa';play.setAttribute('aria-label','Ouvir '+(song.artist_name||'')+' — '+(song.title||''));play.addEventListener('click',()=>{const player=window.capitalMusicPlayer;if(!player?.playSong){status.textContent='O player ainda está carregando. Tente novamente em instantes.';return;}player.playSong(song);const root=document.getElementById('capital-music-player');root?.scrollIntoView({behavior:'smooth',block:'center'});});main.append(play);}
    const actions=document.createElement('div');actions.className='my-uploaded-song-actions';
    const menu=document.createElement('details');menu.className='my-song-menu';
    const menuTrigger=document.createElement('summary');menuTrigger.textContent='⋮';menuTrigger.setAttribute('aria-label','Mais opções para '+(song.title||'música'));menuTrigger.title='Mais opções';
@@ -2604,4 +2762,4 @@ window.addEventListener('capital-do-trem:song-published',refreshMyUploads);
 </script>
 <script type="module" src="./music-playlists.js"></script>
 <script src="./persistent-music-player.js" defer></script>
-</body></html>
+<script src="./mobile-bottom-nav.js" defer></script>\n</body></html>

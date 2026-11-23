@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Gera ícones quadrados do Capital do Trem com a marca melhor enquadrada."""
+"""Prepara ícones Android/PWA a partir da marca oficial em alta resolução."""
 from pathlib import Path
 import sys
-from PIL import Image, ImageChops, ImageOps
+from PIL import Image, ImageChops, ImageDraw, ImageOps
 
 source = Path(sys.argv[1])
 out = Path(sys.argv[2])
@@ -16,54 +16,64 @@ def load_brand_art():
         try:
             with Image.open(source) as original:
                 art = ImageOps.exif_transpose(original).convert("RGBA")
-            print("Arte oficial carregada; preservando desenho e proporções.")
+            print(f"Marca oficial carregada: {art.width}x{art.height}.")
             return art
         except (OSError, ValueError):
             print("Imagem oficial inválida; usando marca vetorial local.")
     else:
         print("Imagem oficial indisponível; usando marca vetorial local.")
 
-    from PIL import ImageDraw, ImageFont
+    from PIL import ImageFont
     canvas = Image.new("RGBA", (SIZE, SIZE), BACKGROUND)
     draw = ImageDraw.Draw(canvas)
-    draw.polygon([(512, 110), (330, 430), (694, 430)], fill=(237, 28, 36, 255))
-    draw.rounded_rectangle((190, 430, 834, 720), radius=54, fill=(16, 16, 16, 255))
-    draw.rectangle((265, 500, 759, 650), fill=(237, 28, 36, 255))
+    draw.ellipse((42, 42, 982, 982), fill=(16, 16, 16, 255), outline=(237, 28, 36, 255), width=22)
+    draw.polygon([(220, 560), (804, 560), (740, 680), (284, 680)], fill=(237, 28, 36, 255))
+    draw.rectangle((300, 360, 724, 535), fill=(255, 255, 255, 255))
+    draw.rectangle((365, 410, 659, 490), fill=(16, 16, 16, 255))
     try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 90)
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 88)
     except OSError:
         font = ImageFont.load_default()
-    for label, y in (("CAPITAL", 745), ("DO TREM", 850)):
+    for label, y in (("CAPITAL", 245), ("DO TREM", 770)):
         bounds = draw.textbbox((0, 0), label, font=font)
-        draw.text(((SIZE - (bounds[2] - bounds[0])) / 2, y), label, font=font, fill=(16, 16, 16, 255))
+        draw.text(((SIZE - (bounds[2] - bounds[0])) / 2, y), label, font=font, fill=(255, 255, 255, 255))
     return canvas
 
 
 def trim_outer_white_margin(art):
-    """Remove apenas a margem branca externa; preserva todas as partes da marca."""
-    rgb = art.convert("RGB")
-    white = Image.new("RGB", rgb.size, (255, 255, 255))
-    diff = ImageChops.difference(rgb, white).convert("L")
-    # Tolerância a ruído quase branco causado pela compressão JPEG.
-    mask = diff.point(lambda value: 255 if value > 18 else 0)
+    """Remove apenas a margem externa, considerando transparência como branco."""
+    white = Image.new("RGBA", art.size, BACKGROUND)
+    flattened = Image.alpha_composite(white, art).convert("RGB")
+    diff = ImageChops.difference(flattened, Image.new("RGB", flattened.size, (255, 255, 255)))
+    mask = diff.convert("L").point(lambda value: 255 if value > 18 else 0)
     bounds = mask.getbbox()
     return art.crop(bounds) if bounds else art
 
 
+def centered_icon(art, size, background=BACKGROUND):
+    fitted = ImageOps.contain(art, (size, size), method=Image.Resampling.LANCZOS)
+    canvas = Image.new("RGBA", (size, size), background)
+    canvas.alpha_composite(fitted, ((size - fitted.width) // 2, (size - fitted.height) // 2))
+    return canvas
+
+
 art = trim_outer_white_margin(load_brand_art())
 
-# Ícone quadrado: amplia a marca dentro do fundo branco, sem distorcer proporções.
-legacy_art = art.copy()
-legacy_art.thumbnail((940, 940), Image.Resampling.LANCZOS)
-legacy = Image.new("RGBA", (SIZE, SIZE), BACKGROUND)
-legacy.alpha_composite(legacy_art, ((SIZE - legacy_art.width) // 2, (SIZE - legacy_art.height) // 2))
-legacy.convert("RGB").save(out / "icon-only.png", optimize=True)
+# A marca é ampliada de verdade (inclusive quando a origem tem 512 px),
+# sem distorção e com margem segura para a máscara arredondada do Android.
+legacy = centered_icon(art, 940)
+icon = Image.new("RGBA", (SIZE, SIZE), BACKGROUND)
+icon.alpha_composite(legacy, ((SIZE - legacy.width) // 2, (SIZE - legacy.height) // 2))
+icon.convert("RGB").save(out / "icon-only.png", optimize=True)
 
-# Foreground adaptativo: conserva área segura para máscaras dos launchers.
-adaptive_art = art.copy()
-adaptive_art.thumbnail((820, 820), Image.Resampling.LANCZOS)
-foreground = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
-foreground.alpha_composite(adaptive_art, ((SIZE - adaptive_art.width) // 2, (SIZE - adaptive_art.height) // 2))
+for icon_size in (192, 512):
+    icon.resize((icon_size, icon_size), Image.Resampling.LANCZOS).convert("RGB").save(
+        out / f"pwa-icon-{icon_size}.png", optimize=True
+    )
+
+# Foreground adaptativo com área segura: o Android aplica a máscara arredondada
+# do launcher sem cortar o nome ou os elementos principais da marca.
+foreground = centered_icon(art, 820, (0, 0, 0, 0))
 foreground.save(out / "icon-foreground.png", optimize=True)
 Image.new("RGB", (SIZE, SIZE), (255, 255, 255)).save(out / "icon-background.png", optimize=True)
-print("Ícones gerados com a marca ampliada e área segura adaptativa.")
+print("Ícones 1024/512/192 gerados com a marca ampliada e área segura adaptativa.")

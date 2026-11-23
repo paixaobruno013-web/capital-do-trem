@@ -5,6 +5,9 @@ const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const migration = await readFile(new URL('../supabase/migrations/20261118190000_remove_per_upload_rights_confirmation.sql', import.meta.url), 'utf8');
 const checks = [
   [upload.includes("event.preventDefault()"), 'O envio ainda pode provocar navegação/recarregamento do formulário.'],
+  [html.includes('onsubmit="event.preventDefault(); return false"') && html.includes('id="music-upload-form"'), 'O formulário não bloqueia submissão nativa mesmo se o módulo de upload falhar ao carregar.'],
+  [!upload.includes('form.reset()') && upload.includes("fileInput.value='';titleInput.value='';"), 'O sucesso ainda usa reset global do formulário em vez de limpar somente os campos do envio.'],
+  [upload.includes("form.setAttribute('aria-busy','true')") && upload.includes("form.removeAttribute('aria-busy')"), 'O estado de envio não é sinalizado e restaurado no formulário.'],
   [upload.includes("if (submit.disabled) return;"), 'Falta proteção contra envio duplicado.'],
   [upload.includes("fileInput.files?.[0]") && upload.includes("catch (error)"), 'O arquivo selecionado não é mantido no fluxo de erro para nova tentativa.'],
   [!upload.includes('music-upload-rights') && !upload.includes('rightsConfirmed'), 'O formulário ainda exige confirmação de direitos por envio.'],

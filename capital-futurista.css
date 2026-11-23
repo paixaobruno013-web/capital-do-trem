@@ -1192,3 +1192,110 @@ body:has(#private-layout) #conversation-search{min-height:48px;border:1px solid 
     width:44px!important;height:44px!important;min-width:44px!important;
   }
 }
+
+
+/* Catálogo musical: capas, hierarquia e controles com acabamento consistente no celular. */
+#musicas #published-song-catalog{display:flex!important;flex-direction:column;gap:9px!important}
+#musicas #published-song-catalog>.music-track-row{
+  display:grid!important;grid-template-columns:22px 52px minmax(0,1fr) 42px!important;
+  grid-template-rows:auto auto!important;align-items:center!important;gap:3px 11px!important;
+  min-height:76px!important;margin:0!important;padding:10px 12px!important;
+  border:1px solid rgba(237,28,36,.34)!important;border-radius:15px!important;
+  background:linear-gradient(105deg,#1d1114 0%,#111113 58%,#090909 100%)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.045),0 5px 15px rgba(0,0,0,.28)!important;
+}
+#musicas #published-song-catalog>.music-track-row:before{grid-column:1!important;grid-row:1/3!important;color:#9c9c9c!important;font-size:12px!important}
+#musicas #published-song-catalog>.music-track-row>.music-track-cover,
+#musicas #published-song-catalog>.music-track-row>img,
+#musicas #published-song-catalog>.music-track-row>.song-cover{
+  grid-column:2!important;grid-row:1/3!important;width:52px!important;height:52px!important;min-width:52px!important;
+  border:1px solid rgba(255,255,255,.13)!important;border-radius:11px!important;object-fit:cover!important;
+  background:radial-gradient(circle at 30% 20%,#f0444d,#7b1019 48%,#090909 100%)!important;
+  box-shadow:0 0 13px rgba(237,28,36,.22),inset 0 0 12px rgba(255,255,255,.08)!important;
+}
+#musicas #published-song-catalog>.music-track-row h3{
+  grid-column:3!important;grid-row:1!important;min-width:0!important;margin:0!important;padding:0!important;
+  color:#fff!important;font-size:14px!important;font-weight:800!important;line-height:1.3!important;
+  white-space:normal!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+#musicas #published-song-catalog>.music-track-row>p,
+#musicas #published-song-catalog>.music-track-row .music-track-artist,
+#musicas #published-song-catalog>.music-track-row .song-artist{
+  grid-column:3!important;grid-row:2!important;min-width:0!important;margin:0!important;
+  color:#c2bfc0!important;font-size:11px!important;line-height:1.25!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#musicas #published-song-catalog>.music-track-row .music-play-button{
+  grid-column:4!important;grid-row:1/3!important;justify-self:center!important;
+  width:40px!important;height:40px!important;min-width:40px!important;border-radius:50%!important;
+  background:linear-gradient(145deg,#ff3947,#a90018)!important;border:1px solid #ffffff30!important;
+  box-shadow:0 0 0 4px #ed1c2418,0 4px 12px #0008!important;font-size:16px!important;
+}
+#musicas #published-song-catalog>.music-track-row .music-add-to-playlist{
+  grid-column:4!important;grid-row:3!important;justify-self:center!important;width:32px!important;height:30px!important;
+  min-width:32px!important;margin-top:1px!important;border-radius:9px!important;background:#171719!important;
+  border:1px solid #ed1c2466!important;color:#fff!important;
+}
+#musicas #published-song-catalog>.music-track-row>p{grid-column:3!important}
+#musicas #published-song-catalog>.music-track-row:focus-within{border-color:#ed1c24!important;box-shadow:0 0 0 2px #ed1c2422,0 8px 18px #0008!important}
+@media(max-width:420px){
+  #musicas #published-song-catalog>.music-track-row{grid-template-columns:18px 46px minmax(0,1fr) 38px!important;gap:3px 8px!important;padding:9px 8px!important;min-height:68px!important}
+  #musicas #published-song-catalog>.music-track-row>.music-track-cover,
+  #musicas #published-song-catalog>.music-track-row>img,
+  #musicas #published-song-catalog>.music-track-row>.song-cover{width:46px!important;height:46px!important;min-width:46px!important}
+  #musicas #published-song-catalog>.music-track-row h3{font-size:12px!important}
+  #musicas #published-song-catalog>.music-track-row .music-play-button{width:36px!important;height:36px!important;min-width:36px!important}
+}
+
+/* Correção visual mobile do catálogo: nunca mostrar os controles nativos do áudio oculto. */
+#musicas #published-song-catalog .music-track-row audio[hidden],
+#musicas #published-song-catalog .music-track-row audio:not([controls]){
+ display:none!important;width:0!important;height:0!important;visibility:hidden!important
+}
+#musicas #published-song-catalog .music-track-row{
+ min-width:0!important;max-width:100%!important;overflow:hidden!important;
+}
+#musicas #published-song-catalog .music-track-row>*{min-width:0;max-width:100%;box-sizing:border-box}
+#musicas #published-song-catalog .music-track-row h3{overflow-wrap:anywhere;word-break:break-word}
+#musicas #published-song-catalog .music-track-row .music-play-button{align-self:center}
+#musicas #published-song-catalog .music-track-row .music-add-to-playlist{align-self:center}
+#musicas #published-song-catalog .music-track-row audio{display:none!important}
+#musicas #published-song-catalog .music-track-row .music-track-cover{
+ display:grid;place-items:center;border-radius:10px;background:radial-gradient(circle at 35% 25%,#ff5360,#5a0710 48%,#090909 78%);
+ color:#fff;text-shadow:0 0 12px #ff2638;box-shadow:inset 0 0 0 1px #ff667766,0 4px 12px #0008
+}
+@media(max-width:520px){
+ #musicas #published-song-catalog{width:100%;min-width:0;overflow-x:clip}
+ #musicas #published-song-catalog .music-track-row{padding:10px!important;border-radius:12px}
+ #musicas #published-song-catalog .music-track-row h3{font-size:13px!important;line-height:1.3}
+ #capital-music-player.ct-player-persistent .ct-player-shell{padding:8px 10px;gap:4px 8px}
+ #capital-music-player.ct-player-persistent .ct-player-controls{gap:5px}
+ #capital-music-player.ct-player-persistent .ct-player-controls button{width:36px;height:36px;min-width:36px}
+ #capital-music-player.ct-player-persistent .ct-player-controls .ct-player-play{width:46px;height:46px;min-width:46px}
+}
+
+/* Minhas músicas enviadas: cartão compacto com reprodução no player principal. */
+#my-uploaded-songs-list .my-uploaded-song{
+ display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;
+ gap:10px!important;padding:13px!important;min-width:0!important;overflow:visible!important;
+ border:1px solid #ed1c244d!important;border-radius:15px!important;
+ background:linear-gradient(115deg,#1b1012 0%,#101012 65%,#090909 100%)!important;
+ box-shadow:inset 3px 0 0 #ed1c24,0 8px 20px #0007!important
+}
+#my-uploaded-songs-list .my-uploaded-song-main{display:grid!important;gap:6px!important;min-width:0!important}
+#my-uploaded-songs-list .my-uploaded-song-name{font-size:14px!important;line-height:1.35!important;color:#fff!important;overflow-wrap:anywhere}
+#my-uploaded-songs-list .my-uploaded-song-main>.muted{font-size:11px!important;letter-spacing:.2px}
+#my-uploaded-songs-list .my-uploaded-song-play{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;
+ min-height:36px!important;width:max-content!important;max-width:100%!important;padding:7px 13px!important;
+ border:1px solid #ff3448!important;border-radius:999px!important;
+ background:linear-gradient(120deg,#e91b35,#82102a)!important;color:#fff!important;
+ font-size:12px!important;font-weight:850!important;box-shadow:0 0 14px #ed1c2433!important
+}
+#my-uploaded-songs-list .my-uploaded-song-actions{align-self:center!important}
+#my-uploaded-songs-list .my-song-menu>summary{width:40px!important;height:40px!important;min-height:40px!important}
+#my-uploaded-songs-list .my-song-editor{grid-column:1/-1!important}
+@media(max-width:420px){
+ #my-uploaded-songs-list .my-uploaded-song{grid-template-columns:minmax(0,1fr) 38px!important;gap:7px!important;padding:10px!important}
+ #my-uploaded-songs-list .my-uploaded-song-name{font-size:13px!important}
+ #my-uploaded-songs-list .my-uploaded-song-play{min-height:34px!important;font-size:11px!important}
+}
