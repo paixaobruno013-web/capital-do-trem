@@ -4,15 +4,18 @@ Esta lista acompanha a primeira atualização pós-lançamento. Não marcar item
 
 ## Acesso e autenticação
 - [ ] Manter login com e-mail e senha para contas já cadastradas.
-- [ ] Validar e ativar OAuth Google no Supabase; o código de redirecionamento Google já existe, mas depende de Client ID/Secret e URLs autorizadas no painel.
-- [ ] Implementar login por telefone com OTP (envio e confirmação) e testar com número real.
-- [ ] Definir e configurar entrega por WhatsApp. WhatsApp não é um provedor automático do navegador: depende de provedor compatível, credenciais e modelo/template aprovados. Não apresentar como ativo antes dessa configuração.
+- [x] Adicionar botão de acesso Google à tela de conta e ligar ao fluxo OAuth já existente.
+- [ ] Validar e ativar OAuth Google no Supabase; depende de Client ID/Secret e URLs autorizadas no painel.
+- [x] Implementar fluxo de envio e confirmação de código SMS para contas já cadastradas.
+- [ ] Configurar provedor SMS no Supabase e testar com número real.
+- [ ] Definir e configurar entrega por WhatsApp. Depende de provedor compatível, credenciais e modelo/template aprovados; não apresentar como ativo antes dessa configuração.
 - [ ] Garantir fluxo de retorno ao app no Safari iOS e Android, recuperação de senha e sessão persistente.
 
 ## Perfis, seguidores e pesquisa
 - [ ] Confirmar conta/perfil oficial CAPITAL DO TREM e sua identificação visual/verificação.
-- [ ] Exibir lista de seguidores e de perfis seguidos ao tocar nos contadores.
-- [ ] Pesquisar perfis públicos por nome, @ e cidade, incluindo o perfil oficial.
+- [x] Adicionar listas de seguidores e de perfis seguidos ao tocar nos contadores do perfil.
+- [x] Confirmar busca existente de perfis públicos por nome, @ e cidade.
+- [ ] Confirmar que o perfil oficial CAPITAL DO TREM está público e aparece na busca.
 - [ ] Testar seguir/deixar de seguir, contadores e auto-follow do perfil oficial.
 - [ ] Respeitar perfis privados e políticas RLS: nunca revelar e-mail ou dados privados.
 
