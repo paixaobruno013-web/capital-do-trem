@@ -45,12 +45,14 @@ Esta lista acompanha a primeira atualização pós-lançamento. Não marcar item
 - [ ] Aplicar exatamente a logo fornecida pelo proprietário, sem editar o desenho; apenas encaixe no canvas do ícone com cantos arredondados, sem cortar a arte.
 - [ ] Aplicar ícone Apple Touch/PWA e ícones Android coerentes com a mesma marca.
 - [ ] Confirmar ícone Instagram com gradiente oficial rosa/roxo/laranja/amarelo.
-- [ ] Testar GitHub Pages/PWA no Safari iOS: manifest, service worker, adicionar à Tela de Início, safe areas, mídia, login e cache.
+- [x] Teste do aplicativo atual no Safari do iPhone informado pelo usuário como concluído com funcionamento correto.
+- [ ] Fazer regressão da NOVA atualização no Safari iOS após integrar os ajustes: manifest, service worker, adicionar à Tela de Início, safe areas, mídia, login e cache.
 - [ ] Testar atualização do PWA e limpar cache antigo sem perder dados/sessão.
 
 ## Critério de conclusão
 - [ ] Testes automatizados e testes manuais em Android e Safari iOS.
 - [ ] Confirmar migrations incrementais no Supabase antes de pedir qualquer execução manual; nunca reaplicar schema completo no projeto de produção.
 - [ ] Gerar novo APK assinado somente depois da aprovação dos testes Android.
-- [ ] Publicar a versão web/PWA somente depois da aprovação dos testes Safari iOS.
+- [x] Aprovação do usuário para o funcionamento da versão atual no Safari iOS.
+- [ ] Publicar a atualização web/PWA somente depois dos testes de regressão desta nova versão.
 - [ ] Não publicar chaves privadas, senhas, service_role ou credenciais de provedores no repositório.
