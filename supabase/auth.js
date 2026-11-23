@@ -113,6 +113,35 @@ export async function signInWithGoogleAccount({ redirectTo = window.location.hre
   return data;
 }
 
+export async function sendPhoneLoginCode(phone) {
+  const cleanPhone = String(phone || '').replace(/[\s().-]/g, '');
+  if (!/^\+[1-9]\d{7,14}$/.test(cleanPhone)) {
+    throw new Error('Informe o telefone no formato internacional, por exemplo +55 31 99999-9999.');
+  }
+  const supabase = initSupabase();
+  const { data, error } = await supabase.auth.signInWithOtp({
+    phone: cleanPhone,
+    options: { shouldCreateUser: false, channel: 'sms' }
+  });
+  if (error) throw error;
+  return { ...data, phone: cleanPhone };
+}
+
+export async function verifyPhoneLoginCode({ phone, token }) {
+  const cleanPhone = String(phone || '').replace(/[\s().-]/g, '');
+  const cleanToken = String(token || '').replace(/\s/g, '');
+  if (!/^\+[1-9]\d{7,14}$/.test(cleanPhone)) throw new Error('Informe o telefone com código do país.');
+  if (!/^\d{6,8}$/.test(cleanToken)) throw new Error('Digite o código recebido por SMS.');
+  const supabase = initSupabase();
+  const { data, error } = await supabase.auth.verifyOtp({
+    phone: cleanPhone,
+    token: cleanToken,
+    type: 'sms'
+  });
+  if (error) throw error;
+  return data;
+}
+
 export async function signOutAccount() {
   const supabase = initSupabase();
   const { error } = await supabase.auth.signOut();
