@@ -2,10 +2,11 @@ import { readFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [ai, camera, index, sw, edge, built, profile, groupChat, privateChat, privacy, update] = await Promise.all([
+const [ai, camera, index, sw, edge, built, profile, groupChat, privateChat, privacy, update, account, authModule] = await Promise.all([
   read('capital-ai.js'), read('home-story-composer.js'), read('index.html'),
   read('sw.js'), read('supabase/functions/capital-ai-assistant/index.ts'),
-  read('www/capital-ai.js'), read('rede.html'), read('bate-papo.html'), read('mensagens.html'), read('privacidade.html'), read('update.js')
+  read('www/capital-ai.js'), read('rede.html'), read('bate-papo.html'), read('mensagens.html'), read('privacidade.html'), read('update.js'),
+  read('conta.html'), read('supabase/auth.js')
 ]);
 const checks = [
   [ai.includes("functions.invoke('capital-ai-assistant'") && ai.includes("getSession()"), 'Assistente chama IA somente com sessão autenticada'],
@@ -23,7 +24,9 @@ const checks = [
   [privacy.includes('Assistente de inteligência artificial e câmera') && privacy.includes('custos de API'), 'Política de privacidade informa envio opcional de imagens e custos da IA'],
   [update.includes('const confirmationDelay=navigator.onLine?1500:0;') && update.includes('},confirmationDelay);') && !update.includes('13 segundos contínuos sem internet'), 'Alerta offline imediato quando o sistema detecta perda de rede; confirmação curta para falha de internet'],
   [update.includes('Ao detectar o retorno real da internet, avisa imediatamente') && update.includes('reconnectTimer=window.setTimeout(()=>{alertBox.style.display=\'none\';},13000);'), 'Alerta de retorno dispara imediatamente e permanece 13 segundos'],
-  [update.includes('setInterval(verifyRealConnection,1000)') && update.includes("window.addEventListener('offline',showOffline)"), 'Monitoramento automático de conexão sem toque na tela']
+  [update.includes('setInterval(verifyRealConnection,1000)') && update.includes("window.addEventListener('offline',showOffline)"), 'Monitoramento automático de conexão sem toque na tela'],
+  [account.includes('id="google-sign-in"') && authModule.includes("provider: 'google'") && account.includes('signInWithGoogleAccount'), 'Acesso Google disponível na tela de conta'],
+  [account.includes('id="phone-login-number"') && account.includes('id="phone-login-code"') && authModule.includes('sendPhoneLoginCode') && authModule.includes('verifyPhoneLoginCode') && authModule.includes('shouldCreateUser: false'), 'Acesso por SMS com código para contas já cadastradas']
 ];
 for (const [ok, label] of checks) { console.log((ok ? 'OK  ' : 'ERRO ') + label); if (!ok) process.exitCode = 1; }
 for (const [name, source] of [['capital-ai.js', ai], ['home-story-composer.js', camera]]) {
