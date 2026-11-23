@@ -2,7 +2,7 @@ name: Auditoria de segurança do Capital do Trem
 
 on:
   push:
-    branches: [main, ia-camera-comandos-rapidos]
+    branches: [main, ia-camera-comandos-rapidos, fix/fala-uai-view-once-server]
   pull_request:
     branches: [main]
   workflow_dispatch:
