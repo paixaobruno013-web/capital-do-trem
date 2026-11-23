@@ -129,9 +129,26 @@ jobs:
         run: |
           set -euo pipefail
           umask 077
-          printf '%s' "$APP_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/capital-do-trem-app-signing.jks"
-          test -s "$RUNNER_TEMP/capital-do-trem-app-signing.jks"
-          keytool -list -keystore "$RUNNER_TEMP/capital-do-trem-app-signing.jks" -storepass "$APP_STORE_PASSWORD" -alias "$APP_KEY_ALIAS" >/dev/null
+          KEYSTORE_FILE="$RUNNER_TEMP/capital-do-trem-app-signing.jks"
+          if ! printf '%s' "$APP_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE_FILE"; then
+            echo "::error::O segredo do arquivo de assinatura não está em Base64 válido. Não gere outra chave; confira o conteúdo do segredo ANDROID_APP_SIGNING_KEYSTORE_BASE64."
+            exit 1
+          fi
+          if [ ! -s "$KEYSTORE_FILE" ]; then
+            echo "::error::O arquivo de assinatura restaurado está vazio. Confira o segredo ANDROID_APP_SIGNING_KEYSTORE_BASE64."
+            exit 1
+          fi
+          if ! keytool -list -keystore "$KEYSTORE_FILE" -storepass "$APP_STORE_PASSWORD" > "$RUNNER_TEMP/keystore-list.txt" 2> "$RUNNER_TEMP/keystore-error.txt"; then
+            echo "::error::O arquivo foi restaurado, mas a senha de armazenamento não foi aceita. Confira ANDROID_APP_SIGNING_STORE_PASSWORD. Nenhuma senha foi exibida."
+            exit 1
+          fi
+          if ! grep -Fq "$APP_KEY_ALIAS" "$RUNNER_TEMP/keystore-list.txt"; then
+            echo "::error::A senha de armazenamento foi aceita, mas o alias configurado não existe. Alias(s) presentes no arquivo:"
+            awk -F, '/PrivateKeyEntry|keyEntry/ {gsub(/^[[:space:]]+|[[:space:]]+$/, "", $1); print $1}' "$RUNNER_TEMP/keystore-list.txt"
+            exit 1
+          fi
+          keytool -list -keystore "$KEYSTORE_FILE" -storepass "$APP_STORE_PASSWORD" -alias "$APP_KEY_ALIAS" >/dev/null
+          echo "Arquivo de assinatura, senha de armazenamento e alias validados sem expor credenciais."
 
       - name: Gerar APK Release assinado para distribuição direta
         working-directory: android
