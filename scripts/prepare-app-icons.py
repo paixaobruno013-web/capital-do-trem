@@ -1,28 +1,31 @@
 #!/usr/bin/env python3
-"""Prepara ícones Android/PWA a partir da marca oficial em alta resolução."""
+"""Prepara ícones Android/PWA a partir da melhor arte oficial disponível."""
 from pathlib import Path
 import sys
 from PIL import Image, ImageChops, ImageDraw, ImageOps
 
-source = Path(sys.argv[1])
-out = Path(sys.argv[2])
+if len(sys.argv) < 3:
+    raise SystemExit("Uso: prepare-app-icons.py <imagem1> [imagem2 ...] <pasta-saida>")
+sources = [Path(value) for value in sys.argv[1:-1]]
+out = Path(sys.argv[-1])
 out.mkdir(parents=True, exist_ok=True)
 SIZE = 1024
 BACKGROUND = (255, 255, 255, 255)
 
 
 def load_brand_art():
-    if source.is_file():
+    for source in sources:
+        if not source.is_file():
+            continue
         try:
             with Image.open(source) as original:
-                art = ImageOps.exif_transpose(original).convert("RGBA")
-            print(f"Marca oficial carregada: {art.width}x{art.height}.")
+                original.load()
+                art = original.convert("RGBA")
+            print(f"Marca oficial carregada de {source}: {art.width}x{art.height}.")
             return art
-        except (OSError, ValueError):
-            print("Imagem oficial inválida; usando marca vetorial local.")
-    else:
-        print("Imagem oficial indisponível; usando marca vetorial local.")
-
+        except (OSError, ValueError) as error:
+            print(f"Não foi possível abrir {source}: {error!r}; tentando a próxima arte.")
+    print("Nenhuma imagem oficial pôde ser aberta; usando marca vetorial local.")
     from PIL import ImageFont
     canvas = Image.new("RGBA", (SIZE, SIZE), BACKGROUND)
     draw = ImageDraw.Draw(canvas)
@@ -59,8 +62,8 @@ def centered_icon(art, size, background=BACKGROUND):
 
 art = trim_outer_white_margin(load_brand_art())
 
-# A marca é ampliada de verdade (inclusive quando a origem tem 512 px),
-# sem distorção e com margem segura para a máscara arredondada do Android.
+# A imagem é ampliada mesmo quando a origem é menor que 1024 px,
+# mantendo proporções e margem para a máscara arredondada do launcher.
 legacy = centered_icon(art, 940)
 icon = Image.new("RGBA", (SIZE, SIZE), BACKGROUND)
 icon.alpha_composite(legacy, ((SIZE - legacy.width) // 2, (SIZE - legacy.height) // 2))
@@ -71,8 +74,7 @@ for icon_size in (192, 512):
         out / f"pwa-icon-{icon_size}.png", optimize=True
     )
 
-# Foreground adaptativo com área segura: o Android aplica a máscara arredondada
-# do launcher sem cortar o nome ou os elementos principais da marca.
+# Foreground adaptativo com 820 px de área segura; o Android aplica o recorte redondo.
 foreground = centered_icon(art, 820, (0, 0, 0, 0))
 foreground.save(out / "icon-foreground.png", optimize=True)
 Image.new("RGB", (SIZE, SIZE), (255, 255, 255)).save(out / "icon-background.png", optimize=True)
