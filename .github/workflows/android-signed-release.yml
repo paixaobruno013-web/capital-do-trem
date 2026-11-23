@@ -75,6 +75,13 @@ jobs:
       - name: Preparar aplicativo e projeto Android
         run: |
           npm install --no-audit --no-fund
+          node scripts/check-music-experience.mjs
+          node scripts/check-music-upload-stability.mjs
+          node scripts/check-view-once-chat.mjs
+          node scripts/check-offline-experience.mjs
+          node scripts/check-screen-organization.mjs
+          node scripts/check-chat-controls.mjs
+          node scripts/check-chat-attachments.mjs
           npm run build:web
           npx cap add android
 
@@ -82,9 +89,8 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p assets
-          base64 --decode assets/capital-do-trem-logo.jpg.b64 > /tmp/capital-do-trem-logo.jpg
           python -m pip install --quiet Pillow
-          python scripts/prepare-app-icons.py /tmp/capital-do-trem-logo.jpg assets
+          python scripts/prepare-app-icons.py assets/apple-touch-icon.png assets
           mkdir -p www/assets
           cp assets/pwa-icon-192.png assets/pwa-icon-512.png www/assets/
           npx --yes @capacitor/assets@3.0.0 generate --android --assetPath assets --iconBackgroundColor '#ffffff' --iconBackgroundColorDark '#ffffff'
