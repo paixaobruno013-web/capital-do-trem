@@ -8,6 +8,7 @@ const checks=[
 [js.includes("from('profile_follows')")&&js.includes("from('posts')")&&js.includes("from('post_media')"),'Rede usa tabelas de perfis, seguidores, publicações e anexos'],
 [js.includes('getPublishedSongs')&&js.includes('musicPlayer.setCatalog(allSongs)')&&js.includes('musicPlayer.playSong(song)'),'Catálogo carrega faixas publicadas no player musical compartilhado'],
 [js.includes('getPublicProfiles')&&js.includes('toggleFollow'),'Busca lista perfis públicos e permite seguir'],
+[js.includes('showFollowDirectory')&&js.includes("eq(kind==='followers'?'followed_id':'follower_id',userId)")&&js.includes('profile-follow-directory'),'Contadores de seguidores e seguindo abrem diretórios públicos'],
 [js.includes("select('user_id,display_name,username')")&&js.includes("person?.username?'@'+person.username:''"),'Mural de mídias identifica nome e usuário do autor'],
 [(js.match(/media-search'\)\.addEventListener/g)||[]).length===1,'Busca de mídias possui apenas um listener'],
 [js.includes('buildProfileMediaActions')&&js.includes('makeProfilePostMediaOpenable')&&js.includes('profile-media-tile'),'Perfil exibe miniaturas individuais em grade e abre mídias com ações sociais no visualizador'],
