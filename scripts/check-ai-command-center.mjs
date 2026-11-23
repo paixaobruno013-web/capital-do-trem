@@ -21,7 +21,7 @@ const checks = [
   [built.includes('functions.invoke') && !built.includes('cdt-command-center'), 'Serviço interno de IA incluído no pacote web/Android, sem interface flutuante'],
   [profile.includes('src="./capital-ai.js"') && groupChat.includes('src="./capital-ai.js"') && privateChat.includes('src="./capital-ai.js"'), 'Assistente e atalhos disponíveis também no perfil e conversas'],
   [privacy.includes('Assistente de inteligência artificial e câmera') && privacy.includes('custos de API'), 'Política de privacidade informa envio opcional de imagens e custos da IA'],
-  [update.includes('},13000);') && update.includes('13 segundos contínuos sem internet'), 'Alerta offline dispara após 13 segundos contínuos'],
+  [update.includes('const confirmationDelay=navigator.onLine?1500:0;') && update.includes('},confirmationDelay);') && !update.includes('13 segundos contínuos sem internet'), 'Alerta offline imediato quando o sistema detecta perda de rede; confirmação curta para falha de internet'],
   [update.includes('Ao detectar o retorno real da internet, avisa imediatamente') && update.includes('reconnectTimer=window.setTimeout(()=>{alertBox.style.display=\'none\';},13000);'), 'Alerta de retorno dispara imediatamente e permanece 13 segundos'],
   [update.includes('setInterval(verifyRealConnection,1000)') && update.includes("window.addEventListener('offline',showOffline)"), 'Monitoramento automático de conexão sem toque na tela']
 ];
