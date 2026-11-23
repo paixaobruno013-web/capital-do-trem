@@ -17,6 +17,7 @@ Esta lista acompanha a primeira atualização pós-lançamento. Não marcar item
 - [ ] Respeitar perfis privados e políticas RLS: nunca revelar e-mail ou dados privados.
 
 ## Conectividade e presença
+- [x] Alinhar o teste automatizado com a nova regra de alerta imediato/confirmação curta para perda de rede.
 - [x] Reduzir o atraso do alerta de perda de internet: evento de rede do sistema dispara alerta imediatamente; falha de internet com Wi-Fi ainda conectado recebe confirmação curta.
 - [ ] Testar perda/retorno de rede real em Android e Safari iOS, incluindo Wi-Fi conectado sem internet, troca Wi-Fi/4G, app em segundo plano e retorno ao primeiro plano.
 - [ ] Validar que presença online no banco não fica marcada como ativa após desconexão/fechamento inesperado.
