@@ -48,4 +48,5 @@ $('download').addEventListener('click',()=>{if(!currentBlob)return;let blob=curr
 function save(blob,name){if(!blob)return;const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);setStatus('Arquivo salvo/baixado pelo navegador.');}
 window.addEventListener('pagehide',()=>{if(stream)stream.getTracks().forEach(t=>t.stop());});
 })();
-</script></body></html>
+</script><script src="./file-picker-guard.js" defer></script>
+</body></html>
