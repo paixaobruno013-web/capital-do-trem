@@ -304,13 +304,13 @@ label{letter-spacing:.01em}
     <label for="phone-login-number">Telefone com código do país</label>
     <input id="phone-login-number" type="tel" inputmode="tel" autocomplete="tel" placeholder="+55 31 99999-9999" disabled>
     <button type="button" class="secondary" id="send-phone-code" disabled>Enviar código por SMS</button>
-    <form id="phone-login-form">
+    <div id="phone-login-form">
       <div id="phone-code-wrap" hidden>
         <label for="phone-login-code">Código recebido por SMS</label>
         <input id="phone-login-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Digite o código" disabled>
-        <button type="submit" id="verify-phone-code" disabled>Confirmar código e entrar</button>
+        <button type="button" id="verify-phone-code" disabled>Confirmar código e entrar</button>
       </div>
-    </form>
+    </div>
     <p id="phone-login-status" class="status" role="status" aria-live="polite"></p>
     <p class="muted">O acesso por telefone depende da configuração de SMS no serviço de autenticação. Use o número com código internacional.</p>
   </div>
