@@ -23,6 +23,8 @@ jobs:
         run: npm run build:web
       - name: Conferir arquivos e ícones do PWA
         run: node scripts/check-pwa.mjs
+      - name: Verificar idioma Português (Brasil) em todo o aplicativo
+        run: node scripts/check-brazilian-portuguese.mjs
       - name: Verificar compatibilidade iOS PWA e cache privado
         run: node scripts/check-ios-pwa.mjs
       - name: Verificar dependências locais do pacote Android/Web
