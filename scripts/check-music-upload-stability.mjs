@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 const upload = await readFile(new URL('../music-upload.js', import.meta.url), 'utf8');
 const auth = await readFile(new URL('../supabase/auth.js', import.meta.url), 'utf8');
 const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-const migration = await readFile(new URL('../supabase/migrations/20261118190000_remove_per_upload_rights_confirmation.sql', import.meta.url), 'utf8');
+const migration = await readFile(new URL('../supabase/migrations/20261124130939_remove_per_upload_rights_confirmation.sql', import.meta.url), 'utf8');
 const checks = [
   [upload.includes("event.preventDefault()"), 'O envio ainda pode provocar navegação/recarregamento do formulário.'],
   [html.includes('onsubmit="event.preventDefault(); return false"') && html.includes('id="music-upload-form"'), 'O formulário não bloqueia submissão nativa mesmo se o módulo de upload falhar ao carregar.'],
