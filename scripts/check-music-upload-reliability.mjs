@@ -18,7 +18,7 @@ assert.ok(upload.includes('onProgress: percent =>'), 'A tela precisa mostrar o p
 assert.ok(upload.includes('event.preventDefault()'), 'O formulário não pode navegar/recarregar a página');
 assert.ok(upload.includes('fileInput.value=\'\';titleInput.value=\'\''), 'Os campos só devem limpar após upload concluído');
 assert.ok(player.includes('onRefreshAudio=null'), 'O player precisa aceitar renovação de link');
-assert.ok(player.includes('O Android não reconheceu a codificação deste áudio'), 'O player precisa explicar falhas de decodificação');
+assert.ok(player.includes('o Android não reconheceu a codificação deste áudio'), 'O player precisa explicar falhas de decodificação');
 assert.ok(home.includes('onRefreshAudio:song=>api.getSongPlaybackUrl(song.id)'), 'A página precisa conectar o player à renovação do link');
 for (const file of ['music-upload.js','capital-music-player.js','supabase/auth.js']) {
   assert.ok(prepare.includes(file), file + ' precisa entrar no pacote Android/iOS');
