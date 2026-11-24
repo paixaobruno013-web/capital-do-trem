@@ -115,3 +115,12 @@ Referência visual enviada pelo usuário: catálogo escuro em tela cheia, semelh
 - [ ] Preservar a arte original dos alto-falantes e o texto “AQUI A MÚSICA NÃO PARA!”, com enquadramento integral sem cortes, em formato horizontal e altura compacta.
 - [ ] Manter o gerenciamento da capa pelo administrador, sem alterar a identidade visual preto, vermelho e branco.
 - [ ] A nova interface de catálogo com capas individuais, nomes de artista/faixa e menu de três pontos deve começar abaixo desse banner.
+
+
+## Ajustes efetivamente aplicados nesta rodada — 24/11
+
+- [x] FALA UAI: mensagens próprias agora recebem classe visual separada, ficam alinhadas à direita e usam balão em degradê preto/vermelho; mensagens recebidas permanecem à esquerda. O recurso de editar/excluir mensagens próprias já existia no código e foi preservado.
+- [x] Atualizações: o aviso do Service Worker agora anuncia "🚂 TEM ATUALIZAÇÃO NOVA NO TREM!" e o botão usa "🚂 ATUALIZAR AGORA". A atualização só é aplicada após ação do usuário e continua protegendo formulários com alterações não salvas.
+- [ ] Ícone oficial: a arte enviada pelo proprietário ainda precisa ser incorporada como arquivo binário de origem do pipeline de ícones e validada no APK/PWA. Não marcar como concluído até conferir o arquivo gerado e a instalação real.
+- [ ] Ícone do Instagram: identificar o ponto exato da interface em que o ícone deve aparecer e aplicar o símbolo oficial com gradiente; não confundir com o ícone geral do aplicativo.
+- [ ] FALA UAI: a melhoria visual acima não substitui os testes de duas contas, mensagens privadas, chamadas de áudio/vídeo, notificações e integrações de backend descritos neste plano.
