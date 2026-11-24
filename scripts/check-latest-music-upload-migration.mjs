@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
 const [migration, schema, uploader, auth] = await Promise.all([
-  read('supabase/migrations/20261118213000_repair_admin_music_upload_permissions.sql'),
+  read('supabase/migrations/20261124130941_repair_admin_music_upload_permissions.sql'),
   read('supabase/schema.sql'),
   read('music-upload.js'),
   read('supabase/auth.js')
