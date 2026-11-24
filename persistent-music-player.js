@@ -68,9 +68,13 @@ body.light #capital-music-player.ct-player-persistent .ct-player-shell{backgroun
       let offsetY=0,offsetX=0;
       try{offsetY=Number(localStorage.getItem('ct-player-offset-y')||0)||0;offsetX=Number(localStorage.getItem('ct-player-offset-x')||0)||0}catch{}
       const applyOffset=(x,y)=>{
-        const maxX=Math.max(0,Math.floor((innerWidth-root.getBoundingClientRect().width)/2)-8);
+        const playerWidth=root.getBoundingClientRect().width;
+        const compact=root.classList.contains('ct-player-compact');
+        // No modo compacto o dock parte da margem esquerda; permita arrastá-lo por toda a largura útil.
+        const maxX=compact?Math.max(0,Math.floor(innerWidth-playerWidth-16)):Math.max(0,Math.floor((innerWidth-playerWidth)/2)-8);
+        const minX=compact?0:-maxX;
         const maxY=Math.max(0,Math.floor(innerHeight*.62));
-        offsetX=Math.max(-maxX,Math.min(maxX,x));
+        offsetX=Math.max(minX,Math.min(maxX,x));
         offsetY=Math.max(-Math.round(innerHeight*.22),Math.min(maxY,y));
         root.style.setProperty('--ct-player-offset-x',offsetX+'px');
         root.style.setProperty('--ct-player-offset-y',offsetY+'px');
