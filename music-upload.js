@@ -36,7 +36,8 @@ if (form && access && status && fileInput && submit) {
     try {
       const session = await withAccessTimeout(getCurrentSession(), 'A verificação da conta demorou mais que o esperado. Confira sua conexão e atualize a página.');
       if (!session?.user) {
-        access.textContent = 'Entre na sua conta de MC/DJ para enviar músicas.';
+        access.textContent = 'Entre na sua conta de MC/DJ para enviar músicas. Depois, toque em “Verificar acesso novamente”.';
+        retry.hidden = false;
         return;
       }
       // A conta proprietária confirmada precisa executar o bootstrap do banco
