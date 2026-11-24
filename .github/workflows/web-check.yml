@@ -217,6 +217,8 @@ jobs:
         run: node scripts/check-screen-organization.mjs
       - name: Verificar modernização visual de Música e FALA UAI
         run: node scripts/check-modern-ui.mjs
+      - name: Verificar estabilidade do envio e reprodução de músicas
+        run: node scripts/check-music-upload-reliability.mjs
       - name: Verificar álbum privado do administrador
         run: node scripts/check-private-admin-gallery.mjs
       - name: Verificar Stories no perfil do usuário
