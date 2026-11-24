@@ -541,7 +541,8 @@ export async function uploadMySong({ file, title, artistName, producerName = '',
   const cleanArtist = String(artistName || '').trim();
   const cleanProducer = String(producerName || '').trim();
   const cleanDescription = String(description || '').trim();
-  if (cleanTitle.length < 1 || cleanTitle.length > 120) throw new Error('O título deve ter até 120 caracteres.');
+  if (!cleanTitle) throw new Error('Informe o título da música antes de enviar.');
+  if (cleanTitle.length > 120) throw new Error('O título da música deve ter no máximo 120 caracteres.');
   if (cleanArtist.length < 2 || cleanArtist.length > 100) throw new Error('Informe o nome artístico (até 100 caracteres).');
   if (cleanProducer.length > 100) throw new Error('O nome do produtor deve ter até 100 caracteres.');
   if (cleanDescription.length > 1000) throw new Error('A descrição deve ter até 1.000 caracteres.');
