@@ -77,3 +77,21 @@ Esta lista acompanha a primeira atualização pós-lançamento. Não marcar item
 - [x] Aprovação do usuário para o funcionamento da versão atual no Safari iOS.
 - [ ] Publicar a atualização web/PWA somente depois dos testes de regressão desta nova versão.
 - [ ] Não publicar chaves privadas, senhas, service_role ou credenciais de provedores no repositório.
+
+
+
+## Nova interface da área Músicas — atualização ampliada de 24/11
+
+Referência visual enviada pelo usuário: catálogo escuro em tela cheia, semelhante à organização da imagem anexada, mas mantendo integralmente a identidade CAPITAL DO TREM (preto, vermelho e branco). A referência orienta a disposição e a densidade da lista, não a cópia da marca ou das cores do aplicativo mostrado.
+
+- [ ] Aplicar fundo escuro com degradê discreto preto → vermelho profundo → preto, usando branco para textos principais e vermelho para realces, bordas e estados ativos. Evitar azul/verde da referência.
+- [ ] Cada faixa deve aparecer em um cartão/linha de catálogo com capa quadrada própria (arte do arquivo ou capa padrão da marca quando não houver arte).
+- [ ] Exibir em destaque o nome da música e, logo abaixo, o nome do artista; truncar textos longos sem ocultar a informação completa nos detalhes.
+- [ ] Manter controles de reprodução e adicionar à playlist acessíveis em cada faixa, com estados visuais claros.
+- [ ] Exibir menu de três pontos por faixa. Para quem tiver permissão de proprietário/admin: editar artista, título e capa; excluir com confirmação explícita. Para ouvintes comuns: não mostrar ações administrativas.
+- [ ] Respeitar permissões existentes no banco e no Storage; validar autorização no servidor/RLS, não apenas esconder botões na interface.
+- [ ] Não substituir nem alterar os arquivos de áudio ao editar metadados/capa; exclusão deve remover o registro e tratar o arquivo conforme política segura, com confirmação e tratamento de falhas.
+- [ ] Preservar player persistente, playlists, busca e envio já existentes; não reiniciar a página ao selecionar arquivo e não perder metadados do formulário.
+- [ ] Garantir layout responsivo Android/iPhone Safari, acessibilidade, contraste, alvos de toque e carregamento de capas com fallback.
+- [ ] Testar com faixas sem capa, nomes extensos, upload interrompido, rede instável, usuário comum, artista e administrador; testar editar/excluir e reprodução durante navegação entre abas.
+- [ ] Só marcar como concluído após validação visual e funcional em aparelhos reais. A especificação e os testes estáticos, isoladamente, não comprovam que a interface foi entregue.
