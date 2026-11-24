@@ -10,6 +10,7 @@ const checks = [
   [upload.includes("form.setAttribute('aria-busy','true')") && upload.includes("form.removeAttribute('aria-busy')"), 'O estado de envio não é sinalizado e restaurado no formulário.'],
   [upload.includes("if (submit.disabled) return;"), 'Falta proteção contra envio duplicado.'],
   [upload.includes("retry.hidden = false;") && upload.includes('Depois, toque em “Verificar acesso novamente”.'), 'A interface não oferece nova verificação depois que o usuário entra na conta.'],
+  [upload.includes('watchAuthChanges') && upload.includes("event === 'SIGNED_IN'") && upload.includes('stopWatchingAuth'), 'O acesso ao envio não é revalidado automaticamente após o login.'],
   [upload.includes("fileInput.files?.[0]") && upload.includes("catch (error)"), 'O arquivo selecionado não é mantido no fluxo de erro para nova tentativa.'],
   [!upload.includes('music-upload-rights') && !upload.includes('rightsConfirmed'), 'O formulário ainda exige confirmação de direitos por envio.'],
   [!auth.includes('rightsConfirmed !== true') && !auth.includes('rights_confirmed_at:new Date()'), 'A função de upload ainda exige/gera confirmação individual de direitos.'],
