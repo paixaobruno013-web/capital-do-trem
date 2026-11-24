@@ -4,14 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       release_version:
-        description: "Versão do aplicativo (ex.: 1.0.0)"
+        description: "Versão do aplicativo (ex.: 1.0.1)"
         required: true
-        default: "1.0.0"
+        default: "1.0.1"
         type: string
   push:
     branches: [main]
     paths:
-      - ".github/release-triggers/android-v1.0.0"
+      - ".github/release-triggers/android-v1.0.1"
 
 permissions:
   contents: write
@@ -55,13 +55,25 @@ jobs:
           if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
             RELEASE_VERSION="$RELEASE_VERSION_INPUT"
           else
-            RELEASE_VERSION="$(tr -d '[:space:]' < .github/release-triggers/android-v1.0.0)"
+            RELEASE_VERSION="$(tr -d '[:space:]' < .github/release-triggers/android-v1.0.1)"
           fi
           if [[ ! "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
             echo "::error::Informe uma versão válida, como 1.0.0."
             exit 1
           fi
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$RELEASE_VERSION"
+          PATCH="${PATCH%%-*}"
+          if (( 10#$MINOR > 999 || 10#$PATCH > 999 )); then
+            echo "::error::Versão fora do intervalo suportado para versionCode."
+            exit 1
+          fi
+          RELEASE_VERSION_CODE="$((10#$MAJOR * 1000000 + 10#$MINOR * 1000 + 10#$PATCH))"
+          if [[ ! "$RELEASE_VERSION_CODE" =~ ^[1-9][0-9]*$ ]] || (( RELEASE_VERSION_CODE > 2100000000 )); then
+            echo "::error::Código de versão Android inválido."
+            exit 1
+          fi
           echo "RELEASE_VERSION=$RELEASE_VERSION" >> "$GITHUB_ENV"
+          echo "RELEASE_VERSION_CODE=$RELEASE_VERSION_CODE" >> "$GITHUB_ENV"
           echo "RELEASE_TAG=android-v$RELEASE_VERSION" >> "$GITHUB_ENV"
 
       - name: Configurar Node.js
@@ -95,6 +107,19 @@ jobs:
           node scripts/check-chat-attachments.mjs
           npm run build:web
           npx cap add android
+
+      - name: Aplicar versionName e versionCode no Android
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+          RELEASE_VERSION_CODE: ${{ env.RELEASE_VERSION_CODE }}
+        run: |
+          set -euo pipefail
+          sed -i -E "s/^([[:space:]]*versionCode[[:space:]]+)[0-9]+$/\\1${RELEASE_VERSION_CODE}/" android/app/build.gradle
+          sed -i -E "s/^([[:space:]]*versionName[[:space:]]+)[\"'][^\"']*[\"']$/\\1\"${RELEASE_VERSION}\"/" android/app/build.gradle
+          grep -E "versionCode|versionName" android/app/build.gradle
+          grep -Eq "^[[:space:]]*versionCode[[:space:]]+${RELEASE_VERSION_CODE}[[:space:]]*$" android/app/build.gradle
+          grep -Eq "^[[:space:]]*versionName[[:space:]]+[\"\x27]${RELEASE_VERSION}[\"\x27][[:space:]]*$" android/app/build.gradle
 
       - name: Preparar ícones com a arte oficial do Capital do Trem
         run: |
