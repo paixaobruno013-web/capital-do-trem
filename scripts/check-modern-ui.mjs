@@ -7,7 +7,7 @@ const chat = read('../bate-papo.html');
 const css = read('../capital-modern-ui.css');
 
 for (const [name, html] of [['index.html', home], ['bate-papo.html', chat]]) {
-  assert.match(html, /<link\\s+rel=["']stylesheet["'][^>]*href=["']\\.\\/capital-modern-ui\\.css\\?v=1["']/i,
+  assert.ok(html.includes('href="./capital-modern-ui.css?v=1"'),
     name + ' precisa carregar a folha de modernização');
 }
 for (const selector of [
@@ -17,13 +17,11 @@ for (const selector of [
 ]) {
   assert.ok(css.includes(selector), 'Seletor visual ausente: ' + selector);
 }
-assert.match(home, /id=["']musicas["']/);
-assert.match(home, /id=["']music-upload-area["']/);
-assert.match(home, /id=["']published-song-catalog["']/);
-assert.match(home, /music-track-row/); // cartões são montados pelo catálogo
-assert.match(home, /id=["']music-playlists-list["']/);
-assert.match(home, /id=["']capital-music-player["']/);
-assert.match(chat, /id=["']messages["']/);
-assert.match(chat, /class=["']composer["']/);
-assert.match(chat, /className=['"]message['"]/); // mensagens são montadas em tempo real
+for (const [html, token] of [
+  [home, 'id="musicas"'], [home, 'id="music-upload-area"'],
+  [home, 'id="published-song-catalog"'], [home, 'music-track-row'],
+  [home, 'id="music-playlists-list"'], [home, 'id="capital-music-player"'],
+  [chat, 'id="messages"'], [chat, 'class="composer"'], [chat, "className='message'"]
+]) assert.ok(html.includes(token), 'Elemento esperado ausente: ' + token);
+
 console.log('Modernização visual: links, seletores reais e componentes Música/FALA UAI conferidos.');
