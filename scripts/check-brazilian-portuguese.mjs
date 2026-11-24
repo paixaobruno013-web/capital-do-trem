@@ -26,6 +26,12 @@ for (const page of pages) {
 }
 
 const home = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+if (/(?:aria-label|title|textContent)\\s*=\\s*[^;]{0,100}['"](?:Online|Offline)['"]/i.test(home)) {
+  failures.push('index.html: rótulos de presença ainda aparecem em inglês');
+}
+if (!home.includes('Conectado') || !home.includes('Desconectado')) {
+  failures.push('index.html: rótulos de presença em Português (Brasil) ausentes');
+}
 if (!/<meta\s+property=["']og:locale["']\s+content=["']pt_BR["']/i.test(home)) {
   failures.push('index.html: metadado de idioma pt_BR para compartilhamento ausente');
 }
