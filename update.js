@@ -96,14 +96,17 @@
   offlineTimer=window.setTimeout(()=>{alertBox.style.display='none';},13000);
  }
  function showOffline(){
-  // Só confirma a queda após 13 segundos contínuos sem internet.
+  // Se o próprio sistema operacional informou que o aparelho ficou sem rede,
+  // exibe o alerta imediatamente. Se o Wi-Fi continua conectado mas a internet
+  // falhou, usa uma confirmação curta para evitar falsos positivos.
   clearTimeout(reconnectTimer);
   if(confirmedOffline||connectionDebounceTimer)return;
+  const confirmationDelay=navigator.onLine?1500:0;
   connectionDebounceTimer=window.setTimeout(()=>{
    connectionDebounceTimer=null;
    confirmedOffline=true;
    displayOffline();
-  },13000);
+  },confirmationDelay);
  }
  function showOnline(){
   // Ao detectar o retorno real da internet, avisa imediatamente, sem toque na tela.
@@ -193,7 +196,7 @@
  navigator.connection?.addEventListener?.('change',verifyRealConnection);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)verifyRealConnection();});
  window.setTimeout(verifyRealConnection,500);
- // Verifica a internet a cada segundo enquanto o app está visível; a queda exige 13 segundos contínuos e o retorno avisa imediatamente.
+ // Verifica a internet a cada segundo enquanto o app está visível; perda de rede do aparelho gera alerta imediato e falha do acesso à internet recebe confirmação curta.
  window.setInterval(verifyRealConnection,1000);
  if(!supportsServiceWorkerUpdates||!('serviceWorker' in navigator))return;
  let registration=null,reloading=false;
@@ -203,9 +206,9 @@
  banner.setAttribute('aria-live','polite');
  banner.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:10001;max-width:560px;margin-inline:auto;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;background:#111;color:#fff;border:1px solid #ed1c24;border-radius:14px;box-shadow:0 8px 30px #0009;font:600 14px/1.4 system-ui,Arial,sans-serif';
  const message=document.createElement('span');
- message.textContent='Uma nova versão do Capital do Trem está pronta.';
+ message.textContent='🚂 TEM ATUALIZAÇÃO NOVA NO TREM! Uma nova versão do Capital do Trem está pronta.';
  const button=document.createElement('button');
- button.type='button';button.textContent='Atualizar agora';button.setAttribute('aria-label','Atualizar o Capital do Trem para a versão mais recente');
+ button.type='button';button.textContent='🚂 ATUALIZAR AGORA';button.setAttribute('aria-label','Atualizar o Capital do Trem para a versão mais recente');
  button.style.cssText='min-height:44px;border:0;border-radius:9px;padding:10px 16px;background:#ed1c24;color:#fff;font-weight:800;cursor:pointer';
  button.addEventListener('focus',()=>{button.style.outline='3px solid #fff';button.style.outlineOffset='3px';});
  button.addEventListener('blur',()=>{button.style.outline='none';});

@@ -1,4 +1,4 @@
-import { getCurrentSession, isCurrentUserArtistOrAdmin, bootstrapFirstAdmin, uploadMySong } from './supabase/auth.js';
+import { getCurrentSession, isCurrentUserArtistOrAdmin, bootstrapFirstAdmin, uploadMySong, watchAuthChanges } from './supabase/auth.js';
 
 const $ = id => document.getElementById(id);
 const form = $('music-upload-form');
@@ -36,7 +36,8 @@ if (form && access && status && fileInput && submit) {
     try {
       const session = await withAccessTimeout(getCurrentSession(), 'A verificação da conta demorou mais que o esperado. Confira sua conexão e atualize a página.');
       if (!session?.user) {
-        access.textContent = 'Entre na sua conta de MC/DJ para enviar músicas.';
+        access.textContent = 'Entre na sua conta de MC/DJ para enviar músicas. Depois, toque em “Verificar acesso novamente”.';
+        retry.hidden = false;
         return;
       }
       // A conta proprietária confirmada precisa executar o bootstrap do banco
@@ -72,6 +73,17 @@ if (form && access && status && fileInput && submit) {
   }
 
   retry.addEventListener('click', prepareUpload);
+  // Revalida automaticamente quando o usuário conclui o login em outra área do app.
+  const stopWatchingAuth = watchAuthChanges(({ event }) => {
+    if (event === 'SIGNED_IN') prepareUpload();
+    if (event === 'SIGNED_OUT') {
+      form.hidden = true;
+      access.hidden = false;
+      access.textContent = 'Entre na sua conta de MC/DJ para enviar músicas.';
+      retry.hidden = false;
+    }
+  });
+  window.addEventListener('pagehide', stopWatchingAuth, { once: true });
 
   fileInput.addEventListener('change', () => {
     const file = fileInput.files?.[0];
@@ -81,7 +93,8 @@ if (form && access && status && fileInput && submit) {
   form.addEventListener('submit', async event => {
     event.preventDefault();
     const file = fileInput.files?.[0];
-    if (titleInput && (!titleInput.value.trim() || titleInput.value.trim().length > 120)) { status.textContent = `O nome da música deve ter entre 1 e 120 caracteres. Você digitou ${titleInput.value.trim().length}.`; titleInput.focus(); return; }
+    if (titleInput && !titleInput.value.trim()) { status.textContent = 'Informe o título da música antes de enviar.'; titleInput.focus(); return; }
+    if (titleInput && titleInput.value.trim().length > 120) { status.textContent = `O título da música deve ter no máximo 120 caracteres. Você digitou ${titleInput.value.trim().length}.`; titleInput.focus(); return; }
     if (!file) {
       status.textContent = 'Escolha um arquivo de áudio primeiro.';
       return;

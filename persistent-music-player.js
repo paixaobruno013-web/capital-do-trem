@@ -20,12 +20,14 @@
 #capital-music-player.ct-player-persistent .ct-player-range{height:4px;min-height:4px;margin:0;flex:1;accent-color:#ed1c24}
 #capital-music-player.ct-player-persistent .ct-player-times{display:flex;gap:6px;font-size:9px;white-space:nowrap}
 
-#capital-music-player.ct-player-persistent{transform:translateY(calc(-1 * var(--ct-player-offset-y,0px)));will-change:transform}
+#capital-music-player.ct-player-persistent{transform:translate(var(--ct-player-offset-x,0px),calc(-1 * var(--ct-player-offset-y,0px)));will-change:transform;max-height:calc(100dvh - 110px)}
 #capital-music-player.ct-player-persistent .ct-player-shell{position:relative;padding-top:25px}
 #capital-music-player.ct-player-persistent .ct-player-drag-handle{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:54px;height:14px;padding:0;border:0;border-radius:999px;background:transparent;display:grid;place-items:center;cursor:grab;touch-action:none;z-index:4}
 #capital-music-player.ct-player-persistent .ct-player-drag-handle::before{content:"";display:block;width:34px;height:4px;border-radius:99px;background:#aaa;box-shadow:0 0 7px rgba(255,255,255,.28)}
 #capital-music-player.ct-player-persistent .ct-player-drag-handle:active{cursor:grabbing}
 #capital-music-player.ct-player-persistent .ct-player-compact-toggle{width:30px;height:30px;min-width:30px;min-height:30px;padding:0;border:1px solid rgba(255,255,255,.3);border-radius:50%;background:#171717;color:#fff;font-size:14px;line-height:1}
+#capital-music-player.ct-player-persistent.ct-player-compact{left:8px;right:auto;width:min(92vw,340px);max-width:340px}
+#capital-music-player.ct-player-persistent.ct-player-compact .ct-player-shell{background:rgba(8,8,10,.48);border-color:rgba(237,28,36,.48);box-shadow:0 4px 16px rgba(0,0,0,.16),0 0 10px rgba(237,28,36,.10);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
 #capital-music-player.ct-player-persistent.ct-player-compact .ct-player-shell{grid-template-areas:"info controls";padding:20px 9px 8px;gap:4px 8px;border-radius:13px}
 #capital-music-player.ct-player-persistent.ct-player-compact .ct-player-progress-wrap,
 #capital-music-player.ct-player-persistent.ct-player-compact .ct-player-eyebrow,
@@ -65,10 +67,31 @@ body.light #capital-music-player.ct-player-persistent .ct-player-shell{backgroun
         try{applyCompact(localStorage.getItem('ct-player-compact')==='true')}catch{}
         compact.addEventListener('click',()=>applyCompact(!root.classList.contains('ct-player-compact')));
       }
-      let offset=0;try{offset=Number(localStorage.getItem('ct-player-offset-y')||0)||0}catch{}
-      const applyOffset=value=>{offset=Math.max(-Math.round(innerHeight*.22),Math.min(Math.round(innerHeight*.62),value));root.style.setProperty('--ct-player-offset-y',offset+'px');try{localStorage.setItem('ct-player-offset-y',String(offset))}catch{}};
-      applyOffset(offset);
-      handle.addEventListener('pointerdown',event=>{if(root.classList.contains('ct-player-fullscreen'))return;event.preventDefault();handle.setPointerCapture?.(event.pointerId);const startY=event.clientY,startOffset=offset;const move=e=>applyOffset(startOffset-(e.clientY-startY));const finish=()=>{handle.removeEventListener('pointermove',move);handle.removeEventListener('pointerup',finish);handle.removeEventListener('pointercancel',finish)};handle.addEventListener('pointermove',move);handle.addEventListener('pointerup',finish);handle.addEventListener('pointercancel',finish)});
+      let offsetY=0,offsetX=0;
+      try{offsetY=Number(localStorage.getItem('ct-player-offset-y')||0)||0;offsetX=Number(localStorage.getItem('ct-player-offset-x')||0)||0}catch{}
+      const applyOffset=(x,y)=>{
+        const playerWidth=root.getBoundingClientRect().width;
+        const compact=root.classList.contains('ct-player-compact');
+        // No modo compacto o dock parte da margem esquerda; permita arrastá-lo por toda a largura útil.
+        const maxX=compact?Math.max(0,Math.floor(innerWidth-playerWidth-16)):Math.max(0,Math.floor((innerWidth-playerWidth)/2)-8);
+        const minX=compact?0:-maxX;
+        const maxY=Math.max(0,Math.floor(innerHeight*.62));
+        offsetX=Math.max(minX,Math.min(maxX,x));
+        offsetY=Math.max(-Math.round(innerHeight*.22),Math.min(maxY,y));
+        root.style.setProperty('--ct-player-offset-x',offsetX+'px');
+        root.style.setProperty('--ct-player-offset-y',offsetY+'px');
+        try{localStorage.setItem('ct-player-offset-x',String(offsetX));localStorage.setItem('ct-player-offset-y',String(offsetY))}catch{}
+      };
+      applyOffset(offsetX,offsetY);
+      handle.addEventListener('pointerdown',event=>{
+        if(root.classList.contains('ct-player-fullscreen'))return;
+        event.preventDefault();handle.setPointerCapture?.(event.pointerId);
+        const startX=event.clientX,startY=event.clientY,startOffsetX=offsetX,startOffsetY=offsetY;
+        const move=e=>applyOffset(startOffsetX+(e.clientX-startX),startOffsetY-(e.clientY-startY));
+        const finish=()=>{handle.removeEventListener('pointermove',move);handle.removeEventListener('pointerup',finish);handle.removeEventListener('pointercancel',finish)};
+        handle.addEventListener('pointermove',move);handle.addEventListener('pointerup',finish);handle.addEventListener('pointercancel',finish);
+      });
+      window.addEventListener('resize',()=>applyOffset(offsetX,offsetY),{passive:true});
     }
     const audio=root.querySelector('audio');if(!audio||wired.has(audio))return;wired.add(audio);
     const reveal=()=>{root.classList.add('ct-player-ready');document.body.classList.add('ct-has-floating-player')};

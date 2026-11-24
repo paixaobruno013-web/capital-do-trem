@@ -49,6 +49,7 @@
 <meta name="apple-mobile-web-app-title" content="Capital do Trem">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
 <meta property="og:site_name" content="Capital do Trem">
 <meta property="og:title" content="Capital do Trem — A música da nossa quebrada!">
 <meta property="og:description" content="Conectando música, cultura, eventos e ações sociais. Descubra o que está acontecendo logo ali!">
@@ -1671,8 +1672,8 @@ updateConnectionStatus();
    const handle=document.createElement('p');handle.className='muted';handle.style.margin='2px 0 6px';handle.textContent='@'+(profile.username||'usuario');
    const meta=document.createElement('div');meta.className='community-profile-meta';
    const role=document.createElement('span');role.className='community-profile-role';role.textContent=profile.account_type==='artist'?'Artista / DJ':'Usuário Uai';meta.append(role);if(profile.account_type==='artist'){const verified=document.createElement('span');verified.className='verified-badge';verified.textContent='✓';verified.setAttribute('role','img');verified.setAttribute('aria-label','Artista verificado');meta.append(verified);}
-   const status=document.createElement('span');status.className='community-online-dot'+(onlineIds.has(profile.user_id)?' is-online':'');status.setAttribute('role','img');status.setAttribute('aria-label',onlineIds.has(profile.user_id)?'Online':'Offline');status.title=onlineIds.has(profile.user_id)?'Online':'Offline';
-   const statusText=document.createElement('span');statusText.className='community-online-label';statusText.textContent=onlineIds.has(profile.user_id)?'Online':'Offline';
+   const status=document.createElement('span');status.className='community-online-dot'+(onlineIds.has(profile.user_id)?' is-online':'');status.setAttribute('role','img');status.setAttribute('aria-label',onlineIds.has(profile.user_id)?'Conectado':'Desconectado');status.title=onlineIds.has(profile.user_id)?'Conectado':'Desconectado';
+   const statusText=document.createElement('span');statusText.className='community-online-label';statusText.textContent=onlineIds.has(profile.user_id)?'Conectado':'Desconectado';
    meta.append(status,statusText);onlineNodes.set(profile.user_id,{dot:status,label:statusText});
    copy.append(name,handle,meta);
    if(profile.city){const city=document.createElement('p');city.className='muted community-profile-city';city.textContent=profile.city;copy.append(city);}
@@ -1686,8 +1687,8 @@ updateConnectionStatus();
     for(const [userId,nodes] of onlineNodes){
      const online=onlineIds.has(userId);
      nodes.dot.classList.toggle('is-online',online);
-     nodes.dot.setAttribute('aria-label',online?'Online':'Offline');
-     nodes.dot.title=online?'Online':'Offline';nodes.label.textContent=online?'Online':'Offline';
+     nodes.dot.setAttribute('aria-label',online?'Conectado':'Desconectado');
+     nodes.dot.title=online?'Conectado':'Desconectado';nodes.label.textContent=online?'Conectado':'Desconectado';
     }
    }catch(error){/* Mantém o último status válido quando a rede oscilar. */}
   },45000);

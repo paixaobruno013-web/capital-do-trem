@@ -3,7 +3,7 @@ name: Gerar APK de teste do Capital do Trem
 on:
   workflow_dispatch:
   push:
-    branches: [main, melhorias-stories-navegacao-icone, correcoes-alertas-offline-playlist, ia-camera-comandos-rapidos]
+    branches: [main, melhorias-stories-navegacao-icone, correcoes-alertas-offline-playlist, ia-camera-comandos-rapidos, first-update/online-offline-and-social]
     paths:
       - '**.html'
       - '**.js'
@@ -14,6 +14,7 @@ on:
       - '**.webp'
       - '**.jpg'
       - '**.jpeg'
+      - '**.py'
       - '**.mp4'
       - 'package-lock.json'
       - '.github/workflows/**'
@@ -39,7 +40,6 @@ on:
       - 'marca.svg'
       - 'manifest.webmanifest'
       - 'sw.js'
-      - 'update.js'
       - 'update.js'
       - 'supabase/**'
       - 'supabase/auth.js'

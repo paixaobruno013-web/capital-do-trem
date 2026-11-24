@@ -297,6 +297,24 @@ label{letter-spacing:.01em}
 <button id="submit-account" type="submit" disabled>Entrar</button>
 <p id="account-status" class="status" role="status" aria-live="polite"></p>
 </form>
+<div class="auth-provider" style="display:grid;gap:12px;margin-top:16px">
+  <button type="button" class="secondary" id="google-sign-in" disabled>🌐 Entrar com Google</button>
+  <div style="border-top:1px solid var(--line);padding-top:12px">
+    <h3 style="margin:0 0 8px">Entrar com telefone</h3>
+    <label for="phone-login-number">Telefone com código do país</label>
+    <input id="phone-login-number" type="tel" inputmode="tel" autocomplete="tel" placeholder="+55 31 99999-9999" disabled>
+    <button type="button" class="secondary" id="send-phone-code" disabled>Enviar código por SMS</button>
+    <div id="phone-login-form">
+      <div id="phone-code-wrap" hidden>
+        <label for="phone-login-code">Código recebido por SMS</label>
+        <input id="phone-login-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Digite o código" disabled>
+        <button type="button" id="verify-phone-code" disabled>Confirmar código e entrar</button>
+      </div>
+    </div>
+    <p id="phone-login-status" class="status" role="status" aria-live="polite"></p>
+    <p class="muted">O acesso por telefone depende da configuração de SMS no serviço de autenticação. Use o número com código internacional.</p>
+  </div>
+</div>
 </section>
 <section class="card" id="post-panel" hidden aria-labelledby="post-title">
 <h2 id="post-title">📣 Publicar na comunidade</h2>
@@ -376,7 +394,7 @@ const passwordToggle=document.getElementById('toggle-password');
 passwordToggle.addEventListener('click',()=>{const visible=passwordInput.type==='password';passwordInput.type=visible?'text':'password';passwordToggle.textContent=visible?'Ocultar':'Mostrar';passwordToggle.setAttribute('aria-pressed',String(visible));});
 const form=document.getElementById('account-form');
 const status=document.getElementById('account-status');
-const controls=[...form.querySelectorAll('input,button,select,textarea'),...document.querySelectorAll('.account-actions button')];
+const controls=[...form.querySelectorAll('input,button,select,textarea'),...document.querySelectorAll('.account-actions button,.auth-provider input,.auth-provider button')];
 const accessPanel=document.getElementById('access-panel');
 const profilePanel=document.getElementById('profile-panel');
 const basicProfilePanel=document.getElementById('basic-profile-panel');
@@ -948,6 +966,42 @@ form.addEventListener('submit',async event=>{
  }catch(error){
   status.textContent=error?.message||'Não foi possível concluir. Confira os dados e tente novamente.';
  }finally{submit.disabled=false;}
+});
+const googleSignInButton=document.getElementById('google-sign-in');
+const phoneNumberInput=document.getElementById('phone-login-number');
+const sendPhoneCodeButton=document.getElementById('send-phone-code');
+const phoneLoginForm=document.getElementById('phone-login-form');
+const phoneCodeWrap=document.getElementById('phone-code-wrap');
+const phoneCodeInput=document.getElementById('phone-login-code');
+const verifyPhoneCodeButton=document.getElementById('verify-phone-code');
+const phoneLoginStatus=document.getElementById('phone-login-status');
+googleSignInButton.addEventListener('click',async()=>{
+ if(!auth){phoneLoginStatus.textContent='Serviço de contas ainda está carregando. Tente novamente.';return;}
+ googleSignInButton.disabled=true;status.textContent='Abrindo o acesso seguro do Google…';
+ try{await auth.signInWithGoogleAccount({redirectTo:window.location.href});}
+ catch(error){status.textContent=error?.message||'Não foi possível iniciar o acesso Google. Confira a configuração do provedor.';googleSignInButton.disabled=false;}
+});
+sendPhoneCodeButton.addEventListener('click',async()=>{
+ if(!auth){phoneLoginStatus.textContent='Serviço de contas ainda está carregando. Tente novamente.';return;}
+ sendPhoneCodeButton.disabled=true;phoneLoginStatus.textContent='Solicitando código por SMS…';
+ try{
+  const result=await auth.sendPhoneLoginCode(phoneNumberInput.value);
+  phoneNumberInput.value=result.phone;
+  phoneCodeWrap.hidden=false;
+  phoneCodeInput.disabled=false;verifyPhoneCodeButton.disabled=false;
+  phoneLoginStatus.textContent='Código solicitado. Confira as mensagens SMS do número informado.';
+  phoneCodeInput.focus();
+ }catch(error){phoneLoginStatus.textContent=error?.message||'Não foi possível enviar o código. Confira o número e a configuração de SMS.';}
+ finally{sendPhoneCodeButton.disabled=false;}
+});
+verifyPhoneCodeButton.addEventListener('click',async()=>{
+ if(!auth)return;
+ verifyPhoneCodeButton.disabled=true;phoneLoginStatus.textContent='Validando código…';
+ try{
+  await auth.verifyPhoneLoginCode({phone:phoneNumberInput.value,token:phoneCodeInput.value});
+  phoneLoginStatus.textContent='Acesso confirmado. Abrindo o Capital do Trem…';
+  window.location.replace('./');
+ }catch(error){phoneLoginStatus.textContent=error?.message||'Código inválido ou expirado. Solicite outro e tente novamente.';verifyPhoneCodeButton.disabled=false;}
 });
 artistForm.addEventListener('submit',async event=>{
  event.preventDefault();

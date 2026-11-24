@@ -383,7 +383,7 @@ function addMessage(m){
  if(!m||!m.id||seen.has(m.id))return;
  const wasNearBottom=list.scrollHeight-list.scrollTop-list.clientHeight<90;
  seen.add(m.id);
- const box=document.createElement('article');box.className='message';box.dataset.createdAt=m.created_at||'';box.dataset.messageId=m.id;
+ const box=document.createElement('article');box.className='message';if(m.author_id===currentUserId)box.classList.add('message-own');box.dataset.createdAt=m.created_at||'';box.dataset.messageId=m.id;
  const head=document.createElement('div');head.className='message-head';
  const avatar=document.createElement('span');avatar.className='message-avatar';avatar.setAttribute('aria-hidden','true');
  if(m.author_avatar_type==='photo'&&typeof m.author_avatar_url==='string'&&m.author_avatar_url.startsWith('https://')){
@@ -445,8 +445,16 @@ async function startGroupChat(){
  gate.hidden=true;area.hidden=false;$('leave-group').hidden=false;
  connection.textContent='Conectando à sala em tempo real…';
  if(unsubscribe){unsubscribe();unsubscribe=null;}
- unsubscribe=subscribeChatMessages(addMessage,connectionStatus=>{if(connectionStatus==='SUBSCRIBED')connection.textContent='Conectado: novas mensagens aparecem automaticamente.';else if(connectionStatus==='CHANNEL_ERROR'||connectionStatus==='TIMED_OUT')connection.textContent='Conexão instável. O chat está tentando se reconectar.';else if(connectionStatus==='CLOSED')connection.textContent='Conexão encerrada. Entre novamente no grupo para reconectar.';else connection.textContent='Conectando à sala em tempo real…';});
+ // Bufferiza eventos durante a carga inicial para não perder mensagens em tempo real.
+ let historyReady=false;
+ const pendingRealtime=[];
+ unsubscribe=subscribeChatMessages(message=>{
+  if(!historyReady)pendingRealtime.push(message);
+  else addMessage(message);
+ },connectionStatus=>{if(connectionStatus==='SUBSCRIBED')connection.textContent='Conectado: novas mensagens aparecem automaticamente.';else if(connectionStatus==='CHANNEL_ERROR'||connectionStatus==='TIMED_OUT')connection.textContent='Conexão instável. O chat está tentando se reconectar.';else if(connectionStatus==='CLOSED')connection.textContent='Conexão encerrada. Entre novamente no grupo para reconectar.';else connection.textContent='Conectando à sala em tempo real…';});
  const messages=await getChatMessages(80);list.replaceChildren();seen.clear();messages.forEach(addMessage);
+ historyReady=true;
+ pendingRealtime.sort((a,b)=>new Date(a.created_at||0)-new Date(b.created_at||0)).forEach(addMessage);
  if(savedChatState)requestAnimationFrame(()=>{list.scrollTop=Number(savedChatState.listScroll)||list.scrollHeight;window.scrollTo(0,Number(savedChatState.pageScroll)||0);});
 }
 // Registra o envio antes de qualquer consulta assíncrona de sessão ou histórico.
@@ -605,6 +613,17 @@ body.cdt-inbox-mode #main-content,body.cdt-inbox-mode #main-content *{box-sizing
  .cdt-chat-copy small{font-size:11px}
  .cdt-chat-meta small{font-size:8px}
 }
+
+/* Bolhas alinhadas como mensageiro moderno, mantendo a identidade preta/vermelha. */
+#messages{display:flex;flex-direction:column;align-items:stretch;gap:10px}
+#messages .message{align-self:flex-start;width:fit-content;max-width:min(88%,560px);border-radius:16px 16px 16px 5px;background:var(--panel);border:1px solid var(--line)}
+#messages .message.message-own{align-self:flex-end;background:linear-gradient(145deg,#541014,#21090b);border-color:#ed1c2477;border-radius:16px 16px 5px 16px}
+#messages .message-own .message-head{flex-direction:row-reverse;justify-content:flex-start}
+#messages .message-own .message-head>div{text-align:right}
+#messages .message-own .message-own-controls{justify-content:flex-end}
+#messages .message-own .message-attachment{margin-left:auto}
+#messages .message-own .message-attachment img,#messages .message-own .message-attachment video{border:1px solid #ed1c2466}
+@media(max-width:480px){#messages .message{max-width:92%;padding:10px 11px}}
 </style>
 <script id="cdt-inbox-navigation">
 (()=>{
@@ -619,4 +638,5 @@ body.cdt-inbox-mode #main-content,body.cdt-inbox-mode #main-content *{box-sizing
  inbox.querySelectorAll('[data-open-view]').forEach(button=>button.addEventListener('click',()=>showView(button.dataset.openView)));
  showInbox();
 })();
-</script></body></html>
+</script><script src="./file-picker-guard.js" defer></script>
+</body></html>
