@@ -90,7 +90,7 @@ jobs:
       - name: Conferir proteção e segurança do banco
         run: |
           grep -q 'create policy "songs_insert_artist_pending_or_admin"' supabase/schema.sql
-          grep -q 'create policy "songs_insert_artist_pending_or_admin"' supabase/migrations/20261118120000_admin_approval_for_artist_songs.sql
+          grep -q 'create policy "songs_insert_artist_pending_or_admin"' supabase/migrations/20261124130936_admin_approval_for_artist_songs.sql
           grep -q 'create policy "audio_upload_artist_own_folder_or_admin"' supabase/schema.sql
           grep -q 'producer_name text not null default' supabase/schema.sql
           grep -q 'video/quicktime' supabase/schema.sql
