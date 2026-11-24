@@ -1,0 +1,103 @@
+/* CAPITAL DO TREM — skins de referência para FALA UAI e biblioteca musical.
+   Preserva IDs, eventos, dados, permissões e scripts existentes. */
+:root{--cdt-red:#ed1c24;--cdt-red-hot:#ff3448;--cdt-ink:#070709;--cdt-panel:#17181e;--cdt-muted:#a6a8b2}
+body{background:radial-gradient(ellipse at 50% 0%,#20222b 0,#09090c 48%,#050506 100%)!important}
+button,a,input{ -webkit-tap-highlight-color:transparent }
+
+/* FALA UAI — cabeçalho compacto e caixa de entrada */
+body:has(#private-layout) header,
+body:has(#cdt-chat-inbox) header{background:linear-gradient(180deg,#171820f5,#09090cf7)!important;border-bottom:1px solid #ed1c2455!important}
+body:has(#private-layout) header h1{font-size:19px!important;letter-spacing:.04em;color:#fff}
+body:has(#private-layout) header p{font-size:11px;margin:0;color:#aeb0ba}
+body:has(#private-layout) header img{width:42px!important;height:42px!important;border:2px solid var(--cdt-red);border-radius:50%;box-shadow:0 0 14px #ed1c2455}
+body:has(#private-layout) header .actions{gap:6px}
+body:has(#private-layout) header .actions .btn,
+body:has(#private-layout) header .actions button{min-height:34px;padding:6px 9px;font-size:11px;border-radius:999px}
+#private-layout{gap:12px!important}
+#sidebar-panel,#thread-panel{background:linear-gradient(155deg,#1b1d25f5,#101116f5)!important;border:1px solid #ffffff12!important;border-radius:23px!important;box-shadow:0 18px 42px #0008,0 0 22px #ed1c2410!important}
+#sidebar-panel{padding:14px!important}
+#sidebar-panel h2{color:#fff!important;font-size:17px!important}
+#sidebar-panel .section-title button{min-height:36px;padding:6px 12px;border-radius:999px}
+#search,#conversation-search{background:#101218!important;border:1px solid #ffffff12!important;border-radius:999px!important;color:#fff!important;min-height:44px;padding:11px 16px!important}
+#people .person,#conversations .conversation{min-height:72px!important;padding:9px 10px!important;border:1px solid #ffffff0b!important;border-radius:16px!important;background:linear-gradient(105deg,#20222b,#15161c)!important;gap:11px!important}
+#conversations .conversation{width:100%;text-align:left}
+#conversations .conversation[aria-current=true]{border-color:#ed1c2477!important;background:linear-gradient(105deg,#43131b,#19151a)!important;box-shadow:inset 3px 0 #ed1c24,0 0 16px #ed1c241c!important}
+#conversations .official-group{border-color:#ed1c2488!important;background:linear-gradient(105deg,#4b111b,#171219)!important}
+.profile-avatar,.group-avatar{width:48px!important;height:48px!important;min-width:48px!important;border:2px solid #ed1c246b!important;box-shadow:0 0 12px #ed1c2425!important}
+.person-copy strong,.conversation-copy strong{font-size:13px!important;color:#f8f8fa!important}
+.person-copy .small,.conversation-copy .small{font-size:11px!important;color:#a9abb5!important}
+.online-status{font-size:10px!important;color:#aaa!important}
+#incoming .person{background:#271318!important;border-color:#ed1c2438!important}
+#thread-panel{padding:13px!important;min-height:570px}
+#thread-panel .section-title{background:#15161df2!important;border-bottom:1px solid #ffffff12!important;border-radius:14px 14px 0 0;padding:9px 5px 12px!important}
+#chat-title{font-size:15px!important;color:#fff!important}
+#thread-presence{color:#a6a8b2!important;font-size:10px!important}
+#back-to-list{display:none;min-width:38px;width:38px;height:38px;min-height:38px;padding:0;border-radius:50%;background:#262832!important;color:#ff5963!important}
+.messages{background:radial-gradient(ellipse at 50% 0%,#22242c66,transparent 65%)!important;padding:18px 10px 24px!important;gap:10px!important}
+.bubble{max-width:min(82%,520px)!important;padding:10px 13px!important;border-radius:17px 17px 17px 5px!important;background:#262832!important;border:1px solid #ffffff0d!important;color:#f4f4f5!important;box-shadow:0 5px 14px #0004!important;font-size:13px}
+.bubble.mine{background:linear-gradient(135deg,#ff5260,#c9152b)!important;border-color:#ff7b85!important;border-radius:17px 17px 5px 17px!important;color:#fff!important}
+.bubble time{font-size:9px!important;color:#ddd!important}
+.compose{background:#15161d!important;border:1px solid #ffffff1b!important;border-radius:28px!important;padding:6px!important;gap:5px!important;box-shadow:0 8px 22px #0008!important}
+#compose #message{background:#20222b!important;color:#fff!important;border-radius:22px!important;min-height:42px!important;font-size:15px!important}
+#compose #send{background:linear-gradient(145deg,#ff5b65,#c30f26)!important;border:0!important;box-shadow:0 0 16px #ed1c2466!important}
+#compose #private-attach,#private-emoji-toggle{background:transparent!important;color:#ff5963!important;border:0!important}
+#compose .private-attachment-menu{background:#181a22!important;border-color:#ed1c2466!important}
+@media(max-width:680px){
+ body:has(#private-layout) header{padding:10px 12px!important;gap:8px!important}
+ body:has(#private-layout) header .actions{width:100%;display:flex;overflow-x:auto;justify-content:flex-start}
+ body:has(#private-layout) header .actions>*{flex:0 0 auto!important}
+ #private-layout{display:block!important}
+ #sidebar-panel,#thread-panel{min-height:calc(100dvh - 150px)!important}
+ #thread-panel{height:calc(100dvh - 145px)!important;max-height:calc(100dvh - 145px)!important}
+ .layout:not(.chat-open) #thread-panel{display:none!important}
+ .layout.chat-open #sidebar-panel{display:none!important}
+ .layout.chat-open #thread-panel{display:flex!important}
+ .layout.chat-open #back-to-list{display:inline-flex!important;align-items:center;justify-content:center}
+ #thread-panel .messages{flex:1 1 auto!important;min-height:0!important;max-height:none!important;overflow-y:auto!important}
+ #thread-panel .compose{position:sticky!important;bottom:calc(env(safe-area-inset-bottom,0px) + 4px)!important}
+ #incoming{margin-bottom:10px}
+}
+
+/* FALA UAI — sala pública, mesma linguagem visual da tela privada */
+#cdt-chat-inbox{background:linear-gradient(155deg,#1b1d25,#0d0e13)!important;border:1px solid #ffffff14!important;border-radius:24px!important;box-shadow:0 18px 42px #0008!important;padding:15px!important}
+.cdt-inbox-top{color:#fff!important;letter-spacing:.1em}
+.cdt-inbox-top span{color:#fff!important}
+.cdt-inbox-top a{background:linear-gradient(145deg,#ff5963,#c30f26)!important;box-shadow:0 0 14px #ed1c2466!important}
+.cdt-inbox-tabs{border-bottom-color:#ffffff15!important}
+.cdt-chat-row{background:linear-gradient(105deg,#22242d,#15161c)!important;border:1px solid #ffffff12!important;border-radius:16px!important;min-height:76px!important}
+.cdt-chat-row:active{background:#35151b!important}
+.cdt-chat-copy strong{color:#fff!important}
+.cdt-chat-copy small,.cdt-chat-meta small{color:#aeb0ba!important}
+.cdt-chat-avatar{border:2px solid #ed1c2477!important;box-shadow:0 0 14px #ed1c2433!important}
+
+/* Catálogo musical — biblioteca com linhas no padrão de streaming, em vermelho/preto */
+#musicas .music-tagline{color:#c4c5cc!important}
+#musicas .music-quick-actions a{background:linear-gradient(145deg,#251015,#111216)!important;border:1px solid #ed1c2455!important;color:#fff!important;box-shadow:0 7px 18px #0006!important}
+#song-catalog-search{background:#12141b!important;border:1px solid #ed1c2466!important;border-radius:999px!important;color:#fff!important;min-height:46px;padding:12px 17px!important}
+#song-catalog-count{color:#aaa!important}
+#published-song-catalog{display:flex!important;flex-direction:column!important;gap:9px!important;perspective:none!important}
+#published-song-catalog .music-track-row{
+ display:grid!important;grid-template-columns:58px minmax(0,1fr) 42px!important;grid-auto-flow:row!important;align-items:center!important;gap:4px 11px!important;
+ min-height:78px!important;margin:0!important;padding:10px 11px!important;border:1px solid #ffffff12!important;border-radius:15px!important;
+ background:linear-gradient(105deg,#20222b,#121319)!important;box-shadow:0 7px 18px #0007!important
+}
+#published-song-catalog .music-track-cover{grid-column:1!important;grid-row:1/span 5!important;width:56px!important;height:56px!important;display:grid!important;place-items:center!important;border:1px solid #ed1c2477!important;border-radius:11px!important;background:radial-gradient(circle at 50% 30%,#8e1726,#1b0a10 72%)!important;color:#fff!important;font-size:28px!important;box-shadow:0 0 15px #ed1c2430!important}
+#published-song-catalog .music-track-row h3{grid-column:2/4!important;grid-row:1!important;margin:0!important;color:#fff!important;font-size:13px!important;line-height:1.35!important;font-weight:800!important;cursor:pointer}
+#published-song-catalog .music-track-row>p{grid-column:2/4!important;margin:0!important;color:#aeb0ba!important;font-size:10px!important;line-height:1.35!important}
+#published-song-catalog .music-track-row .music-play-button{grid-column:3!important;grid-row:1!important;justify-self:end!important;align-self:center!important;width:38px!important;min-width:38px!important;height:38px!important;min-height:38px!important;padding:0!important;border-radius:50%!important;background:linear-gradient(145deg,#ff5963,#c30f26)!important;border:0!important;box-shadow:0 0 14px #ed1c2455!important}
+#published-song-catalog .music-track-row .music-play-button+h3{grid-column:2!important}
+#published-song-catalog .music-track-row .btn{min-height:32px!important;padding:6px 10px!important;border-radius:999px!important;font-size:10px!important}
+#published-song-catalog .music-track-row .music-add-to-playlist{border-color:#ed1c2477!important;color:#ff6972!important}
+#music-library,.music-playlist-manager,.music-local-picker{background:linear-gradient(150deg,#1b1d25,#101116)!important;border:1px solid #ed1c2438!important;border-radius:20px!important}
+#music-library h3,#music-playlist-title,#music-local-picker-title{color:#fff!important}
+.music-playlist-card,.music-playlist-row{background:linear-gradient(110deg,#21151a,#14151a)!important;border:1px solid #ed1c2455!important;border-radius:15px!important;padding:13px!important}
+.music-playlist-card strong,.music-playlist-row strong{color:#fff!important}
+.music-playlist-manager input,.music-playlist-manager select{background:#101218!important;color:#fff!important;border-color:#ffffff20!important;border-radius:12px!important}
+#capital-music-player.ct-player-persistent .ct-player-shell{background:linear-gradient(110deg,#1d151a,#101116)!important;border-color:#ed1c24!important;box-shadow:0 0 18px #ed1c2430!important}
+#capital-music-player .ct-player-play{background:linear-gradient(145deg,#ff5963,#c30f26)!important;border:0!important;box-shadow:0 0 14px #ed1c2455!important}
+@media(max-width:430px){
+ #published-song-catalog .music-track-row{grid-template-columns:52px minmax(0,1fr) 38px!important;gap:4px 8px!important;padding:9px!important}
+ #published-song-catalog .music-track-cover{width:50px!important;height:50px!important}
+ #published-song-catalog .music-track-row h3{font-size:12px!important}
+ #published-song-catalog .music-track-row .music-play-button{width:34px!important;min-width:34px!important;height:34px!important;min-height:34px!important}
+}
