@@ -106,3 +106,12 @@ Referência visual enviada pelo usuário: catálogo escuro em tela cheia, semelh
 - [ ] Preservar posição de reprodução, faixa atual e estado de pausa ao alternar entre os modos.
 - [ ] Garantir que a área compacta respeite a navegação inferior, áreas seguras do Android/iPhone e não cubra botões ou campos.
 - [ ] Validar minimização/restauração durante navegação e após retorno do app; não afirmar reprodução em segundo plano fora do app sem serviço nativo Android e teste real em iOS Safari.
+
+
+
+### Preservar a capa oficial no topo da área Músicas
+
+- [ ] Manter a capa/banner oficial já existente no topo da área Músicas, antes do título e do catálogo; não remover, substituir pela lista de faixas, nem deslocar para baixo.
+- [ ] Preservar a arte original dos alto-falantes e o texto “AQUI A MÚSICA NÃO PARA!”, com enquadramento integral sem cortes, em formato horizontal e altura compacta.
+- [ ] Manter o gerenciamento da capa pelo administrador, sem alterar a identidade visual preto, vermelho e branco.
+- [ ] A nova interface de catálogo com capas individuais, nomes de artista/faixa e menu de três pontos deve começar abaixo desse banner.
