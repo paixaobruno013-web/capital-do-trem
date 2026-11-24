@@ -26,7 +26,7 @@ for (const page of pages) {
 }
 
 const home = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-if (/(?:aria-label|title|textContent)\\s*=\\s*[^;]{0,100}['"](?:Online|Offline)['"]/i.test(home)) {
+if (/(?:aria-label|title|textContent)\s*=\s*[^;]{0,100}['"](?:Online|Offline)['"]/i.test(home)) {
   failures.push('index.html: rótulos de presença ainda aparecem em inglês');
 }
 if (!home.includes('Conectado') || !home.includes('Desconectado')) {
