@@ -1,8 +1,8 @@
 import { readFile } from 'node:fs/promises';
 
 const config = await readFile('supabase-config.js', 'utf8');
-const urlMatch = config.match(/CAPITAL_SUPABASE_URL\\s*=\\s*["'](https:\\/\\/[^"']+)["']/);
-const keyMatch = config.match(/CAPITAL_SUPABASE_KEY\\s*=\\s*["']([^"']+)["']/);
+const urlMatch = config.match(/CAPITAL_SUPABASE_URL\s*=\s*["']([^"']+)["']/);
+const keyMatch = config.match(/CAPITAL_SUPABASE_KEY\s*=\s*["']([^"']+)["']/);
 
 if (!urlMatch || !keyMatch) {
   throw new Error('Configuração pública do Supabase não encontrada; nenhum segredo foi exibido.');
@@ -19,7 +19,7 @@ const response = await fetch(new URL('/auth/v1/health', baseUrl), {
 });
 
 if (!response.ok) {
-  throw new Error(`Supabase de produção respondeu HTTP ${response.status} no health check.`);
+  throw new Error(\`Supabase de produção respondeu HTTP \${response.status} no health check.\`);
 }
 
 console.log('OK: endpoint Auth do Supabase de produção respondeu via chave publicável.');
