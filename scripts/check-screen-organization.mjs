@@ -7,9 +7,12 @@ const [home, profile, profileScript, chat] = await Promise.all([
 ]);
 const discovery = home.match(/<section class="page" id="pesquisa">[\s\S]*?<section class="page" id="eventos">/)?.[0] || '';
 const musicArea = home.match(/<section class="page" id="musicas">[\s\S]*?<section class="page" id="pesquisa">/)?.[0] || '';
+const musicBanner = musicArea.match(/<section class="music-section-banner"[^>]*>[\s\S]*?<\/section>/)?.[0] || '';
+const musicCover = musicArea.match(/<section id="music-cover-area"[^>]*>[\s\S]*?<\/section>/)?.[0] || '';
 const checks = [
  ['Feed social é a página inicial e aparece na navegação', /data-page="inicio"[^>]*>⌂ Feed/.test(home) && /id="home-community-feed"/.test(home)],
- ['área Músicas permite capa própria e não impõe banner fixo', musicArea.includes('id="music-cover-area"') && musicArea.includes('id="music-cover-preview"') && !musicArea.includes('id="music-cover-upload"') && !musicArea.includes('music-cover-controls') && !musicArea.includes('src="./assets/banner-speakers.webp"')],
+ ['banner oficial de alto-falantes fica no topo de Músicas', musicArea.indexOf('class="music-section-banner"') > musicArea.indexOf('id="musicas"') && musicBanner.includes('src="./assets/banner-speakers.webp"') && musicBanner.includes('AQUI A MÚSICA NÃO PARA!')],
+ ['capa personalizada continua disponível sem controles administrativos na tela pública', musicCover.includes('id="music-cover-preview"') && musicCover.includes('id="music-cover-area"') && !musicArea.includes('id="music-cover-upload"') && !musicArea.includes('music-cover-controls')],
  ['vídeos de descoberta ficam na Pesquisa, não misturados ao Feed', /home-youtube/.test(discovery) && !/<section class="card home-youtube"/.test(home.slice(home.indexOf('<section class="page active" id="inicio">'),home.indexOf('<section class="page" id="musicas">')))],
  ['atalho de amizades fica no Chat, sem duplicação na tela inicial', /id="fazer-amigos"/.test(chat) && !/class="card home-friends"/.test(home)],
  ['perfil oferece abas separadas para fotos e vídeos', /data-profile-view="photos"[^>]*aria-label="Fotos"/.test(profile) && /data-profile-view="videos"[^>]*aria-label="Vídeos"/.test(profile)],
