@@ -1,0 +1,43 @@
+/* CAPITAL DO TREM — modernização visual incremental, sem alterar dados ou lógica */
+:root{--cdt-red:#ed1c24;--cdt-red-hot:#ff3442;--cdt-surface:#101013;--cdt-border:rgba(255,255,255,.11)}
+html{scroll-behavior:smooth}
+body{background-image:radial-gradient(ellipse at 50% -15%,rgba(237,28,36,.16),transparent 48%),linear-gradient(180deg,#050506 0%,#09090c 55%,#050506 100%)}
+header{backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.card,.panel,.hero,.music-playlist-manager,.my-uploaded-song{border-radius:18px!important;border-color:var(--cdt-border)!important;box-shadow:0 14px 34px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.035)}
+button,.btn{border-radius:12px;transition:transform .18s ease,filter .18s ease,box-shadow .18s ease}
+button:not(:disabled):active,.btn:active{transform:scale(.98)}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #ff5963;outline-offset:3px}
+nav#nav{backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:rgba(5,5,7,.94)!important;border-top:1px solid rgba(237,28,36,.45)!important;box-shadow:0 -10px 28px rgba(0,0,0,.35)}
+nav#nav button.active,nav#nav a.active{color:#fff!important;background:linear-gradient(145deg,#4a1015,#16090b)!important;box-shadow:inset 0 0 0 1px rgba(255,70,80,.55),0 0 16px rgba(237,28,36,.16)}
+/* Música: seletores alinhados aos elementos reais da tela. */
+#musicas .music-section-banner{border:1px solid rgba(237,28,36,.28);border-radius:18px;box-shadow:0 12px 30px rgba(0,0,0,.32)}
+#music-upload-area{border-radius:18px!important;background:linear-gradient(145deg,#1a1012,#0a0a0c)!important;box-shadow:0 14px 32px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.04)}
+#music-upload-area form{display:grid;gap:9px}
+#music-upload-area form[hidden]{display:none!important}
+#music-upload-area input[type=file]{display:block;width:100%;min-height:48px;padding:10px;border:1px dashed rgba(237,28,36,.65);border-radius:12px;background:#100d0e;color:#fff}
+#music-upload-area button[type=submit]{width:100%;min-height:48px;border-radius:13px;font-weight:800;letter-spacing:.02em}
+#musicas .music-catalog-panel,#musicas .music-playlist-manager{border:1px solid rgba(255,255,255,.1);border-radius:18px;background:linear-gradient(145deg,#141417,#09090b)}
+#published-song-catalog .music-track-row{border:1px solid rgba(255,255,255,.075)!important;border-radius:15px!important;margin:8px 0!important;padding:12px!important;background:linear-gradient(100deg,#17171b,#0c0c0f)!important;box-shadow:0 8px 20px rgba(0,0,0,.2)}
+#published-song-catalog .music-track-cover{border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+#published-song-catalog .music-track-row button{min-width:42px;min-height:42px}
+#music-playlists-list>.card,#music-playlists-list>.item{border:1px solid rgba(255,255,255,.1);border-radius:15px;background:linear-gradient(100deg,#17171b,#0c0c0f);padding:12px;margin:8px 0}
+#music-library .music-library-row{border-radius:13px;background:linear-gradient(100deg,#17171b,#0c0c0f)}
+#capital-music-player,.ct-player-host{scroll-margin-top:18px}
+#capital-music-player .ct-player-shell,.ct-player-shell{border-color:rgba(237,28,36,.5);background:radial-gradient(ellipse at 12% 0%,rgba(237,28,36,.24),transparent 44%),linear-gradient(145deg,#171013,#08080b 70%,#160b0e)}
+/* FALA UAI: conversa e compositor mais legíveis, sem mexer no envio. */
+.chat-panel{border:1px solid rgba(237,28,36,.25);background:linear-gradient(145deg,#111114,#09090b);box-shadow:0 16px 38px rgba(0,0,0,.35)}
+#messages{border-radius:18px;background:linear-gradient(180deg,#09090c,#0d0b0d);border:1px solid rgba(255,255,255,.1);padding:14px}
+#messages .message{border:1px solid rgba(255,255,255,.09);border-radius:16px 16px 16px 5px;background:linear-gradient(145deg,#19191d,#101013);box-shadow:0 6px 16px rgba(0,0,0,.22);padding:12px}
+#messages .message strong{color:#ff5963}
+#messages .message-avatar{flex:0 0 36px;width:36px;height:36px;display:grid;place-items:center;border-radius:50%;overflow:hidden;background:#251014;border:1px solid rgba(237,28,36,.4)}
+#messages .message-avatar img{width:100%;height:100%;object-fit:cover}
+#messages .message-head{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+#composer{border:1px solid rgba(237,28,36,.28);border-radius:17px;background:#0b0b0e;padding:9px}
+#composer input:not([type=file]):not([type=checkbox]){border-radius:12px!important;background:#151519!important}
+@media(max-width:600px){
+ main{padding-left:10px!important;padding-right:10px!important}
+ #published-song-catalog .music-track-row{gap:9px}
+ #published-song-catalog .music-track-row button{min-width:40px;min-height:40px}
+ #messages{height:min(57svh,560px);min-height:220px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
