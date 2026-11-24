@@ -20,7 +20,7 @@
 #capital-music-player.ct-player-persistent .ct-player-range{height:4px;min-height:4px;margin:0;flex:1;accent-color:#ed1c24}
 #capital-music-player.ct-player-persistent .ct-player-times{display:flex;gap:6px;font-size:9px;white-space:nowrap}
 
-#capital-music-player.ct-player-persistent{transform:translate(var(--ct-player-offset-x,0px),calc(-1 * var(--ct-player-offset-y,0px)));will-change:transform}
+#capital-music-player.ct-player-persistent{transform:translate(var(--ct-player-offset-x,0px),calc(-1 * var(--ct-player-offset-y,0px)));will-change:transform;max-height:calc(100dvh - 110px)}
 #capital-music-player.ct-player-persistent .ct-player-shell{position:relative;padding-top:25px}
 #capital-music-player.ct-player-persistent .ct-player-drag-handle{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:54px;height:14px;padding:0;border:0;border-radius:999px;background:transparent;display:grid;place-items:center;cursor:grab;touch-action:none;z-index:4}
 #capital-music-player.ct-player-persistent .ct-player-drag-handle::before{content:"";display:block;width:34px;height:4px;border-radius:99px;background:#aaa;box-shadow:0 0 7px rgba(255,255,255,.28)}
@@ -65,10 +65,27 @@ body.light #capital-music-player.ct-player-persistent .ct-player-shell{backgroun
         try{applyCompact(localStorage.getItem('ct-player-compact')==='true')}catch{}
         compact.addEventListener('click',()=>applyCompact(!root.classList.contains('ct-player-compact')));
       }
-      let offset=0;try{offset=Number(localStorage.getItem('ct-player-offset-y')||0)||0}catch{}
-      const applyOffset=value=>{offset=Math.max(-Math.round(innerHeight*.22),Math.min(Math.round(innerHeight*.62),value));root.style.setProperty('--ct-player-offset-y',offset+'px');try{localStorage.setItem('ct-player-offset-y',String(offset))}catch{}};
-      applyOffset(offset);
-      handle.addEventListener('pointerdown',event=>{if(root.classList.contains('ct-player-fullscreen'))return;event.preventDefault();handle.setPointerCapture?.(event.pointerId);const startY=event.clientY,startOffset=offset;const move=e=>applyOffset(startOffset-(e.clientY-startY));const finish=()=>{handle.removeEventListener('pointermove',move);handle.removeEventListener('pointerup',finish);handle.removeEventListener('pointercancel',finish)};handle.addEventListener('pointermove',move);handle.addEventListener('pointerup',finish);handle.addEventListener('pointercancel',finish)});
+      let offsetY=0,offsetX=0;
+      try{offsetY=Number(localStorage.getItem('ct-player-offset-y')||0)||0;offsetX=Number(localStorage.getItem('ct-player-offset-x')||0)||0}catch{}
+      const applyOffset=(x,y)=>{
+        const maxX=Math.max(0,Math.floor((innerWidth-root.getBoundingClientRect().width)/2)-8);
+        const maxY=Math.max(0,Math.floor(innerHeight*.62));
+        offsetX=Math.max(-maxX,Math.min(maxX,x));
+        offsetY=Math.max(-Math.round(innerHeight*.22),Math.min(maxY,y));
+        root.style.setProperty('--ct-player-offset-x',offsetX+'px');
+        root.style.setProperty('--ct-player-offset-y',offsetY+'px');
+        try{localStorage.setItem('ct-player-offset-x',String(offsetX));localStorage.setItem('ct-player-offset-y',String(offsetY))}catch{}
+      };
+      applyOffset(offsetX,offsetY);
+      handle.addEventListener('pointerdown',event=>{
+        if(root.classList.contains('ct-player-fullscreen'))return;
+        event.preventDefault();handle.setPointerCapture?.(event.pointerId);
+        const startX=event.clientX,startY=event.clientY,startOffsetX=offsetX,startOffsetY=offsetY;
+        const move=e=>applyOffset(startOffsetX+(e.clientX-startX),startOffsetY-(e.clientY-startY));
+        const finish=()=>{handle.removeEventListener('pointermove',move);handle.removeEventListener('pointerup',finish);handle.removeEventListener('pointercancel',finish)};
+        handle.addEventListener('pointermove',move);handle.addEventListener('pointerup',finish);handle.addEventListener('pointercancel',finish);
+      });
+      window.addEventListener('resize',()=>applyOffset(offsetX,offsetY),{passive:true});
     }
     const audio=root.querySelector('audio');if(!audio||wired.has(audio))return;wired.add(audio);
     const reveal=()=>{root.classList.add('ct-player-ready');document.body.classList.add('ct-has-floating-player')};
