@@ -445,8 +445,16 @@ async function startGroupChat(){
  gate.hidden=true;area.hidden=false;$('leave-group').hidden=false;
  connection.textContent='Conectando à sala em tempo real…';
  if(unsubscribe){unsubscribe();unsubscribe=null;}
- unsubscribe=subscribeChatMessages(addMessage,connectionStatus=>{if(connectionStatus==='SUBSCRIBED')connection.textContent='Conectado: novas mensagens aparecem automaticamente.';else if(connectionStatus==='CHANNEL_ERROR'||connectionStatus==='TIMED_OUT')connection.textContent='Conexão instável. O chat está tentando se reconectar.';else if(connectionStatus==='CLOSED')connection.textContent='Conexão encerrada. Entre novamente no grupo para reconectar.';else connection.textContent='Conectando à sala em tempo real…';});
+ // Bufferiza eventos durante a carga inicial para não perder mensagens em tempo real.
+ let historyReady=false;
+ const pendingRealtime=[];
+ unsubscribe=subscribeChatMessages(message=>{
+  if(!historyReady)pendingRealtime.push(message);
+  else addMessage(message);
+ },connectionStatus=>{if(connectionStatus==='SUBSCRIBED')connection.textContent='Conectado: novas mensagens aparecem automaticamente.';else if(connectionStatus==='CHANNEL_ERROR'||connectionStatus==='TIMED_OUT')connection.textContent='Conexão instável. O chat está tentando se reconectar.';else if(connectionStatus==='CLOSED')connection.textContent='Conexão encerrada. Entre novamente no grupo para reconectar.';else connection.textContent='Conectando à sala em tempo real…';});
  const messages=await getChatMessages(80);list.replaceChildren();seen.clear();messages.forEach(addMessage);
+ historyReady=true;
+ pendingRealtime.sort((a,b)=>new Date(a.created_at||0)-new Date(b.created_at||0)).forEach(addMessage);
  if(savedChatState)requestAnimationFrame(()=>{list.scrollTop=Number(savedChatState.listScroll)||list.scrollHeight;window.scrollTo(0,Number(savedChatState.pageScroll)||0);});
 }
 // Registra o envio antes de qualquer consulta assíncrona de sessão ou histórico.
