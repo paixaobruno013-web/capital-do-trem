@@ -14,6 +14,8 @@ const checks = [
   [!auth.includes('rightsConfirmed !== true') && !auth.includes('rights_confirmed_at:new Date()'), 'A função de upload ainda exige/gera confirmação individual de direitos.'],
   [auth.includes("if (!cleanTitle) throw new Error('Informe o título da música antes de enviar.');"), 'O envio não diferencia título vazio de título acima do limite.'],
   [auth.includes("if (cleanTitle.length > 120) throw new Error('O título da música deve ter no máximo 120 caracteres.');"), 'O limite de 120 caracteres do título não está validado com mensagem específica.'],
+  [upload.includes("if (titleInput && !titleInput.value.trim()) { status.textContent = 'Informe o título da música antes de enviar.';"), 'A interface não informa claramente quando o título está vazio.'],
+  [upload.includes('O título da música deve ter no máximo 120 caracteres. Você digitou'), 'A interface não informa claramente quando o título ultrapassa 120 caracteres.'],
   [!html.includes('id="music-upload-rights"') && !html.includes('music-rights-confirmation'), 'A caixa de confirmação ainda aparece no formulário.'],
   [migration.includes('create policy "songs_insert_artist_pending_or_admin"') && !migration.includes('rights_confirmed_at is not null'), 'A política do banco ainda exige confirmação individual.']
 ];
