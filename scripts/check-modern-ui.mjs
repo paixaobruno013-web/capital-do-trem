@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 const read = (path) => readFileSync(new URL(path, import.meta.url), 'utf8');
 const home = read('../index.html');
 const chat = read('../bate-papo.html');
+const inbox = read('../mensagens.html');
 const css = read('../capital-modern-ui.css');
 const prepare = read('./prepare-web.mjs');
 const sw = read('../sw.js');
@@ -38,3 +39,5 @@ console.log('Modernização visual: páginas, seletores, pacote móvel e cache P
 assert.ok(signedRelease.includes('base64 --decode assets/capital-do-trem-logo.jpg.b64'), 'O APK final precisa gerar o ícone a partir da arte oficial.');
 assert.ok(signedRelease.includes('prepare-app-icons.py /tmp/capital-do-trem-logo.jpg'), 'A arte oficial deve ser a primeira fonte do ícone Android.');
 assert.ok(home.includes('linear-gradient(120deg,#ff4fa3 0%,#d629a7 45%,#8b35d6 100%)'), 'O botão do Instagram precisa manter o degradê rosa/roxo aprovado.');
+assert.ok(inbox.includes('FALA UAI — lista de conversas no formato da referência enviada'), 'A lista FALA UAI precisa carregar o layout visual de referência.');
+assert.ok(inbox.includes('#conversations .official-group') && inbox.includes('#conversations .profile-avatar'), 'A lista FALA UAI precisa destacar o grupo oficial e os avatares.');
