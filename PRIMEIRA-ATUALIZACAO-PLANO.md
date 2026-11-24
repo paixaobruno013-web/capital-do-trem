@@ -26,6 +26,17 @@ Esta lista acompanha a primeira atualização pós-lançamento. Não marcar item
 - [ ] Validar que presença online no banco não fica marcada como ativa após desconexão/fechamento inesperado.
 - [ ] Manter alertas visual/sonoro/vibração sujeitos às permissões e políticas do aparelho.
 
+## Recursos sociais e comunicação em tempo real — prioridade da próxima etapa
+- [x] Stories de usuários e do administrador já aceitam selecionar música publicada no catálogo, definir trecho/duração e volume, e armazenar os metadados para reprodução no visualizador.
+- [ ] Validar no Android e Safari iOS a reprodução da música em Stories, incluindo avançar/trocar Story, silenciar, pausar e encerrar sem deixar áudio preso.
+- [ ] Live dentro do aplicativo: integrar a interface de anfitrião e espectador ao backend `lives-api`, incluindo lista de transmissões ativas, iniciar/entrar/encerrar, estados de conexão e reconexão.
+- [ ] Live salva no Feed: configurar e validar gravação privada via LiveKit Egress, webhook e Storage; somente depois de a gravação estar concluída e validada, criar publicação no Feed com reprodução segura. Não publicar arquivo temporário nem URL administrativa.
+- [ ] Chamadas de áudio e vídeo no FALA UAI: integrar o SDK LiveKit à interface, chamadas individuais e em grupo (máximo de 4 participantes), convite recebido, aceitar/recusar, microfone/câmera, alternar câmera, viva-voz e encerrar.
+- [ ] Implantar as Edge Functions `lives-api` e `calls-api` após configuração segura dos secrets do LiveKit no Supabase; nenhum segredo no app ou no GitHub.
+- [ ] Configurar notificações de chamadas recebidas em segundo plano (FCM Android/APNs iOS) e validar em aparelhos reais.
+- [ ] Confirmar limites e cotas do provedor LiveKit antes de ativar; não cadastrar cartão, fazer upgrade ou habilitar cobrança sem autorização expressa.
+- [ ] Testar permissões, rede móvel/Wi-Fi, reconexão, privacidade, RLS, limite de participantes, falhas de gravação e fluxo completo em Android e Safari iOS.
+
 ## Envio de arquivos e retomada
 - [x] Ampliar o guardião de rascunhos para FALA UAI, Rede social e Estúdio, além da página principal e do painel administrativo.
 - [x] Preservar campos de texto/metadados ao retornar do seletor de arquivos quando o Android recriar a tela.
