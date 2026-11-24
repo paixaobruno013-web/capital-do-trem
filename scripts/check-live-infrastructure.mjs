@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-const migration = await readFile(new URL("../supabase/migrations/20261121130000_live_broadcasts.sql", import.meta.url), "utf8");
+const migration = await readFile(new URL("../supabase/migrations/20261124130954_live_broadcasts.sql", import.meta.url), "utf8");
 const api = await readFile(new URL("../supabase/functions/lives-api/index.ts", import.meta.url), "utf8");
 const webhook = await readFile(new URL("../supabase/functions/lives-webhook/index.ts", import.meta.url), "utf8");
-const lifecycle = await readFile(new URL("../supabase/migrations/20261121133000_live_recording_lifecycle.sql", import.meta.url), "utf8");
+const lifecycle = await readFile(new URL("../supabase/migrations/20261124130957_live_recording_lifecycle.sql", import.meta.url), "utf8");
 const guide = await readFile(new URL("../supabase/functions/lives-api/README.md", import.meta.url), "utf8");
-const storage = await readFile(new URL("../supabase/migrations/20261121131500_private_live_recordings_bucket.sql", import.meta.url), "utf8");
+const storage = await readFile(new URL("../supabase/migrations/20261124130956_private_live_recordings_bucket.sql", import.meta.url), "utf8");
 assert.match(migration, /enable row level security/i);
 assert.match(migration, /revoke all privileges.*anon, authenticated/is);
 assert.match(migration, /live_broadcasts_one_active_per_host/);
