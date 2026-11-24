@@ -1,7 +1,7 @@
 const byId=id=>document.getElementById(id);
 const formatTime=value=>{if(!Number.isFinite(value)||value<0)return '0:00';const m=Math.floor(value/60),s=Math.floor(value%60);return m+':'+String(s).padStart(2,'0')};
 function safeAudioUrl(value){try{const url=new URL(value,location.href);return ['https:','http:','blob:'].includes(url.protocol)?url.href:''}catch{return ''}}
-export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null}={}){
+export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null,onRefreshAudio=null}={}){
  const root=typeof rootId==='string'?byId(rootId):rootId;if(!root)return null;
  root.replaceChildren();root.classList.add('ct-player-host');
  const shell=document.createElement('section');shell.className='ct-player-shell';shell.setAttribute('aria-label','Player musical Capital do Trem');
@@ -68,7 +68,29 @@ export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null
  audio.addEventListener('play',()=>{if(current()&&typeof onPlay==='function'&&lastRecordedSongId!==current().id){lastRecordedSongId=current().id;onPlay(current())}shell.classList.add('is-playing');play.textContent='Ⅱ';play.setAttribute('aria-label','Pausar');status.textContent='Tocando agora';if('mediaSession' in navigator){try{navigator.mediaSession.playbackState='playing';configureMediaSession();updateMediaPosition()}catch{}}});
  audio.addEventListener('pause',()=>{shell.classList.remove('is-playing');play.textContent='▶';play.setAttribute('aria-label','Reproduzir');if('mediaSession' in navigator){try{navigator.mediaSession.playbackState='paused'}catch{}}});
  audio.addEventListener('ended',()=>{if('mediaSession' in navigator){try{navigator.mediaSession.playbackState='none'}catch{}}if(queue.length>1)step(1);else{play.textContent='↻';status.textContent='Faixa finalizada.'}});
- audio.addEventListener('error',()=>{shell.classList.remove('is-playing');play.textContent='▶';status.textContent='Não foi possível carregar esta música. Verifique a conexão e tente novamente.';});
+ const refreshedSongIds=new Set();
+ audio.addEventListener('error',async()=>{
+  shell.classList.remove('is-playing');play.textContent='▶';play.setAttribute('aria-label','Reproduzir');
+  const song=current(),code=audio.error?.code||0;
+  if(song?.id&&typeof onRefreshAudio==='function'&&!refreshedSongIds.has(song.id)){
+   refreshedSongIds.add(song.id);status.textContent='Conferindo o link seguro desta música…';
+   try{
+    const freshUrl=safeAudioUrl(await onRefreshAudio(song));
+    if(freshUrl){
+     song.audio_url=freshUrl;
+     const catalogSong=catalog.find(item=>item.id===song.id);if(catalogSong)catalogSong.audio_url=freshUrl;
+     audio.src=freshUrl;audio.load();
+     status.textContent='Link atualizado. Toque em reproduzir para tentar novamente.';
+     return;
+    }
+   }catch(refreshError){console.warn('Não foi possível renovar o link da música.',refreshError);}
+  }
+  status.textContent=(code===3||code===4)
+   ?'O arquivo chegou, mas o Android não reconheceu a codificação deste áudio. É necessário conferir o MP3 original.'
+   :code===2
+    ?'A conexão foi interrompida ao carregar a música. Verifique a internet e toque em reproduzir novamente.'
+    :'Não foi possível carregar esta música. Tente novamente; se persistir, confira o arquivo original.';
+ });
  audio.addEventListener('timeupdate',()=>{if(Number.isFinite(audio.duration)&&audio.duration>0){range.value=String(Math.round(audio.currentTime/audio.duration*1000));elapsed.textContent=formatTime(audio.currentTime);duration.textContent=formatTime(audio.duration);updateMediaPosition()}});
  audio.addEventListener('loadedmetadata',()=>{duration.textContent=formatTime(audio.duration)});
  range.addEventListener('input',()=>{if(Number.isFinite(audio.duration)&&audio.duration>0){audio.currentTime=(Number(range.value)/1000)*audio.duration}});
