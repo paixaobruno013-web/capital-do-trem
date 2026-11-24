@@ -11,6 +11,7 @@ const sw = read('../sw.js');
 
 assert.ok(auth.includes('uploadSongAudioObject'), 'O envio de áudio precisa usar o fluxo resiliente');
 assert.ok(auth.includes('tus-js-client@4'), 'Arquivos de áudio maiores devem usar TUS');
+assert.ok(auth.includes('apikey: SUPABASE_PUBLISHABLE_KEY'), 'O TUS precisa enviar a chave pública do projeto no cabeçalho apikey');
 assert.ok(auth.includes('retryDelays: [0, 2000, 5000, 10000, 20000]'), 'O TUS precisa repetir tentativas em falhas de rede');
 assert.ok(auth.includes('attempt <= 3'), 'O fallback de upload precisa limitar tentativas');
 assert.ok(auth.includes('export async function getSongPlaybackUrl'), 'O aplicativo precisa renovar links expirados');
