@@ -7,6 +7,8 @@ const chat = read('../bate-papo.html');
 const css = read('../capital-modern-ui.css');
 const prepare = read('./prepare-web.mjs');
 const sw = read('../sw.js');
+const signedRelease = read('../.github/workflows/android-signed-release.yml');
+const home = read('../index.html');
 
 for (const [name, html] of [['index.html', home], ['bate-papo.html', chat]]) {
   assert.ok(html.includes('href="./capital-modern-ui.css?v=1"'),
@@ -33,3 +35,7 @@ assert.ok(sw.includes("capital-do-trem-v309"),
   'O cache PWA precisa ser renovado para publicar os novos estilos');
 
 console.log('Modernização visual: páginas, seletores, pacote móvel e cache PWA conferidos.');
+
+assert.ok(signedRelease.includes('base64 --decode assets/capital-do-trem-logo.jpg.b64'), 'O APK final precisa gerar o ícone a partir da arte oficial.');
+assert.ok(signedRelease.includes('prepare-app-icons.py /tmp/capital-do-trem-logo.jpg'), 'A arte oficial deve ser a primeira fonte do ícone Android.');
+assert.ok(home.includes('linear-gradient(120deg,#ff4fa3 0%,#d629a7 45%,#8b35d6 100%)'), 'O botão do Instagram precisa manter o degradê rosa/roxo aprovado.');
