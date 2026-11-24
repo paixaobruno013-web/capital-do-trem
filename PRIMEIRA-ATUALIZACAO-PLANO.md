@@ -26,6 +26,12 @@ Esta lista acompanha a primeira atualização pós-lançamento. Não marcar item
 - [ ] Validar que presença online no banco não fica marcada como ativa após desconexão/fechamento inesperado.
 - [ ] Manter alertas visual/sonoro/vibração sujeitos às permissões e políticas do aparelho.
 
+## Envio de arquivos e retomada
+- [x] Ampliar o guardião de rascunhos para FALA UAI, Rede social e Estúdio, além da página principal e do painel administrativo.
+- [x] Preservar campos de texto/metadados ao retornar do seletor de arquivos quando o Android recriar a tela.
+- [ ] Testar no Android a seleção de foto, vídeo, áudio e documento em cada área; confirmar que o app não reinicia e que o anexo continua selecionado.
+- [ ] Se o Android encerrar o processo, re-selecionar o arquivo é necessário por segurança do sistema; os metadados do formulário devem permanecer recuperados.
+
 ## FALA UAI — chat
 - [ ] Revisar envio de texto e anexos com duas contas reais e corrigir falhas de ponta a ponta.
 - [ ] Fechar interface de conversa no estilo WhatsApp, mantendo identidade preta/vermelha do projeto.
@@ -38,6 +44,10 @@ Esta lista acompanha a primeira atualização pós-lançamento. Não marcar item
 - [ ] Validar publicar foto/vídeo no Feed e salvar/guardar publicações.
 - [ ] Validar Stories, câmera/galeria, marcação de usuários e compartilhamento.
 - [ ] Validar início/fim de Live, gravação e acesso conforme permissões; testar em aparelhos reais.
+- [x] Player flutuante permanece montado no documento principal durante a navegação entre áreas e publica comandos Media Session quando suportados pelo navegador.
+- [ ] Validar reprodução ao alternar entre Perfil, FALA UAI e Pesquisas em Android e Safari iOS.
+- [ ] Implementar e validar serviço nativo Android de reprodução em segundo plano com notificação/controles de mídia; a implementação web atual, isoladamente, não garante áudio quando o Android suspende/encerra o WebView.
+- [ ] Validar reprodução fora do app e controles de tela bloqueada no Android e Safari iOS.
 - [ ] Validar catálogo de músicas, upload, edição/exclusão autorizada, playlists e player persistente em segundo plano.
 - [ ] Preservar layout de músicas aprovado e corrigir apresentação de arquivos.
 
