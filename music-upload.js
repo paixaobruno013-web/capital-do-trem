@@ -81,7 +81,8 @@ if (form && access && status && fileInput && submit) {
   form.addEventListener('submit', async event => {
     event.preventDefault();
     const file = fileInput.files?.[0];
-    if (titleInput && (!titleInput.value.trim() || titleInput.value.trim().length > 120)) { status.textContent = `O nome da música deve ter entre 1 e 120 caracteres. Você digitou ${titleInput.value.trim().length}.`; titleInput.focus(); return; }
+    if (titleInput && !titleInput.value.trim()) { status.textContent = 'Informe o título da música antes de enviar.'; titleInput.focus(); return; }
+    if (titleInput && titleInput.value.trim().length > 120) { status.textContent = `O título da música deve ter no máximo 120 caracteres. Você digitou ${titleInput.value.trim().length}.`; titleInput.focus(); return; }
     if (!file) {
       status.textContent = 'Escolha um arquivo de áudio primeiro.';
       return;
