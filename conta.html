@@ -994,8 +994,7 @@ sendPhoneCodeButton.addEventListener('click',async()=>{
  }catch(error){phoneLoginStatus.textContent=error?.message||'Não foi possível enviar o código. Confira o número e a configuração de SMS.';}
  finally{sendPhoneCodeButton.disabled=false;}
 });
-phoneLoginForm.addEventListener('submit',async event=>{
- event.preventDefault();
+verifyPhoneCodeButton.addEventListener('click',async()=>{
  if(!auth)return;
  verifyPhoneCodeButton.disabled=true;phoneLoginStatus.textContent='Validando código…';
  try{
