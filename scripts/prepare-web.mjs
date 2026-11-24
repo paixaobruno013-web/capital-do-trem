@@ -19,6 +19,7 @@ const files = [
   'music-playlists.js',
   'chat-topics.js',
   'capital-futurista.css',
+  'capital-modern-ui.css',
   'admin.html',
   'file-picker-guard.js',
   'admin-media.js',
