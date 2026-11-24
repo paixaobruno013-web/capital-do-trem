@@ -527,7 +527,7 @@ async function uploadSongAudioObject(supabase, path, file, contentType, onProgre
         const upload = new TusUpload(file, {
           endpoint: `https://${projectId}.storage.supabase.co/storage/v1/upload/resumable`,
           retryDelays: [0, 2000, 5000, 10000, 20000],
-          headers: { authorization: `Bearer ${session.access_token}` },
+          headers: { authorization: `Bearer ${session.access_token}`, apikey: SUPABASE_PUBLISHABLE_KEY },
           uploadDataDuringCreation: true,
           removeFingerprintOnSuccess: true,
           metadata: { bucketName: 'capital-do-trem-audio', objectName: path, contentType, cacheControl: '3600' },
