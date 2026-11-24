@@ -20,13 +20,13 @@
 #capital-music-player.ct-player-persistent .ct-player-range{height:4px;min-height:4px;margin:0;flex:1;accent-color:#ed1c24}
 #capital-music-player.ct-player-persistent .ct-player-times{display:flex;gap:6px;font-size:9px;white-space:nowrap}
 
-#capital-music-player.ct-player-persistent{transform:translateY(calc(-1 * var(--ct-player-offset-y,0px)));will-change:transform}
+#capital-music-player.ct-player-persistent{transform:translate(var(--ct-player-offset-x,0px),calc(-1 * var(--ct-player-offset-y,0px)));will-change:transform}
 #capital-music-player.ct-player-persistent .ct-player-shell{position:relative;padding-top:25px}
 #capital-music-player.ct-player-persistent .ct-player-drag-handle{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:54px;height:14px;padding:0;border:0;border-radius:999px;background:transparent;display:grid;place-items:center;cursor:grab;touch-action:none;z-index:4}
 #capital-music-player.ct-player-persistent .ct-player-drag-handle::before{content:"";display:block;width:34px;height:4px;border-radius:99px;background:#aaa;box-shadow:0 0 7px rgba(255,255,255,.28)}
 #capital-music-player.ct-player-persistent .ct-player-drag-handle:active{cursor:grabbing}
 #capital-music-player.ct-player-persistent .ct-player-compact-toggle{width:30px;height:30px;min-width:30px;min-height:30px;padding:0;border:1px solid rgba(255,255,255,.3);border-radius:50%;background:#171717;color:#fff;font-size:14px;line-height:1}
-#capital-music-player.ct-player-persistent.ct-player-compact .ct-player-shell{grid-template-areas:"info controls";padding:20px 9px 8px;gap:4px 8px;border-radius:13px}
+#capital-music-player.ct-player-persistent.ct-player-compact{left:8px;right:auto;width:min(92vw,340px);max-width:340px}\n#capital-music-player.ct-player-persistent.ct-player-compact .ct-player-shell{background:rgba(8,8,10,.48);border-color:rgba(237,28,36,.48);box-shadow:0 4px 16px rgba(0,0,0,.16),0 0 10px rgba(237,28,36,.10);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}\n#capital-music-player.ct-player-persistent.ct-player-compact .ct-player-shell{grid-template-areas:"info controls";padding:20px 9px 8px;gap:4px 8px;border-radius:13px}
 #capital-music-player.ct-player-persistent.ct-player-compact .ct-player-progress-wrap,
 #capital-music-player.ct-player-persistent.ct-player-compact .ct-player-eyebrow,
 #capital-music-player.ct-player-persistent.ct-player-compact .ct-player-artist,
