@@ -26,6 +26,7 @@ const checks = [
   ['linhas e textos da caixa se adaptam a telas estreitas sem estourar largura', /cdt-chat-row\{overflow:hidden;touch-action:pan-y\}/.test(room) && /@media\(max-width:380px\)/.test(room) && /overflow-wrap:anywhere/.test(room)],
 
   ['chat geral possui formulário e campo de mensagem', /id="composer"/.test(room) && /id="message"/.test(room)],
+  ['mensagens próprias são diferenciadas visualmente e alinhadas à direita', /if\(m\.author_id===currentUserId\)box\.classList\.add\('message-own'\)/.test(room) && /#messages \.message\.message-own\{align-self:flex-end/.test(room)],
   ['chat geral possui área do seletor de emojis', /id="emoji-tray"[^>]*data-emoji-picker/.test(room)],
   ['botão de emojis é inserido no formulário', /emojiButton\.type\s*=\s*['"]button['"][\s\S]*?emojiButton\.id\s*=\s*['"]emoji-toggle['"]/.test(enhancements) && /form\.insertBefore\(tools,input\)/.test(enhancements)],
   ['botão de gravação de áudio é criado e inserido', /recordButton\.id\s*=\s*['"]record-audio['"]/.test(enhancements) && /tools\.append\(emojiButton,recordButton\)/.test(enhancements)],
@@ -40,6 +41,7 @@ const checks = [
   ['mensagens do bate-papo geral usam imagens emoji com fallback', /function appendEmojiText\(/.test(room) && /appendEmojiText\(body,part\)/.test(room)],
   ['conversas privadas e grupo renderizam emojis com suporte visual ampliado', /function appendEmojiText\(/.test(privateChat) && /appendEmojiText\(body,m\.content\|\|''\)/.test(privateChat) && /appendEmojiText\(body,m\.content\|\|''\)/.test(privateChat)],
   ['service worker inclui os módulos de chat e mensagens privadas', /chat-enhancements\.js/.test(worker) && /emoji-picker\.js/.test(worker) && /mensagens\.html/.test(worker)],
+  ['aviso de nova versão exibe identidade 🚂', /🚂 TEM ATUALIZAÇÃO NOVA NO TREM/.test(await read('update.js')) && /🚂 ATUALIZAR AGORA/.test(await read('update.js'))],
 
   ['seletor mantém campo de mensagem e envio visíveis enquanto aberto', !privateChat.includes('#compose.emoji-open #message,#compose.emoji-open #send,#compose.emoji-open #private-emoji-toggle{display:none}') && !room.includes('.composer.emoji-open #message,.composer.emoji-open #camera-open,.composer.emoji-open #record-audio,.composer.emoji-open #send,.composer.emoji-open .chat-tools{display:none!important}')],
   ['seletor insere emoji na posição do cursor e atualiza recentes', emoji.includes("setRangeText(e,start,end,'end')") && emoji.includes('remember(e)')],
