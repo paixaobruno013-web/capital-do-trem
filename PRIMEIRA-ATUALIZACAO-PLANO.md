@@ -95,3 +95,14 @@ Referência visual enviada pelo usuário: catálogo escuro em tela cheia, semelh
 - [ ] Garantir layout responsivo Android/iPhone Safari, acessibilidade, contraste, alvos de toque e carregamento de capas com fallback.
 - [ ] Testar com faixas sem capa, nomes extensos, upload interrompido, rede instável, usuário comum, artista e administrador; testar editar/excluir e reprodução durante navegação entre abas.
 - [ ] Só marcar como concluído após validação visual e funcional em aparelhos reais. A especificação e os testes estáticos, isoladamente, não comprovam que a interface foi entregue.
+
+
+
+### Reprodutor minimizável — requisito obrigatório da área Músicas
+
+- [ ] Manter o reprodutor fixo e acessível enquanto o usuário navega entre Músicas, Perfil, Feed, Pesquisas e FALA UAI.
+- [ ] Incluir controle visível para minimizar e restaurar o reprodutor, sem interromper a faixa em execução.
+- [ ] No modo minimizado, exibir uma barra compacta com capa pequena, título/artista e controles essenciais de reproduzir/pausar e restaurar.
+- [ ] Preservar posição de reprodução, faixa atual e estado de pausa ao alternar entre os modos.
+- [ ] Garantir que a área compacta respeite a navegação inferior, áreas seguras do Android/iPhone e não cubra botões ou campos.
+- [ ] Validar minimização/restauração durante navegação e após retorno do app; não afirmar reprodução em segundo plano fora do app sem serviço nativo Android e teste real em iOS Safari.
