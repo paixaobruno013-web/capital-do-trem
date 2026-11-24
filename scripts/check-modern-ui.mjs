@@ -8,7 +8,6 @@ const css = read('../capital-modern-ui.css');
 const prepare = read('./prepare-web.mjs');
 const sw = read('../sw.js');
 const signedRelease = read('../.github/workflows/android-signed-release.yml');
-const home = read('../index.html');
 
 for (const [name, html] of [['index.html', home], ['bate-papo.html', chat]]) {
   assert.ok(html.includes('href="./capital-modern-ui.css?v=1"'),
