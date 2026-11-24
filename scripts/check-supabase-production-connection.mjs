@@ -19,7 +19,7 @@ const response = await fetch(new URL('/auth/v1/health', baseUrl), {
 });
 
 if (!response.ok) {
-  throw new Error(\`Supabase de produção respondeu HTTP \${response.status} no health check.\`);
+  throw new Error(`Supabase de produção respondeu HTTP ${response.status} no health check.`);
 }
 
 console.log('OK: endpoint Auth do Supabase de produção respondeu via chave publicável.');
