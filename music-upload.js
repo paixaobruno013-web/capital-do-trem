@@ -1,4 +1,4 @@
-import { getCurrentSession, isCurrentUserArtistOrAdmin, bootstrapFirstAdmin, uploadMySong } from './supabase/auth.js';
+import { getCurrentSession, isCurrentUserArtistOrAdmin, bootstrapFirstAdmin, uploadMySong, watchAuthChanges } from './supabase/auth.js';
 
 const $ = id => document.getElementById(id);
 const form = $('music-upload-form');
@@ -73,6 +73,17 @@ if (form && access && status && fileInput && submit) {
   }
 
   retry.addEventListener('click', prepareUpload);
+  // Revalida automaticamente quando o usuário conclui o login em outra área do app.
+  const stopWatchingAuth = watchAuthChanges(({ event }) => {
+    if (event === 'SIGNED_IN') prepareUpload();
+    if (event === 'SIGNED_OUT') {
+      form.hidden = true;
+      access.hidden = false;
+      access.textContent = 'Entre na sua conta de MC/DJ para enviar músicas.';
+      retry.hidden = false;
+    }
+  });
+  window.addEventListener('pagehide', stopWatchingAuth, { once: true });
 
   fileInput.addEventListener('change', () => {
     const file = fileInput.files?.[0];
