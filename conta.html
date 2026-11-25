@@ -687,23 +687,26 @@ function showSession(session){
     }
 const googleLinkButton=document.getElementById('google-link-account');
 const googleLinkStatus=document.getElementById('google-link-status');
-googleLinkButton?.addEventListener('click',async()=>{
- if(!auth){googleLinkStatus.textContent='Serviço de contas ainda está carregando. Tente novamente.';return;}
- googleLinkButton.disabled=true;
- googleLinkStatus.textContent='Preparando a vinculação segura com o Google…';
- try{
-  const result=await auth.linkGoogleIdentityToCurrentAccount({redirectTo:window.location.href});
-  if(result?.alreadyLinked){
-   googleLinkStatus.textContent='Esta conta já possui um Google vinculado.';
-   googleLinkButton.hidden=true;
-  }else{
-   googleLinkStatus.textContent='Continue na tela do Google para confirmar a vinculação. Depois você voltará para esta mesma conta.';
+if(googleLinkButton && !googleLinkButton.dataset.handlerBound){
+ googleLinkButton.dataset.handlerBound='true';
+ googleLinkButton.addEventListener('click',async()=>{
+  if(!auth){googleLinkStatus.textContent='Serviço de contas ainda está carregando. Tente novamente.';return;}
+  googleLinkButton.disabled=true;
+  googleLinkStatus.textContent='Preparando a vinculação segura com o Google…';
+  try{
+   const result=await auth.linkGoogleIdentityToCurrentAccount({redirectTo:window.location.href});
+   if(result?.alreadyLinked){
+    googleLinkStatus.textContent='Esta conta já possui um Google vinculado.';
+    googleLinkButton.hidden=true;
+   }else{
+    googleLinkStatus.textContent='Continue na tela do Google para confirmar a vinculação. Depois você voltará para esta mesma conta.';
+   }
+  }catch(error){
+   googleLinkStatus.textContent=error?.message||'Não foi possível iniciar a vinculação. Confira se a vinculação manual está habilitada no serviço de autenticação.';
+   googleLinkButton.disabled=false;
   }
- }catch(error){
-  googleLinkStatus.textContent=error?.message||'Não foi possível iniciar a vinculação. Confira se a vinculação manual está habilitada no serviço de autenticação.';
-  googleLinkButton.disabled=false;
- }
-});
+ });
+}
     profilePanel.hidden=false;accessPanel.hidden=true;eventPanel.hidden=false;postPanel.hidden=false;basicProfilePanel.hidden=false;
     if(window.location.hash==='#delete-account-panel')window.setTimeout(()=>document.getElementById('delete-account-panel')?.scrollIntoView({behavior:'smooth',block:'start'}),180);
     loadProfileInstallCount();
