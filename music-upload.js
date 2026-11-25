@@ -28,7 +28,11 @@ if (form && access && status && fileInput && submit) {
     );
   });
 
+  let accessCheckInProgress = false;
   async function prepareUpload() {
+    // Evita verificações concorrentes no carregamento inicial e após SIGNED_IN.
+    if (accessCheckInProgress) return;
+    accessCheckInProgress = true;
     retry.hidden = true;
     form.hidden = true;
     access.hidden = false;
@@ -69,6 +73,8 @@ if (form && access && status && fileInput && submit) {
       access.hidden = false;
       access.textContent = error?.message || 'Não foi possível verificar sua permissão de envio.';
       retry.hidden = false;
+    } finally {
+      accessCheckInProgress = false;
     }
   }
 
