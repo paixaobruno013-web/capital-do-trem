@@ -31,7 +31,24 @@ body.light .card,body.light .panel,body.light .conversation,body.light .message-
 
 </style>
 </head>
-<body>
+<body class="admin-gate-pending">
+<div id="admin-access-gate" role="status" aria-live="polite" style="position:fixed;inset:0;z-index:30000;display:grid;place-items:center;padding:24px;background:#050506;color:#fff;text-align:center;font:600 16px/1.5 system-ui,Arial,sans-serif">
+ <div><p style="font-size:28px;margin:0 0 8px">🚂 CAPITAL DO TREM</p><p id="admin-access-message">Validando acesso...</p></div>
+</div>
+<style>.admin-gate-pending #main-content{visibility:hidden}</style>
+<script type="module">
+import { isCurrentUserAdmin } from './supabase/auth.js';
+const gate=document.getElementById('admin-access-gate');
+const message=document.getElementById('admin-access-message');
+try{
+ const allowed=await isCurrentUserAdmin();
+ if(!allowed){message.textContent='Acesso indisponível.';window.location.replace('./');}
+ else{document.body.classList.remove('admin-gate-pending');gate.remove();}
+}catch(error){
+ message.textContent='Acesso indisponível.';
+ window.setTimeout(()=>window.location.replace('./'),900);
+}
+</script>
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a><main id="main-content">
 <header>
 <button class="theme" id="theme-toggle" type="button" aria-pressed="false">☀️ Claro</button><p class="muted">🚂 CAPITAL DO TREM</p>

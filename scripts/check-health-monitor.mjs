@@ -11,6 +11,9 @@ assert.match(update, /MAX_ITEMS\s*=\s*30/, 'histórico deve ter limite de tamanh
 assert.match(update, /localStorage\.setItem\(STORAGE_KEY/, 'eventos devem persistir localmente');
 assert.match(update, /safeFileName/, 'caminhos devem ser reduzidos ao nome do arquivo');
 assert.match(diagnostic, /Histórico de falhas deste aparelho/, 'diagnóstico deve exibir histórico local');
+assert.match(diagnostic, /isCurrentUserAdmin/, 'painel técnico deve validar o papel administrativo no servidor antes de exibir dados');
+assert.match(diagnostic, /admin-gate-pending/, 'conteúdo técnico deve permanecer oculto durante a validação de acesso');
+assert.match(diagnostic, /window\.location\.replace\('\.\/'\)/, 'acesso não autorizado deve retornar ao aplicativo');
 assert.match(diagnostic, /Exportar relatório/, 'diagnóstico deve permitir exportar relatório');
 assert.match(diagnostic, /clearIncidents/, 'diagnóstico deve permitir limpar histórico');
 assert.match(update, /item\.kind==='javascript'\|\|item\.kind==='promise'/, 'tarefas longas e falhas de recursos não devem disparar falso alerta de instabilidade');
