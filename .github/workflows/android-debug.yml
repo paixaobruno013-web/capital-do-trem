@@ -3,7 +3,7 @@ name: Gerar APK de teste do Capital do Trem
 on:
   workflow_dispatch:
   push:
-    branches: [main, melhorias-stories-navegacao-icone, correcoes-alertas-offline-playlist, ia-camera-comandos-rapidos, first-update/online-offline-and-social]
+    branches: [main, feat/google-email-auth-only, melhorias-stories-navegacao-icone, correcoes-alertas-offline-playlist, ia-camera-comandos-rapidos, first-update/online-offline-and-social]
     paths:
       - '**.html'
       - '**.js'

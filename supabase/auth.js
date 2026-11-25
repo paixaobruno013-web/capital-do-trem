@@ -113,30 +113,21 @@ export async function signInWithGoogleAccount({ redirectTo = window.location.hre
   return data;
 }
 
-export async function sendPhoneLoginCode(phone) {
-  const cleanPhone = String(phone || '').replace(/[\s().-]/g, '');
-  if (!/^\+[1-9]\d{7,14}$/.test(cleanPhone)) {
-    throw new Error('Informe o telefone no formato internacional, por exemplo +55 31 99999-9999.');
+export async function linkGoogleIdentityToCurrentAccount({ redirectTo = window.location.href } = {}) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta atual antes de vincular o Google.');
+  const identities = Array.isArray(user.identities) ? user.identities : [];
+  if (identities.some(identity => identity.provider === 'google')) {
+    return { alreadyLinked: true };
   }
-  const supabase = initSupabase();
-  const { data, error } = await supabase.auth.signInWithOtp({
-    phone: cleanPhone,
-    options: { shouldCreateUser: false, channel: 'sms' }
-  });
-  if (error) throw error;
-  return { ...data, phone: cleanPhone };
-}
-
-export async function verifyPhoneLoginCode({ phone, token }) {
-  const cleanPhone = String(phone || '').replace(/[\s().-]/g, '');
-  const cleanToken = String(token || '').replace(/\s/g, '');
-  if (!/^\+[1-9]\d{7,14}$/.test(cleanPhone)) throw new Error('Informe o telefone com código do país.');
-  if (!/^\d{6,8}$/.test(cleanToken)) throw new Error('Digite o código recebido por SMS.');
-  const supabase = initSupabase();
-  const { data, error } = await supabase.auth.verifyOtp({
-    phone: cleanPhone,
-    token: cleanToken,
-    type: 'sms'
+  const { data, error } = await supabase.auth.linkIdentity({
+    provider: 'google',
+    options: {
+      redirectTo,
+      queryParams: { prompt: 'select_account' }
+    }
   });
   if (error) throw error;
   return data;
