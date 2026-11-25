@@ -3,6 +3,7 @@
  const FILE_PICKER_RETURN_KEY='capitaldotrem_file_picker_return_at_v1';
  const FILE_PICKER_RETURN_URL_KEY='capitaldotrem_file_picker_return_url_v1';
  const DRAFT_PREFIX='capitaldotrem_file_picker_draft_v1:';
+ const ACTIVE_PAGE_KEY='capitaldotrem_file_picker_active_page_v1';
  const MAX_AGE=120000;
  const recentReturn=()=>{
   try{
@@ -38,6 +39,12 @@
     if(at&&Date.now()-at>=MAX_AGE)clearReturnMarkers();
    }catch{}
    return;
+  }
+  const activePage=localStorage.getItem(ACTIVE_PAGE_KEY)||'';
+  if(activePage){
+   const tab=Array.from(document.querySelectorAll('[data-page]')).find(item=>item.dataset.page===activePage);
+   if(tab&&document.querySelector('.page#'+CSS.escape(activePage)))tab.click();
+   localStorage.removeItem(ACTIVE_PAGE_KEY);
   }
   for(const form of forms()){
    try{
@@ -78,6 +85,8 @@
   if(!input)return;
   try{
    for(const form of forms())saveForm(form);
+   const activePage=document.querySelector('.page.active[id]')?.id;
+   if(activePage)localStorage.setItem(ACTIVE_PAGE_KEY,activePage);
    localStorage.setItem(FILE_PICKER_RETURN_KEY,String(Date.now()));
    localStorage.setItem(FILE_PICKER_RETURN_URL_KEY,location.pathname);
   }catch{}
