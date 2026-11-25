@@ -91,10 +91,97 @@ if (form && access && status && fileInput && submit) {
   });
   window.addEventListener('pagehide', stopWatchingAuth, { once: true });
 
-  fileInput.addEventListener('change', () => {
-    const file = fileInput.files?.[0];
-    status.textContent = file ? file.name + ' • ' + (file.size / 1024 / 1024).toFixed(2) + ' MB' : '';
+  // Guarda o áudio escolhido no IndexedDB local. Se o Android encerrar o WebView
+  // ao alternar para o seletor/retornar, a tela pode reconstruir o File sem reenviar
+  // o usuário à galeria. O arquivo nunca sai do aparelho por esta cópia temporária.
+  const AUDIO_DRAFT_DB = 'capital-do-trem-music-upload';
+  const AUDIO_DRAFT_STORE = 'pending-audio';
+  const openAudioDraftDb = () => new Promise((resolve, reject) => {
+    if (!('indexedDB' in window)) return reject(new Error('Armazenamento temporário indisponível.'));
+    const request = indexedDB.open(AUDIO_DRAFT_DB, 1);
+    request.onupgradeneeded = () => {
+      if (!request.result.objectStoreNames.contains(AUDIO_DRAFT_STORE)) request.result.createObjectStore(AUDIO_DRAFT_STORE);
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error('Não foi possível preparar o áudio temporário.'));
   });
+  const saveAudioDraft = async file => {
+    const db = await openAudioDraftDb();
+    try {
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(AUDIO_DRAFT_STORE, 'readwrite');
+        tx.objectStore(AUDIO_DRAFT_STORE).put({
+          blob: file, name: file.name || 'audio', type: file.type || 'application/octet-stream',
+          lastModified: file.lastModified || Date.now(), savedAt: Date.now()
+        }, 'selected');
+        tx.oncomplete = resolve;
+        tx.onerror = () => reject(tx.error || new Error('Não foi possível guardar o áudio temporariamente.'));
+        tx.onabort = () => reject(tx.error || new Error('O armazenamento temporário foi interrompido.'));
+      });
+    } finally { db.close(); }
+  };
+  const readAudioDraft = async () => {
+    const db = await openAudioDraftDb();
+    try {
+      return await new Promise((resolve, reject) => {
+        const tx = db.transaction(AUDIO_DRAFT_STORE, 'readonly');
+        const request = tx.objectStore(AUDIO_DRAFT_STORE).get('selected');
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => reject(request.error || new Error('Não foi possível recuperar o áudio.'));
+      });
+    } finally { db.close(); }
+  };
+  const clearAudioDraft = async () => {
+    try {
+      const db = await openAudioDraftDb();
+      try {
+        await new Promise((resolve, reject) => {
+          const tx = db.transaction(AUDIO_DRAFT_STORE, 'readwrite');
+          tx.objectStore(AUDIO_DRAFT_STORE).delete('selected');
+          tx.oncomplete = resolve;
+          tx.onerror = () => reject(tx.error);
+        });
+      } finally { db.close(); }
+    } catch (error) { console.warn('Não foi possível limpar o áudio temporário.', error); }
+  };
+  const restoreAudioDraft = async () => {
+    try {
+      if (fileInput.files?.length) return;
+      const draft = await readAudioDraft();
+      if (!draft?.blob || Date.now() - Number(draft.savedAt || 0) > 24 * 60 * 60 * 1000) {
+        if (draft) await clearAudioDraft();
+        return;
+      }
+      if (typeof DataTransfer !== 'function' || typeof File !== 'function') {
+        status.textContent = 'O áudio ficou salvo temporariamente, mas este navegador precisa que você escolha o arquivo novamente.';
+        return;
+      }
+      const restored = new File([draft.blob], draft.name, { type: draft.type, lastModified: draft.lastModified });
+      const transfer = new DataTransfer();
+      transfer.items.add(restored);
+      fileInput.files = transfer.files;
+      status.textContent = 'Áudio recuperado após o retorno do Android: ' + restored.name + ' • ' + (restored.size / 1024 / 1024).toFixed(2) + ' MB';
+    } catch (error) {
+      console.warn('Não foi possível recuperar o áudio selecionado.', error);
+    }
+  };
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files?.[0];
+    status.textContent = file ? 'Preparando cópia segura do áudio…' : '';
+    if (!file) { await clearAudioDraft(); return; }
+    if (file.size > 50 * 1024 * 1024) {
+      status.textContent = file.name + ' • arquivo acima do limite de 50 MB.';
+      return;
+    }
+    try {
+      await saveAudioDraft(file);
+      status.textContent = file.name + ' • ' + (file.size / 1024 / 1024).toFixed(2) + ' MB • seleção protegida contra reinício da tela.';
+    } catch (error) {
+      status.textContent = file.name + ' • não foi possível guardar uma cópia temporária; mantenha esta tela aberta.';
+      console.warn('Falha ao preservar áudio selecionado.', error);
+    }
+  });
+  restoreAudioDraft();
 
   form.addEventListener('submit', async event => {
     event.preventDefault();
