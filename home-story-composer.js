@@ -49,6 +49,7 @@ let busy = false;
 let selectedStoryMusicId = '';
 let storyProfilesLoaded = false;
 let storySongsLoaded = false;
+let storySongs = [];
 let cameraRequestId = 0;
 let recordingAudioStream = null;
 function stopRecordingAudio() {
@@ -187,6 +188,9 @@ function openComposer() {
   modal.setAttribute('aria-hidden', 'false');
   window.CapitalVolumeBridge?.setStoryCameraOpen?.(true);
   selectedFile = null;
+  selectedStoryMusicId = '';
+  if (musicSelect) musicSelect.value = '';
+  if (musicPreview) { musicPreview.pause(); musicPreview.removeAttribute('src'); musicPreview.hidden = true; }
   album.value = '';
   publish.disabled = true;
   const feedPublish = el('home-story-feed-publish'); if (feedPublish) feedPublish.disabled = true;
@@ -395,6 +399,9 @@ async function toggleRecording() {
 }
 async function preparePhotoForExport(file) {
   const extension = String(file?.name || '').split('.').pop().toLowerCase();
+  if (['heic','heif'].includes(extension) || /image\/(heic|heif)/i.test(file?.type || '')) {
+    return preparePhotoForExport(await auth.prepareStoryMediaFile(file));
+  }
   const isImage = file?.type?.startsWith('image/') || ['jpg','jpeg','png','webp','heic','heif','avif'].includes(extension);
   if (!isImage) return file;
   const image = new Image();
@@ -546,6 +553,17 @@ const musicToggle = el('home-story-music-toggle');
 const musicPanel = el('home-story-music-panel');
 const musicSelect = el('home-story-music-select');
 const musicStatus = el('home-story-music-status');
+let musicPreview = null;
+function mountStoryMusicPreview() {
+  if (!musicPanel || musicPreview) return;
+  musicPreview = document.createElement('audio');
+  musicPreview.id = 'home-story-music-preview';
+  musicPreview.controls = true;
+  musicPreview.preload = 'none';
+  musicPreview.hidden = true;
+  musicPreview.style.cssText = 'display:block;width:100%;margin-top:10px';
+  musicPanel.append(musicPreview);
+}
 musicToggle?.addEventListener('click', async () => {
   musicPanel.hidden = !musicPanel.hidden;
   if (musicPanel.hidden || storySongsLoaded) return;
@@ -553,15 +571,33 @@ musicToggle?.addEventListener('click', async () => {
   if (musicStatus) musicStatus.textContent = 'Carregando músicas publicadas…';
   try {
     const songs = await auth.getPublishedSongs();
+    storySongs = songs;
     musicSelect.replaceChildren(new Option('Sem música', ''));
     for (const song of songs) musicSelect.add(new Option(song.title + ' — ' + song.artist_name, song.id));
+    mountStoryMusicPreview();
     storySongsLoaded = true;
     if (musicStatus) musicStatus.textContent = songs.length ? 'Escolha a trilha do seu Story.' : 'Ainda não há músicas publicadas no catálogo.';
   } catch (error) {
     if (musicStatus) musicStatus.textContent = error?.message || 'Não foi possível carregar as músicas.';
   } finally { musicToggle.disabled = false; }
 });
-musicSelect?.addEventListener('change', () => { selectedStoryMusicId = musicSelect.value; });
+musicSelect?.addEventListener('change', () => {
+  selectedStoryMusicId = musicSelect.value;
+  const song = storySongs.find(item => item.id === selectedStoryMusicId);
+  if (!musicPreview) mountStoryMusicPreview();
+  if (musicPreview) {
+    musicPreview.pause();
+    musicPreview.removeAttribute('src');
+    if (song?.audio_url) {
+      musicPreview.src = song.audio_url;
+      musicPreview.hidden = false;
+      if (musicStatus) musicStatus.textContent = 'Selecionada: ' + song.artist_name + ' — ' + song.title + '. Ouça a prévia ou publique o Story.';
+    } else {
+      musicPreview.hidden = true;
+      if (musicStatus) musicStatus.textContent = selectedStoryMusicId ? 'A faixa selecionada não está disponível para prévia.' : 'Seu Story será publicado sem música.';
+    }
+  }
+});
 el('home-story-friends-toggle')?.addEventListener('click', async () => {
   const panel=el('home-story-friends-panel'); panel.hidden=!panel.hidden;
   if(panel.hidden) return;
