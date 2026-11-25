@@ -8,6 +8,8 @@ const [html, auth, player, persistent, upload, playlists, css, build] = await Pr
 ]);
 
 const checks = [
+  ['Feed composer offers published music from all profiles and clip selection', html.includes('id="home-feed-music-toggle"') && html.includes('id="home-feed-music-select"') && html.includes('id="home-feed-music-start"') && html.includes('id="home-feed-music-duration"')],
+  ['Feed composer previews and saves selected music clip only with photo publication', (await read('home-feed.js')).includes('getPublishedSongs()') && (await read('home-feed.js')).includes("from('post_music').insert") && (await read('home-feed.js')).includes('Para anexar música no Feed, escolha também uma foto.' )],
   ['music page and published catalog are present', html.includes('id="musicas"') && html.includes('id="published-song-catalog"')],
   ['music catalog initializes Supabase and loads published tracks', html.includes("api.initSupabase()") && html.includes('api.getPublishedSongs()')],
   ['published tracks receive signed audio URLs', auth.includes('export async function getPublishedSongs()') && auth.includes('createSignedUrls(paths, 60 * 60)')],
