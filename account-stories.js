@@ -14,6 +14,7 @@ const composeFields = el('my-story-compose-fields');
 const preview = el('my-story-preview');
 const cancelButton = el('my-story-cancel');
 let previewUrl = '';
+let selectedStoryFile = null;
 let loading = false;
 let storySongs = [];
 let musicSelect, musicStart, musicVolume, musicDuration, musicPreview;
@@ -168,26 +169,42 @@ function mountStoryMusicPicker() {
 function clearStoryDraft() {
   if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = ''; }
   preview?.replaceChildren();
+  selectedStoryFile = null;
   form?.reset();
   if (composeFields) composeFields.hidden = true;
 }
 addButton?.addEventListener('click', () => fileInput?.click());
-fileInput?.addEventListener('change', () => {
-  const file = fileInput.files?.[0];
-  if (!file) return;
-  if (previewUrl) URL.revokeObjectURL(previewUrl);
-  previewUrl = URL.createObjectURL(file);
-  preview?.replaceChildren();
-  const extension = String(file.name || '').toLowerCase().split('.').pop();
-  const isVideo = file.type.startsWith('video/') || ['mp4', 'webm'].includes(extension);
-  const media = document.createElement(isVideo ? 'video' : 'img');
-  media.src = previewUrl;
-  if (isVideo) { media.controls = true; media.playsInline = true; media.preload = 'metadata'; }
-  else media.alt = 'Prévia do seu Story';
-  preview?.append(media);
-  if (composeFields) composeFields.hidden = false;
-  say('Prévia pronta. Se quiser, escreva uma mensagem e publique.');
-  captionInput?.focus();
+fileInput?.addEventListener('change', async () => {
+  const original = fileInput.files?.[0];
+  if (!original) return;
+  loading = true;
+  publishButton.disabled = true;
+  fileInput.disabled = true;
+  say('Preparando a imagem da galeria para o Story…');
+  try {
+    const file = await auth.prepareStoryMediaFile(original);
+    selectedStoryFile = file;
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    previewUrl = URL.createObjectURL(file);
+    preview?.replaceChildren();
+    const extension = String(file.name || '').toLowerCase().split('.').pop();
+    const isVideo = file.type.startsWith('video/') || ['mp4', 'webm', 'mov'].includes(extension);
+    const media = document.createElement(isVideo ? 'video' : 'img');
+    media.src = previewUrl;
+    if (isVideo) { media.controls = true; media.playsInline = true; media.preload = 'metadata'; }
+    else media.alt = 'Prévia do seu Story';
+    preview?.append(media);
+    if (composeFields) composeFields.hidden = false;
+    say('Prévia pronta. Se quiser, escreva uma mensagem e publique.');
+    captionInput?.focus();
+  } catch (error) {
+    selectedStoryFile = null;
+    say(error?.message || 'Não foi possível abrir essa imagem. Escolha JPG, PNG ou WebP.');
+  } finally {
+    loading = false;
+    fileInput.disabled = false;
+    publishButton.disabled = !selectedStoryFile;
+  }
 });
 cancelButton?.addEventListener('click', () => {
   clearStoryDraft();
@@ -196,14 +213,14 @@ cancelButton?.addEventListener('click', () => {
 form?.addEventListener('submit', async event => {
   event.preventDefault();
   if (loading) return;
-  const file = fileInput.files?.[0];
+  const file = selectedStoryFile || fileInput.files?.[0];
   if (!file) { say('Escolha uma foto ou vídeo.'); return; }
   loading = true;
   publishButton.disabled = true;
   publishButton.textContent = 'PUBLICANDO…';
   say('Enviando sua publicação…');
   try {
-    await auth.createMyStory({ file, caption: captionInput.value, musicSongId: musicSelect?.value || '', musicStartSeconds: musicStart?.value || 0, musicVolume: musicVolume?.value || 0.8, musicDurationSeconds: musicDuration?.value || 15 });
+    await auth.createMyStory({ file: await auth.prepareStoryMediaFile(file), caption: captionInput.value, musicSongId: musicSelect?.value || '', musicStartSeconds: musicStart?.value || 0, musicVolume: musicVolume?.value || 0.8, musicDurationSeconds: musicDuration?.value || 15 });
     clearStoryDraft();
     await loadStories();
     say('🟢 Seu Story foi publicado! Ele já aparece para a comunidade por 24 horas.');
