@@ -1481,6 +1481,52 @@ export async function saveAdminMusicCoverSettings(options = {}) {
 }
 
 
+// Normaliza fotos HEIC/HEIF da galeria (comuns no iPhone) para JPEG antes do upload.
+// Os demais formatos seguem intactos para preservar qualidade e transparência.
+export async function prepareStoryMediaFile(file) {
+  if (!(file instanceof File)) throw new Error('Escolha uma foto ou vídeo.');
+  const extension = String(file.name || '').split('.').pop().toLowerCase();
+  const heic = ['heic', 'heif'].includes(extension) || /image\/(heic|heif)/i.test(file.type || '');
+  if (!heic) return file;
+  let source = null;
+  let objectUrl = '';
+  try {
+    if (typeof createImageBitmap === 'function') {
+      try { source = await createImageBitmap(file); } catch {}
+    }
+    if (!source) {
+      objectUrl = URL.createObjectURL(file);
+      const image = new Image();
+      await new Promise((resolve, reject) => {
+        image.onload = resolve;
+        image.onerror = () => reject(new Error('Este aparelho não conseguiu decodificar a foto HEIC. Exporte a imagem como JPG na galeria e tente novamente.'));
+        image.src = objectUrl;
+      });
+      source = image;
+    }
+    const width = source.width || source.naturalWidth;
+    const height = source.height || source.naturalHeight;
+    if (!width || !height) throw new Error('A foto selecionada está inválida. Escolha outra imagem.');
+    const scale = Math.min(1, 1920 / Math.max(width, height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(width * scale));
+    canvas.height = Math.max(1, Math.round(height * scale));
+    const context = canvas.getContext('2d', { alpha: false });
+    if (!context) throw new Error('Não foi possível preparar a foto para publicação.');
+    context.drawImage(source, 0, 0, canvas.width, canvas.height);
+    let blob = null;
+    for (const quality of [0.88, 0.8, 0.72, 0.64]) {
+      blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+      if (blob && blob.size <= 7.5 * 1024 * 1024) break;
+    }
+    if (!blob || blob.size > 8 * 1024 * 1024) throw new Error('A foto ficou muito pesada após a conversão. Escolha uma imagem menor.');
+    return new File([blob], 'capital-do-trem-story.jpg', { type: 'image/jpeg', lastModified: Date.now() });
+  } finally {
+    source?.close?.();
+    if (objectUrl) URL.revokeObjectURL(objectUrl);
+  }
+}
+
 // Normaliza MIME genérico/vazio devolvido por alguns seletores Android.
 async function getBrandingUploadFormat(file, allowed) {
  const has=(key)=>Object.prototype.hasOwnProperty.call(allowed,key);
