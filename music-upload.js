@@ -110,7 +110,12 @@ if (form && access && status && fileInput && submit) {
         title: $('music-upload-title').value,
         artistName: $('music-upload-artist').value,
         producerName: $('music-upload-producer').value,
-        description: $('music-upload-description').value
+        description: $('music-upload-description').value,
+        onProgress: percent => {
+          status.textContent = percent >= 100
+            ? 'Arquivo enviado. Finalizando o cadastro da música…'
+            : 'Enviando áudio sem sair desta tela… ' + percent + '%';
+        }
       });
       fileInput.value='';titleInput.value='';$('music-upload-artist').value='';$('music-upload-producer').value='';$('music-upload-description').value='';updateTitleCounter();
       status.textContent = song.status === 'published'
