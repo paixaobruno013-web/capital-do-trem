@@ -210,6 +210,7 @@ if (form && access && status && fileInput && submit) {
             : 'Enviando áudio sem sair desta tela… ' + percent + '%';
         }
       });
+      await clearAudioDraft();
       fileInput.value='';titleInput.value='';$('music-upload-artist').value='';$('music-upload-producer').value='';$('music-upload-description').value='';updateTitleCounter();
       status.textContent = song.status === 'published'
         ? 'Música publicada no catálogo!'
