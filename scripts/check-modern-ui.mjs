@@ -31,7 +31,7 @@ assert.ok(prepare.includes("'capital-modern-ui.css'"),
   'A folha visual precisa ser copiada para o pacote www/Android/iOS');
 assert.ok(sw.includes("'./capital-modern-ui.css'"),
   'A folha visual precisa integrar o cache complementar do PWA');
-assert.ok(sw.includes("capital-do-trem-v309"),
+assert.ok(sw.includes("capital-do-trem-v310"),
   'O cache PWA precisa ser renovado para publicar os novos estilos');
 
 console.log('Modernização visual: páginas, seletores, pacote móvel e cache PWA conferidos.');
