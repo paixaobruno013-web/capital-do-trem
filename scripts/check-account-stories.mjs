@@ -6,6 +6,8 @@ const script = fs.readFileSync('account-stories.js', 'utf8');
 const auth = fs.readFileSync('supabase/auth.js', 'utf8');
 const storyViewer = fs.readFileSync('stories-ui.js', 'utf8');
 const adminStories = fs.readFileSync('admin-stories.js', 'utf8');
+const home = fs.readFileSync('index.html', 'utf8');
+const homeComposer = fs.readFileSync('home-story-composer.js', 'utf8');
 const storiesUi = fs.readFileSync('stories-ui.js', 'utf8');
 
 
@@ -54,8 +56,6 @@ assert.match(adminStories, /auth\.getPublishedSongs\(\)/);
 assert.match(adminStories, /musicSongId: musicSelect\?\.value/);
 assert.match(auth, /export async function createAdminStory\(\{ file, caption = '', musicSongId = ''/);
 assert.match(auth, /expires_at: new Date\(Date\.now\(\) \+ 24 \* 60 \* 60 \* 1000\)\.toISOString\(\)/);
-const home = fs.readFileSync('index.html', 'utf8');
-const homeComposer = fs.readFileSync('home-story-composer.js', 'utf8');
 assert.match(home, /home-story-caption-assist/);
 assert.match(home, /data-story-caption=/);
 assert.match(home, /sua foto e seu vídeo não são enviados/);
