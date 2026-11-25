@@ -634,7 +634,7 @@ el('home-story-tool-tag')?.addEventListener('click', () => el('home-story-friend
 el('home-story-tool-save')?.addEventListener('click', saveToGallery);
 el('home-story-close')?.addEventListener('click', closeComposer);
 el('home-story-album-button')?.addEventListener('click', () => album.click());
-album?.addEventListener('change', () => {
+album?.addEventListener('change', async () => {
   const original = album.files?.[0];
   if (!original) return;
   const extension = String(original.name || '').split('.').pop().toLowerCase();
@@ -657,7 +657,27 @@ album?.addEventListener('change', () => {
     ? (original.type || (extension === 'mov' ? 'video/quicktime' : extension === 'webm' ? 'video/webm' : 'video/mp4'))
     : (original.type || (['heic','heif'].includes(extension) ? 'image/heic' : extension === 'png' ? 'image/png' : extension === 'webp' ? 'image/webp' : 'image/jpeg'));
   const file = original.type === inferredType ? original : new File([original], original.name || ('story.' + extension), { type: inferredType, lastModified: original.lastModified || Date.now() });
-  setSelected(file);
+  publish.disabled = true;
+  if (saveButton) saveButton.disabled = true;
+  say('Preparando a mídia da galeria…');
+  try {
+    // Normaliza HEIC/HEIF antes da prévia, evitando que o navegador mostre uma tela vazia.
+    const preparedFile = await auth.prepareStoryMediaFile(file);
+    // Se outra mídia foi escolhida durante a conversão, não substitua a seleção mais recente.
+    if (album.files?.[0] !== original) return;
+    setSelected(preparedFile);
+    say('Mídia pronta para prévia e publicação.');
+  } catch (error) {
+    if (album.files?.[0] === original) {
+      album.value = '';
+      say(error?.message || 'Não foi possível preparar essa mídia. Escolha JPG, PNG ou WebP.');
+    }
+  } finally {
+    if (album.files?.[0] === original) {
+      publish.disabled = !selectedFile || busy;
+      if (saveButton) saveButton.disabled = !selectedFile || busy;
+    }
+  }
 });
 el('home-story-photo-button')?.addEventListener('click', capturePhoto);
 // Toque longo grava; soltar encerra. Clique de teclado continua acessível.
