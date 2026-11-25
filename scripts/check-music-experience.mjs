@@ -13,7 +13,7 @@ const checks = [
   ['published tracks receive signed audio URLs', auth.includes('export async function getPublishedSongs()') && auth.includes('createSignedUrls(paths, 60 * 60)')],
   ['catalog rows have play controls connected to the persistent player', html.includes('musicPlayer.playSong(') && html.includes('music-play-button')],
   ['player supports catalog, playlists, queue and direct playback', player.includes('function setCatalog(') && player.includes('function setPlaylists(') && player.includes('function playSong(') && player.includes('audio.play()')],
-  ['player reports audio loading errors accessibly', player.includes("audio.addEventListener('error'") && player.includes('Verifique a conexão e tente novamente')],
+  ['player reports audio loading errors accessibly', player.includes("audio.addEventListener('error'") && player.includes('Não foi possível carregar esta música.')],
   ['player supports Android lock-screen media controls', player.includes('navigator.mediaSession') && player.includes('setActionHandler')],
   ['persistent player is mounted and keeps playback visible across screens', html.includes('persistent-music-player.js') && persistent.includes('ct-player-ready')],
   ['floating player can be moved with touch and pointer input', persistent.includes("handle.addEventListener('pointerdown'") && persistent.includes("handle.addEventListener('pointermove',move)") && persistent.includes('setPointerCapture')],
