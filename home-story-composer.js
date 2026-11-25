@@ -394,23 +394,34 @@ async function toggleRecording() {
   }
 }
 async function preparePhotoForExport(file) {
-  if (!file?.type.startsWith('image/')) return file;
+  const extension = String(file?.name || '').split('.').pop().toLowerCase();
+  const isImage = file?.type?.startsWith('image/') || ['jpg','jpeg','png','webp','heic','heif','avif'].includes(extension);
+  if (!isImage) return file;
   const image = new Image();
   const url = URL.createObjectURL(file);
   try {
     await new Promise((resolve, reject) => {
       image.onload = resolve;
-      image.onerror = reject;
+      image.onerror = () => reject(new Error('Não foi possível abrir esta foto. Se ela estiver em HEIC/HEIF, escolha uma versão compatível da galeria.'));
       image.src = url;
     });
+    const maxSide = 1920;
+    const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
     const canvas = document.createElement('canvas');
-    canvas.width = image.naturalWidth;
-    canvas.height = image.naturalHeight;
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
     const context = canvas.getContext('2d');
+    if (!context) throw new Error('Não foi possível preparar a imagem para publicação.');
     context.filter = effectCss();
-    context.drawImage(image, 0, 0);
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.94));
-    return blob ? new File([blob], 'capital-do-trem-story.jpg', { type: 'image/jpeg' }) : file;
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    let blob = null;
+    for (const quality of [0.86, 0.78, 0.68]) {
+      blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+      if (blob && blob.size <= 7.5 * 1024 * 1024) break;
+    }
+    if (!blob) throw new Error('Não foi possível converter a foto para publicação.');
+    if (blob.size > 8 * 1024 * 1024) throw new Error('Esta foto continua muito pesada. Escolha uma imagem menor.');
+    return new File([blob], 'capital-do-trem-story.jpg', { type: 'image/jpeg', lastModified: Date.now() });
   } finally {
     URL.revokeObjectURL(url);
   }
@@ -588,20 +599,28 @@ el('home-story-tool-save')?.addEventListener('click', saveToGallery);
 el('home-story-close')?.addEventListener('click', closeComposer);
 el('home-story-album-button')?.addEventListener('click', () => album.click());
 album?.addEventListener('change', () => {
-  const file = album.files?.[0];
-  if (!file) return;
-  if (!(file.type.startsWith('image/') || file.type.startsWith('video/'))) {
-    say('Escolha uma foto ou vídeo válido.');
+  const original = album.files?.[0];
+  if (!original) return;
+  const extension = String(original.name || '').split('.').pop().toLowerCase();
+  const videoByExtension = ['mp4','mov','webm','m4v'].includes(extension);
+  const imageByExtension = ['jpg','jpeg','png','webp','gif','heic','heif','avif'].includes(extension);
+  const isVideo = original.type.startsWith('video/') || videoByExtension;
+  const isImage = original.type.startsWith('image/') || imageByExtension;
+  if (!isImage && !isVideo) {
+    say('Escolha uma foto ou vídeo válido da galeria.');
     album.value = '';
     return;
   }
-  const isVideo = file.type.startsWith('video/');
-  const maxSize = isVideo ? 20 * 1024 * 1024 : 8 * 1024 * 1024;
-  if (file.size > maxSize) {
-    say(isVideo ? 'O vídeo deve ter até 20 MB.' : 'A foto deve ter até 8 MB.');
+  const maxSize = isVideo ? 20 * 1024 * 1024 : 30 * 1024 * 1024;
+  if (original.size > maxSize) {
+    say(isVideo ? 'O vídeo deve ter até 20 MB.' : 'A foto original deve ter até 30 MB para ser otimizada antes do envio.');
     album.value = '';
     return;
   }
+  const inferredType = isVideo
+    ? (original.type || (extension === 'mov' ? 'video/quicktime' : extension === 'webm' ? 'video/webm' : 'video/mp4'))
+    : (original.type || (['heic','heif'].includes(extension) ? 'image/heic' : extension === 'png' ? 'image/png' : extension === 'webp' ? 'image/webp' : 'image/jpeg'));
+  const file = original.type === inferredType ? original : new File([original], original.name || ('story.' + extension), { type: inferredType, lastModified: original.lastModified || Date.now() });
   setSelected(file);
 });
 el('home-story-photo-button')?.addEventListener('click', capturePhoto);
