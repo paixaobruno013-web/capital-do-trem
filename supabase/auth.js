@@ -509,7 +509,74 @@ export async function isCurrentUserArtistOrAdmin() {
   return data?.account_type === 'artist';
 }
 
-export async function uploadMySong({ file, title, artistName, producerName = '', description = '' }) {
+/* Upload de áudio tolerante a oscilações: TUS acima de 2 MB e fallback com tentativas limitadas. */
+async function uploadSongAudioObject(supabase, path, file, contentType, onProgress) {
+  if (file.size > 2 * 1024 * 1024) {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError) throw sessionError;
+    if (!session?.access_token) throw new Error('Sua sessão expirou. Entre novamente antes de enviar a música.');
+    let TusUpload = null;
+    try {
+      ({ Upload: TusUpload } = await import('https://cdn.jsdelivr.net/npm/tus-js-client@4/+esm'));
+    } catch (error) {
+      console.warn('TUS indisponível; usando envio direto com tentativas limitadas.', error);
+    }
+    if (TusUpload) {
+      const projectId = new URL(SUPABASE_URL).hostname.split('.')[0];
+      await new Promise((resolve, reject) => {
+        const upload = new TusUpload(file, {
+          endpoint: `https://${projectId}.storage.supabase.co/storage/v1/upload/resumable`,
+          retryDelays: [0, 2000, 5000, 10000, 20000],
+          headers: { authorization: `Bearer ${session.access_token}`, apikey: SUPABASE_PUBLISHABLE_KEY },
+          uploadDataDuringCreation: true,
+          removeFingerprintOnSuccess: true,
+          metadata: { bucketName: 'capital-do-trem-audio', objectName: path, contentType, cacheControl: '3600' },
+          chunkSize: 6 * 1024 * 1024,
+          onError: reject,
+          onProgress: (uploaded, total) => onProgress?.(Math.min(99, Math.round(uploaded / total * 100))),
+          onSuccess: resolve
+        });
+        upload.start();
+      });
+      onProgress?.(100);
+      return;
+    }
+  }
+  let lastError = null;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const { error } = await supabase.storage.from('capital-do-trem-audio').upload(path, file, {
+        contentType, cacheControl: '3600', upsert: false
+      });
+      if (error) throw error;
+      onProgress?.(100);
+      return;
+    } catch (error) {
+      lastError = error;
+      if (attempt < 3) {
+        onProgress?.(0);
+        await new Promise(resolve => setTimeout(resolve, attempt * 1200));
+      }
+    }
+  }
+  throw lastError || new Error('Não foi possível enviar o áudio.');
+}
+
+export async function getSongPlaybackUrl(songId) {
+  const supabase = initSupabase();
+  if (!songId) throw new Error('Música sem identificador.');
+  const { data: song, error: songError } = await supabase.from('songs')
+    .select('storage_path').eq('id', songId).maybeSingle();
+  if (songError) throw songError;
+  if (!song?.storage_path) throw new Error('O arquivo desta música não está disponível.');
+  const { data, error } = await supabase.storage.from('capital-do-trem-audio')
+    .createSignedUrl(song.storage_path, 60 * 60);
+  if (error) throw error;
+  if (!data?.signedUrl) throw new Error('Não foi possível renovar o link da música.');
+  return data.signedUrl;
+}
+
+export async function uploadMySong({ file, title, artistName, producerName = '', description = '', onProgress = null }) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
@@ -548,8 +615,7 @@ export async function uploadMySong({ file, title, artistName, producerName = '',
   if (cleanDescription.length > 1000) throw new Error('A descrição deve ter até 1.000 caracteres.');
   const canonicalMime = ({mp3:'audio/mpeg',m4a:'audio/mp4',aac:'audio/aac',wav:'audio/wav',ogg:'audio/ogg'})[extension];
   const path = user.id + '/songs/' + crypto.randomUUID() + '.' + extension;
-  const { error: uploadError } = await supabase.storage.from('capital-do-trem-audio').upload(path,file,{contentType:canonicalMime,cacheControl:'3600',upsert:false});
-  if (uploadError) throw uploadError;
+  await uploadSongAudioObject(supabase, path, file, canonicalMime, onProgress);
   const { data, error } = await supabase.from('songs').insert({
     user_id:user.id,title:cleanTitle,artist_name:cleanArtist,producer_name:cleanProducer,description:cleanDescription,
     storage_path:path,mime_type:canonicalMime,file_size:file.size,status:isAdmin?'published':'pending'
