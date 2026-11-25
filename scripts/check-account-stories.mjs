@@ -41,6 +41,7 @@ assert.ok(auth.includes("'heic'") && auth.includes("'heif'"), 'Conversão HEIC/H
 assert.ok(script.includes('auth.prepareStoryMediaFile(original)'), 'O seletor do perfil deve normalizar a imagem antes da prévia.');
 assert.match(script, /selectedStoryFile/);
 assert.ok(homeComposer.includes('auth.prepareStoryMediaFile(file)'), 'O compositor principal deve normalizar fotos HEIC.');
+assert.match(homeComposer, /album\?\.addEventListener\('change', async[\s\S]*?await auth\.prepareStoryMediaFile\(file\)[\s\S]*?setSelected\(preparedFile\)/, 'A galeria do compositor principal deve normalizar HEIC antes da prévia.');
 assert.match(homeComposer, /home-story-music-preview/);
 assert.match(homeComposer, /Selecionada:/);
 assert.match(auth, /export async function createMyStory\(\{ file, caption = '', musicSongId = ''/);
