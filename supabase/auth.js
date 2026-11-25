@@ -113,6 +113,26 @@ export async function signInWithGoogleAccount({ redirectTo = window.location.hre
   return data;
 }
 
+export async function linkGoogleIdentityToCurrentAccount({ redirectTo = window.location.href } = {}) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta atual antes de vincular o Google.');
+  const identities = Array.isArray(user.identities) ? user.identities : [];
+  if (identities.some(identity => identity.provider === 'google')) {
+    return { alreadyLinked: true };
+  }
+  const { data, error } = await supabase.auth.linkIdentity({
+    provider: 'google',
+    options: {
+      redirectTo,
+      queryParams: { prompt: 'select_account' }
+    }
+  });
+  if (error) throw error;
+  return data;
+}
+
 export async function signOutAccount() {
   const supabase = initSupabase();
   const { error } = await supabase.auth.signOut();
