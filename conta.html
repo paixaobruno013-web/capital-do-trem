@@ -954,17 +954,12 @@ form.addEventListener('submit',async event=>{
  }finally{submit.disabled=false;}
 });
 const googleSignInButton=document.getElementById('google-sign-in');
-const phoneNumberInput=document.getElementById('phone-login-number');
-const sendPhoneCodeButton=document.getElementById('send-phone-code');
-const phoneLoginForm=document.getElementById('phone-login-form');
-const phoneCodeWrap=document.getElementById('phone-code-wrap');
-const phoneCodeInput=document.getElementById('phone-login-code');
-const verifyPhoneCodeButton=document.getElementById('verify-phone-code');
-const phoneLoginStatus=document.getElementById('phone-login-status');
 googleSignInButton.addEventListener('click',async()=>{
  if(!auth){status.textContent='Serviço de contas ainda está carregando. Tente novamente.';return;}
  googleSignInButton.disabled=true;status.textContent='Abrindo o acesso seguro do Google…';
- try{await auth.signInWithGoogleAccount({redirectTo:window.location.href});
+ try{await auth.signInWithGoogleAccount({redirectTo:window.location.href});}
+ catch(error){status.textContent=error?.message||'Não foi possível iniciar o acesso Google. Confira a configuração do provedor.';googleSignInButton.disabled=false;}
+});
 artistForm.addEventListener('submit',async event=>{
  event.preventDefault();
  const saveButton=document.getElementById('save-artist');
