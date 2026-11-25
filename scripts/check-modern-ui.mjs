@@ -38,6 +38,6 @@ console.log('Modernização visual: páginas, seletores, pacote móvel e cache P
 
 assert.ok(signedRelease.includes('base64 --decode assets/capital-do-trem-logo.jpg.b64'), 'O APK final precisa gerar o ícone a partir da arte oficial.');
 assert.ok(signedRelease.includes('prepare-app-icons.py /tmp/capital-do-trem-logo.jpg'), 'A arte oficial deve ser a primeira fonte do ícone Android.');
-assert.ok(home.includes('linear-gradient(120deg,#ff4fa3 0%,#d629a7 45%,#8b35d6 100%)'), 'O botão do Instagram precisa manter o degradê rosa/roxo aprovado.');
+assert.ok(css.includes('.instagram-button{background:linear-gradient(120deg,#833ab4 0%,#c13584 28%,#e1306c 52%,#fd1d1d 72%,#f77737 88%,#fcaf45 100%)'), 'O botão do Instagram precisa manter o degradê completo aprovado.');
 assert.ok(inbox.includes('FALA UAI — lista de conversas no formato da referência enviada'), 'A lista FALA UAI precisa carregar o layout visual de referência.');
 assert.ok(inbox.includes('#conversations .official-group') && inbox.includes('#conversations .profile-avatar'), 'A lista FALA UAI precisa destacar o grupo oficial e os avatares.');
