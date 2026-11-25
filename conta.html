@@ -155,6 +155,12 @@ label{letter-spacing:.01em}
 <section class="card" id="profile-panel" hidden aria-labelledby="profile-title">
 <h2 id="profile-title">Sua área</h2>
 <p id="profile-welcome"></p>
+<div class="notice" id="google-link-panel" style="margin:12px 0">
+ <strong>🔗 Conectar conta Google</strong>
+ <p class="muted">Vincule seu Google a esta conta atual. Isso não cria outro perfil nem substitui seu acesso por e-mail e senha.</p>
+ <button type="button" class="secondary" id="google-link-account">Vincular minha conta Google</button>
+ <p id="google-link-status" class="status" role="status" aria-live="polite"></p>
+</div>
 <div id="admin-identity" class="admin-identity" hidden aria-label="Conta oficial verificada do administrador">
  <span class="admin-crown" aria-hidden="true">👑</span>
  <span class="admin-verified"><span class="admin-verified-mark" aria-hidden="true">✓</span> CONTA VERIFICADA</span>
@@ -679,6 +685,25 @@ function showSession(session){
         if(isAdmin)sessionStatus.textContent='Acesso de administrador confirmado.';
       }).catch(error=>console.warn('Não foi possível confirmar o selo administrativo:',error));
     }
+const googleLinkButton=document.getElementById('google-link-account');
+const googleLinkStatus=document.getElementById('google-link-status');
+googleLinkButton?.addEventListener('click',async()=>{
+ if(!auth){googleLinkStatus.textContent='Serviço de contas ainda está carregando. Tente novamente.';return;}
+ googleLinkButton.disabled=true;
+ googleLinkStatus.textContent='Preparando a vinculação segura com o Google…';
+ try{
+  const result=await auth.linkGoogleIdentityToCurrentAccount({redirectTo:window.location.href});
+  if(result?.alreadyLinked){
+   googleLinkStatus.textContent='Esta conta já possui um Google vinculado.';
+   googleLinkButton.hidden=true;
+  }else{
+   googleLinkStatus.textContent='Continue na tela do Google para confirmar a vinculação. Depois você voltará para esta mesma conta.';
+  }
+ }catch(error){
+  googleLinkStatus.textContent=error?.message||'Não foi possível iniciar a vinculação. Confira se a vinculação manual está habilitada no serviço de autenticação.';
+  googleLinkButton.disabled=false;
+ }
+});
     profilePanel.hidden=false;accessPanel.hidden=true;eventPanel.hidden=false;postPanel.hidden=false;basicProfilePanel.hidden=false;
     if(window.location.hash==='#delete-account-panel')window.setTimeout(()=>document.getElementById('delete-account-panel')?.scrollIntoView({behavior:'smooth',block:'start'}),180);
     loadProfileInstallCount();
