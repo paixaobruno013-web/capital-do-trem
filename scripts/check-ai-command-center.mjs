@@ -28,7 +28,7 @@ const checks = [
   [update.includes('Ao detectar o retorno real da internet, avisa imediatamente') && update.includes('reconnectTimer=window.setTimeout(()=>{alertBox.style.display=\'none\';},13000);'), 'Alerta de retorno dispara imediatamente e permanece 13 segundos'],
   [update.includes('setInterval(verifyRealConnection,1000)') && update.includes("window.addEventListener('offline',showOffline)"), 'Monitoramento automático de conexão sem toque na tela'],
   [account.includes('id="google-sign-in"') && authModule.includes("provider: 'google'") && account.includes('signInWithGoogleAccount'), 'Acesso Google disponível na tela de conta'],
-  [account.includes('id="phone-login-number"') && account.includes('id="phone-login-code"') && authModule.includes('sendPhoneLoginCode') && authModule.includes('verifyPhoneLoginCode') && authModule.includes('shouldCreateUser: false'), 'Acesso por SMS com código para contas já cadastradas']
+  [!account.includes('phone-login-number') && !account.includes('phone-login-code') && !authModule.includes('sendPhoneLoginCode') && !authModule.includes('verifyPhoneLoginCode'), 'Acesso por SMS removido; autenticação simplificada para Google e e-mail/senha']
 ];
 for (const [ok, label] of checks) { console.log((ok ? 'OK  ' : 'ERRO ') + label); if (!ok) process.exitCode = 1; }
 for (const [name, source] of [['capital-ai.js', ai], ['home-story-composer.js', camera]]) {
