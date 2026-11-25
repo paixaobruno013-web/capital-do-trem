@@ -1,8 +1,14 @@
-import {initSupabase,getCurrentSession,submitMyPost,getPostSocial,togglePostLike,addPostComment,updateMyPost,deleteMyPost} from './supabase/auth.js';
+import {initSupabase,getCurrentSession,submitMyPost,getPostSocial,togglePostLike,addPostComment,updateMyPost,deleteMyPost,getPublishedSongs} from './supabase/auth.js';
 import {loadPostMusic,createPostMusicControl} from './post-music.js';
 const supabase=initSupabase();
 const $=id=>document.getElementById(id);
 const root=$('home-feed-list'),form=$('home-feed-composer'),status=$('home-feed-status'),fileInput=$('home-feed-media'),fileName=$('home-feed-media-name'),preview=$('home-feed-preview'),previewStage=$('home-feed-preview-stage'),clearMedia=$('home-feed-clear-media'),caption=$('home-feed-text'),charCount=$('home-feed-char-count');
+const musicToggle=$('home-feed-music-toggle'),musicPanel=$('home-feed-music-panel'),musicSelect=$('home-feed-music-select'),musicStart=$('home-feed-music-start'),musicDuration=$('home-feed-music-duration'),musicPreview=$('home-feed-music-preview'),musicStatus=$('home-feed-music-status');
+let feedSongs=[],feedSongsLoaded=false,selectedFeedSongId='';
+function resetFeedMusicPreview(){if(musicPreview){musicPreview.pause();musicPreview.removeAttribute('src');musicPreview.hidden=true;}}
+async function loadFeedSongs(){if(feedSongsLoaded)return;musicToggle.disabled=true;if(musicStatus)musicStatus.textContent='Carregando músicas publicadas…';try{feedSongs=await getPublishedSongs();musicSelect.replaceChildren(new Option('Sem música',''));for(const song of feedSongs)musicSelect.add(new Option(song.title+' — '+song.artist_name,song.id));feedSongsLoaded=true;if(musicStatus)musicStatus.textContent=feedSongs.length?'Escolha uma faixa de qualquer artista e ouça a prévia.':'Ainda não há músicas publicadas.';}catch(error){if(musicStatus)musicStatus.textContent=error.message||'Não foi possível carregar as músicas.';}finally{musicToggle.disabled=false;}}
+musicToggle?.addEventListener('click',async()=>{musicPanel.hidden=!musicPanel.hidden;if(!musicPanel.hidden)await loadFeedSongs();});
+musicSelect?.addEventListener('change',()=>{selectedFeedSongId=musicSelect.value;const song=feedSongs.find(item=>item.id===selectedFeedSongId);resetFeedMusicPreview();if(song?.audio_url){musicPreview.src=song.audio_url;musicPreview.hidden=false;if(musicStatus)musicStatus.textContent='Selecionada: '+song.artist_name+' — '+song.title+'. Ajuste o trecho e ouça antes de publicar.';}else if(musicStatus)musicStatus.textContent='A publicação será feita sem música.';});
 let previewUrl='';
 function clearSelectedMedia(){if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl='';}if(fileInput)fileInput.value='';if(fileName)fileName.textContent='Nenhuma mídia selecionada';if(previewStage)previewStage.replaceChildren();if(preview)preview.hidden=true;}
 function renderSelectedMedia(file){clearSelectedMedia();if(!file)return;fileName.textContent=file.name+' • '+(file.size/1024/1024).toFixed(2)+' MB';previewUrl=URL.createObjectURL(file);const media=document.createElement(file.type.startsWith('video/')?'video':'img');media.src=previewUrl;media.className='home-feed-preview-media';if(media.tagName==='VIDEO'){media.controls=true;media.playsInline=true;}else media.alt='Prévia da foto que será publicada';previewStage.append(media);preview.hidden=false;}
@@ -95,6 +101,7 @@ if(root&&form){
   event.preventDefault();
   const text=$('home-feed-text').value.trim(),file=fileInput?.files?.[0];
   if(!text&&!file){status.textContent='Escreva uma mensagem ou escolha uma foto/vídeo.';return}
+  if(selectedFeedSongId&&(!file||!file.type.startsWith('image/'))){status.textContent='Para anexar música no Feed, escolha também uma foto. O trecho musical será exibido junto à publicação.';return}
   if(file){const allowed=['image/jpeg','image/png','image/webp','video/mp4','video/webm','video/quicktime'];if(!allowed.includes(file.type)){status.textContent='Formato não permitido.';return}const max=file.type.startsWith('image/')?10*1024*1024:50*1024*1024;if(file.size>max){status.textContent='Arquivo muito grande para publicar.';return}}
   const button=form.querySelector('button[type=submit]');button.disabled=true;status.textContent='Publicando…';
   let createdPost=null,uploadedPath=null;
@@ -109,7 +116,8 @@ if(root&&form){
     const row=await supabase.from('post_media').insert({post_id:createdPost.id,owner_id:session.user.id,bucket_id:'capital-do-trem-social',storage_path:uploadedPath,media_type:file.type.startsWith('video/')?'video':'image',mime_type:file.type,byte_size:file.size,alt_text:text.slice(0,200)});
     if(row.error)throw row.error;
    }
-   $('home-feed-text').value='';clearSelectedMedia();if(charCount)charCount.textContent='0/1500';status.textContent='Publicação compartilhada com os Maquinistas! ❤️';await load();
+   if(selectedFeedSongId){const start=Math.max(0,Math.min(3600,Number(musicStart?.value)||0));const duration=Math.max(5,Math.min(60,Number(musicDuration?.value)||15));const linked=await supabase.from('post_music').insert({post_id:createdPost.id,song_id:selectedFeedSongId,start_seconds:start,duration_seconds:duration,volume:0.8});if(linked.error)throw linked.error;}
+   $('home-feed-text').value='';clearSelectedMedia();selectedFeedSongId='';if(musicSelect)musicSelect.value='';resetFeedMusicPreview();if(charCount)charCount.textContent='0/1500';status.textContent='Publicação compartilhada com os Maquinistas! ❤️';await load();
   }catch(error){
    if(uploadedPath){try{const {error:removeError}=await supabase.storage.from('capital-do-trem-social').remove([uploadedPath]);if(removeError)console.error('Falha ao remover mídia órfã do Feed.',removeError);}catch(cleanupError){console.error('Falha ao limpar mídia órfã do Feed.',cleanupError);}}
    if(createdPost?.id){try{await deleteMyPost(createdPost.id);}catch(cleanupError){console.error('Falha ao reverter publicação incompleta.',cleanupError);}}
