@@ -11,6 +11,13 @@ const config: CapacitorConfig = {
   },
   android: {
     backgroundColor: '#000000'
+  },
+  plugins: {
+    LiveUpdate: {
+      readyTimeout: 10000,
+      autoBlockRolledBackBundles: true,
+      autoDeleteBundles: true
+    }
   }
 };
 
