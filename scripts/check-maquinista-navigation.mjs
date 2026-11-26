@@ -1,10 +1,10 @@
 import {readFile} from 'node:fs/promises';
 import {spawnSync} from 'node:child_process';
 const read=path=>readFile(new URL('../'+path,import.meta.url),'utf8');
-const files=['index.html','rede.html','bate-papo.html','mensagens.html','conta.html','admin.html','estudio.html','apoiadores.html','avatar.html','mobile-bottom-nav.js','home-feed.js','music-playlists.js','bate-papo.html','chat-topics.js','rede.html','rede.js','conta.html','supabase/auth.js','supabase/migrations/20261116170000_discussion_topics.sql','scripts/prepare-web.mjs','sw.js','capital-futurista.css'];
+const files=['index.html','rede.html','bate-papo.html','mensagens.html','conta.html','admin.html','estudio.html','apoiadores.html','avatar.html','diagnostico.html','admin-apoiadores.html','mobile-bottom-nav.js','home-feed.js','music-playlists.js','bate-papo.html','chat-topics.js','rede.html','rede.js','conta.html','supabase/auth.js','supabase/migrations/20261116170000_discussion_topics.sql','scripts/prepare-web.mjs','sw.js','capital-futurista.css'];
 const v=Object.fromEntries(await Promise.all(files.map(async p=>[p,await read(p)])));
 const checks=[
- [['index.html','rede.html','bate-papo.html','mensagens.html','conta.html','admin.html','estudio.html','apoiadores.html','avatar.html'].every(p=>v[p].includes('./mobile-bottom-nav.js'))&&v['mobile-bottom-nav.js'].includes('position:fixed!important')&&v['mobile-bottom-nav.js'].includes("href: './rede.html'"),'Barra inferior fixa permanece presente nas áreas principais do aplicativo'],
+ [['index.html','rede.html','bate-papo.html','mensagens.html','conta.html','admin.html','estudio.html','apoiadores.html','avatar.html','diagnostico.html','admin-apoiadores.html'].every(p=>v[p].includes('./mobile-bottom-nav.js'))&&v['mobile-bottom-nav.js'].includes('position:fixed!important')&&v['mobile-bottom-nav.js'].includes("href: './rede.html'"),'Barra inferior fixa permanece presente nas áreas principais do aplicativo'],
  [v['index.html'].includes('home-community-feed')&&v['index.html'].includes('home-feed-composer')&&v['index.html'].includes('home-feed.js'),'Feed com publicação fica na tela inicial'],
  [v['index.html'].includes('data-page="pesquisa"')&&v['index.html'].includes('random-video-results')&&v['home-feed.js'].includes('shuffle-videos'),'Pesquisa oferece vídeos aleatórios e filtro'],
  [v['index.html'].includes('capital-music-player')&&v['rede.html'].includes('class="playlist-manager card"')&&v['rede.js'].includes('api.createMyPlaylist'),'Central de Músicas tem player e o perfil tem criação de playlists'],
