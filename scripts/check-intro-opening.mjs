@@ -2,9 +2,9 @@ import { readFile } from 'node:fs/promises';
 const [index, admin, auth] = await Promise.all([
   readFile(new URL('../index.html', import.meta.url), 'utf8'),
   readFile(new URL('../admin.html', import.meta.url), 'utf8'),
-const storyComposer = await readFile(new URL('../home-story-composer.js', import.meta.url), 'utf8');
   readFile(new URL('../supabase/auth.js', import.meta.url), 'utf8')
 ]);
+const storyComposer = await readFile(new URL('../home-story-composer.js', import.meta.url), 'utf8');
 const pickerGuard = await readFile(new URL('../file-picker-guard.js', import.meta.url), 'utf8');
 const checks = [
   ['retorno do seletor restaura a rota antes da abertura', /const FILE_PICKER_RETURN_KEY/.test(index) && /FILE_PICKER_RETURN_URL_KEY/.test(index) && /intro-smoke-skip/.test(index) && /file-picker-guard\.js/.test(index)],
