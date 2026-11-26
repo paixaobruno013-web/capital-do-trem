@@ -99,7 +99,7 @@
     body { padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)) !important; }
     nav#nav {
       position:fixed!important;z-index:500!important;left:0!important;right:0!important;
-      bottom:0!important;top:auto!important;height:78px!important;display:flex!important;
+      bottom:0!important;top:auto!important;height:calc(78px + env(safe-area-inset-bottom,0px))!important;min-height:78px!important;box-sizing:border-box!important;display:flex!important;
       justify-content:space-around!important;align-items:center!important;gap:2px!important;
       padding:5px 8px calc(5px + env(safe-area-inset-bottom,0px))!important;
       margin:0!important;border-radius:0!important;border-top:1px solid #444!important;
