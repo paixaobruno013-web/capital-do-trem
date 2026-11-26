@@ -18,12 +18,18 @@ async function fetchLatestBundle() {
   );
   if (!release) return null;
   const zip = release.assets?.find(asset => asset.name === 'capital-do-trem-web-bundle.zip');
-  const checksumMatch = String(release.body || '').match(/SHA-256:\s*([a-f0-9]{64})/i);
-  if (!zip?.browser_download_url || !checksumMatch) {
-    throw new Error('Pacote de atualização incompleto ou sem SHA-256.');
+  const body = String(release.body || '');
+  const checksumMatch = body.match(/SHA-256:\s*([a-f0-9]{64})/i);
+  const signatureMatch = body.match(/RSA-SIGNATURE:\s*([A-Za-z0-9+/=]+)/);
+  if (!zip?.browser_download_url || !checksumMatch || !signatureMatch) {
+    throw new Error('Pacote de atualização incompleto, sem SHA-256 ou sem assinatura RSA.');
   }
-  const checksum = checksumMatch[1].toLowerCase();
-  return { bundleId: release.tag_name, url: zip.browser_download_url, checksum, signature: signatureMatch[1] };
+  return {
+    bundleId: release.tag_name,
+    url: zip.browser_download_url,
+    checksum: checksumMatch[1].toLowerCase(),
+    signature: signatureMatch[1]
+  };
 }
 
 async function checkForUpdate() {
@@ -48,6 +54,7 @@ async function checkForUpdate() {
       url: latest.url,
       bundleId: latest.bundleId,
       checksum: latest.checksum,
+      signature: latest.signature,
       artifactType: 'zip'
     });
   }
