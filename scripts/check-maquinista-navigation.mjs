@@ -9,16 +9,15 @@ const checks=[
  [v['index.html'].includes('data-page="pesquisa"')&&v['index.html'].includes('random-video-results')&&v['home-feed.js'].includes('shuffle-videos'),'Pesquisa oferece vídeos aleatórios e filtro'],
  [v['index.html'].includes('capital-music-player')&&v['rede.html'].includes('class="playlist-manager card"')&&v['rede.js'].includes('api.createMyPlaylist'),'Central de Músicas tem player e o perfil tem criação de playlists'],
  [v['supabase/auth.js'].includes('export async function getPublishedSongs')&&v['supabase/auth.js'].includes('storage.createSignedUrls(paths, 60 * 60)'),'Músicas publicadas ficam disponíveis automaticamente com links temporários'],
- [v['bate-papo.html'].includes('GRUPO • CAPITAL do TREM')&&v['bate-papo.html'].includes('id="chat-topics"')&&v['bate-papo.html'].includes('id="fazer-amigos"')&&!v['bate-papo.html'].includes('id="private-conversations-shortcut"'),'Chat mantém grupo e assuntos, com amizades no rodapé e conversas individuais sem atalho PRIVADO'],
+ [v['bate-papo.html'].includes('GRUPO • CAPITAL do TREM')&&!v['bate-papo.html'].includes('id="chat-topics"')&&v['bate-papo.html'].includes('id="fazer-amigos"')&&!v['bate-papo.html'].includes('id="private-conversations-shortcut"'),'Chat mantém o grupo e amizades, sem criação de assuntos ou atalho PRIVADO'],
  [!v['bate-papo.html'].includes('fala-uai-player')&&!v['bate-papo.html'].includes('createCapitalMusicPlayer'),'Chat não mistura player musical'],
- [v['supabase/auth.js'].includes('getDiscussionTopics')&&v['supabase/auth.js'].includes('sendDiscussionMessage')&&v['chat-topics.js'].includes('subscribeDiscussionMessages'),'Salas por assunto suportam mensagens em tempo real'],
- [v['supabase/migrations/20261116170000_discussion_topics.sql'].includes('enable row level security')&&v['supabase/migrations/20261116170000_discussion_topics.sql'].includes('discussion_topic_messages_insert_members'),'Salas e mensagens têm RLS e participação obrigatória'],
+ [!v['bate-papo.html'].includes('chat-topics.js')&&!v['sw.js'].includes('chat-topics.js'),'Página do chat não carrega o módulo de assuntos nem o coloca no cache'],
  [v['rede.html'].includes('profile-hidden-data')&&v['rede.html'].includes('profile-verified-seal')&&v['rede.html'].includes('stat-followers')&&v['rede.html'].includes('stat-following'),'Perfil fica focado em dados pessoais, seguidores e selo'],
  [v['rede.js'].includes("eq('status','published')")&&v['rede.js'].includes('profile-verified-seal'),'Selo aparece apenas para artistas publicados/aprovados'],
  [v['conta.html'].includes('SEJA BEM-VINDO')&&v['conta.html'].includes('MAQUINISTA DESSE TREM'),'Cadastro recebe mensagem de boas-vindas do projeto'],
  [v['conta.html'].includes('nome, foto, nome de usuário e descrição são opcionais')&&!/<input id="basic-display-name"[^>]*required/.test(v['conta.html']),'Nome do perfil pode ficar em branco; o perfil continua automático'],
  [v['scripts/prepare-web.mjs'].includes('home-feed.js')&&v['scripts/prepare-web.mjs'].includes('music-playlists.js')&&v['scripts/prepare-web.mjs'].includes('chat-topics.js'),'Todos os módulos entram nos pacotes nativos'],
- [v['sw.js'].includes('home-feed.js')&&v['sw.js'].includes('music-playlists.js')&&v['sw.js'].includes('chat-topics.js'),'Todos os módulos entram no cache PWA']
+ [v['sw.js'].includes('home-feed.js')&&v['sw.js'].includes('music-playlists.js')&&!v['sw.js'].includes('chat-topics.js'),'Módulos essenciais entram no cache PWA sem o módulo de assuntos']
 ];
 for(const [ok,label] of checks){console.log((ok?'OK  ':'ERRO ')+label);if(!ok)process.exitCode=1;}
 for(const [name,source] of [['home-feed.js',v['home-feed.js']],['music-playlists.js',v['music-playlists.js']],['chat-topics.js',v['chat-topics.js']],['rede.js',v['rede.js']],['supabase/auth.js',v['supabase/auth.js']]]){
