@@ -28,6 +28,6 @@ assert(updater.indexOf('await LiveUpdate.ready()') < updater.indexOf("if (Capaci
 assert(updater.includes('setNextBundle'), 'Pacote baixado precisa ser preparado para a próxima abertura.');
 assert(!updater.includes('LiveUpdate.reload()'), 'Atualização não pode reiniciar a interface no meio do uso.');
 assert(updater.includes('CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000'), 'Verificação deve respeitar intervalo para economizar bateria.');
-assert(/if \(!latest\)[\\s\\S]*LAST_CHECK_KEY/.test(updater), 'Ausência de release também precisa respeitar o intervalo de consulta.');
+assert(/if \(!latest\)[\s\S]*LAST_CHECK_KEY/.test(updater), 'Ausência de release também precisa respeitar o intervalo de consulta.');
 
 console.log('Atualizador remoto: compatibilidade, checksum, rollback, intervalo e aplicação na próxima abertura conferidos.');
