@@ -163,7 +163,7 @@ function buildProfileMediaActions(post,item,index,url){
   const download=add(item.media_type==='video'?'⬇️ Fazer download do vídeo':'⬇️ Fazer download da foto',async()=>{download.disabled=true;try{const ext=(item.storage_path.split('.').pop()||(item.media_type==='video'?'mp4':'jpg')).toLowerCase();await downloadPostMedia(url,'capital-do-trem-'+post.id+'-'+(index+1)+'.'+ext,item.media_type)}catch(e){notice('global-status',e.message||'Não foi possível baixar a mídia.')}finally{download.disabled=false}});
  };
 }
-function renderProfile(p,stats,own){const avatar=$('profile-avatar');if(avatar)setAvatar(avatar,p);const verifiedSeal=$('profile-verified-seal');if(verifiedSeal){verifiedSeal.hidden=true;if(p.account_type==='artist')supabase.from('artists').select('id').eq('user_id',p.user_id).eq('status','published').maybeSingle().then(({data,error})=>{verifiedSeal.hidden=!!error||!data}).catch(()=>{verifiedSeal.hidden=true})}const cover=$('profile-cover');if(cover){if(p.cover_url){cover.src=p.cover_url;cover.style.objectFit='cover'}else{cover.removeAttribute('src');cover.style.objectFit='cover'}makeProfileImageOpenable(cover,'foto de capa')}makeProfileImageOpenable(avatar,'foto de perfil');for(const [id,value] of [['profile-name',p.display_name||'Usuário Uai'],['profile-handle','@'+(p.username||'')],['profile-city',p.city||'Cidade não informada'],['profile-bio',p.bio||''],['stat-posts',stats.posts],['stat-followers',stats.followers],['stat-following',stats.following]]){const el=$(id);if(el)el.textContent=value};for(const [id,kind,label] of [['stat-followers','followers','Abrir lista de seguidores'],['stat-following','following','Abrir lista de perfis seguidos']]){const count=$(id);if(count){count.setAttribute('role','button');count.setAttribute('tabindex','0');count.setAttribute('aria-label',label);count.style.cursor='pointer';count.onclick=()=>showFollowDirectory(kind,p.user_id);count.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();showFollowDirectory(kind,p.user_id)}}}}const editor=$('profile-edit');if(editor)editor.hidden=!own;const actions=$('profile-actions');if(actions){actions.replaceChildren();if(!own){const b=document.createElement('button');b.className='btn primary';b.textContent='Seguir';b.onclick=()=>toggleFollow(p.user_id,b);actions.append(b)}}}
+function renderProfile(p,stats,own){const avatar=$('profile-avatar');if(avatar)setAvatar(avatar,p);const verifiedSeal=$('profile-verified-seal');if(verifiedSeal){verifiedSeal.hidden=true;if(p.account_type==='artist')supabase.from('artists').select('id').eq('user_id',p.user_id).eq('status','published').maybeSingle().then(({data,error})=>{verifiedSeal.hidden=!!error||!data}).catch(()=>{verifiedSeal.hidden=true})}const cover=$('profile-cover');if(cover){if(p.cover_url){cover.src=p.cover_url;cover.style.objectFit='cover'}else{cover.removeAttribute('src');cover.style.objectFit='cover'}makeProfileImageOpenable(cover,'foto de capa')}makeProfileImageOpenable(avatar,'foto de perfil');for(const [id,value] of [['profile-name',p.display_name||'Usuário Uai'],['profile-handle','@'+(p.username||'')],['profile-city',p.city||'Cidade não informada'],['profile-bio',p.bio||''],['stat-posts',stats.posts],['stat-followers',stats.followers],['stat-following',stats.following]]){const el=$(id);if(el)el.textContent=value};for(const [id,kind,label] of [['stat-followers','followers','Abrir lista de seguidores'],['stat-following','following','Abrir lista de perfis seguidos']]){const count=$(id),wrap=$(id+'-wrap');if(count&&wrap){wrap.setAttribute('role','button');wrap.setAttribute('tabindex','0');wrap.setAttribute('aria-label',label);wrap.onclick=()=>showFollowDirectory(kind,p.user_id);wrap.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();showFollowDirectory(kind,p.user_id)}}}}const editor=$('profile-edit');if(editor)editor.hidden=!own;const actions=$('profile-actions');if(actions){actions.replaceChildren();if(!own){const b=document.createElement('button');b.className='btn primary';b.textContent='Seguir';b.onclick=()=>toggleFollow(p.user_id,b);actions.append(b)}}}
 async function getStats(userId){
  const [posts,followers,following]=await Promise.all([
   supabase.from('posts').select('id',{count:'exact',head:true}).eq('author_id',userId).eq('status','published'),
@@ -177,35 +177,47 @@ async function getStats(userId){
 async function showFollowDirectory(kind,userId){
  const title=kind==='followers'?'Seguidores':'Seguindo';
  let dialog=document.getElementById('profile-follow-directory');
- if(!dialog){
-  dialog=document.createElement('section');dialog.id='profile-follow-directory';dialog.className='card';
-  dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-labelledby','profile-follow-directory-title');
-  dialog.style.cssText='position:fixed;z-index:1200;inset:8% 14px auto;margin:auto;width:min(520px,calc(100% - 28px));max-height:84vh;overflow:auto;background:var(--panel,#111);border:1px solid var(--red,#ed1c24);border-radius:18px;padding:18px;box-shadow:0 18px 60px #000c';
-  document.body.append(dialog);
- }
+ if(!dialog){dialog=document.createElement('section');dialog.id='profile-follow-directory';dialog.className='card';dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-labelledby','profile-follow-directory-title');dialog.style.cssText='position:fixed;z-index:1200;inset:8% 14px auto;margin:auto;width:min(520px,calc(100% - 28px));max-height:84vh;overflow:auto;background:var(--panel,#111);border:1px solid var(--red,#ed1c24);border-radius:18px;padding:18px;box-shadow:0 18px 60px #000c';document.body.append(dialog);}
  dialog.replaceChildren();
  const heading=document.createElement('h2');heading.id='profile-follow-directory-title';heading.textContent=title;
  const close=document.createElement('button');close.type='button';close.className='btn';close.textContent='Fechar';close.addEventListener('click',()=>{dialog.hidden=true;});
  const status=document.createElement('p');status.className='muted';status.textContent='Carregando perfis…';
- const list=document.createElement('div');list.className='follow-directory-list';
- dialog.append(heading,close,status,list);dialog.hidden=false;
+ const search=document.createElement('input');search.type='search';search.placeholder='Buscar por nome ou @usuário…';search.setAttribute('aria-label','Buscar '+title.toLowerCase());search.autocomplete='off';
+ const list=document.createElement('div');list.className='follow-directory-list';dialog.append(heading,close,search,status,list);dialog.hidden=false;
  try{
   const column=kind==='followers'?'follower_id':'followed_id';
-  const relation=await supabase.from('profile_follows').select(column).eq(kind==='followers'?'followed_id':'follower_id',userId).limit(100);
-  if(relation.error)throw relation.error;
-  const ids=(relation.data||[]).map(row=>row[column]).filter(Boolean);
-  if(!ids.length){status.textContent=kind==='followers'?'Este perfil ainda não tem seguidores.':'Este perfil ainda não segue outros usuários.';return;}
-  const people=await supabase.from('profiles').select('user_id,display_name,username,city,avatar_type,avatar_url,avatar_data').in('user_id',ids).eq('is_public',true).limit(100);
-  if(people.error)throw people.error;
-  status.textContent=people.data?.length?ids.length>100?'Mostrando até 100 perfis públicos.':'': 'Os perfis estão privados ou indisponíveis.';
-  for(const person of people.data||[]){
-   const row=document.createElement('a');row.className='user-row';row.href='./rede.html?perfil='+encodeURIComponent(person.user_id);row.style.cssText='display:flex;align-items:center;gap:12px;padding:10px 0;color:inherit;text-decoration:none;border-bottom:1px solid var(--line,#333)';
-   const avatar=document.createElement('img');avatar.width=44;avatar.height=44;avatar.style.cssText='width:44px;height:44px;border-radius:50%;object-fit:cover';setAvatar(avatar,person);
-   const copy=document.createElement('span');copy.className='grow';
-   const name=document.createElement('strong');name.textContent=person.display_name||'Usuário Uai';
-   const meta=document.createElement('small');meta.className='muted';meta.textContent='@'+(person.username||'')+(person.city?' · '+person.city:'');
-   copy.append(name,document.createElement('br'),meta);row.append(avatar,copy);list.append(row);
+  const filter=kind==='followers'?'followed_id':'follower_id';
+  const ids=[];const pageSize=500;let from=0;
+  while(true){
+   const relation=await supabase.from('profile_follows').select(column).eq(filter,userId).range(from,from+pageSize-1);
+   if(relation.error)throw relation.error;
+   const batch=(relation.data||[]).map(row=>row[column]).filter(Boolean);ids.push(...batch);
+   if(batch.length<pageSize)break;
+   from+=pageSize;
   }
+  if(!ids.length){status.textContent=kind==='followers'?'Este perfil ainda não tem seguidores.':'Este perfil ainda não segue outros usuários.';search.hidden=true;return;}
+  const peopleRows=[];
+  for(let i=0;i<ids.length;i+=100){
+   const people=await supabase.from('profiles').select('user_id,display_name,username,city,avatar_type,avatar_url,avatar_data').in('user_id',ids.slice(i,i+100)).eq('is_public',true);
+   if(people.error)throw people.error;
+   peopleRows.push(...(people.data||[]));
+  }
+  const people=peopleRows.sort((a,b)=>(a.display_name||a.username||'').localeCompare(b.display_name||b.username||'','pt-BR'));
+  function renderMatches(){
+   const query=search.value.trim().toLocaleLowerCase('pt-BR');list.replaceChildren();let shown=0;
+   for(const person of people){
+    const name=person.display_name||'Usuário Uai';const username='@'+(person.username||'');
+    if(query&&!((name+' '+username+' '+(person.city||'')).toLocaleLowerCase('pt-BR').includes(query)))continue;
+    const row=document.createElement('a');row.className='user-row';row.href='./rede.html?perfil='+encodeURIComponent(person.user_id);row.style.cssText='display:flex;align-items:center;gap:12px;padding:10px 0;color:inherit;text-decoration:none;border-bottom:1px solid var(--line,#333)';
+    const avatar=document.createElement('img');avatar.width=44;avatar.height=44;avatar.style.cssText='width:44px;height:44px;border-radius:50%;object-fit:cover';setAvatar(avatar,person);
+    const copy=document.createElement('span');copy.className='grow';const label=document.createElement('strong');label.textContent=name;
+    const meta=document.createElement('small');meta.className='muted';meta.textContent=username+(person.city?' · '+person.city:'');
+    copy.append(label,document.createElement('br'),meta);row.append(avatar,copy);list.append(row);shown++;
+   }
+   if(!shown){const empty=document.createElement('p');empty.className='muted';empty.textContent='Nenhum perfil encontrado com essa pesquisa.';list.append(empty);}
+   status.textContent=shown+' perfil(is) encontrado(s).';
+  }
+  search.addEventListener('input',renderMatches);renderMatches();
  }catch(error){status.textContent=error?.message||'Não foi possível carregar essa lista agora.';}
 }
 
