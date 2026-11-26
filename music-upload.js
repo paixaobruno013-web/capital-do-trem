@@ -166,6 +166,7 @@ if (form && access && status && fileInput && submit) {
     }
   };
   fileInput.addEventListener('change', async () => {
+    audioSelectionVersion += 1;
     const file = fileInput.files?.[0];
     status.textContent = file ? 'Preparando cópia segura do áudio…' : '';
     if (!file) { await clearAudioDraft(); return; }
