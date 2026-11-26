@@ -32,7 +32,7 @@ assert.ok(prepare.includes("'capital-modern-ui.css'"),
   'A folha visual precisa ser copiada para o pacote www/Android/iOS');
 assert.ok(sw.includes("'./capital-modern-ui.css'"),
   'A folha visual precisa integrar o cache complementar do PWA');
-assert.ok(sw.includes("capital-do-trem-v315"),
+assert.ok(sw.includes("capital-do-trem-v316"),
   'O cache PWA precisa ser renovado para publicar os novos estilos');
 
 assert.ok(update.includes("message.textContent='🚂 NOVA ATUALIZAÇÃO DISPONÍVEL'"), 'O aviso de atualização deve ser compacto e identificável');
