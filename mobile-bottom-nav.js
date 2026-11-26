@@ -22,7 +22,7 @@
   nav.setAttribute('aria-label', 'Navegação principal');
   const items = [
     { id: 'feed', label: 'Feed', icon: '⌂', href: './index.html#inicio' },
-    { id: 'chat', label: 'Chat', icon: '💬', href: './mensagens.html' },
+    { id: 'chat', label: 'Chat', icon: '💬', href: './bate-papo.html' },
     { id: 'musicas', label: 'Músicas', icon: '♫', href: './index.html#musicas' },
     { id: 'pesquisa', label: 'Pesquisa', icon: '⌕', href: './index.html#pesquisa' },
     { id: 'perfil', label: 'Perfil', icon: '♙', href: './rede.html' }
