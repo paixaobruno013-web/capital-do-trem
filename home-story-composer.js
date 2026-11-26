@@ -130,8 +130,8 @@ async function startCamera() {
       cameraStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: { ideal: facingMode },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
           frameRate: { ideal: 24, max: 30 }
         },
         audio: false
@@ -162,15 +162,15 @@ async function startCamera() {
     live.hidden = false;
     applyEffect();
     await live.play();
-    if (!live.videoWidth || !live.videoHeight) {
-      await new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => reject(new Error('A câmera demorou para iniciar')), 4500);
-        live.addEventListener('loadedmetadata', () => { clearTimeout(timeout); resolve(); }, { once: true });
-        live.addEventListener('error', () => { clearTimeout(timeout); reject(new Error('Falha na prévia da câmera')); }, { once: true });
-      });
-    }
-    message.textContent = 'Câmera aberta • escolha Foto, Vídeo ou Álbum';
-    say('Câmera pronta. Escolha um efeito ou capture sua mídia.');
+    // Não bloquear a abertura do estúdio esperando metadados: a prévia termina de iniciar em segundo plano.
+    live.addEventListener('loadeddata', () => {
+      if (requestId === cameraRequestId && modal?.classList.contains('is-open')) {
+        message.textContent = 'Câmera aberta • escolha Foto, Vídeo ou Álbum';
+        say('Câmera pronta. Escolha um efeito ou capture sua mídia.');
+      }
+    }, { once: true });
+    message.textContent = 'Câmera conectada • preparando a prévia…';
+    say('A câmera está iniciando. Você já pode escolher uma mídia do álbum.');
     return true;
   } catch (error) {
     if (requestId !== cameraRequestId || !modal?.classList.contains('is-open')) return false;
@@ -253,33 +253,29 @@ function capturePhoto() {
     say('A câmera ainda não está pronta. Aguarde ou escolha uma mídia do álbum.');
     return;
   }
-  // Limita a imagem final a 2048 px no lado maior: mantém boa definição para Stories
-  // sem travar o aparelho ao codificar quadros 4K muito pesados.
+  // Reduz o quadro para até 1600 px e codifica em segundo plano; evita toDataURL,
+  // que cria uma string enorme e pode congelar aparelhos Android mais modestos.
   const sourceWidth = live.videoWidth;
   const sourceHeight = live.videoHeight;
   const captureZoom = hardwareZoomActive ? 1 : cameraZoom;
   const cropWidth = sourceWidth / captureZoom;
   const cropHeight = sourceHeight / captureZoom;
-  const scale = Math.min(1, 2048 / Math.max(cropWidth, cropHeight));
+  const scale = Math.min(1, 1600 / Math.max(cropWidth, cropHeight));
   const canvas = document.createElement('canvas');
   canvas.width = Math.max(1, Math.round(cropWidth * scale));
   canvas.height = Math.max(1, Math.round(cropHeight * scale));
   const context = canvas.getContext('2d', { alpha: false });
   if (!context) { say('Não foi possível preparar a foto. Tente novamente.'); return; }
   context.imageSmoothingEnabled = true;
-  context.imageSmoothingQuality = 'high';
+  context.imageSmoothingQuality = 'medium';
   context.drawImage(live,
     (sourceWidth - cropWidth) / 2, (sourceHeight - cropHeight) / 2, cropWidth, cropHeight,
     0, 0, canvas.width, canvas.height);
-  // Congela e mostra o quadro imediatamente; a codificação do arquivo acontece em paralelo.
-  // Assim a pessoa vê o resultado do clique sem esperar o JPEG terminar de ser criado.
   live.pause();
   live.hidden = true;
-  photoPreview.hidden = false;
-  photoPreview.src = canvas.toDataURL('image/jpeg', 0.86);
-  photoPreview.style.filter = effectCss();
+  photoPreview.hidden = true;
   message.textContent = 'Sua foto';
-  say('Foto capturada • preparando o arquivo…');
+  say('Foto capturada • otimizando imagem…');
   canvas.toBlob(blob => {
     if (!blob) {
       live.hidden = false;
@@ -291,7 +287,7 @@ function capturePhoto() {
     setSelected(new File([blob], 'capital-do-trem-story.jpg', { type: 'image/jpeg' }));
     applyEffect();
     say('Foto pronta! Veja como ficou e escolha publicar ou salvar.');
-  }, 'image/jpeg', 0.92);
+  }, 'image/jpeg', 0.84);
 }
 function startFilteredRecording() {
   const canvas = document.createElement('canvas');
@@ -562,6 +558,7 @@ async function publishStory() {
 const musicToggle = el('home-story-music-toggle');
 const musicPanel = el('home-story-music-panel');
 const musicSelect = el('home-story-music-select');
+const musicSearch = el('home-story-music-search');
 const musicStatus = el('home-story-music-status');
 let musicPreview = null;
 function mountStoryMusicPreview() {
@@ -574,6 +571,21 @@ function mountStoryMusicPreview() {
   musicPreview.style.cssText = 'display:block;width:100%;margin-top:10px';
   musicPanel.append(musicPreview);
 }
+function renderStorySongOptions() {
+  if (!musicSelect) return;
+  const query = String(musicSearch?.value || '').trim().toLocaleLowerCase('pt-BR');
+  const selected = selectedStoryMusicId;
+  const filtered = storySongs.filter(song =>
+    [song.title, song.artist_name].some(value => String(value || '').toLocaleLowerCase('pt-BR').includes(query))
+  );
+  musicSelect.replaceChildren(new Option('Sem música', ''));
+  for (const song of filtered) musicSelect.add(new Option(song.title + ' — ' + song.artist_name, song.id));
+  if (filtered.some(song => song.id === selected)) musicSelect.value = selected;
+  if (musicStatus && storySongsLoaded) musicStatus.textContent = filtered.length
+    ? filtered.length + ' música(s) do catálogo. Escolha uma faixa para seu Story.'
+    : 'Nenhuma música encontrada com esse nome.';
+}
+musicSearch?.addEventListener('input', renderStorySongOptions);
 musicToggle?.addEventListener('click', async () => {
   musicPanel.hidden = !musicPanel.hidden;
   if (musicPanel.hidden || storySongsLoaded) return;
@@ -582,10 +594,10 @@ musicToggle?.addEventListener('click', async () => {
   try {
     const songs = await auth.getPublishedSongs();
     storySongs = songs;
-    musicSelect.replaceChildren(new Option('Sem música', ''));
-    for (const song of songs) musicSelect.add(new Option(song.title + ' — ' + song.artist_name, song.id));
-    mountStoryMusicPreview();
     storySongsLoaded = true;
+    renderStorySongOptions();
+    musicSearch?.focus();
+    mountStoryMusicPreview();
     if (musicStatus) musicStatus.textContent = songs.length ? 'Escolha a trilha do seu Story.' : 'Ainda não há músicas publicadas no catálogo.';
   } catch (error) {
     if (musicStatus) musicStatus.textContent = error?.message || 'Não foi possível carregar as músicas.';
