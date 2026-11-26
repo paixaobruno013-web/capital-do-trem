@@ -94,7 +94,7 @@ async function startLiveUpdates() {
   if (Capacitor.getPlatform() !== 'android') return;
 
   // Verifica na abertura e novamente quando o usuário retorna ao aplicativo.
-  // O intervalo de seis horas evita consultas repetidas e economiza bateria/dados.
+  // O intervalo de quinze minutos equilibra atualização rápida e economia de bateria/dados.
   void checkForUpdateSingleFlight();
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') void checkForUpdateSingleFlight();
