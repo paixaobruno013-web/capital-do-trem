@@ -100,7 +100,7 @@ export async function signInAccount({ email, password }) {
   return data;
 }
 
-export async function signInWithGoogleAccount({ redirectTo = window.location.href } = {}) {
+export async function signInWithGoogleAccount({ redirectTo = 'https://paixaobruno013-web.github.io/capital-do-trem/conta.html' } = {}) {
   const supabase = initSupabase();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
@@ -113,7 +113,7 @@ export async function signInWithGoogleAccount({ redirectTo = window.location.hre
   return data;
 }
 
-export async function linkGoogleIdentityToCurrentAccount({ redirectTo = window.location.href } = {}) {
+export async function linkGoogleIdentityToCurrentAccount({ redirectTo = 'https://paixaobruno013-web.github.io/capital-do-trem/conta.html' } = {}) {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
