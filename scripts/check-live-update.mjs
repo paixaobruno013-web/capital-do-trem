@@ -15,7 +15,10 @@ assert(pkg.devDependencies?.esbuild, 'Empacotador do módulo de atualização au
 assert(config.includes('readyTimeout: 10000'), 'Proteção de rollback precisa ter prazo de inicialização.');
 assert(config.includes('autoBlockRolledBackBundles: true'), 'Pacotes que falharem precisam ser bloqueados após rollback.');
 assert(html.includes('src="./live-update.js"'), 'Carregador do atualizador não está ligado à página principal.');
-assert(sw.includes("'./live-update.js'"), 'Service worker não inclui o módulo de atualização.');
+const shim = await readFile('live-update.js', 'utf8');
+assert(shim.includes('isNativePlatform()') && shim.includes("import('./live-update-native.js')"), 'A PWA deve ignorar o SDK nativo e carregá-lo apenas em WebView.');
+assert(sw.includes("'./live-update.js'"), 'Service worker não inclui o carregador compartilhado.');
+assert(sw.includes("'./live-update-native.js'"), 'Service worker não inclui o módulo nativo gerado.');
 assert(updater.includes("startsWith('web-update-')"), 'Filtro de publicação precisa aceitar somente releases de atualização web.');
 assert(updater.includes('checksum: latest.checksum'), 'Download precisa validar SHA-256.');
 assert(updater.includes("Capacitor.getPlatform() !== 'android'"), 'Download remoto precisa ser restrito ao Android nativo.');
