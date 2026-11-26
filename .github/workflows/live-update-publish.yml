@@ -35,7 +35,7 @@ jobs:
             exit 0
           fi
           changed="$(git diff --name-only "$BEFORE_SHA" "$CURRENT_SHA")"
-          if printf '%s\n' "$changed" | grep -Eq '^(package\.json|capacitor\.config\.ts|live-update-entry\.js|live-update\.js|scripts/prepare-web\.mjs|scripts/configure-android-media\.py|scripts/prepare-ios-info\.py|\.github/release-triggers/.*)$'; then
+          if printf '%s\n' "$changed" | grep -Eq '^(package\.json|capacitor\.config\.ts|live-update\.js|scripts/prepare-web\.mjs|scripts/configure-android-media\.py|scripts/prepare-ios-info\.py|\.github/release-triggers/.*)$'; then
             echo "publish=false" >> "$GITHUB_OUTPUT"
             echo "Alteração nativa/de empacotamento detectada. Nenhum pacote OTA será publicado."
           else
