@@ -68,7 +68,7 @@ jobs:
           test -s capital-do-trem-web-bundle.zip
           sha256sum capital-do-trem-web-bundle.zip | awk '{print $1}' > capital-do-trem-web-bundle.sha256
           test "$(wc -c < capital-do-trem-web-bundle.sha256)" -eq 65
-          printf 'Pacote web para atualização remota do Capital do Trem.\\nCompatível apenas com alterações HTML, CSS, JavaScript e arquivos web.\\nSHA-256: %s\\n' "$(cat capital-do-trem-web-bundle.sha256)" > release-notes.md
+          printf 'Pacote web para atualização remota do Capital do Trem.\nCompatível apenas com alterações HTML, CSS, JavaScript e arquivos web.\nSHA-256: %s\n' "$(cat capital-do-trem-web-bundle.sha256)" > release-notes.md
       - name: Publicar pacote remoto gratuito
         if: steps.native_guard.outputs.publish == 'true'
         uses: softprops/action-gh-release@v2
