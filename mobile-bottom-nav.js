@@ -8,19 +8,30 @@
   sharedNavStyle.id = 'capital-nav-size-standard';
   sharedNavStyle.textContent = `
     @media (max-width: 759px) {
-      nav#nav { height:76px!important; min-height:76px!important; gap:5px!important; padding:7px 8px calc(7px + env(safe-area-inset-bottom,0px))!important; }
-      nav#nav > a, nav#nav > button { flex:0 0 68px!important; width:68px!important; min-width:68px!important; max-width:68px!important; min-height:48px!important; padding:8px 8px!important; display:flex!important; flex-direction:column!important; align-items:center!important; justify-content:center!important; gap:2px!important; font:700 12px/1.15 system-ui,Arial,sans-serif!important; text-align:center!important; white-space:normal!important; }
-      nav#nav > a > span:first-child, nav#nav > button > span:first-child { display:block!important; font-size:17px!important; line-height:18px!important; margin:0!important; }
-      nav#nav > a > span:last-child, nav#nav > button > span:last-child { display:block!important; font-size:12px!important; line-height:1.15!important; margin:0!important; }
-      nav#nav > button:before { font-size:17px!important; line-height:18px!important; }
+      nav#nav { height:calc(76px + env(safe-area-inset-bottom,0px))!important; min-height:76px!important; gap:2px!important; padding:5px 8px calc(5px + env(safe-area-inset-bottom,0px))!important; justify-content:space-around!important; align-items:center!important; overflow:hidden!important; }
+      nav#nav > a, nav#nav > button { box-sizing:border-box!important; flex:1 1 20%!important; width:20%!important; min-width:0!important; max-width:20%!important; min-height:52px!important; height:52px!important; padding:4px 1px!important; display:flex!important; flex-direction:column!important; align-items:center!important; justify-content:center!important; gap:3px!important; font:700 11px/1.1 system-ui,Arial,sans-serif!important; text-align:center!important; white-space:normal!important; }
+      nav#nav > a > span:first-child, nav#nav > button > span:first-child { display:block!important; font-size:19px!important; line-height:21px!important; width:auto!important; height:21px!important; margin:0!important; }
+      nav#nav > a > span:last-child, nav#nav > button > span:last-child { display:block!important; font-size:10px!important; line-height:12px!important; margin:0!important; }
+      nav#nav > button:before { display:none!important; }
     }
-  `;
+  `;;
   if (!document.getElementById(sharedNavStyle.id)) document.head.append(sharedNavStyle);
 
   // Na página inicial, preserva integralmente o cabeçalho no Feed.
   // Ao entrar em Músicas ou Pesquisa, recolhe apenas o bloco superior,
   // sem alterar o conteúdo nem a barra inferior.
   if (isHome) {
+    const homeItems = [
+      ['button[data-page="inicio"]','⌂','Feed'],['a.nav-chat','💬','Chat'],
+      ['button[data-page="musicas"]','♫','Músicas'],['button[data-page="pesquisa"]','⌕','Pesquisa'],['a.nav-profile','👤','Perfil']
+    ];
+    for (const [selector, glyph, label] of homeItems) {
+      const item = document.querySelector('nav#nav '+selector);
+      if (!item || item.querySelector('.nav-icon')) continue;
+      const icon = document.createElement('span'); icon.className='nav-icon'; icon.setAttribute('aria-hidden','true'); icon.textContent=glyph;
+      const caption = document.createElement('span'); caption.className='nav-label'; caption.textContent=label;
+      item.replaceChildren(icon,caption);
+    }
     const homeStyle = document.createElement('style');
     homeStyle.id = 'capital-home-header-by-section';
     homeStyle.textContent = 'body.cdt-secondary-section > header { display:none !important; }';
@@ -139,6 +150,8 @@
   `;
   document.head.append(style);
   document.body.append(nav);
+  // Garante que o mesmo padrão visual prevaleça sobre estilos antigos das páginas internas.
+  document.head.append(sharedNavStyle);
   updateActive();
   window.addEventListener('hashchange', updateActive);
 
