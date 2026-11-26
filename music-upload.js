@@ -144,10 +144,13 @@ if (form && access && status && fileInput && submit) {
       } finally { db.close(); }
     } catch (error) { console.warn('Não foi possível limpar o áudio temporário.', error); }
   };
+  let audioSelectionVersion = 0;
   const restoreAudioDraft = async () => {
+    const versionAtStart = audioSelectionVersion;
     try {
       if (fileInput.files?.length) return;
       const draft = await readAudioDraft();
+      if (versionAtStart !== audioSelectionVersion || fileInput.files?.length) return;
       if (!draft?.blob || Date.now() - Number(draft.savedAt || 0) > 24 * 60 * 60 * 1000) {
         if (draft) await clearAudioDraft();
         return;
