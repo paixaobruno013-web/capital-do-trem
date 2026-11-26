@@ -23,7 +23,9 @@ const checks = [
   ['perfil individual superior abre a sala do grupo', /id="open-group-profile"/.test(room) && /aria-controls="capital-do-trem-room"/.test(room) && /toggleProfilePanel\(groupRoom,groupProfileButton,groupRoom.hidden\)/.test(room)],
   ['atalho inferior de amizades abre a pesquisa de perfis', /id="open-friends-profile"/.test(room) && /aria-controls="fazer-amigos"/.test(room) && /toggleProfilePanel\(friendsPanel,friendsProfileButton,friendsPanel.hidden\)/.test(room)],
   ['salas começam recolhidas e amizades podem ser fechadas', /id="capital-do-trem-room" class="panel chat-panel" hidden/.test(room) && /id="fazer-amigos" class="panel friends-panel" hidden/.test(room) && /close-friends-profile/.test(room)],
-  ['cache PWA avançado para v320', /capital-do-trem-v320/.test(worker)],
+  ['cache PWA usa versão identificada e atualizável', /const CACHE='capital-do-trem-v\\d+'/.test(worker)],
+  ['configurações permitem escolher foto dos três perfis do FALA UAI', /id=\"chat-brand-image-file\"/.test(room) && /id=\"chat-group-image-file\"/.test(room) && /id=\"chat-friends-image-file\"/.test(room) && /id=\"friends-profile-image\"/.test(room)],
+  ['salvar todas persiste e restaura as três imagens escolhidas', /cdt_fala_friends_image_v1/.test(room) && /\['brand','group','friends'\]/.test(room) && /Todas as imagens selecionadas foram salvas neste aparelho/.test(room) && /friendsImage\.src='\.\/assets\/pwa-icon-192\.png'/.test(room)],
 
 
   ['grupo usa marca branca e amizades ficam em atalho inferior compacto', /id="open-group-card"/.test(room) && /src="\.\/marca\.svg" alt="Logo branco do grupo Capital do Trem"/.test(room) && /fala-friends-profile\{display:flex!important/.test(room) && /<\/section><button id="open-friends-profile"/.test(room)],
