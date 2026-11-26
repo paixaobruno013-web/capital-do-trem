@@ -2,53 +2,6 @@ name: Preparar iOS — Capital do Trem
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '**.html'
-      - '**.js'
-      - '**.css'
-      - '**.json'
-      - '**.svg'
-      - '**.png'
-      - '**.webp'
-      - '**.jpg'
-      - '**.jpeg'
-      - '**.mp4'
-      - 'package-lock.json'
-      - '.github/workflows/**'
-      - 'index.html'
-      - 'youtube-feed.js'
-      - 'event-social-composer.js'
-      - 'home-story-composer.js'
-      - 'offline.html'
-      - 'manifest.webmanifest'
-      - 'conta.html'
-      - 'capital-futurista.css'
-      - 'rede.js'
-      - 'rede.html'
-      - 'admin.html'
-      - 'privacidade.html'
-      - 'bate-papo.html'
-      - 'chat-enhancements.js'
-      - 'avatar.html'
-      - 'mensagens.html'
-      - 'diagnostico.html'
-      - 'marca.svg'
-      - 'sw.js'
-      - 'update.js'
-      - 'supabase/**'
-      - 'scripts/**'
-      - 'assets/**'
-      - 'package.json'
-      - 'capacitor.config.ts'
-      - '.github/workflows/ios-build.yml'
-      - 'admin-media.js'
-      - 'emoji-picker.js'
-      - 'stories-ui.js'
-      - 'admin-stories.js'
-      - 'account-stories.js'
-      - 'supabase-config.js'
 
 permissions:
   contents: read
