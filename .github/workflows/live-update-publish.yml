@@ -22,8 +22,8 @@ jobs:
         id: native_guard
         shell: bash
         env:
-          BEFORE_SHA: \${{ github.event.before }}
-          CURRENT_SHA: \${{ github.sha }}
+          BEFORE_SHA: ${{ github.event.before }}
+          CURRENT_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
           if [[ -z "$BEFORE_SHA" || "$BEFORE_SHA" =~ ^0+$ ]]; then
@@ -70,8 +70,8 @@ jobs:
         if: steps.native_guard.outputs.publish == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: web-update-\${{ github.run_number }}
-          name: "Capital do Trem — atualização web \${{ github.run_number }}"
+          tag_name: web-update-${{ github.run_number }}
+          name: "Capital do Trem — atualização web ${{ github.run_number }}"
           body: |
             Pacote web para atualização remota do Capital do Trem.
             Compatível apenas com alterações HTML, CSS, JavaScript e arquivos web.
