@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-debug-apk:
+  android-native-validation:
     name: Compilar e validar integração Android
     runs-on: ubuntu-latest
     steps:
@@ -60,11 +60,11 @@ jobs:
         run: npx cap sync android
       - name: Permitir áudio automático no WebView Android
         run: python scripts/configure-android-media.py android
-      - name: Compilar APK de teste com novas tentativas para falhas temporárias do Maven Central
+      - name: Validar compilação nativa Android com novas tentativas para falhas temporárias do Maven Central
         working-directory: android
         run: |
           for attempt in 1 2 3; do
-            echo "Tentativa $attempt de 3 para compilar o APK"
+            echo "Tentativa $attempt de 3 para validar a compilação Android"
             if ./gradlew --no-daemon --max-workers=2 assembleDebug; then
               exit 0
             fi
