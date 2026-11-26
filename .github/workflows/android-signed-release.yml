@@ -70,6 +70,7 @@ jobs:
           echo "Certificado RSA verificado; chave pública configurada sem expor a chave privada."
 
       - name: Validar versão da publicação
+        id: release_meta
         shell: bash
         env:
           RELEASE_VERSION_INPUT: ${{ inputs.release_version }}
@@ -79,7 +80,7 @@ jobs:
           if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
             RELEASE_VERSION="$RELEASE_VERSION_INPUT"
           else
-            RELEASE_VERSION="$(tr -d '[:space:]' < .github/release-triggers/android-v1.0.4)"
+            RELEASE_VERSION="$(tr -d '[:space:]' < .github/release-triggers/android-v1.0.5)"
           fi
           if [[ ! "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
             echo "::error::Informe uma versão válida, como 1.0.0."
@@ -96,9 +97,9 @@ jobs:
             echo "::error::Código de versão Android inválido."
             exit 1
           fi
-          echo "RELEASE_VERSION=$RELEASE_VERSION" >> "$GITHUB_ENV"
-          echo "RELEASE_VERSION_CODE=$RELEASE_VERSION_CODE" >> "$GITHUB_ENV"
-          echo "RELEASE_TAG=android-v$RELEASE_VERSION" >> "$GITHUB_ENV"
+          echo "version=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
+          echo "version_code=$RELEASE_VERSION_CODE" >> "$GITHUB_OUTPUT"
+          echo "tag=android-v$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Configurar Node.js
         uses: actions/setup-node@v4
@@ -135,8 +136,8 @@ jobs:
       - name: Aplicar versionName e versionCode no Android
         shell: bash
         env:
-          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
-          RELEASE_VERSION_CODE: ${{ env.RELEASE_VERSION_CODE }}
+          RELEASE_VERSION: ${{ steps.release_meta.outputs.version }}
+          RELEASE_VERSION_CODE: ${{ steps.release_meta.outputs.version_code }}
         run: |
           set -euo pipefail
           sed -i -E "s/^([[:space:]]*versionCode[[:space:]]+)[0-9]+$/\\1${RELEASE_VERSION_CODE}/" android/app/build.gradle
@@ -253,9 +254,9 @@ jobs:
       - name: Publicar APK para download direto
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.RELEASE_TAG }}
+          tag_name: ${{ steps.release_meta.outputs.tag }}
           target_commitish: ${{ github.sha }}
-          name: "CAPITAL DO TREM Android ${{ env.RELEASE_VERSION }}"
+          name: "CAPITAL DO TREM Android ${{ steps.release_meta.outputs.version }}"
           body: |
             Lançamento Android do CAPITAL DO TREM para instalação direta.
 
@@ -264,7 +265,7 @@ jobs:
             - Download gratuito.
             - Confira o SHA-256 publicado junto ao APK.
           files: |
-            CAPITAL-DO-TREM-${{ env.RELEASE_TAG }}.apk
+            CAPITAL-DO-TREM-${{ steps.release_meta.outputs.tag }}.apk
             capital-do-trem-apk.sha256
             capital-do-trem-apk-certificate.txt
           draft: false
