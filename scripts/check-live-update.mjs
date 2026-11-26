@@ -18,8 +18,9 @@ assert(html.includes('src="./live-update.js"'), 'Carregador do atualizador não 
 assert(sw.includes("'./live-update.js'"), 'Service worker não inclui o módulo de atualização.');
 assert(updater.includes("startsWith('web-update-')"), 'Filtro de publicação precisa aceitar somente releases de atualização web.');
 assert(updater.includes('checksum: latest.checksum'), 'Download precisa validar SHA-256.');
-assert(updater.includes("Capacitor.getPlatform() !== 'android'"), 'Atualizador precisa ser restrito ao Android nativo.');
+assert(updater.includes("Capacitor.getPlatform() !== 'android'"), 'Download remoto precisa ser restrito ao Android nativo.');
 assert(updater.includes('await LiveUpdate.ready()'), 'O app precisa confirmar prontidão antes de buscar atualização.');
+assert(updater.indexOf('await LiveUpdate.ready()') < updater.indexOf("if (Capacitor.getPlatform() !== 'android') return;"), 'A prontidão também precisa ser confirmada em WebViews nativas iOS.');
 assert(updater.includes('setNextBundle'), 'Pacote baixado precisa ser preparado para a próxima abertura.');
 assert(!updater.includes('LiveUpdate.reload()'), 'Atualização não pode reiniciar a interface no meio do uso.');
 assert(updater.includes('CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000'), 'Verificação deve respeitar intervalo para economizar bateria.');
