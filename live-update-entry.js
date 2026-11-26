@@ -59,16 +59,18 @@ async function checkForUpdate() {
 
 async function startLiveUpdates() {
   if (!Capacitor.isNativePlatform() ||
-      Capacitor.getPlatform() !== 'android' ||
       !Capacitor.isPluginAvailable('LiveUpdate')) return;
 
   try {
-    // Confirma que a interface atual iniciou corretamente antes de procurar outra versão.
+    // Confirma a inicialização em qualquer WebView nativa para manter o rollback seguro.
     await LiveUpdate.ready();
   } catch (error) {
     console.warn('[Capital do Trem] Não foi possível confirmar a inicialização do atualizador.', error);
     return;
   }
+
+  // O iPhone Safari/PWA não usa este plugin; a atualização nativa fica restrita ao Android.
+  if (Capacitor.getPlatform() !== 'android') return;
 
   try {
     await checkForUpdate();
