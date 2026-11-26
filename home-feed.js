@@ -120,21 +120,24 @@ if(root&&form){
    if(selectedFeedSongId&&(!file||!file.type.startsWith('image/'))){status.textContent='Para anexar música no Feed, escolha também uma foto. O trecho musical será exibido junto à publicação.';return}
    if(file){const allowed=['image/jpeg','image/png','image/webp','video/mp4','video/webm','video/quicktime'];if(!allowed.includes(file.type)){status.textContent='Formato não permitido.';return}const max=file.type.startsWith('image/')?10*1024*1024:50*1024*1024;if(file.size>max){status.textContent='Arquivo muito grande para publicar.';return}}
    const button=form.querySelector('button[type=submit]');button.disabled=true;if(storyPublishButton)storyPublishButton.disabled=true;status.textContent='Publicando…';
-   let createdPost=null,uploadedPath=null,feedPublished=false;
+   let createdPost=null,uploadedPath=null,feedPublished=false,publishStage='validar a conta';
    try{
+    status.textContent='Confirmando sua conta…';
     const session=await getCurrentSession();if(!session?.user)throw new Error('Entre na sua conta para publicar no Feed.');
+    publishStage='criar a publicação no Feed';status.textContent='Criando publicação…';
     createdPost=await submitMyPost(text||'📸 Nova publicação na comunidade');
-    if(file){const ext=({'image/jpeg':'jpg','image/png':'png','image/webp':'webp','video/mp4':'mp4','video/webm':'webm','video/quicktime':'mov'})[file.type];uploadedPath=session.user.id+'/posts/'+crypto.randomUUID()+'.'+ext;
+    if(file){publishStage='enviar a foto ou o vídeo';status.textContent='Enviando mídia…';const ext=({'image/jpeg':'jpg','image/png':'png','image/webp':'webp','video/mp4':'mp4','video/webm':'webm','video/quicktime':'mov'})[file.type];uploadedPath=session.user.id+'/posts/'+crypto.randomUUID()+'.'+ext;
      const uploaded=await supabase.storage.from('capital-do-trem-social').upload(uploadedPath,file,{contentType:file.type,cacheControl:'3600',upsert:false});if(uploaded.error)throw uploaded.error;
+     publishStage='vincular a mídia à publicação';status.textContent='Finalizando a publicação…';
      const row=await supabase.from('post_media').insert({post_id:createdPost.id,owner_id:session.user.id,bucket_id:'capital-do-trem-social',storage_path:uploadedPath,media_type:file.type.startsWith('video/')?'video':'image',mime_type:file.type,byte_size:file.size,alt_text:text.slice(0,200)});if(row.error)throw row.error;}
-    if(selectedFeedSongId){const start=Math.max(0,Math.min(3600,Number(musicStart?.value)||0)),duration=Math.max(5,Math.min(60,Number(musicDuration?.value)||15));const linked=await supabase.from('post_music').insert({post_id:createdPost.id,song_id:selectedFeedSongId,start_seconds:start,duration_seconds:duration,volume:0.8});if(linked.error)throw linked.error;}
+    if(selectedFeedSongId){publishStage='vincular a música à publicação';status.textContent='Adicionando a música…';const start=Math.max(0,Math.min(3600,Number(musicStart?.value)||0)),duration=Math.max(5,Math.min(60,Number(musicDuration?.value)||15));const linked=await supabase.from('post_music').insert({post_id:createdPost.id,song_id:selectedFeedSongId,start_seconds:start,duration_seconds:duration,volume:0.8});if(linked.error)throw linked.error;}
     feedPublished=true;
-    if(alsoStory){try{const start=Math.max(0,Math.min(3600,Number(musicStart?.value)||0)),duration=Math.max(5,Math.min(60,Number(musicDuration?.value)||15));const story=await createMyStory({file,caption:text,musicSongId:selectedFeedSongId,musicStartSeconds:start,musicDurationSeconds:duration});document.dispatchEvent(new CustomEvent('capital:stories-updated',{detail:{id:story.id}}));}
+    if(alsoStory){try{publishStage='publicar também nos Stories';status.textContent='Publicação no Feed concluída. Enviando aos Stories…';const start=Math.max(0,Math.min(3600,Number(musicStart?.value)||0)),duration=Math.max(5,Math.min(60,Number(musicDuration?.value)||15));const story=await createMyStory({file,caption:text,musicSongId:selectedFeedSongId,musicStartSeconds:start,musicDurationSeconds:duration});document.dispatchEvent(new CustomEvent('capital:stories-updated',{detail:{id:story.id}}));}
      catch(storyError){status.textContent='Feed publicado! Mas o Story não foi publicado: '+(storyError.message||'tente novamente.');await load();return;}}
     caption.value='';clearSelectedMedia();selectedFeedSongId='';if(musicSelect)musicSelect.value='';resetFeedMusicPreview();setComposerExpanded(false);status.textContent=alsoStory?'Compartilhado no Feed e nos Stories! ❤️':'Publicação compartilhada no Feed! ❤️';await load();
    }catch(error){if(!feedPublished){if(uploadedPath){try{const {error:removeError}=await supabase.storage.from('capital-do-trem-social').remove([uploadedPath]);if(removeError)console.error('Falha ao remover mídia órfã do Feed.',removeError);}catch(cleanupError){console.error('Falha ao limpar mídia órfã do Feed.',cleanupError);}}
     if(createdPost?.id){try{await deleteMyPost(createdPost.id);}catch(cleanupError){console.error('Falha ao reverter publicação incompleta.',cleanupError);}}}
-    status.textContent=error.message||'Não foi possível publicar.';
+    status.textContent='Falha ao '+publishStage+': '+(error.message||'não foi possível concluir.');
    }finally{button.disabled=false;if(storyPublishButton)storyPublishButton.disabled=!fileInput?.files?.length;}
   }
   form.addEventListener('submit',event=>{event.preventDefault();publishPost(false);});
