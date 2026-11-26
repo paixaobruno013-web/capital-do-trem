@@ -186,10 +186,9 @@ async function showFollowDirectory(kind,userId){
  const list=document.createElement('div');list.className='follow-directory-list';dialog.append(heading,close,search,status,list);dialog.hidden=false;
  try{
   const column=kind==='followers'?'follower_id':'followed_id';
-  const filter=kind==='followers'?'followed_id':'follower_id';
   const ids=[];const pageSize=500;let from=0;
   while(true){
-   const relation=await supabase.from('profile_follows').select(column).eq(filter,userId).range(from,from+pageSize-1);
+   const relation=await supabase.from('profile_follows').select(column).eq(kind==='followers'?'followed_id':'follower_id',userId).range(from,from+pageSize-1);
    if(relation.error)throw relation.error;
    const batch=(relation.data||[]).map(row=>row[column]).filter(Boolean);ids.push(...batch);
    if(batch.length<pageSize)break;
