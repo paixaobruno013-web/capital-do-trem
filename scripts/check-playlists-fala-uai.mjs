@@ -17,7 +17,7 @@ const checks=[
  [redeJs.includes('async function loadPlaylists')&&redeJs.includes('api.createMyPlaylist')&&redeJs.includes('api.addSongToMyPlaylist'),'Interface permite criar playlists e adicionar faixas'],
  [redeJs.includes('api.moveSongInMyPlaylist')&&redeJs.includes('api.removeSongFromMyPlaylist'),'Interface permite reordenar e remover faixas'],
  [redeJs.includes('getPublishedSongsForProfile(userId)')&&redeJs.includes('Adicionar à minha playlist')&&redeJs.includes('api.addSongToMyPlaylist(selected.id,song.id)'),'Perfil público do MC/DJ permite adicionar diretamente a faixa à playlist do ouvinte'],
- [chat.includes('Grupo CAPITAL DO TREM')&&chat.includes('id="chat-topics"')&&!chat.includes('fala-uai-player'),'Chat apresenta grupo oficial e salas por assunto sem misturar o player'],
+ [chat.includes('GRUPO • CAPITAL DO TREM')&&chat.includes('id="chat-topics"')&&!chat.includes('fala-uai-player'),'Chat apresenta grupo oficial e salas por assunto sem misturar o player'],
  [home.includes('id="capital-music-player"')&&redeHtml.includes('id="my-playlists-list"')&&redeJs.includes('api.getMyPlaylists'),'Player fica na Central de Músicas e playlists ficam no perfil'],
  [redeJs.includes('api.createMyPlaylist')&&redeJs.includes('api.addSongToMyPlaylist')&&player.includes("audio.addEventListener('ended'")&&player.includes('function step(amount)'),'Usuário cria playlists no perfil, adiciona faixas e reproduz pelo player 3D'],
  [chat.includes('id="messages"')&&!chat.includes('fala-uai-player'),'Player não invade a área de bate-papo'],
