@@ -130,8 +130,8 @@ async function startCamera() {
       cameraStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: { ideal: facingMode },
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
+          width: { ideal: 960 },
+          height: { ideal: 540 },
           frameRate: { ideal: 24, max: 30 }
         },
         audio: false
@@ -149,26 +149,30 @@ async function startCamera() {
       return false;
     }
     stream = cameraStream;
-    // Sempre iniciar sem zoom digital; ele pode reduzir a nitidez e cortar o enquadramento.
+    // Não aplicar restrições de zoom ao abrir: isso pode atrasar o primeiro quadro.
+    // O zoom nativo será solicitado somente quando a pessoa mover o controle.
     cameraZoom = 1;
+    hardwareZoomActive = false;
     if (zoomControl) zoomControl.value = '1';
     if (zoomValue) zoomValue.textContent = '1×';
-    hardwareZoomActive = await applyZoomToTrack();
-    live.style.transform = hardwareZoomActive ? 'none' : 'scale(1)';
+    live.style.transform = 'none';
     live.muted = true;
     live.autoplay = true;
     live.playsInline = true;
+    live.preload = 'auto';
+    // Registrar os eventos antes de associar o stream e chamar play evita perder loadeddata.
+    const markCameraReady = () => {
+      if (requestId !== cameraRequestId || !modal?.classList.contains('is-open')) return;
+      message.textContent = 'Câmera aberta • escolha Foto, Vídeo ou Álbum';
+      say('Câmera pronta. Escolha um efeito ou capture sua mídia.');
+    };
+    live.addEventListener('loadeddata', markCameraReady, { once: true });
+    live.addEventListener('canplay', markCameraReady, { once: true });
     live.srcObject = stream;
     live.hidden = false;
     applyEffect();
     await live.play();
-    // Não bloquear a abertura do estúdio esperando metadados: a prévia termina de iniciar em segundo plano.
-    live.addEventListener('loadeddata', () => {
-      if (requestId === cameraRequestId && modal?.classList.contains('is-open')) {
-        message.textContent = 'Câmera aberta • escolha Foto, Vídeo ou Álbum';
-        say('Câmera pronta. Escolha um efeito ou capture sua mídia.');
-      }
-    }, { once: true });
+    if (live.readyState >= 2 && live.videoWidth > 0) markCameraReady();
     message.textContent = 'Câmera conectada • preparando a prévia…';
     say('A câmera está iniciando. Você já pode escolher uma mídia do álbum.');
     return true;
@@ -260,7 +264,8 @@ function capturePhoto() {
   const captureZoom = hardwareZoomActive ? 1 : cameraZoom;
   const cropWidth = sourceWidth / captureZoom;
   const cropHeight = sourceHeight / captureZoom;
-  const scale = Math.min(1, 1600 / Math.max(cropWidth, cropHeight));
+  // 1280 px mantém boa nitidez para Stories e reduz o tempo de codificação em celulares.
+  const scale = Math.min(1, 1280 / Math.max(cropWidth, cropHeight));
   const canvas = document.createElement('canvas');
   canvas.width = Math.max(1, Math.round(cropWidth * scale));
   canvas.height = Math.max(1, Math.round(cropHeight * scale));
@@ -287,7 +292,7 @@ function capturePhoto() {
     setSelected(new File([blob], 'capital-do-trem-story.jpg', { type: 'image/jpeg' }));
     applyEffect();
     say('Foto pronta! Veja como ficou e escolha publicar ou salvar.');
-  }, 'image/jpeg', 0.84);
+  }, 'image/jpeg', 0.78);
 }
 function startFilteredRecording() {
   const canvas = document.createElement('canvas');
