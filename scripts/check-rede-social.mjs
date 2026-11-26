@@ -36,3 +36,6 @@ console.log('Feed direciona para o perfil público de cada autor.');
 
 if(!html.includes('profile-stat')||!html.includes('publicações')||!html.includes('seguidores')||!html.includes('seguindo')||!js.includes("placeholder='Buscar por nome ou @usuário…'")||!js.includes('pageSize=500'))throw new Error('Estatísticas compactas e pesquisa nas listas de seguidores ausentes.');
 console.log('Contadores compactos e pesquisa de seguidores/seguindo conferidos.');
+
+if(!html.includes('profile-stat')||!html.includes('publicações')||!html.includes('seguidores')||!html.includes('seguindo')||!js.includes("placeholder='Buscar por nome ou @usuário…'")||!js.includes('pageSize=500'))throw new Error('Estatísticas compactas e pesquisa nas listas de seguidores ausentes.');
+console.log('Contadores compactos e pesquisa de seguidores/seguindo conferidos.');
