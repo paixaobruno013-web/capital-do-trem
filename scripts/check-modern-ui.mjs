@@ -39,6 +39,7 @@ assert.ok(update.includes("message.textContent='🚂 NOVA ATUALIZAÇÃO DISPONÍ
 assert.ok(update.includes("updateHornPlayed=true;playTrainHorn()"), 'A chegada da atualização deve tocar a corneta quando o áudio estiver liberado');
 assert.ok(update.includes("postMessage({type:'SKIP_WAITING'})"), 'O botão deve ativar a atualização aguardando');
 assert.ok(update.includes("button.textContent='ATUALIZADO'") && update.includes("},5000)"), 'A confirmação verde deve desaparecer após cinco segundos');
+assert.ok(update.includes('hadServiceWorkerController=Boolean(navigator.serviceWorker.controller)') && update.includes('if(!hadServiceWorkerController){hadServiceWorkerController=true;return;}'), 'A primeira instalação não deve ser confundida com uma atualização concluída');
 
 console.log('Modernização visual: páginas, seletores, pacote móvel e cache PWA conferidos.');
 
