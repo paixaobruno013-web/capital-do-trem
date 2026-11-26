@@ -15,8 +15,8 @@ const checks = [
   [schema.includes('create policy "artists_insert_own_pending"') && schema.includes('with check (user_id = (select auth.uid()) and status = \'pending\')'), 'O artista só pode criar a própria ficha como pendente.'],
   [schema.includes('create policy "artists_update_own_or_admin"') && schema.includes("(user_id = (select auth.uid()) and status = 'pending')\n    or (select private.is_admin())"), 'O artista não pode aprovar a própria ficha; somente administrador pode publicar.'],
   [admin.includes('auth.getModerationQueue()') && (admin.includes('auth.moderateItem(kind,item.id,next,reason)') || admin.includes('auth.moderateItem(kind,item.id,next)')), 'O painel administrativo precisa usar a fila e a ação protegida de moderação.'],
-  [auth.includes("export async function getPublicProfiles()") && auth.includes(".eq('is_public', true)"), 'A descoberta de amizades deve listar somente perfis públicos.'],
-  [chat.includes('não usamos GPS nem mostramos endereço ou distância exata') && chat.includes('Na minha cidade'), 'A área de amizades deve explicar que usa cidade informada e não GPS.']
+  [auth.includes("export async function getPublicProfiles()") && auth.includes(".eq('is_public', true)"), 'A faixa de contatos online deve listar somente perfis públicos.'],
+  [!chat.includes('id="fazer-amigos"') && !chat.includes('id="open-friends-profile"'), 'A descoberta por localização deve permanecer removida do FALA UAI.']
 ];
 for (const [ok, message] of checks) if (!ok) throw new Error(message);
 console.log('Verificação de artistas, selo administrativo, RLS e privacidade da descoberta de amizades conferidos.');
