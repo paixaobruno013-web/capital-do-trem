@@ -242,14 +242,14 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important;overscroll-behav
 </style>
 </head><body class="cdt-fala-uai-page">
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
-<header><img src="./marca.svg" alt="Capital do Trem"><div class="chat-brand"><span class="chat-live-dot" aria-hidden="true"></span><span>FALA UAI</span><small>O ponto de encontro da comunidade</small></div><h1>FALA UAI da quebrada</h1><p class="muted">Artistas e Usuários Uai, juntos na mesma conversa.</p><div class="actions"><a class="btn alt" href="./index.html">Início</a><a class="btn alt" href="./conta.html">Minha conta</a><a class="btn alt" href="./avatar.html">Meu avatar</a><a class="btn" href="./mensagens.html">✉️ Minhas conversas</a><button class="alt" id="theme" type="button">☀️ Claro</button></div></header>
+<header class="fala-uai-clean-header"><div class="fala-uai-header-actions"><a class="btn alt" href="./index.html">Início</a><a class="btn alt" href="./conta.html">Minha conta</a><a class="btn alt" href="./mensagens.html">Conversas</a><button class="alt" id="theme" type="button">☀️ Claro</button></div></header>
 <main id="main-content">
-<nav class="chat-area-nav" aria-label="Área principal do FALA UAI"><a href="#capital-do-trem-room">👥 GRUPO • CAPITAL do TREM</a></nav>
-<section id="capital-do-trem-room" class="panel chat-panel"><div class="room-heading"><div><span class="eyebrow">CAPITAL DO TREM • COMUNIDADE</span><h2>💬 Sala geral</h2></div><div style="display:flex;align-items:center;gap:8px"><span class="room-tag">FALA UAI</span><button id="leave-group" class="alt" type="button" hidden>Sair do grupo</button></div></div><div id="group-live-presence" class="group-live-presence" aria-live="polite"><div><strong>● online</strong><span id="group-online-list">Verificando participantes…</span></div><div><strong>✍ digitando</strong><span id="group-typing-list">Ninguém digitando agora</span></div></div><div class="security-seal" role="note">
+<button id="open-group-profile" class="fala-profile-card fala-group-profile" type="button" aria-controls="capital-do-trem-room" aria-expanded="false"><span class="fala-profile-avatar">🚂</span><span class="fala-profile-info"><strong>GRUPO • CAPITAL do TREM</strong><small>Grupo oficial · <span id="group-card-online">conferindo presença…</span></small></span><span class="fala-profile-arrow">›</span></button>
+<section id="capital-do-trem-room" class="panel chat-panel" hidden><div class="room-heading"><div><span class="eyebrow">SALA DE CONVERSA</span><h2>GRUPO • CAPITAL do TREM</h2></div><div style="display:flex;align-items:center;gap:8px"><button id="leave-group" class="alt" type="button" hidden>Sair do grupo</button></div></div><div id="group-live-presence" class="group-live-presence" aria-live="polite"><div><strong>● online</strong><span id="group-online-list">Verificando participantes…</span></div><div><strong>✍ digitando</strong><span id="group-typing-list">Ninguém digitando agora</span></div></div><div class="security-seal" role="note" hidden>
   <div class="security-seal-title"><span aria-hidden="true">🔒</span><span>Conexão criptografada</span><small>HTTPS</small></div>
   <p>Seus dados são protegidos durante a transmissão por HTTPS. Esta versão ainda não oferece criptografia ponta a ponta.</p>
 </div>
-<p class="muted">Respeito em primeiro lugar. Não compartilhe dados pessoais, ameaças ou conteúdo ofensivo. A equipe poderá moderar o espaço.</p><div id="gate" class="status" role="status" aria-live="polite">Verificando sua conta…</div><div id="chat-area" hidden><p id="chat-connection" class="status" role="status" aria-live="polite">Conectando à sala em tempo real…</p>
+<div id="gate" class="status" role="status" aria-live="polite">Verificando sua conta…</div><div id="chat-area" hidden><p id="chat-connection" class="status" role="status" aria-live="polite">Conectando à sala em tempo real…</p>
 <div class="actions" style="justify-content:flex-end;margin:8px 0"><button id="gallery-open" class="alt" type="button">🖼️ Galeria da conversa</button></div><section id="media-gallery" class="panel" hidden><div class="room-heading"><h3>Fotos e vídeos compartilhados</h3><button id="gallery-close" class="alt" type="button">Fechar</button></div><div id="media-gallery-grid" class="media-gallery-grid"></div><p id="gallery-empty" class="muted" hidden>Nenhuma foto ou vídeo compartilhado ainda.</p></section><div id="messages" aria-live="polite" aria-relevant="additions" aria-label="Mensagens do bate-papo"></div><form id="composer" class="composer"><div id="emoji-tray" data-emoji-picker data-input="#message"></div><label class="sr-only" for="message">Sua mensagem para o bate-papo</label><input id="message" maxlength="1000" autocomplete="off" placeholder="Escreva sua mensagem…" aria-describedby="message-counter"><input id="chat-attachment" type="file" accept="image/*,video/*,audio/*,application/pdf,text/plain,text/csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx" hidden><input id="chat-camera" type="file" accept="image/*,video/*" capture="environment" hidden><small id="attachment-name" class="muted" aria-live="polite"></small><label class="view-once-option"><input id="chat-view-once" type="checkbox"> 👁️ Visualização única (foto, vídeo ou áudio)</label><div id="chat-upload-progress" class="chat-upload-progress" hidden><span></span></div><small id="message-counter" class="muted" aria-live="polite">0/1000 caracteres</small><button id="camera-open" class="alt" type="button" aria-label="Anexar arquivo" aria-haspopup="true" aria-expanded="false">📎</button><button id="send" type="submit">Enviar</button></form><p id="status" class="status" role="status" aria-live="polite"></p></div></section><section id="chat-topics" class="panel chat-topics-panel">
  <div class="room-heading"><div><span class="eyebrow">CAPITAL DO TREM • CONVERSAS</span><h2>💬 Bate-papo por assuntos</h2></div><span class="room-tag">Maquinistas</span></div>
  <p class="muted">Crie uma conversa sobre um tema e convide seus seguidores e a comunidade para trocar ideias com respeito.</p>
@@ -266,7 +266,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important;overscroll-behav
   <p id="topic-message-status" class="status" role="status" aria-live="polite"></p>
  </section>
 </section>
-<section id="fazer-amigos" class="panel friends-panel"><div class="room-heading"><div><span class="eyebrow">CAPITAL DO TREM • CONEXÕES</span><h2>fazer amizades pela localização</h2></div><span class="room-tag">Comunidade</span></div><p class="muted">Conheça participantes que também fazem parte do Capital do Trem. Só aparecem pessoas que escolheram deixar o perfil público. A cidade é informada pela própria pessoa; não usamos GPS nem mostramos endereço ou distância exata.</p><label for="chat-friends-search">Buscar pessoas</label><input id="chat-friends-search" type="search" maxlength="80" placeholder="Nome, @usuário, cidade ou interesse"><label for="chat-friends-distance">Onde procurar</label><select id="chat-friends-distance"><option value="all">Todas as cidades</option><option value="same">Na minha cidade</option><option value="other">Em outras cidades</option></select><p id="chat-friends-count" class="status" aria-live="polite">Carregando participantes públicos…</p><div id="chat-friends-directory" class="friends-directory" aria-live="polite"><p class="muted">Carregando…</p></div><p class="muted">Respeite a privacidade e as escolhas de cada pessoa.</p></section><nav class="chat-area-nav chat-area-nav-bottom" aria-label="Fazer amizades pela localização"><a href="#fazer-amigos">🤝 fazer amizades pela localização</a></nav></main>
+<button id="open-friends-profile" class="fala-profile-card fala-friends-profile" type="button" aria-controls="fazer-amigos" aria-expanded="false"><span class="fala-profile-avatar">📍</span><span class="fala-profile-info"><strong>fazer amizades pela localização</strong><small>Descubra pessoas e pesquise perfis públicos</small></span><span class="fala-profile-arrow">›</span></button><section id="fazer-amigos" class="panel friends-panel" hidden><div class="room-heading"><div><span class="eyebrow">PESQUISAR PESSOAS</span><h2>fazer amizades pela localização</h2></div><button id="close-friends-profile" class="alt" type="button">Fechar</button></div><p class="muted">Conheça participantes que também fazem parte do Capital do Trem. Só aparecem pessoas que escolheram deixar o perfil público. A cidade é informada pela própria pessoa; não usamos GPS nem mostramos endereço ou distância exata.</p><label for="chat-friends-search">Buscar pessoas</label><input id="chat-friends-search" type="search" maxlength="80" placeholder="Nome, @usuário, cidade ou interesse"><label for="chat-friends-distance">Onde procurar</label><select id="chat-friends-distance"><option value="all">Todas as cidades</option><option value="same">Na minha cidade</option><option value="other">Em outras cidades</option></select><p id="chat-friends-count" class="status" aria-live="polite">Carregando participantes públicos…</p><div id="chat-friends-directory" class="friends-directory" aria-live="polite"><p class="muted">Carregando…</p></div><p class="muted">Respeite a privacidade e as escolhas de cada pessoa.</p></section></main>
 <script type="module">
 import {getCurrentSession,getChatGroupMembership,joinChatGroup,leaveChatGroup,getChatMessages,sendChatMessage,subscribeChatMessages,uploadChatAttachment,reportChatParticipant,moderateChatParticipant,openViewOnceChatMedia,updateMyGroupMessage,deleteMyGroupMessage,initSupabase,startUserPresence,getOnlineUserIds,subscribeUserPresence} from './supabase/auth.js';
 const gate=document.getElementById('gate'),area=document.getElementById('chat-area'),connection=document.getElementById('chat-connection'),list=document.getElementById('messages'),form=document.getElementById('composer'),input=document.getElementById('message'),send=document.getElementById('send'),status=document.getElementById('status');
@@ -334,11 +334,16 @@ input.addEventListener('input',updateCounter);
 let unsubscribe=null,seen=new Set(),currentUserId=null;
 let stopPresence=null,watchPresence=null,groupTypingChannel=null,typingStopTimer=null;
 const onlineList=document.getElementById('group-online-list'),typingList=document.getElementById('group-typing-list');
+const groupProfileButton=document.getElementById('open-group-profile'),friendsProfileButton=document.getElementById('open-friends-profile'),friendsPanel=document.getElementById('fazer-amigos'),groupRoom=document.getElementById('capital-do-trem-room');
+function toggleProfilePanel(panel,button,open){panel.hidden=!open;button.setAttribute('aria-expanded',String(open));if(open)panel.scrollIntoView({behavior:'smooth',block:'start'});}
+groupProfileButton.addEventListener('click',()=>toggleProfilePanel(groupRoom,groupProfileButton,groupRoom.hidden));
+friendsProfileButton.addEventListener('click',()=>toggleProfilePanel(friendsPanel,friendsProfileButton,friendsPanel.hidden));
+document.getElementById('close-friends-profile').addEventListener('click',()=>toggleProfilePanel(friendsPanel,friendsProfileButton,false));
 const typingUsers=new Map();
 function renderGroupPresence(ids){
  const known=window.cdtPublicChatProfiles||[];
  const names=[...ids].filter(id=>id!==currentUserId).map(id=>known.find(p=>p.user_id===id)?.display_name||'Participante').slice(0,8);
- if(onlineList)onlineList.textContent=names.length?names.join(' · '):'Nenhum outro participante online';
+ if(onlineList)onlineList.textContent=names.length?names.join(' · '):'Nenhum outro participante online';const cardOnline=document.getElementById('group-card-online');if(cardOnline)cardOnline.textContent=names.length?names.length+' online':'grupo pronto para conversar';
 }
 function renderGroupTyping(){
  const known=window.cdtPublicChatProfiles||[];
@@ -681,6 +686,35 @@ body.cdt-fala-uai-page .friends-directory{display:grid;gap:8px}
 body.cdt-fala-uai-page .friend-person{align-items:center}
 body.cdt-fala-uai-page main>.chat-area-nav-bottom{order:6!important}
 @media(max-width:480px){body.cdt-fala-uai-page .group-live-presence>div{grid-template-columns:82px minmax(0,1fr)}}
+</style>
+<style id="cdt-fala-uai-clean-profiles">
+body.cdt-fala-uai-page{background:#050505!important;background-image:none!important}
+body.cdt-fala-uai-page>header.fala-uai-clean-header{max-width:760px;margin:0 auto;padding:10px 12px 4px;border:0;text-align:right;background:transparent}
+body.cdt-fala-uai-page .fala-uai-header-actions{display:flex;justify-content:flex-end;gap:7px;flex-wrap:wrap}
+body.cdt-fala-uai-page .fala-uai-header-actions .btn,body.cdt-fala-uai-page .fala-uai-header-actions button{min-height:34px;padding:6px 10px;font-size:12px}
+body.cdt-fala-uai-page #main-content{max-width:760px;padding:10px 12px 34px;display:flex;flex-direction:column;gap:10px}
+body.cdt-fala-uai-page .fala-profile-card{width:100%;display:flex;align-items:center;gap:12px;min-height:78px;padding:13px 14px;border:1px solid #ed1c2477;border-radius:16px;background:linear-gradient(105deg,#1b0b0d,#0b0b0d 75%);color:#fff;text-align:left;box-shadow:0 5px 18px #0008;cursor:pointer}
+body.cdt-fala-uai-page .fala-profile-card[aria-expanded="true"]{border-color:#ed1c24;box-shadow:0 0 14px #ed1c2433}
+body.cdt-fala-uai-page .fala-profile-avatar{width:46px;height:46px;flex:0 0 46px;display:grid;place-items:center;border:1px solid #ed1c24;border-radius:50%;background:#090909;font-size:23px}
+body.cdt-fala-uai-page .fala-profile-info{display:grid;gap:3px;min-width:0;flex:1}
+body.cdt-fala-uai-page .fala-profile-info strong{font-size:14px;line-height:1.3;overflow-wrap:anywhere}
+body.cdt-fala-uai-page .fala-profile-info small{font-size:11px;color:#aaa;font-weight:500}
+body.cdt-fala-uai-page .fala-profile-arrow{font-size:28px;color:#ff5961;line-height:1}
+body.cdt-fala-uai-page #capital-do-trem-room[hidden],body.cdt-fala-uai-page #fazer-amigos[hidden]{display:none!important}
+body.cdt-fala-uai-page .chat-panel,body.cdt-fala-uai-page .friends-panel{margin:0;padding:12px;border:1px solid #292929;border-radius:15px;background:#101010;box-shadow:none}
+body.cdt-fala-uai-page .room-heading{margin-bottom:8px}
+body.cdt-fala-uai-page .room-heading h2{font-size:17px}
+body.cdt-fala-uai-page .eyebrow{font-size:9px;letter-spacing:1px}
+body.cdt-fala-uai-page .group-live-presence{margin:7px 0 9px;padding:8px 10px;gap:5px;border-radius:10px}
+body.cdt-fala-uai-page .group-live-presence>div{font-size:11px}
+body.cdt-fala-uai-page .security-seal[hidden]{display:none!important}
+body.cdt-fala-uai-page #messages{height:min(54vh,520px);min-height:220px}
+body.cdt-fala-uai-page .friends-panel>p.muted{font-size:11px;line-height:1.4}
+body.cdt-fala-uai-page .friends-panel label{font-size:12px}
+body.cdt-fala-uai-page .friend-person{padding:9px;border-radius:11px}
+body.cdt-fala-uai-page .friend-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+body.cdt-fala-uai-page .friend-actions button{min-height:32px;padding:5px 10px;font-size:10px}
+@media(max-width:480px){body.cdt-fala-uai-page .fala-uai-header-actions{justify-content:space-between}body.cdt-fala-uai-page .fala-profile-card{min-height:72px;padding:11px}body.cdt-fala-uai-page .fala-profile-info strong{font-size:13px}}
 </style>
 </body></html>
 
