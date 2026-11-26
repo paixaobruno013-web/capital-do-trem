@@ -1872,6 +1872,38 @@ export async function getOnlineUserIds() {
   return new Set((data || []).map(row => row.user_id));
 }
 
+export function subscribeUserPresence(onChange) {
+  const supabase = initSupabase();
+  const channel = supabase.channel('capital-do-trem-user-presence');
+  const emit = () => {
+    const state = channel.presenceState();
+    if (typeof onChange === 'function') onChange(new Set(Object.keys(state || {})));
+  };
+  channel.on('presence', { event: 'sync' }, emit)
+    .on('presence', { event: 'join' }, emit)
+    .on('presence', { event: 'leave' }, emit)
+    .subscribe(status => { if (status === 'SUBSCRIBED') emit(); });
+  return () => { supabase.removeChannel(channel); };
+}
+
+export async function subscribePrivateTyping(conversationId, onTyping) {
+  const supabase = initSupabase();
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error) throw error;
+  if (!user) throw new Error('Entre na sua conta para usar o chat.');
+  const channel = supabase.channel('private-typing-' + conversationId);
+  channel.on('broadcast', { event: 'typing' }, message => {
+    const payload = message?.payload || {};
+    if (payload.user_id && payload.user_id !== user.id && typeof onTyping === 'function') {
+      onTyping({ user_id: payload.user_id, typing: payload.typing === true });
+    }
+  }).subscribe();
+  return {
+    send: typing => channel.send({ type: 'broadcast', event: 'typing', payload: { user_id: user.id, typing: Boolean(typing) } }),
+    unsubscribe: () => supabase.removeChannel(channel)
+  };
+}
+
 export async function startUserPresence() {
   const supabase = initSupabase();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -1891,6 +1923,13 @@ export async function startUserPresence() {
     } finally { busy = false; }
   };
   await heartbeat();
+  const presenceChannel = supabase.channel('capital-do-trem-user-presence', { config: { presence: { key: user.id } } });
+  presenceChannel.subscribe(async status => {
+    if (status === 'SUBSCRIBED' && !stopped) {
+      try { await presenceChannel.track({ user_id: user.id, online_at: new Date().toISOString() }); }
+      catch (error) { console.warn('Não foi possível publicar presença em tempo real.', error); }
+    }
+  });
   const timer = window.setInterval(heartbeat, 45000);
   const onFocus = () => heartbeat();
   const onOnline = () => heartbeat();
@@ -1903,6 +1942,7 @@ export async function startUserPresence() {
     window.removeEventListener('focus', onFocus);
     window.removeEventListener('online', onOnline);
     document.removeEventListener('visibilitychange', onFocus);
+    supabase.removeChannel(presenceChannel);
   };
 }
 
