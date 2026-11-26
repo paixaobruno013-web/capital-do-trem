@@ -551,7 +551,7 @@ window.addEventListener('pagehide',()=>{saveChatState();if(unsubscribe)unsubscri
     card.append(avatar,copy);list.append(card);
    }
   };
-  search.addEventListener('input',render);distance.addEventListener('change',render);render();
+  search.addEventListener('input',render);distance.addEventListener('change',render);render();const stopWatchingPresence=auth.subscribeUserPresence(next=>{onlineIds=next;render();});window.addEventListener('pagehide',()=>stopWatchingPresence());
  }catch(error){list.replaceChildren();const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar participantes agora. Confira a conexão e tente novamente.';list.append(message);count.textContent='Diretório temporariamente indisponível.';}
 })();
 </script>
