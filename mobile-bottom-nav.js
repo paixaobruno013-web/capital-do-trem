@@ -1,11 +1,18 @@
 (() => {
-  // Em todas as áreas, a navegação principal fica somente na barra inferior.
+  const path = location.pathname.toLowerCase();
+  const isHome = path.endsWith('/') || path.endsWith('/index.html');
+
+  // A página inicial é intocável: preserva capa do helicóptero/favela,
+  // redes sociais, localização, foto de perfil e navegação original.
+  if (isHome) return;
+
+  // Nas áreas internas, mantém os títulos e a identidade de cada tela,
+  // removendo apenas atalhos superiores duplicados; a barra inferior permanece.
   const cleanup = document.createElement('style');
   cleanup.id = 'capital-top-navigation-cleanup';
   cleanup.textContent = `
-    /* O cabeçalho antigo e os atalhos superiores saem; o conteúdo ocupa o espaço liberado. */
-    body > header { display: none !important; }
     .chat-area-nav { display: none !important; }
+    body > header .actions a { display: none !important; }
     html { scroll-padding-top: 8px !important; scroll-padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important; }
     body { min-height: 100vh; min-height: 100svh; padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)) !important; }
     body > main {
@@ -16,16 +23,12 @@
     @media (max-width: 759px) {
       body > main { padding-left: 10px !important; padding-right: 10px !important; }
     }
-    /* O espaço final de cada tela fica livre para a barra fixa, sem cobrir conteúdo. */
     body > main > :last-child { scroll-margin-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
   `;
   if (!document.getElementById(cleanup.id)) document.head.append(cleanup);
 
-  // A página inicial já possui a navegação original (#nav). Não criar uma segunda barra.
+  // Não criar uma segunda barra nas telas que já possuem navegação própria.
   if (document.querySelector('nav#nav')) return;
-
-  const path = location.pathname.toLowerCase();
-  const isHome = path.endsWith('/') || path.endsWith('/index.html');
   const getActive = () => {
     if (path.endsWith('/bate-papo.html') || path.endsWith('/mensagens.html')) return 'chat';
     if (path.endsWith('/rede.html')) return 'perfil';
