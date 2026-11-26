@@ -1570,7 +1570,7 @@ export async function prepareStoryMediaFile(file) {
     const width = source.width || source.naturalWidth;
     const height = source.height || source.naturalHeight;
     if (!width || !height) throw new Error('A foto selecionada está inválida. Escolha outra imagem.');
-    const scale = Math.min(1, 1920 / Math.max(width, height));
+    const scale = Math.min(1, 1440 / Math.max(width, height));
     const canvas = document.createElement('canvas');
     canvas.width = Math.max(1, Math.round(width * scale));
     canvas.height = Math.max(1, Math.round(height * scale));
@@ -1578,7 +1578,7 @@ export async function prepareStoryMediaFile(file) {
     if (!context) throw new Error('Não foi possível preparar a foto para publicação.');
     context.drawImage(source, 0, 0, canvas.width, canvas.height);
     let blob = null;
-    for (const quality of [0.88, 0.8, 0.72, 0.64]) {
+    for (const quality of [0.84, 0.76, 0.68]) {
       blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
       if (blob && blob.size <= 7.5 * 1024 * 1024) break;
     }
