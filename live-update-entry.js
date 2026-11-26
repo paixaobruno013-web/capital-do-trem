@@ -23,7 +23,7 @@ async function fetchLatestBundle() {
     throw new Error('Pacote de atualização incompleto ou sem SHA-256.');
   }
   const checksum = checksumMatch[1].toLowerCase();
-  return { bundleId: release.tag_name, url: zip.browser_download_url, checksum };
+  return { bundleId: release.tag_name, url: zip.browser_download_url, checksum, signature: signatureMatch[1] };
 }
 
 async function checkForUpdate() {
