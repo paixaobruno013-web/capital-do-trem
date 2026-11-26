@@ -2,9 +2,25 @@
   const path = location.pathname.toLowerCase();
   const isHome = path.endsWith('/') || path.endsWith('/index.html');
 
-  // A página inicial é intocável: preserva capa do helicóptero/favela,
-  // redes sociais, localização, foto de perfil e navegação original.
-  if (isHome) return;
+  // Na página inicial, preserva integralmente o cabeçalho no Feed.
+  // Ao entrar em Músicas ou Pesquisa, recolhe apenas o bloco superior,
+  // sem alterar o conteúdo nem a barra inferior.
+  if (isHome) {
+    const homeStyle = document.createElement('style');
+    homeStyle.id = 'capital-home-header-by-section';
+    homeStyle.textContent = 'body.cdt-secondary-section > header { display:none !important; }';
+    if (!document.getElementById(homeStyle.id)) document.head.append(homeStyle);
+    const syncHomeHeader = () => {
+      const active = document.querySelector('main .page.active');
+      document.body.classList.toggle('cdt-secondary-section', !!active && active.id !== 'inicio');
+    };
+    syncHomeHeader();
+    const pageObserver = new MutationObserver(syncHomeHeader);
+    document.querySelectorAll('main .page').forEach(page =>
+      pageObserver.observe(page, { attributes:true, attributeFilter:['class'] })
+    );
+    return;
+  }
 
   // Nas áreas internas, mantém os títulos e a identidade de cada tela,
   // removendo apenas atalhos superiores duplicados; a barra inferior permanece.
