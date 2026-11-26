@@ -1401,6 +1401,63 @@ export async function getChatModerationReports(limit=100) {
  return data||[];
 }
 
+
+/* Imagens oficiais do FALA UAI: leitura compartilhada e gravação exclusiva do administrador. */
+export async function getPublicChatProfileImages() {
+  const supabase = initSupabase();
+  const { data, error } = await supabase.from('site_settings')
+    .select('setting_key,setting_value')
+    .in('setting_key', ['chat_brand_profile_image_url','chat_group_profile_image_url']);
+  if (error) throw error;
+  const settings = Object.fromEntries((data || []).map(row => [row.setting_key, row.setting_value]));
+  return {
+    brand: settings.chat_brand_profile_image_url || '',
+    group: settings.chat_group_profile_image_url || ''
+  };
+}
+
+export async function saveAdminChatProfileImages(files = {}) {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user || !(await isCurrentUserAdmin())) throw new Error('Somente o administrador pode alterar as imagens oficiais do FALA UAI.');
+  const selected = [['brand',files.brand,'chat-brand'],['group',files.group,'chat-group']].filter(([,file]) => file instanceof File);
+  if (!selected.length) throw new Error('Escolha pelo menos uma imagem antes de salvar.');
+  const rows = [];
+  for (const [kind,file,prefix] of selected) {
+    const format = await getBrandingUploadFormat(file, { jpg:true, jpeg:true, png:true, webp:true });
+    if (file.size < 1 || file.size > 5 * 1024 * 1024) throw new Error('Cada imagem deve ter até 5 MB.');
+    const path = user.id + '/branding/' + prefix + '-' + crypto.randomUUID() + '.' + format.extension;
+    const { error: uploadError } = await supabase.storage.from('capital-do-trem-media').upload(path,file,{
+      contentType:format.contentType,cacheControl:'3600',upsert:false
+    });
+    if (uploadError) throw uploadError;
+    const { data: publicData } = supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
+    if (!publicData?.publicUrl) throw new Error('Não foi possível gerar o endereço público da imagem.');
+    rows.push({setting_key:kind==='brand'?'chat_brand_profile_image_url':'chat_group_profile_image_url',setting_value:publicData.publicUrl,updated_at:new Date().toISOString()});
+  }
+  const { error } = await supabase.from('site_settings').upsert(rows,{onConflict:'setting_key'});
+  if (error) throw error;
+  return await getPublicChatProfileImages();
+}
+
+/* Diretório do grupo: IDs ativos e perfis públicos, sem expor dados privados. */
+export async function getChatGroupDirectory() {
+  const supabase = initSupabase();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user) throw new Error('Entre na sua conta para ver os participantes.');
+  const { data: ids, error: idsError } = await supabase.rpc('active_chat_group_member_ids');
+  if (idsError) throw idsError;
+  const memberIds = (ids || []).map(row => typeof row === 'string' ? row : row.user_id).filter(Boolean);
+  if (!memberIds.length) return { count:0, participants:[] };
+  const { data: profiles, error: profilesError } = await supabase.from('profiles')
+    .select('user_id,display_name,username,avatar_type,avatar_url,avatar_data')
+    .in('user_id',memberIds).eq('is_public',true).order('display_name',{ascending:true}).limit(200);
+  if (profilesError) throw profilesError;
+  return { count:memberIds.length, participants:profiles || [] };
+}
+
 // Identidade visual oficial do aplicativo: leitura pública e gravação exclusiva de administradores.
 export async function getPublicBranding() {
   const supabase = initSupabase();
