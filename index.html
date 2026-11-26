@@ -1553,14 +1553,35 @@ function requestNearbyLocation(status,mapLink){mapLink.hidden=true;const buttons
 document.getElementById('find-nearby').addEventListener('click',()=>requestNearbyLocation(document.getElementById('location-status'),document.getElementById('nearby-map')));
 document.getElementById('quick-location').addEventListener('click',()=>{const status=document.getElementById('location-status'),mapLink=document.getElementById('nearby-map');requestNearbyLocation(status,mapLink);document.querySelector('[data-page=\"eventos\"]').click();});
 
-// Compartilhar o site usando os recursos disponíveis no celular.
+// Compartilhamento compatível com Safari/iOS e navegadores sem Web Share.
+async function copyCapitalLink(url){
+ try{
+  if(navigator.clipboard&&window.isSecureContext){
+   await navigator.clipboard.writeText(url);
+   return true;
+  }
+ }catch(error){console.warn('Clipboard API indisponível; tentando cópia manual.',error);}
+ const field=document.createElement('textarea');
+ field.value=url;field.setAttribute('readonly','');
+ field.style.cssText='position:fixed;left:-9999px;top:0;opacity:0';
+ document.body.append(field);field.select();field.setSelectionRange(0,field.value.length);
+ let copied=false;
+ try{copied=document.execCommand('copy');}catch(error){console.warn('Cópia manual indisponível.',error);}
+ field.remove();
+ return copied;
+}
 document.getElementById('compartilhar-site').addEventListener('click',async()=>{
  const shareData={title:'Capital do Trem',text:'A música da nossa quebrada! Conheça o Capital do Trem.',url:location.href};
- try{
-  if(navigator.share){await navigator.share(shareData);}
-  else if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(shareData.url);alert('Link do Capital do Trem copiado. Agora é só compartilhar!');}
-  else{window.prompt('Copie o link do Capital do Trem:',shareData.url);}
- }catch(error){if(error.name!=='AbortError')alert('Não foi possível compartilhar agora. Tente copiar o endereço do site.');}
+ if(typeof navigator.share==='function'){
+  try{await navigator.share(shareData);return;}
+  catch(error){
+   if(error.name==='AbortError')return;
+   console.warn('Compartilhamento nativo indisponível; usando alternativa.',error);
+  }
+ }
+ const copied=await copyCapitalLink(shareData.url);
+ if(copied)alert('Link do Capital do Trem copiado! Abra o WhatsApp, Instagram ou outro aplicativo e cole o endereço.');
+ else window.prompt('Copie o link do Capital do Trem:',shareData.url);
 });
 // Oferece a instalação como aplicativo quando o navegador Android permitir.
 let installPrompt=null;
