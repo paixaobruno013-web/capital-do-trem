@@ -1299,3 +1299,16 @@ body:has(#private-layout) #conversation-search{min-height:48px;border:1px solid 
  #my-uploaded-songs-list .my-uploaded-song-name{font-size:13px!important}
  #my-uploaded-songs-list .my-uploaded-song-play{min-height:34px!important;font-size:11px!important}
 }
+
+/* Publicação simplificada: texto, galeria, edição e duas formas de compartilhar. */
+.home-feed-composer-v2{gap:12px;padding:14px}.home-feed-composer-v2 textarea{min-height:78px;max-height:180px;resize:vertical}
+.home-feed-editor-tools{display:flex;gap:9px;flex-wrap:wrap}.home-feed-tool-button{min-height:40px;padding:8px 13px;border:1px solid rgba(237,28,36,.48);border-radius:11px;background:#171012;color:#fff;font-weight:800}
+.home-feed-tool-button[aria-pressed="true"]{background:#ed1c24;border-color:#ff5961;box-shadow:0 0 13px #ed1c2466}
+.home-feed-gallery-picker{display:flex;min-height:150px;aspect-ratio:1.45/1;max-height:230px;flex-direction:column;align-items:center;justify-content:center;gap:7px;border:1.5px dashed rgba(237,28,36,.72);border-radius:15px;background:radial-gradient(circle,rgba(237,28,36,.12),transparent 60%),#090909;color:#fff;cursor:pointer;text-align:center}
+.home-feed-gallery-picker>span{display:grid;place-items:center;width:54px;height:54px;border:1px solid #ed1c24;border-radius:50%;background:#ed1c24;color:#fff;font-size:38px;line-height:1;box-shadow:0 0 18px #ed1c2470}
+.home-feed-gallery-picker strong{font-size:13px}.home-feed-gallery-picker small{font-size:11px;color:#aaa}
+.home-feed-preview{padding:10px;border:1px solid rgba(237,28,36,.32);border-radius:14px;background:#090909}.home-feed-preview-stage{display:grid;place-items:center;max-height:420px;overflow:hidden;border-radius:10px;background:#000}
+.home-feed-preview-media{max-width:100%;max-height:390px;object-fit:contain}.home-feed-preview-stage.is-cropped .home-feed-preview-media,.home-feed-preview-media.is-cropped{width:min(100%,390px);height:auto;aspect-ratio:1;object-fit:cover}
+.home-feed-publish-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.home-feed-publish-actions button{min-height:48px;padding:10px 8px;border-radius:12px;font-size:13px;font-weight:900;white-space:normal}
+.home-feed-publish-story{border:1px solid #ed1c24;background:linear-gradient(145deg,#211014,#090909);color:#fff}.home-feed-publish-actions button:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:380px){.home-feed-publish-actions{grid-template-columns:1fr}.home-feed-gallery-picker{min-height:135px}}
