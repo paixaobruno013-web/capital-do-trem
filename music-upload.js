@@ -208,8 +208,8 @@ if (form && access && status && fileInput && submit) {
         file,
         title: $('music-upload-title').value,
         artistName: $('music-upload-artist').value,
-        producerName: $('music-upload-producer').value,
-        description: $('music-upload-description').value,
+        producerName: $('music-upload-producer')?.value || '',
+        description: $('music-upload-description')?.value || '',
         onProgress: percent => {
           status.textContent = percent >= 100
             ? 'Arquivo enviado. Finalizando o cadastro da música…'
@@ -217,7 +217,7 @@ if (form && access && status && fileInput && submit) {
         }
       });
       await clearAudioDraft();
-      fileInput.value='';titleInput.value='';$('music-upload-artist').value='';$('music-upload-producer').value='';$('music-upload-description').value='';updateTitleCounter();
+      fileInput.value='';titleInput.value='';$('music-upload-artist').value='';if($('music-upload-producer'))$('music-upload-producer').value='';if($('music-upload-description'))$('music-upload-description').value='';updateTitleCounter();
       status.textContent = song.status === 'published'
         ? 'Música publicada no catálogo!'
         : 'Música enviada! Ela ficará aguardando aprovação do administrador antes de aparecer no catálogo.';
