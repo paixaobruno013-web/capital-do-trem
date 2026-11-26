@@ -10,7 +10,8 @@
     "cap:add:ios": "cap add ios",
     "android": "npm run cap:sync && cap open android",
     "ios": "npm run cap:sync && cap open ios",
-    "test:chat": "node scripts/check-chat-controls.mjs && node scripts/check-chat-attachments.mjs && node scripts/check-view-once-chat.mjs && node scripts/check-chat-media-download-guard.mjs && node scripts/check-playlists-fala-uai.mjs"
+    "test:chat": "node scripts/check-chat-controls.mjs && node scripts/check-chat-attachments.mjs && node scripts/check-view-once-chat.mjs && node scripts/check-chat-media-download-guard.mjs && node scripts/check-playlists-fala-uai.mjs",
+    "test:music": "node scripts/check-music-experience.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.6.0",
