@@ -228,7 +228,7 @@
  }
 
  if(!supportsServiceWorkerUpdates||!('serviceWorker' in navigator))return;
- let registration=null,reloading=false,updateHornPlayed=false,updateHideTimer=null;
+ let registration=null,reloading=false,hadServiceWorkerController=Boolean(navigator.serviceWorker.controller),updateHornPlayed=false,updateHideTimer=null;
  const banner=document.createElement('aside');
  banner.id='app-update-banner';
  banner.setAttribute('role','status');
@@ -284,6 +284,7 @@
   });
  }
  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+  if(!hadServiceWorkerController){hadServiceWorkerController=true;return;}
   if(reloading)return;
   reloading=true;
   showUpdated();
