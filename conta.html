@@ -694,7 +694,7 @@ if(googleLinkButton && !googleLinkButton.dataset.handlerBound){
   googleLinkButton.disabled=true;
   googleLinkStatus.textContent='Preparando a vinculação segura com o Google…';
   try{
-   const result=await auth.linkGoogleIdentityToCurrentAccount({redirectTo:window.location.href});
+   const result=await auth.linkGoogleIdentityToCurrentAccount({redirectTo:'https://paixaobruno013-web.github.io/capital-do-trem/conta.html'});
    if(result?.alreadyLinked){
     googleLinkStatus.textContent='Esta conta já possui um Google vinculado.';
     googleLinkButton.hidden=true;
@@ -985,7 +985,7 @@ const googleSignInButton=document.getElementById('google-sign-in');
 googleSignInButton.addEventListener('click',async()=>{
  if(!auth){status.textContent='Serviço de contas ainda está carregando. Tente novamente.';return;}
  googleSignInButton.disabled=true;status.textContent='Abrindo o acesso seguro do Google…';
- try{await auth.signInWithGoogleAccount({redirectTo:window.location.href});}
+ try{await auth.signInWithGoogleAccount({redirectTo:'https://paixaobruno013-web.github.io/capital-do-trem/conta.html'});}
  catch(error){status.textContent=error?.message||'Não foi possível iniciar o acesso Google. Confira a configuração do provedor.';googleSignInButton.disabled=false;}
 });
 artistForm.addEventListener('submit',async event=>{
