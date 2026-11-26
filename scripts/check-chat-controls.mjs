@@ -23,10 +23,13 @@ const checks = [
   ['perfil individual superior abre a sala do grupo', /id="open-group-profile"/.test(room) && /aria-controls="capital-do-trem-room"/.test(room) && /toggleProfilePanel\(groupRoom,groupProfileButton,groupRoom.hidden\)/.test(room)],
   ['perfil individual inferior abre a pesquisa de amizades', /id="open-friends-profile"/.test(room) && /aria-controls="fazer-amigos"/.test(room) && /toggleProfilePanel\(friendsPanel,friendsProfileButton,friendsPanel.hidden\)/.test(room)],
   ['salas começam recolhidas e amizades podem ser fechadas', /id="capital-do-trem-room" class="panel chat-panel" hidden/.test(room) && /id="fazer-amigos" class="panel friends-panel" hidden/.test(room) && /close-friends-profile/.test(room)],
-  ['cache PWA avançado para v317', /capital-do-trem-v317/.test(worker)],
+  ['cache PWA avançado para v318', /capital-do-trem-v318/.test(worker)],
 
 
-  ['FALA UAI mantém o cartão superior do GRUPO • CAPITAL do TREM e o cartão inferior de amizades', /GRUPO • CAPITAL do TREM/.test(room) && /fazer amizades pela localização/.test(room) && /cdt-fala-uai-social-layout/.test(room)],
+  ['FALA UAI mantém grupo e amizades em cartões separados', /GRUPO • CAPITAL do TREM/.test(room) && /fazer amizades pela localização/.test(room)],
+  ['logo oficial branca aparece no perfil do grupo', /id="open-group-profile"/.test(room) && /<img src="\.\/marca\.svg" alt="Logo Capital do Trem">/.test(room)],
+  ['perfis públicos aparecem em faixa horizontal com status online e acesso ao perfil', /id="chat-profile-rail"/.test(room) && /id="chat-online-profiles"/.test(room) && /chat-online-profile\.is-online/.test(room) && /rede\.html\?perfil=/.test(room)],
+  ['atalhos superiores e seletor de tema foram retirados da tela do chat', !/Pular para o conteúdo principal/.test(room) && !/fala-uai-header-actions/.test(room) && !/id="theme"/.test(room)],
   ['presença do grupo exibe quem está online e indicador de digitação em tempo real', /id="group-live-presence"/.test(room) && /startUserPresence/.test(room) && /subscribeUserPresence/.test(room) && /capital-fala-uai-group-typing/.test(room) && /announceGroupTyping/.test(room)],
   ['diretório de amizades oferece ações SEGUIR e CONVERSAR com autenticação', /textContent='SEGUIR'/.test(room) && /textContent='CONVERSAR'/.test(room) && /profile_follows/.test(room) && /requestPrivateConversation/.test(room)],
   ['botão CONVERSAR abre a conversa privada aceita ou informa que o convite aguarda aceite', /shareParams\.get\('user'\)/.test(privateChat) && /openConversation\(target\)/.test(privateChat) && /Seu convite foi enviado/.test(privateChat)],
@@ -37,7 +40,7 @@ const checks = [
   ['navegação móvel abre o FALA UAI', /label: 'Chat', icon: '💬', href: '\.\/bate-papo\.html'/.test(await read('mobile-bottom-nav.js'))],
 
   ['atalho PRIVADO não aparece como cartão ou ícone separado', !/data-open-view="private-conversations-shortcut"/.test(room) && !/id="private-conversations-shortcut"/.test(room) && !/<strong>PRIVADO<\/strong>/.test(room)],
-  ['bate-papo por assuntos permanece funcional sem atalho externo', /id="chat-topics"/.test(room) && /id="topic-create-form"/.test(room) && !/data-open-view="chat-topics"/.test(room)],
+  ['bate-papo por assuntos foi retirado e não chama tabela inexistente', !/id="chat-topics"/.test(room) && !/topic-create-form/.test(room) && !/chat-topics\.js/.test(room) && !/discussion_topics/.test(room)],
 
 
   ['navegação simplificada não injeta cartões de retorno nem caixa de entrada antiga', !room.includes('cdt-inbox-navigation') && !room.includes('id="cdt-chat-inbox"') && !room.includes('Todas as conversas')],
