@@ -13,15 +13,15 @@ const assert = (condition, message) => {
 assert(pkg.dependencies?.['@capawesome/capacitor-live-update']?.startsWith('8.'), 'SDK de atualização precisa ser compatível com Capacitor 8.');
 assert(pkg.devDependencies?.esbuild, 'Empacotador do módulo de atualização ausente.');
 assert(config.includes('readyTimeout: 10000'), 'Proteção de rollback precisa ter prazo de inicialização.');
-assert(config.includes('autoBlockRolledBackBundles: true'), 'Pacotes que falharem precisam ser bloqueados após rollback.');
+assert(config.includes('autoBlockRolledBackBundles: true'), 'Pacotes que falharem precisam ser bloqueados após rollback.');\nassert(config.includes('CAPITAL_DO_TREM_LIVE_UPDATE_PUBLIC_KEY'), 'A chave pública de verificação precisa vir do certificado de assinatura Android.');
 assert(html.includes('src="./live-update.js"'), 'Carregador do atualizador não está ligado à página principal.');
 const shim = await readFile('live-update.js', 'utf8');
 assert(shim.includes('isNativePlatform()') && shim.includes("import('./live-update-native.js')"), 'A PWA deve ignorar o SDK nativo e carregá-lo apenas em WebView.');
 assert(sw.includes("'./live-update.js'"), 'Service worker não inclui o carregador compartilhado.');
 assert(sw.includes("'./live-update-native.js'"), 'Service worker não inclui o módulo nativo gerado.');
 assert(updater.includes("startsWith('web-update-')"), 'Filtro de publicação precisa aceitar somente releases de atualização web.');
-assert(updater.includes('checksum: latest.checksum'), 'Download precisa validar SHA-256.');
-assert(updater.includes('release.body') && updater.includes('SHA-256:'), 'Checksum precisa vir dos metadados HTTPS da release.');
+assert(updater.includes('checksum: latest.checksum'), 'Download precisa validar SHA-256.');\nassert(updater.includes('signature: latest.signature'), 'Download precisa validar assinatura RSA.');\nassert(updater.includes('RSA-SIGNATURE:'), 'Assinatura RSA precisa vir dos metadados HTTPS da release.');
+assert(updater.includes('release.body') && updater.includes('SHA-256:'), 'Checksum precisa vir dos metadados HTTPS da release.');\nassert(updater.includes('!signatureMatch'), 'Release sem assinatura RSA precisa ser recusada.');
 assert(updater.includes("Capacitor.getPlatform() !== 'android'"), 'Download remoto precisa ser restrito ao Android nativo.');
 assert(updater.includes('await LiveUpdate.ready()'), 'O app precisa confirmar prontidão antes de buscar atualização.');
 assert(updater.indexOf('await LiveUpdate.ready()') < updater.indexOf("if (Capacitor.getPlatform() !== 'android') return;"), 'A prontidão também precisa ser confirmada em WebViews nativas iOS.');
