@@ -75,3 +75,18 @@ jobs:
         run: |
           npm run test:chat
           npm run build:web
+
+  music-regression:
+    name: Regressão funcional da área de músicas
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validar catálogo, player, playlists e envio
+        run: |
+          npm run test:music
+          npm run build:web
