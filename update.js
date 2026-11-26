@@ -195,9 +195,43 @@
  window.addEventListener('focus',verifyRealConnection);
  navigator.connection?.addEventListener?.('change',verifyRealConnection);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)verifyRealConnection();});
- window.setTimeout(verifyRealConnection,500);
- // Verifica a internet periodicamente sem sondagens excessivas; foco, retomada e eventos de rede continuam verificando imediatamente.
- window.setInterval(verifyRealConnection,30000);
+ // Monitor adaptativo: pausa sondagens em segundo plano e reduz a frequência com bateria baixa/economia de dados.
+ let connectionProbeTimer=null,batteryStatus=null;
+ const lowPowerMode=()=>Boolean((batteryStatus&&!batteryStatus.charging&&batteryStatus.level<=0.2)||navigator.connection?.saveData||/^(slow-2g|2g)$/.test(navigator.connection?.effectiveType||''));
+ function scheduleConnectionProbe(){
+  window.clearTimeout(connectionProbeTimer);
+  connectionProbeTimer=null;
+  if(document.hidden)return;
+  const delay=lowPowerMode()?45000:30000;
+  connectionProbeTimer=window.setTimeout(async()=>{
+   await verifyRealConnection();
+   scheduleConnectionProbe();
+  },delay);
+ }
+ function resumeConnectionMonitor(){
+  if(document.hidden)return;
+  verifyRealConnection();
+  scheduleConnectionProbe();
+ }
+ window.setTimeout(resumeConnectionMonitor,500);
+ window.addEventListener('focus',resumeConnectionMonitor);
+ window.addEventListener('pageshow',resumeConnectionMonitor);
+ window.addEventListener('online',()=>window.setTimeout(resumeConnectionMonitor,300));
+ document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){window.clearTimeout(connectionProbeTimer);connectionProbeTimer=null;}
+  else resumeConnectionMonitor();
+ });
+ navigator.connection?.addEventListener?.('change',scheduleConnectionProbe);
+ if(typeof navigator.getBattery==='function'){
+  navigator.getBattery().then(battery=>{
+   batteryStatus=battery;
+   const refreshPowerPolicy=()=>scheduleConnectionProbe();
+   battery.addEventListener('levelchange',refreshPowerPolicy);
+   battery.addEventListener('chargingchange',refreshPowerPolicy);
+   scheduleConnectionProbe();
+  }).catch(()=>{});
+ }
+
  if(!supportsServiceWorkerUpdates||!('serviceWorker' in navigator))return;
  let registration=null,reloading=false;
  const banner=document.createElement('aside');
