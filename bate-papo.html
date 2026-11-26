@@ -375,7 +375,7 @@ const groupCardButton=document.getElementById('open-group-card');
  }
  document.getElementById('save-chat-images')?.addEventListener('click',()=>{
   try{
-   for(const key of ['brand','group','friends'])if(pendingChatImages[key])localStorage.setItem(chatImageKeys[key],pendingChatImages[key]);
+   for(const key of ['brand','group'])if(pendingChatImages[key])localStorage.setItem(chatImageKeys[key],pendingChatImages[key]);
    applySavedChatImages();pendingChatImages.brand=null;pendingChatImages.group=null;
     document.getElementById('chat-brand-image-file').value='';document.getElementById('chat-group-image-file').value='';
    settingsStatus.textContent='Todas as imagens selecionadas foram salvas neste aparelho.';
