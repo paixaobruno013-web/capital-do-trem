@@ -174,6 +174,8 @@ if (form && access && status && fileInput && submit) {
     status.textContent = file ? 'Preparando cópia segura do áudio…' : '';
     if (!file) { await clearAudioDraft(); return; }
     if (file.size > 50 * 1024 * 1024) {
+      // Não deixe um áudio antigo no rascunho local quando a nova seleção é inválida.
+      await clearAudioDraft();
       status.textContent = file.name + ' • arquivo acima do limite de 50 MB.';
       return;
     }
