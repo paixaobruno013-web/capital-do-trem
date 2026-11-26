@@ -1,17 +1,28 @@
-import {initSupabase,getCurrentSession,submitMyPost,getPostSocial,togglePostLike,addPostComment,updateMyPost,deleteMyPost,getPublishedSongs} from './supabase/auth.js';
+import {initSupabase,getCurrentSession,submitMyPost,getPostSocial,togglePostLike,addPostComment,updateMyPost,deleteMyPost,getPublishedSongs,createMyStory} from './supabase/auth.js';
 import {loadPostMusic,createPostMusicControl} from './post-music.js';
 const supabase=initSupabase();
 const $=id=>document.getElementById(id);
-const root=$('home-feed-list'),form=$('home-feed-composer'),status=$('home-feed-status'),fileInput=$('home-feed-media'),fileName=$('home-feed-media-name'),preview=$('home-feed-preview'),previewStage=$('home-feed-preview-stage'),clearMedia=$('home-feed-clear-media'),caption=$('home-feed-text'),charCount=$('home-feed-char-count');
+const root=$('home-feed-list'),form=$('home-feed-composer'),status=$('home-feed-status'),fileInput=$('home-feed-media'),fileName=$('home-feed-media-name'),preview=$('home-feed-preview'),previewStage=$('home-feed-preview-stage'),clearMedia=$('home-feed-clear-media'),caption=$('home-feed-text'),cropToggle=$('home-feed-crop-toggle'),storyPublishButton=$('home-feed-publish-story');
 const musicToggle=$('home-feed-music-toggle'),musicPanel=$('home-feed-music-panel'),musicSelect=$('home-feed-music-select'),musicStart=$('home-feed-music-start'),musicDuration=$('home-feed-music-duration'),musicPreview=$('home-feed-music-preview'),musicStatus=$('home-feed-music-status');
-let feedSongs=[],feedSongsLoaded=false,selectedFeedSongId='';
+let feedSongs=[],feedSongsLoaded=false,selectedFeedSongId='',cropSelectedImage=false;
 function resetFeedMusicPreview(){if(musicPreview){musicPreview.pause();musicPreview.removeAttribute('src');musicPreview.hidden=true;}}
 async function loadFeedSongs(){if(feedSongsLoaded)return;musicToggle.disabled=true;if(musicStatus)musicStatus.textContent='Carregando músicas publicadas…';try{feedSongs=await getPublishedSongs();musicSelect.replaceChildren(new Option('Sem música',''));for(const song of feedSongs)musicSelect.add(new Option(song.title+' — '+song.artist_name,song.id));feedSongsLoaded=true;if(musicStatus)musicStatus.textContent=feedSongs.length?'Escolha uma faixa de qualquer artista e ouça a prévia.':'Ainda não há músicas publicadas.';}catch(error){if(musicStatus)musicStatus.textContent=error.message||'Não foi possível carregar as músicas.';}finally{musicToggle.disabled=false;}}
 musicToggle?.addEventListener('click',async()=>{musicPanel.hidden=!musicPanel.hidden;if(!musicPanel.hidden)await loadFeedSongs();});
 musicSelect?.addEventListener('change',()=>{selectedFeedSongId=musicSelect.value;const song=feedSongs.find(item=>item.id===selectedFeedSongId);resetFeedMusicPreview();if(song?.audio_url){musicPreview.src=song.audio_url;musicPreview.hidden=false;if(musicStatus)musicStatus.textContent='Selecionada: '+song.artist_name+' — '+song.title+'. Ajuste o trecho e ouça antes de publicar.';}else if(musicStatus)musicStatus.textContent='A publicação será feita sem música.';});
 let previewUrl='';
-function clearSelectedMedia(){if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl='';}if(fileInput)fileInput.value='';if(fileName)fileName.textContent='Nenhuma mídia selecionada';if(previewStage)previewStage.replaceChildren();if(preview)preview.hidden=true;}
-function renderSelectedMedia(file){clearSelectedMedia();if(!file)return;fileName.textContent=file.name+' • '+(file.size/1024/1024).toFixed(2)+' MB';previewUrl=URL.createObjectURL(file);const media=document.createElement(file.type.startsWith('video/')?'video':'img');media.src=previewUrl;media.className='home-feed-preview-media';if(media.tagName==='VIDEO'){media.controls=true;media.playsInline=true;}else media.alt='Prévia da foto que será publicada';previewStage.append(media);preview.hidden=false;}
+function clearSelectedMedia(){if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl='';}if(fileInput)fileInput.value='';if(fileName){fileName.textContent='Nenhuma mídia selecionada';fileName.hidden=true;}if(previewStage)previewStage.replaceChildren();if(preview)preview.hidden=true;cropSelectedImage=false;if(cropToggle){cropToggle.setAttribute('aria-pressed','false');cropToggle.disabled=true;cropToggle.textContent='✂ Editar / cortar';}if(storyPublishButton)storyPublishButton.disabled=true;}
+function renderSelectedMedia(file){clearSelectedMedia();if(!file)return;if(fileName){fileName.textContent=file.name+' • '+(file.size/1024/1024).toFixed(2)+' MB';fileName.hidden=false;}previewUrl=URL.createObjectURL(file);const media=document.createElement(file.type.startsWith('video/')?'video':'img');media.src=previewUrl;media.className='home-feed-preview-media';if(media.tagName==='VIDEO'){media.controls=true;media.playsInline=true;}else{media.alt='Prévia da foto que será publicada';if(cropToggle)cropToggle.disabled=false;}previewStage.append(media);preview.hidden=false;if(storyPublishButton)storyPublishButton.disabled=false;}
+async function cropImageToSquare(file){
+ const image=new Image(),url=URL.createObjectURL(file);
+ try{await new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=()=>reject(new Error('Não foi possível abrir a foto para cortar.'));image.src=url;});
+ const side=Math.min(image.naturalWidth,image.naturalHeight),sx=(image.naturalWidth-side)/2,sy=(image.naturalHeight-side)/2,scale=Math.min(1,1600/side);
+ const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(side*scale));canvas.height=canvas.width;
+ const context=canvas.getContext('2d');if(!context)throw new Error('Não foi possível preparar o corte da foto.');
+ context.drawImage(image,sx,sy,side,side,0,0,canvas.width,canvas.height);
+ const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.88));if(!blob)throw new Error('Não foi possível salvar o corte da foto.');
+ return new File([blob],'capital-do-trem-feed-cortada.jpg',{type:'image/jpeg',lastModified:Date.now()});
+ }finally{URL.revokeObjectURL(url);}
+}
 if(root&&form){
  let currentUser=null;
  const safe=(value)=>String(value??'');
@@ -95,37 +106,37 @@ if(root&&form){
   }catch(error){root.textContent='Não foi possível carregar o Feed: '+(error.message||'verifique sua conexão.')}
  }
  fileInput?.addEventListener('change',()=>renderSelectedMedia(fileInput.files?.[0]));
- clearMedia?.addEventListener('click',clearSelectedMedia);
- caption?.addEventListener('input',()=>{if(charCount)charCount.textContent=caption.value.length+'/1500'});
- form.addEventListener('submit',async event=>{
-  event.preventDefault();
-  const text=$('home-feed-text').value.trim(),file=fileInput?.files?.[0];
-  if(!text&&!file){status.textContent='Escreva uma mensagem ou escolha uma foto/vídeo.';return}
-  if(selectedFeedSongId&&(!file||!file.type.startsWith('image/'))){status.textContent='Para anexar música no Feed, escolha também uma foto. O trecho musical será exibido junto à publicação.';return}
-  if(file){const allowed=['image/jpeg','image/png','image/webp','video/mp4','video/webm','video/quicktime'];if(!allowed.includes(file.type)){status.textContent='Formato não permitido.';return}const max=file.type.startsWith('image/')?10*1024*1024:50*1024*1024;if(file.size>max){status.textContent='Arquivo muito grande para publicar.';return}}
-  const button=form.querySelector('button[type=submit]');button.disabled=true;status.textContent='Publicando…';
-  let createdPost=null,uploadedPath=null;
-  try{
-   const session=await getCurrentSession();if(!session?.user)throw new Error('Entre na sua conta para publicar no Feed.');
-   createdPost=await submitMyPost(text||'📸 Nova publicação na comunidade');
-   if(file){
-    const ext=({'image/jpeg':'jpg','image/png':'png','image/webp':'webp','video/mp4':'mp4','video/webm':'webm','video/quicktime':'mov'})[file.type];
-    uploadedPath=session.user.id+'/posts/'+crypto.randomUUID()+'.'+ext;
-    const uploaded=await supabase.storage.from('capital-do-trem-social').upload(uploadedPath,file,{contentType:file.type,cacheControl:'3600',upsert:false});
-    if(uploaded.error)throw uploaded.error;
-    const row=await supabase.from('post_media').insert({post_id:createdPost.id,owner_id:session.user.id,bucket_id:'capital-do-trem-social',storage_path:uploadedPath,media_type:file.type.startsWith('video/')?'video':'image',mime_type:file.type,byte_size:file.size,alt_text:text.slice(0,200)});
-    if(row.error)throw row.error;
-   }
-   if(selectedFeedSongId){const start=Math.max(0,Math.min(3600,Number(musicStart?.value)||0));const duration=Math.max(5,Math.min(60,Number(musicDuration?.value)||15));const linked=await supabase.from('post_music').insert({post_id:createdPost.id,song_id:selectedFeedSongId,start_seconds:start,duration_seconds:duration,volume:0.8});if(linked.error)throw linked.error;}
-   $('home-feed-text').value='';clearSelectedMedia();selectedFeedSongId='';if(musicSelect)musicSelect.value='';resetFeedMusicPreview();if(charCount)charCount.textContent='0/1500';status.textContent='Publicação compartilhada com os Maquinistas! ❤️';await load();
-  }catch(error){
-   if(uploadedPath){try{const {error:removeError}=await supabase.storage.from('capital-do-trem-social').remove([uploadedPath]);if(removeError)console.error('Falha ao remover mídia órfã do Feed.',removeError);}catch(cleanupError){console.error('Falha ao limpar mídia órfã do Feed.',cleanupError);}}
-   if(createdPost?.id){try{await deleteMyPost(createdPost.id);}catch(cleanupError){console.error('Falha ao reverter publicação incompleta.',cleanupError);}}
-   status.textContent=error.message||'Não foi possível publicar.';
+  clearMedia?.addEventListener('click',clearSelectedMedia);
+  cropToggle?.addEventListener('click',()=>{const file=fileInput?.files?.[0];if(!file||!file.type.startsWith('image/'))return;cropSelectedImage=!cropSelectedImage;cropToggle.setAttribute('aria-pressed',String(cropSelectedImage));cropToggle.textContent=cropSelectedImage?'✓ Corte quadrado ativado':'✂ Editar / cortar';previewStage?.classList.toggle('is-cropped',cropSelectedImage);const image=previewStage?.querySelector('img');if(image)image.classList.toggle('is-cropped',cropSelectedImage);});
+  async function publishPost(alsoStory=false){
+   const text=caption.value.trim(),originalFile=fileInput?.files?.[0];let file=originalFile;
+   if(!text&&!file){status.textContent='Escreva uma mensagem ou escolha uma foto/vídeo.';return}
+   if(alsoStory&&!file){status.textContent='Escolha uma foto ou vídeo para compartilhar também nos Stories.';return}
+   if(alsoStory&&file&&file.size>(file.type.startsWith('video/')?20:8)*1024*1024){status.textContent=file.type.startsWith('video/')?'Para compartilhar também no Story, o vídeo deve ter até 20 MB.':'Para compartilhar também no Story, a foto deve ter até 8 MB.';return}
+   if(file&&cropSelectedImage&&file.type.startsWith('image/')){try{status.textContent='Preparando o corte da foto…';file=await cropImageToSquare(file);}catch(error){status.textContent=error.message;return}}
+   if(selectedFeedSongId&&(!file||!file.type.startsWith('image/'))){status.textContent='Para anexar música no Feed, escolha também uma foto. O trecho musical será exibido junto à publicação.';return}
+   if(file){const allowed=['image/jpeg','image/png','image/webp','video/mp4','video/webm','video/quicktime'];if(!allowed.includes(file.type)){status.textContent='Formato não permitido.';return}const max=file.type.startsWith('image/')?10*1024*1024:50*1024*1024;if(file.size>max){status.textContent='Arquivo muito grande para publicar.';return}}
+   const button=form.querySelector('button[type=submit]');button.disabled=true;if(storyPublishButton)storyPublishButton.disabled=true;status.textContent='Publicando…';
+   let createdPost=null,uploadedPath=null,feedPublished=false;
+   try{
+    const session=await getCurrentSession();if(!session?.user)throw new Error('Entre na sua conta para publicar no Feed.');
+    createdPost=await submitMyPost(text||'📸 Nova publicação na comunidade');
+    if(file){const ext=({'image/jpeg':'jpg','image/png':'png','image/webp':'webp','video/mp4':'mp4','video/webm':'webm','video/quicktime':'mov'})[file.type];uploadedPath=session.user.id+'/posts/'+crypto.randomUUID()+'.'+ext;
+     const uploaded=await supabase.storage.from('capital-do-trem-social').upload(uploadedPath,file,{contentType:file.type,cacheControl:'3600',upsert:false});if(uploaded.error)throw uploaded.error;
+     const row=await supabase.from('post_media').insert({post_id:createdPost.id,owner_id:session.user.id,bucket_id:'capital-do-trem-social',storage_path:uploadedPath,media_type:file.type.startsWith('video/')?'video':'image',mime_type:file.type,byte_size:file.size,alt_text:text.slice(0,200)});if(row.error)throw row.error;}
+    if(selectedFeedSongId){const start=Math.max(0,Math.min(3600,Number(musicStart?.value)||0)),duration=Math.max(5,Math.min(60,Number(musicDuration?.value)||15));const linked=await supabase.from('post_music').insert({post_id:createdPost.id,song_id:selectedFeedSongId,start_seconds:start,duration_seconds:duration,volume:0.8});if(linked.error)throw linked.error;}
+    feedPublished=true;
+    if(alsoStory){try{const start=Math.max(0,Math.min(3600,Number(musicStart?.value)||0)),duration=Math.max(5,Math.min(60,Number(musicDuration?.value)||15));const story=await createMyStory({file,caption:text,musicSongId:selectedFeedSongId,musicStartSeconds:start,musicDurationSeconds:duration});document.dispatchEvent(new CustomEvent('capital:stories-updated',{detail:{id:story.id}}));}
+     catch(storyError){status.textContent='Feed publicado! Mas o Story não foi publicado: '+(storyError.message||'tente novamente.');await load();return;}}
+    caption.value='';clearSelectedMedia();selectedFeedSongId='';if(musicSelect)musicSelect.value='';resetFeedMusicPreview();status.textContent=alsoStory?'Compartilhado no Feed e nos Stories! ❤️':'Publicação compartilhada no Feed! ❤️';await load();
+   }catch(error){if(!feedPublished){if(uploadedPath){try{const {error:removeError}=await supabase.storage.from('capital-do-trem-social').remove([uploadedPath]);if(removeError)console.error('Falha ao remover mídia órfã do Feed.',removeError);}catch(cleanupError){console.error('Falha ao limpar mídia órfã do Feed.',cleanupError);}}
+    if(createdPost?.id){try{await deleteMyPost(createdPost.id);}catch(cleanupError){console.error('Falha ao reverter publicação incompleta.',cleanupError);}}}
+    status.textContent=error.message||'Não foi possível publicar.';
+   }finally{button.disabled=false;if(storyPublishButton)storyPublishButton.disabled=!fileInput?.files?.length;}
   }
-  finally{button.disabled=false}
- });
- (async()=>{try{const session=await getCurrentSession();currentUser=session?.user||null;if(!currentUser){status.textContent='Entre ou crie sua conta para publicar, curtir e comentar.';form.querySelector('button[type=submit]').disabled=true}}catch{}await load()})();
+  form.addEventListener('submit',event=>{event.preventDefault();publishPost(false);});
+  storyPublishButton?.addEventListener('click',()=>publishPost(true));
+  (async()=>{try{const session=await getCurrentSession();currentUser=session?.user||null;if(!currentUser){status.textContent='Entre ou crie sua conta para publicar, curtir e comentar.';form.querySelector('button[type=submit]').disabled=true;if(storyPublishButton)storyPublishButton.disabled=true}}catch{}await load()})();
 }
 const searchRoot=$('random-video-results');
 if(searchRoot){
