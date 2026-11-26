@@ -374,9 +374,9 @@ const groupCardButton=document.getElementById('open-group-card');
   });
  }
  async function saveOneChatImage(key){
-  const file=pendingChatImages[key];
-  const button=document.getElementById(key==='brand'?'save-chat-brand-image':'save-chat-group-image');
   const fileInput=key==='brand'?brandFile:groupFile;
+  const file=pendingChatImages[key]||fileInput?.files?.[0]||null;
+  const button=document.getElementById(key==='brand'?'save-chat-brand-image':'save-chat-group-image');
   if(!file){settingsStatus.textContent='Escolha a imagem antes de salvar.';return;}
   if(button)button.disabled=true;
   settingsStatus.textContent=key==='brand'?'Salvando a foto do perfil do chat…':'Salvando a foto do grupo…';
@@ -389,7 +389,7 @@ const groupCardButton=document.getElementById('open-group-card');
   }catch(error){
    settingsStatus.textContent=(error?.message||'Não foi possível salvar a imagem.')+' Se o arquivo já foi enviado, ele será mantido até concluir a gravação.';
   }finally{
-   if(button)button.disabled=!pendingChatImages[key];
+   if(button)button.disabled=!(pendingChatImages[key]||fileInput?.files?.[0]);
   }
  }
  document.getElementById('save-chat-brand-image')?.addEventListener('click',()=>saveOneChatImage('brand'));
@@ -399,7 +399,8 @@ const groupCardButton=document.getElementById('open-group-card');
  document.getElementById('save-chat-images')?.addEventListener('click',async()=>{
   const button=document.getElementById('save-chat-images');button.disabled=true;
   try{
-   const images=await saveAdminChatProfileImages(pendingChatImages);
+   const filesToSave={brand:pendingChatImages.brand||brandFile?.files?.[0]||null,group:pendingChatImages.group||groupFile?.files?.[0]||null};
+   const images=await saveAdminChatProfileImages(filesToSave);
    applyChatImages(images);pendingChatImages.brand=null;pendingChatImages.group=null;
    if(brandFile)brandFile.value='';if(groupFile)groupFile.value='';
    settingsStatus.textContent='Imagens oficiais salvas e publicadas para todos os usuários.';
