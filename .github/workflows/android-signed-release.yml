@@ -2,11 +2,17 @@ name: Publicar CAPITAL DO TREM — APK Android direto
 
 on:
   workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Versão Android para atualização no mesmo aplicativo (ex.: 1.0.5)'
+        required: true
+        type: string
+        default: '1.0.5'
   push:
     branches:
       - main
     paths:
-      - '.github/release-triggers/android-v1.0.4'
+      - '.github/release-triggers/android-v1.0.5'
 
 permissions:
   contents: write
