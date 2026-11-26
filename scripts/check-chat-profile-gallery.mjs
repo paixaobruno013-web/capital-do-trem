@@ -16,7 +16,7 @@ const checks = [
   ['Diretório do grupo limita dados de perfil a perfis públicos', /eq\('is_public',true\)/.test(auth)],
   ['Galeria do grupo mantém filtragem de foto e vídeo', /getChatMessages\(100\)/.test(chat) && /attachment_type/.test(chat)],
   ['Galeria privada consulta somente a conversa selecionada', /getPrivateMessages\(active\.id\)/.test(messages) && /private-media-gallery/.test(messages)],
-  ['Atualização invalida cache anterior do PWA', /capital-do-trem-v327/.test(sw)]
+  ['Atualização invalida cache anterior do PWA', /capital-do-trem-v329/.test(sw)]
 ];
 const failed = checks.filter(([,ok])=>!ok);
 for (const [name,ok] of checks) console.log((ok?'✓ ':'✗ ')+name);
