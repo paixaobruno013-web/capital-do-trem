@@ -40,7 +40,7 @@ jobs:
           else
             echo "publish=true" >> "$GITHUB_OUTPUT"
           fi
-      - name: Configurar Node.js
+      - name: Assinar o pacote com a mesma chave do aplicativo Android\n        if: steps.native_guard.outputs.publish == 'true'\n        shell: bash\n        env:\n          APP_KEYSTORE_BASE64: ${{ secrets.ANDROID_APP_SIGNING_KEYSTORE_BASE64 }}\n          APP_STORE_PASSWORD: ${{ secrets.ANDROID_APP_SIGNING_STORE_PASSWORD }}\n          APP_KEY_ALIAS: ${{ secrets.ANDROID_APP_SIGNING_KEY_ALIAS }}\n          APP_KEY_PASSWORD: ${{ secrets.ANDROID_APP_SIGNING_KEY_PASSWORD }}\n        run: |\n          set -euo pipefail\n          umask 077\n          KEYSTORE=\"$RUNNER_TEMP/capital-do-trem-signing.jks\"\n          PKCS12=\"$RUNNER_TEMP/capital-do-trem-signing.p12\"\n          PRIVATE_KEY=\"$RUNNER_TEMP/capital-do-trem-live-update-private.pem\"\n          CERT=\"$RUNNER_TEMP/capital-do-trem-signing-cert.pem\"\n          printf '%s' \"$APP_KEYSTORE_BASE64\" | base64 --decode > \"$KEYSTORE\"\n          test -s \"$KEYSTORE\"\n          keytool -importkeystore -noprompt -srckeystore \"$KEYSTORE\" -srcstorepass \"$APP_STORE_PASSWORD\" -srcalias \"$APP_KEY_ALIAS\" -srckeypass \"$APP_KEY_PASSWORD\" -destkeystore \"$PKCS12\" -deststoretype PKCS12 -deststorepass \"$APP_KEY_PASSWORD\" -destkeypass \"$APP_KEY_PASSWORD\" >/dev/null\n          openssl pkcs12 -in \"$PKCS12\" -passin env:APP_KEY_PASSWORD -nocerts -nodes -out \"$PRIVATE_KEY\"\n          openssl pkcs12 -in \"$PKCS12\" -passin env:APP_KEY_PASSWORD -clcerts -nokeys -out \"$CERT\"\n          openssl pkey -in \"$PRIVATE_KEY\" -check -noout\n          openssl x509 -in \"$CERT\" -noout -pubkey | openssl pkey -pubin -text -noout | grep -q 'Public-Key'\n          echo \"Signing key and certificate extracted in a protected temporary directory.\"\n          echo \"APP_KEY_PASSWORD=$APP_KEY_PASSWORD\" >> \"$GITHUB_ENV\"\n      - name: Configurar Node.js
         if: steps.native_guard.outputs.publish == 'true'
         uses: actions/setup-node@v4
         with:
@@ -77,6 +77,6 @@ jobs:
           body_path: release-notes.md
           files: |
             capital-do-trem-web-bundle.zip
-            capital-do-trem-web-bundle.sha256
+            capital-do-trem-web-bundle.sha256\n            capital-do-trem-web-bundle.sig
           draft: false
           prerelease: false
