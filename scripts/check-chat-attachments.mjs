@@ -23,7 +23,7 @@ const checks = [
   ['gravadores WebM são identificados como áudio e MOV é aceito para iPhone', /audio\/webm/.test(auth) && /video\/quicktime/.test(auth) && /video\/quicktime/.test(quicktimeMigration)],
   ['administradores conseguem moderar anexos do grupo', /is_current_chat_group_member\(\) or private\.is_admin\(\)/.test(adminReadMigration)],
   ['exclusão de conta inclui arquivos privados do chat', /collectChatAttachmentFiles/.test(accountDeletion) && /capital-do-trem-chat/.test(accountDeletion)],
-  ['verificação de conexão reage aos eventos e monitora a cada 30 segundos com confirmação offline de 13 segundos', /addEventListener\('online',[^\n]*verifyRealConnection/.test(updater) && /addEventListener\('offline',showOffline\)/.test(updater) && /setInterval\(verifyRealConnection,30000\)/.test(updater) && /setTimeout\(\(\)=>\{[\s\S]*?showOffline/.test(updater)],
+  ['monitor de conexão adapta intervalo à bateria, pausa em segundo plano e preserva alertas imediatos', /lowPowerMode\(\)\?45000:30000/.test(updater) && /if\(document\.hidden\)return/.test(updater) && /addEventListener\('offline',showOffline\)/.test(updater) && /resumeConnectionMonitor/.test(updater)],
   ['upload do grupo usa pasta group no bucket privado', /export async function uploadChatAttachment[\s\S]*?const path = 'group\/' \+ user\.id[\s\S]*?uploadChatFile\(file, path\)/.test(auth)],
   ['upload privado usa pasta private/conversa/usuário', /const path='private\/'\+conversationId\+'\/'\+user\.id/.test(auth)],
   ['mensagem privada aceita arquivo e preserva o controle de conversa', /export async function sendPrivateMessage\(conversationId,content,file=null,viewOnce=false\)[\s\S]*?uploadChatFile\(file,path\)[\s\S]*?private_messages/.test(auth)],
