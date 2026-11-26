@@ -8,6 +8,7 @@ const inbox = read('../mensagens.html');
 const css = read('../capital-modern-ui.css');
 const prepare = read('./prepare-web.mjs');
 const sw = read('../sw.js');
+const update = read('../update.js');
 const signedRelease = read('../.github/workflows/android-signed-release.yml');
 
 for (const [name, html] of [['index.html', home], ['bate-papo.html', chat]]) {
@@ -33,6 +34,11 @@ assert.ok(sw.includes("'./capital-modern-ui.css'"),
   'A folha visual precisa integrar o cache complementar do PWA');
 assert.ok(sw.includes("capital-do-trem-v311"),
   'O cache PWA precisa ser renovado para publicar os novos estilos');
+
+assert.ok(update.includes("message.textContent='🚂 NOVA ATUALIZAÇÃO DISPONÍVEL'"), 'O aviso de atualização deve ser compacto e identificável');
+assert.ok(update.includes("updateHornPlayed=true;playTrainHorn()"), 'A chegada da atualização deve tocar a corneta quando o áudio estiver liberado');
+assert.ok(update.includes("postMessage({type:'SKIP_WAITING'})"), 'O botão deve ativar a atualização aguardando');
+assert.ok(update.includes("button.textContent='ATUALIZADO'") && update.includes("},5000)"), 'A confirmação verde deve desaparecer após cinco segundos');
 
 console.log('Modernização visual: páginas, seletores, pacote móvel e cache PWA conferidos.');
 
