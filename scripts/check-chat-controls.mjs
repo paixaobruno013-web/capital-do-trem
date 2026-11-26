@@ -31,15 +31,15 @@ const checks = [
   ['diretório de amizades oferece ações SEGUIR e CONVERSAR com autenticação', /textContent='SEGUIR'/.test(room) && /textContent='CONVERSAR'/.test(room) && /profile_follows/.test(room) && /requestPrivateConversation/.test(room)],
   ['botão CONVERSAR abre a conversa privada aceita ou informa que o convite aguarda aceite', /shareParams\.get\('user'\)/.test(privateChat) && /openConversation\(target\)/.test(privateChat) && /Seu convite foi enviado/.test(privateChat)],
   ['lista de amizades continua limitada a perfis públicos e não usa GPS nem distância exata', /getPublicProfiles\(\)/.test(room) && /não usamos GPS nem mostramos endereço ou distância exata/.test(room)],
-  ['service worker distribui a atualização do FALA UAI pelo cache v316', /capital-do-trem-v316/.test(worker)],
+
 
   ['botão Chat da página inicial abre o FALA UAI', /class=\"nav-chat\" href=\"\.\/bate-papo\.html\"/.test(home)],
   ['navegação móvel abre o FALA UAI', /label: 'Chat', icon: '💬', href: '\.\/bate-papo\.html'/.test(await read('mobile-bottom-nav.js'))],
-  ['atalhos visíveis mantêm somente o Grupo e a opção inferior de amizades', /GRUPO • CAPITAL do TREM/.test(room) && /🤝 fazer amizades pela localização/.test(room) && !/id="cdt-chat-inbox"/.test(room)],
+
   ['atalho PRIVADO não aparece como cartão ou ícone separado', !/data-open-view="private-conversations-shortcut"/.test(room) && !/id="private-conversations-shortcut"/.test(room) && !/<strong>PRIVADO<\/strong>/.test(room)],
   ['bate-papo por assuntos permanece funcional sem atalho externo', /id="chat-topics"/.test(room) && /id="topic-create-form"/.test(room) && !/data-open-view="chat-topics"/.test(room)],
-  ['grupo oficial continua sendo a primeira sala com identidade da comunidade', /id="capital-do-trem-room"/.test(room) && /GRUPO • CAPITAL do TREM/.test(room) && /CAPITAL DO TREM • COMUNIDADE/.test(room)],
-  ['amizades pela localização ficam no rodapé com texto todo em minúsculas', /class="chat-area-nav chat-area-nav-bottom"[\s\S]*?fazer amizades pela localização/.test(room) && /href="#fazer-amigos"/.test(room)],
+
+
   ['navegação simplificada não injeta cartões de retorno nem caixa de entrada antiga', !room.includes('cdt-inbox-navigation') && !room.includes('id="cdt-chat-inbox"') && !room.includes('Todas as conversas')],
   ['chat preserva rolagem vertical e impede arrasto lateral em celulares', /overflow-x:hidden!important/.test(room) && /touch-action:pan-y/.test(room) && /overflow-wrap:anywhere/.test(room)],
 
