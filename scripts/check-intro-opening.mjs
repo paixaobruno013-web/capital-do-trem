@@ -29,7 +29,12 @@ const checks = [
   ['painel mostra progresso no envio do vídeo da abertura', /Enviando vídeo da abertura… '\+p\+'%'/ .test(admin)],
   ['abertura por imagem encerra sem acessar variável de vídeo inexistente', /const finish=\(\)=>\{if\(finished\)return;finished=true;progress=100;paint\(\);screen\.querySelector\('video'\)\?\.pause\(\);/.test(index)],
   ['restauração localiza campos pelo id real ou pelo name, sem usar namedItem para id', pickerGuard.includes('Array.from(form.elements||[]).find') && !pickerGuard.includes('form.elements.namedItem(selector.slice(1))')],
-  ['restauração também roda após DOMContentLoaded e em pageshow', pickerGuard.includes("if(document.readyState==='loading')") && pickerGuard.includes("window.addEventListener('pageshow',restoreForms)")]
+  ['restauração também roda após DOMContentLoaded e em pageshow', pickerGuard.includes("if(document.readyState==='loading')") && pickerGuard.includes("window.addEventListener('pageshow',restoreForms)")],
+  ['Stories solicita resolução inicial mais leve para abrir a câmera mais rápido', /width: \{ ideal: 960 \}/.test(await readFile(new URL('../home-story-composer.js', import.meta.url), 'utf8')) && /height: \{ ideal: 540 \}/.test(await readFile(new URL('../home-story-composer.js', import.meta.url), 'utf8'))],
+  ['Stories registra loadeddata e canplay antes de chamar play', /addEventListener\('loadeddata', markCameraReady[\s\S]*?addEventListener\('canplay', markCameraReady[\s\S]*?await live\.play\(\)/.test(await readFile(new URL('../home-story-composer.js', import.meta.url), 'utf8'))],
+  ['Stories não solicita zoom do hardware durante a abertura inicial da câmera', !/hardwareZoomActive = await applyZoomToTrack\(\)/.test(await readFile(new URL('../home-story-composer.js', import.meta.url), 'utf8'))],
+  ['Stories mantém o quadro capturado visível durante a codificação da foto', /live\.pause\(\);\s*live\.hidden = false;\s*photoPreview\.hidden = true;/.test(await readFile(new URL('../home-story-composer.js', import.meta.url), 'utf8'))],
+  ['Stories reduz o tamanho de codificação para prévia mais rápida sem eliminar a qualidade', /1280 \/ Math\.max\(cropWidth, cropHeight\)/.test(await readFile(new URL('../home-story-composer.js', import.meta.url), 'utf8')) && /}, 'image\/jpeg', 0\.78\)/.test(await readFile(new URL('../home-story-composer.js', import.meta.url), 'utf8'))]
 ];
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO ') + name);
 if (checks.some(([, ok]) => !ok)) process.exit(1);
