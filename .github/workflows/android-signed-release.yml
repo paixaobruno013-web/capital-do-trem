@@ -40,6 +40,29 @@ jobs:
       - name: Baixar o código
         uses: actions/checkout@v4
 
+      - name: Extrair chave pública para validar atualizações remotas
+        shell: bash
+        env:
+          APP_KEYSTORE_BASE64: ${{ secrets.ANDROID_APP_SIGNING_KEYSTORE_BASE64 }}
+          APP_STORE_PASSWORD: ${{ secrets.ANDROID_APP_SIGNING_STORE_PASSWORD }}
+          APP_KEY_ALIAS: ${{ secrets.ANDROID_APP_SIGNING_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          umask 077
+          KEYSTORE="$RUNNER_TEMP/capital-do-trem-app-signing.jks"
+          CERT="$RUNNER_TEMP/capital-do-trem-signing-cert.pem"
+          printf '%s' "$APP_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE"
+          test -s "$KEYSTORE"
+          keytool -exportcert -rfc -keystore "$KEYSTORE" -storepass "$APP_STORE_PASSWORD" -alias "$APP_KEY_ALIAS" -file "$CERT"
+          openssl x509 -in "$CERT" -noout -text | grep -q 'Public Key Algorithm: rsaEncryption'
+          PUBLIC_KEY="$(openssl x509 -in "$CERT" -pubkey -noout | tr -d '\r\n')"
+          case "$PUBLIC_KEY" in
+            '-----BEGIN PUBLIC KEY-----'*'-----END PUBLIC KEY-----') ;;
+            *) echo "::error::Não foi possível extrair uma chave pública RSA válida."; exit 1 ;;
+          esac
+          echo "CAPITAL_DO_TREM_LIVE_UPDATE_PUBLIC_KEY=$PUBLIC_KEY" >> "$GITHUB_ENV"
+          echo "Certificado RSA verificado; chave pública configurada sem expor a chave privada."
+
       - name: Validar versão da publicação
         shell: bash
         env:
