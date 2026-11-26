@@ -19,20 +19,68 @@ jobs:
     steps:
       - name: Baixar o código
         uses: actions/checkout@v4
+      - name: Impedir publicação de mudanças nativas por OTA
+        id: native_guard
+        shell: bash
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          CURRENT_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [[ "$BEFORE_SHA" =~ ^0+$ ]]; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "Publicação inicial ignorada; aguarda a instalação do mecanismo nativo."
+            exit 0
+          fi
+          changed="$(git diff --name-only "$BEFORE_SHA" "$CURRENT_SHA")"
+          if printf '%s\n' "$changed" | grep -Eq '^(package.json|capacitor.config.ts|live-update-entry.js|live-update.js|scripts/prepare-web.mjs|scripts/configure-android-media.py|scripts/prepare-ios-info.py)          set -euo pipefail
+          cd www
+          zip -qr ../capital-do-trem-web-bundle.zip .
+          cd ..
+          test -s capital-do-trem-web-bundle.zip
+          sha256sum capital-do-trem-web-bundle.zip | awk '{print $1}' > capital-do-trem-web-bundle.sha256
+          test "$(wc -c < capital-do-trem-web-bundle.sha256)" -eq 65
+      - name: Publicar pacote remoto gratuito
+        if: steps.native_guard.outputs.publish == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: web-update-${{ github.run_number }}
+          name: "Capital do Trem — atualização web ${{ github.run_number }}"
+          body: |
+            Pacote web para atualização remota do Capital do Trem.
+            Compatível apenas com alterações HTML, CSS, JavaScript e arquivos web.
+            Integridade do ZIP validada por SHA-256.
+          files: |
+            capital-do-trem-web-bundle.zip
+            capital-do-trem-web-bundle.sha256
+          draft: false
+          prerelease: false
+; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "Alteração nativa/de empacotamento detectada. Nenhum pacote OTA será publicado."
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Configurar Node.js
+        if: steps.native_guard.outputs.publish == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
       - name: Instalar dependências
+        if: steps.native_guard.outputs.publish == 'true'
         run: npm install --no-audit --no-fund
       - name: Preparar os arquivos web
+        if: steps.native_guard.outputs.publish == 'true'
         run: npm run build:web
       - name: Validar o mecanismo de atualização
+        if: steps.native_guard.outputs.publish == 'true'
         run: npm run test:live-update
       - name: Validar o pacote PWA
+        if: steps.native_guard.outputs.publish == 'true'
         run: node scripts/check-pwa.mjs
       - name: Montar pacote web compatível com Capacitor
+        if: steps.native_guard.outputs.publish == 'true'
         run: |
           set -euo pipefail
           cd www
