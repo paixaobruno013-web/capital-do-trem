@@ -24,6 +24,7 @@ assert(sw.includes("'./live-update-native.js'"), 'Service worker não inclui o m
 assert(updater.includes("startsWith('web-update-')"), 'Filtro de publicação precisa aceitar somente releases de atualização web.');
 assert(updater.includes(".sort((a, b) => Date.parse(b.published_at) - Date.parse(a.published_at))"), 'A seleção deve priorizar a publicação web mais recente, sem depender da ordem da API.');
 assert(publishWorkflow.includes('make_latest: "true"'), 'A publicação web deve ser marcada como a mais recente para inicializar instalações antigas.');
+assert(publishWorkflow.includes('gh release delete web-update-8 --yes --cleanup-tag'), 'O ponteiro legado deve ser removido para destravar instalações que o selecionam primeiro.');
 assert(updater.includes('checksum: latest.checksum'), 'Download precisa validar SHA-256.');
 assert(updater.includes('signature: latest.signature'), 'Download precisa validar assinatura RSA.');
 assert(updater.includes('RSA-SIGNATURE:'), 'Assinatura RSA precisa vir dos metadados HTTPS da release.');
