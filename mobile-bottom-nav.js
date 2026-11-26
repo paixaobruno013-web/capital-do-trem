@@ -2,6 +2,21 @@
   const path = location.pathname.toLowerCase();
   const isHome = path.endsWith('/') || path.endsWith('/index.html');
 
+  // Escala única da navegação: a barra mantém o mesmo tamanho em todas as telas.
+  // Ícone e legenda são estilizados separadamente para evitar que ambos herdem 23px.
+  const sharedNavStyle = document.createElement('style');
+  sharedNavStyle.id = 'capital-nav-size-standard';
+  sharedNavStyle.textContent = `
+    @media (max-width: 759px) {
+      nav#nav { height:76px!important; min-height:76px!important; gap:5px!important; padding:7px 8px calc(7px + env(safe-area-inset-bottom,0px))!important; }
+      nav#nav > a, nav#nav > button { flex:0 0 68px!important; width:68px!important; min-width:68px!important; max-width:68px!important; min-height:58px!important; padding:5px 3px!important; display:flex!important; flex-direction:column!important; align-items:center!important; justify-content:center!important; gap:2px!important; font:700 10px/1.15 system-ui,Arial,sans-serif!important; text-align:center!important; white-space:normal!important; }
+      nav#nav > a > span:first-child, nav#nav > button > span:first-child { display:block!important; font-size:19px!important; line-height:20px!important; margin:0!important; }
+      nav#nav > a > span:last-child, nav#nav > button > span:last-child { display:block!important; font-size:10px!important; line-height:1.15!important; margin:0!important; }
+      nav#nav > button:before { font-size:19px!important; line-height:20px!important; }
+    }
+  `;
+  if (!document.getElementById(sharedNavStyle.id)) document.head.append(sharedNavStyle);
+
   // Na página inicial, preserva integralmente o cabeçalho no Feed.
   // Ao entrar em Músicas ou Pesquisa, recolhe apenas o bloco superior,
   // sem alterar o conteúdo nem a barra inferior.
@@ -75,9 +90,11 @@
     link.dataset.section = item.id;
     link.setAttribute('aria-label', item.label);
     const icon = document.createElement('span');
+    icon.className = 'nav-icon';
     icon.setAttribute('aria-hidden', 'true');
     icon.textContent = item.icon;
     const label = document.createElement('span');
+    label.className = 'nav-label';
     label.textContent = item.label;
     link.append(icon, label);
     nav.append(link);
@@ -113,11 +130,12 @@
       background:transparent!important;color:#fff!important;text-decoration:none!important;
       font:700 11px/1.1 system-ui,Arial,sans-serif!important;text-align:center!important;
     }
-    nav#nav a span,nav#nav button span {display:block!important;font-size:23px!important;line-height:1!important}
+    nav#nav a .nav-icon,nav#nav button .nav-icon {display:block!important;font-size:19px!important;line-height:20px!important}
+    nav#nav a .nav-label,nav#nav button .nav-label {display:block!important;font-size:10px!important;line-height:1.15!important}
     nav#nav a.active,nav#nav button.active {background:transparent!important;color:#ff1525!important;box-shadow:inset 0 2px #ff1525!important}
     nav#nav .nav-chat:before,nav#nav .nav-profile:before {display:none!important}
     nav#nav a:focus-visible,nav#nav button:focus-visible {outline:3px solid #fff!important;outline-offset:-3px!important}
-    @media(min-width:760px){nav#nav a span,nav#nav button span{display:inline-block!important;margin-right:8px!important}}
+    @media(min-width:760px){nav#nav a .nav-icon,nav#nav button .nav-icon{display:inline-block!important;margin-right:8px!important}}
   `;
   document.head.append(style);
   document.body.append(nav);
