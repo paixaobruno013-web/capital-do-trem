@@ -33,3 +33,6 @@ console.log('Perfis com capas do sistema e prévias das músicas em análise con
 
 if (!redeJs.includes("profileLink.href='./rede.html?perfil='+encodeURIComponent(post.author_id)") || !redeJs.includes('profileLink.append(img,name)')) throw new Error('Feed não permite abrir o perfil do autor.');
 console.log('Feed direciona para o perfil público de cada autor.');
+
+if(!html.includes('profile-stat')||!html.includes('publicações')||!html.includes('seguidores')||!html.includes('seguindo')||!js.includes("placeholder='Buscar por nome ou @usuário…'")||!js.includes('pageSize=500'))throw new Error('Estatísticas compactas e pesquisa nas listas de seguidores ausentes.');
+console.log('Contadores compactos e pesquisa de seguidores/seguindo conferidos.');
