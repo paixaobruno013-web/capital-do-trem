@@ -725,13 +725,15 @@ export async function getPublishedSongs() {
   for (let from = 0; from < items.length; from += pageSize) {
     const batch = items.slice(from, from + pageSize);
     const paths = batch.map(song => song.storage_path);
-    const [{ data: signed, error: signedError }, { data: downloadable, error: downloadError }] = await Promise.all([
+    // A reprodução é essencial para selecionar uma faixa no Feed e nos Stories.
+    // O link de download é complementar: uma falha nele não pode bloquear o catálogo.
+    const [streamResult, downloadResult] = await Promise.all([
       storage.createSignedUrls(paths, 60 * 60),
-      storage.createSignedUrls(paths, 60 * 60, { download: true })
+      storage.createSignedUrls(paths, 60 * 60, { download: true }).catch(error => ({ data: null, error }))
     ]);
-    if (signedError) throw signedError;
-    const signedByPath = new Map((signed || []).map(item => [item.path, item.signedUrl]));
-    const downloadByPath = new Map((downloadable || []).map(item => [item.path, item.signedUrl]));
+    if (streamResult.error) throw streamResult.error;
+    const signedByPath = new Map((streamResult.data || []).map(item => [item.path, item.signedUrl]));
+    const downloadByPath = new Map((downloadResult.data || []).map(item => [item.path, item.signedUrl]));
     for (const song of batch) {
       const audioUrl = signedByPath.get(song.storage_path);
       // Uma falha isolada ao gerar o link de download não deve esconder uma
