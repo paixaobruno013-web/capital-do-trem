@@ -39,3 +39,8 @@ if (failed.length) {
   process.exit(1);
 }
 console.log('Music experience checks passed: ' + checks.length + '/' + checks.length + '.');
+
+const feed=await readFile(new URL('../home-feed.js',import.meta.url),'utf8');
+if(!html.includes('id="home-feed-open"')||!html.includes('id="home-feed-composer-fields"')||!feed.includes('setComposerExpanded(true)')||!feed.includes('setComposerExpanded(false)'))throw new Error('Publicação compacta e expansível do Feed ausente.');
+if(!html.includes('home-feed-music-toggle')||!html.includes('home-feed-media')||!feed.includes('cropImageToSquare'))throw new Error('Opções de mídia, música ou corte do Feed ausentes.');
+console.log('Feed compacto com expansão, galeria, música e corte de foto conferido.');
