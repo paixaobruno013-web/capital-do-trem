@@ -18,7 +18,7 @@ async function fetchLatestBundle() {
   );
   if (!release) return null;
   const zip = release.assets?.find(asset => asset.name === 'capital-do-trem-web-bundle.zip');
-  const checksumMatch = String(release.body || '').match(/SHA-256:\\s*([a-f0-9]{64})/i);
+  const checksumMatch = String(release.body || '').match(/SHA-256:\s*([a-f0-9]{64})/i);
   if (!zip?.browser_download_url || !checksumMatch) {
     throw new Error('Pacote de atualização incompleto ou sem SHA-256.');
   }
