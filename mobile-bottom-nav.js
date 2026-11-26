@@ -66,7 +66,7 @@
     { id: 'chat', label: 'Chat', icon: '💬', href: './bate-papo.html' },
     { id: 'musicas', label: 'Músicas', icon: '♫', href: './index.html#musicas' },
     { id: 'pesquisa', label: 'Pesquisa', icon: '⌕', href: './index.html#pesquisa' },
-    { id: 'perfil', label: 'Perfil', icon: '♙', href: './rede.html' }
+    { id: 'perfil', label: 'Perfil', icon: '👤', href: './rede.html' }
   ];
   const links = new Map();
   for (const item of items) {
@@ -105,7 +105,7 @@
       margin:0!important;border-radius:0!important;border-top:1px solid #444!important;
       background:#050505!important;box-shadow:none!important;overflow:hidden!important;
     }
-    nav#nav a {
+    nav#nav a,nav#nav button {
       flex:1 1 20%!important;width:20%!important;max-width:20%!important;min-width:0!important;
       min-height:62px!important;display:flex!important;flex-direction:column!important;
       align-items:center!important;justify-content:center!important;gap:4px!important;
@@ -113,9 +113,11 @@
       background:transparent!important;color:#fff!important;text-decoration:none!important;
       font:700 11px/1.1 system-ui,Arial,sans-serif!important;text-align:center!important;
     }
-    nav#nav a span:first-child { display:block!important;font-size:23px!important;line-height:1!important; }
-    nav#nav a.active { background:transparent!important;color:#ff1525!important;box-shadow:inset 0 2px #ff1525!important; }
-    nav#nav a:focus-visible { outline:3px solid #fff!important;outline-offset:-3px!important; }
+    nav#nav a span,nav#nav button span {display:block!important;font-size:23px!important;line-height:1!important}
+    nav#nav a.active,nav#nav button.active {background:transparent!important;color:#ff1525!important;box-shadow:inset 0 2px #ff1525!important}
+    nav#nav .nav-chat:before,nav#nav .nav-profile:before {display:none!important}
+    nav#nav a:focus-visible,nav#nav button:focus-visible {outline:3px solid #fff!important;outline-offset:-3px!important}
+    @media(min-width:760px){nav#nav a span,nav#nav button span{display:inline-block!important;margin-right:8px!important}}
   `;
   document.head.append(style);
   document.body.append(nav);
