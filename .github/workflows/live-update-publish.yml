@@ -124,3 +124,4 @@ jobs:
             capital-do-trem-web-bundle.sig
           draft: false
           prerelease: false
+          make_latest: "true"
