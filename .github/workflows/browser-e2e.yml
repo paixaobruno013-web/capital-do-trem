@@ -71,6 +71,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Instalar dependências do projeto
+        run: npm install --no-audit --no-fund
       - name: Executar verificações de chat, anexos e privacidade
         run: |
           npm run test:chat
@@ -86,6 +88,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Instalar dependências do projeto
+        run: npm install --no-audit --no-fund
       - name: Validar catálogo, player, playlists e envio
         run: |
           npm run test:music
