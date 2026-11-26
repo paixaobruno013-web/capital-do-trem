@@ -228,17 +228,18 @@
  }
 
  if(!supportsServiceWorkerUpdates||!('serviceWorker' in navigator))return;
- let registration=null,reloading=false;
+ let registration=null,reloading=false,updateHornPlayed=false,updateHideTimer=null;
  const banner=document.createElement('aside');
  banner.id='app-update-banner';
  banner.setAttribute('role','status');
  banner.setAttribute('aria-live','polite');
- banner.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:10001;max-width:560px;margin-inline:auto;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;background:#111;color:#fff;border:1px solid #ed1c24;border-radius:14px;box-shadow:0 8px 30px #0009;font:600 14px/1.4 system-ui,Arial,sans-serif';
+ banner.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:10001;max-width:420px;margin-inline:auto;display:none;align-items:center;justify-content:space-between;gap:9px;padding:9px 11px;background:linear-gradient(110deg,#35090c,#16090a);color:#fff;border:1px solid #ed1c24;border-radius:12px;box-shadow:0 5px 22px #0009,0 0 12px #ed1c2444;font:700 12px/1.3 system-ui,Arial,sans-serif';
  const message=document.createElement('span');
- message.textContent='🚂 TEM ATUALIZAÇÃO NOVA NO TREM! Uma nova versão do Capital do Trem está pronta.';
+ message.textContent='🚂 NOVA ATUALIZAÇÃO DISPONÍVEL';
+ message.style.cssText='flex:1;min-width:0;font-size:12px;font-weight:850;letter-spacing:.02em';
  const button=document.createElement('button');
- button.type='button';button.textContent='🚂 ATUALIZAR AGORA';button.setAttribute('aria-label','Atualizar o Capital do Trem para a versão mais recente');
- button.style.cssText='min-height:44px;border:0;border-radius:9px;padding:10px 16px;background:#ed1c24;color:#fff;font-weight:800;cursor:pointer';
+ button.type='button';button.textContent='ATUALIZAR';button.setAttribute('aria-label','Atualizar o Capital do Trem para a versão mais recente');
+ button.style.cssText='min-height:38px;flex:0 0 auto;border:0;border-radius:9px;padding:8px 13px;background:#ed1c24;color:#fff;font-size:12px;font-weight:900;letter-spacing:.04em;cursor:pointer';
  button.addEventListener('focus',()=>{button.style.outline='3px solid #fff';button.style.outlineOffset='3px';});
  button.addEventListener('blur',()=>{button.style.outline='none';});
  button.addEventListener('click',()=>{
@@ -247,7 +248,32 @@
   applyWaitingUpdate();
  });
  banner.append(message,button);
- function showUpdate(){banner.style.display='flex';}
+ function showUpdate(){
+  if(!registration?.waiting)return;
+  clearTimeout(updateHideTimer);
+  message.textContent='🚂 NOVA ATUALIZAÇÃO DISPONÍVEL';
+  button.textContent='ATUALIZAR';button.disabled=false;
+  button.style.background='#ed1c24';button.style.color='#fff';
+  banner.style.display='flex';
+  if(!updateHornPlayed){updateHornPlayed=true;playTrainHorn();}
+ }
+ function applyWaitingUpdate(){
+  if(!registration?.waiting)return;
+  registration.waiting.postMessage({type:'SKIP_WAITING'});
+  message.textContent='APLICANDO A ATUALIZAÇÃO…';
+  button.textContent='AGUARDE';button.disabled=true;
+ }
+ function showUpdated(){
+  clearTimeout(updateHideTimer);
+  message.textContent='🚂 CAPITAL DO TREM ATUALIZADO!';
+  button.textContent='ATUALIZADO';button.disabled=true;
+  button.style.background='#168a4a';button.style.color='#fff';
+  banner.style.borderColor='#20b866';
+  banner.style.background='linear-gradient(110deg,#07351f,#071b12)';
+  banner.style.boxShadow='0 5px 22px #0009,0 0 12px #20b86655';
+  banner.style.display='flex';
+  updateHideTimer=window.setTimeout(()=>{banner.style.display='none';location.reload();},5000);
+ }
  function hasUnsavedWork(){
   const active=document.activeElement;
   if(active&&/^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName))return true;
@@ -260,7 +286,7 @@
  navigator.serviceWorker.addEventListener('controllerchange',()=>{
   if(reloading)return;
   reloading=true;
-  location.reload();
+  showUpdated();
  });
  navigator.serviceWorker.register('./sw.js').then(reg=>{
   registration=reg;
