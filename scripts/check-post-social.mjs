@@ -31,7 +31,7 @@ const checks = [
   ['busca geográfica e filtros de cidade não aparecem mais no FALA UAI', !/chat-friends-search|chat-friends-distance|chat-friends-directory/.test(chat)],
   ['faixa de contatos online usa somente perfis públicos', /getPublicProfiles\(\)/.test(chat) && /\.eq\('is_public', true\)/.test(auth)],
   ['conversas individuais continuam vinculadas a convite e aceite', /requestPrivateConversation/.test(auth) && /requestedUserId=shareParams\.get\('user'\)/.test(privateChat) && /status==='accepted'/.test(privateChat)],
-  ['conversa privada abre em tela própria, separada do grupo oficial', /requestedUserId=shareParams\.get\('user'\)/.test(privateChat) && /openConversation\(target\)/.test(privateChat) && /status==='accepted'/.test(privateChat) && !/fazer-amigos/.test(chat)],
+  ['conversa privada abre em tela própria, separada do grupo oficial', /requestedUserId=shareParams\.get\('user'\)/.test(privateChat) && /openConversation\(target\)/.test(privateChat) && /status==='accepted'/.test(privateChat) && !/id="fazer-amigos"|id="open-friends-profile"/.test(chat)],
   ['vídeo de abertura não recebe poster com logo ou imagem extra', /video\.removeAttribute\('poster'\)/.test(home) && !/const posterLayer\s*=/.test(home)],
   ['marca sobreposta fica oculta quando há vídeo de abertura', /if\(brand\)brand\.style\.display='none'/.test(home)],
   ['locomotiva e três vagões permanecem na abertura', /opening-wagon-rear/.test(home) && /opening-wagon-dancers/.test(home) && /opening-wagon-front/.test(home) && /opening-locomotive/.test(home)]
