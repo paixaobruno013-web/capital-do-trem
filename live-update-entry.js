@@ -13,10 +13,12 @@ async function fetchLatestBundle() {
   });
   if (!response.ok) throw new Error('Não foi possível consultar as atualizações.');
   const releases = await response.json();
-  const release = releases.find(item =>
-    !item.draft && !item.prerelease && typeof item.tag_name === 'string' &&
-    item.tag_name.startsWith('web-update-')
-  );
+  const release = releases
+    .filter(item =>
+      !item.draft && !item.prerelease && typeof item.tag_name === 'string' &&
+      item.tag_name.startsWith('web-update-') && item.published_at
+    )
+    .sort((a, b) => Date.parse(b.published_at) - Date.parse(a.published_at))[0] || null;
   if (!release) return null;
   const zip = release.assets?.find(asset => asset.name === 'capital-do-trem-web-bundle.zip');
   const body = String(release.body || '');
