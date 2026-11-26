@@ -980,6 +980,25 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 @media(prefers-reduced-motion:reduce){.home-story-ring:not(.seen)::before{animation:none}}
 </style>
   <script defer src="./live-update.js"></script>
+
+<style id="capital-story-clean-selection">
+/* Após selecionar/capturar a mídia, priorizar a prévia e as ações essenciais. */
+#home-story-composer.has-selection #home-story-tools-rail,
+#home-story-composer.has-selection #home-story-tools-toggle,
+#home-story-composer.has-selection .home-story-zoom,
+#home-story-composer.has-selection .home-story-effects,
+#home-story-composer.has-selection #home-story-camera-message {display:none!important}
+#home-story-composer.has-selection .home-story-extra-actions{grid-template-columns:1fr;margin:6px 0}
+#home-story-composer.has-selection .home-story-extra-actions button:not(#home-story-music-toggle){display:none!important}
+#home-story-composer.has-selection #home-story-caption{min-height:48px;height:52px;padding:9px 11px;font-size:13px}
+#home-story-composer.has-selection label[for="home-story-caption"]{font-size:12px;margin:4px 0}
+#home-story-composer.has-selection #home-story-music-panel,
+#home-story-composer.has-selection #home-story-friends-panel,
+#home-story-composer.has-selection #home-story-link-panel{max-height:30dvh;overflow:auto}
+#home-story-composer.has-selection #home-story-status{font-size:11px;line-height:1.3;max-height:34px;overflow:auto;margin:4px 0}
+#home-story-composer.has-selection .home-story-publish-actions{bottom:calc(env(safe-area-inset-bottom,0px) + 12px)}
+#home-story-composer.has-selection .home-story-save{bottom:calc(env(safe-area-inset-bottom,0px) + 68px)!important}
+</style>
 </head>
 <body>
 <script>
