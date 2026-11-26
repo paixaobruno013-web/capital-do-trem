@@ -1,0 +1,57 @@
+name: Publicar atualização web do Capital do Trem
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: capital-do-trem-live-update
+  cancel-in-progress: false
+
+jobs:
+  publish-web-bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Instalar dependências
+        run: npm install --no-audit --no-fund
+      - name: Preparar os arquivos web
+        run: npm run build:web
+      - name: Validar o mecanismo de atualização
+        run: npm run test:live-update
+      - name: Validar o pacote PWA
+        run: node scripts/check-pwa.mjs
+      - name: Montar pacote web compatível com Capacitor
+        run: |
+          set -euo pipefail
+          cd www
+          zip -qr ../capital-do-trem-web-bundle.zip .
+          cd ..
+          test -s capital-do-trem-web-bundle.zip
+          sha256sum capital-do-trem-web-bundle.zip | awk '{print $1}' > capital-do-trem-web-bundle.sha256
+          test "$(wc -c < capital-do-trem-web-bundle.sha256)" -eq 65
+      - name: Publicar pacote remoto gratuito
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: web-update-${{ github.run_number }}
+          name: "Capital do Trem — atualização web ${{ github.run_number }}"
+          body: |
+            Pacote web para atualização remota do Capital do Trem.
+            Compatível apenas com alterações HTML, CSS, JavaScript e arquivos web.
+            Integridade do ZIP validada por SHA-256.
+          files: |
+            capital-do-trem-web-bundle.zip
+            capital-do-trem-web-bundle.sha256
+          draft: false
+          prerelease: false
