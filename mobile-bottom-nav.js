@@ -12,7 +12,7 @@
       nav#nav > a, nav#nav > button { flex:0 0 68px!important; width:68px!important; min-width:68px!important; max-width:68px!important; min-height:48px!important; padding:8px 8px!important; display:flex!important; flex-direction:column!important; align-items:center!important; justify-content:center!important; gap:2px!important; font:700 12px/1.15 system-ui,Arial,sans-serif!important; text-align:center!important; white-space:normal!important; }
       nav#nav > a > span:first-child, nav#nav > button > span:first-child { display:block!important; font-size:17px!important; line-height:18px!important; margin:0!important; }
       nav#nav > a > span:last-child, nav#nav > button > span:last-child { display:block!important; font-size:12px!important; line-height:1.15!important; margin:0!important; }
-      nav#nav > button:before { font-size:19px!important; line-height:20px!important; }
+      nav#nav > button:before { font-size:17px!important; line-height:18px!important; }
     }
   `;
   if (!document.getElementById(sharedNavStyle.id)) document.head.append(sharedNavStyle);
