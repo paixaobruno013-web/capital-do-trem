@@ -1,11 +1,12 @@
 import { readFile } from 'node:fs/promises';
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [auth, home, chat, migration, stories] = await Promise.all([
+const [auth, home, chat, migration, stories, privateChat] = await Promise.all([
   read('supabase/auth.js'),
   read('index.html'),
   read('bate-papo.html'),
   read('supabase/migrations/20261111143000_post_likes_comments.sql'),
-  read('stories-ui.js')
+  read('stories-ui.js'),
+  read('mensagens.html')
 ]);
 const checks = [
   ['Stories pessoais salvam a duração selecionada da música', auth.includes('musicDurationSeconds = 15') && auth.includes('music_duration_seconds: Math.max(5')],
@@ -26,11 +27,11 @@ const checks = [
   ['mural mostra botão de curtir e contagem', /getPostSocial\(item\.id\)[\s\S]*?Curtido[\s\S]*?likeCount/.test(home)],
   ['mural mostra lista e formulário de comentários', /Comentários[\s\S]*?post-comment-form[\s\S]*?addPostComment\(item\.id/.test(home)],
   ['compartilhamento privado continua disponível', /Koe Fala Tu[\s\S]*?share_text/.test(home)],
-  ['Fazer Amigos fica abaixo do bate-papo sem ícone extra na tela inicial', !/data-page="amigos"/.test(home) && /id="fazer-amigos"/.test(chat)],
-  ['busca e filtro por cidade ficam abaixo do bate-papo', /id="chat-friends-search"/.test(chat) && /id="chat-friends-distance"/.test(chat) && /id="fazer-amigos"/.test(chat)],
-  ['diretório consulta somente perfis públicos', /getPublicProfiles\(\)/.test(chat) && /\.eq\('is_public', true\)/.test(auth)],
-  ['filtro do próprio perfil usa a sessão autenticada sem variável global inexistente', /profile\.user_id!==session\?\.user\?\.id/.test(chat) && !/profile\.user_id!==user\?\.id/.test(chat)],
-  ['atalho para Koe Fala Tu permanece na área de amizades', /id="fazer-amigos"[\s\S]*?mensagens\.html/.test(chat) && /bate-papo\.html#fazer-amigos/.test(home)],
+  ['descoberta por localização removida e sem atalho na tela inicial', !/data-page="amigos"/.test(home) && !/id="fazer-amigos"|id="open-friends-profile"/.test(chat)],
+  ['busca geográfica e filtros de cidade não aparecem mais no FALA UAI', !/chat-friends-search|chat-friends-distance|chat-friends-directory/.test(chat)],
+  ['faixa de contatos online usa somente perfis públicos', /getPublicProfiles\(\)/.test(chat) && /\.eq\('is_public', true\)/.test(auth)],
+  ['conversas individuais continuam vinculadas a convite e aceite', /requestPrivateConversation/.test(auth) && /requestedUserId=shareParams\.get\('user'\)/.test(privateChat) && /status==='accepted'/.test(privateChat)],
+  ['conversa privada abre em tela própria, separada do grupo oficial', /mensagens\.html\?user=/.test(privateChat) && /openConversation\(target\)/.test(privateChat) && !/fazer-amigos/.test(chat)],
   ['vídeo de abertura não recebe poster com logo ou imagem extra', /video\.removeAttribute\('poster'\)/.test(home) && !/const posterLayer\s*=/.test(home)],
   ['marca sobreposta fica oculta quando há vídeo de abertura', /if\(brand\)brand\.style\.display='none'/.test(home)],
   ['locomotiva e três vagões permanecem na abertura', /opening-wagon-rear/.test(home) && /opening-wagon-dancers/.test(home) && /opening-wagon-front/.test(home) && /opening-locomotive/.test(home)]
