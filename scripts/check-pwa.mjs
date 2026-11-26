@@ -9,8 +9,6 @@ if (matches.length === 0) throw new Error('Não foi possível localizar as lista
 const entries = matches.flatMap((match) => [...match[1].matchAll(/(['"])(.*?)\1/g)].map((item) => item[2]));
 const coreEntries = [...matches[0][1].matchAll(/(['"])(.*?)\1/g)].map((item) => item[2]);
 for (const entry of coreEntries) {
-  // live-update.js é gerado pelo empacotador depois da cópia dos arquivos-fonte.
-  if (entry === './live-update.js') continue;
   if (/^(https?:)?\/\//i.test(entry)) continue;
   const pathname = decodeURIComponent(entry.split(/[?#]/, 1)[0]);
   const relative = pathname === './' || pathname === '.' ? 'index.html' : pathname.replace(/^\.\//, '');
