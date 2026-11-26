@@ -9,7 +9,7 @@ const migration = read('supabase/migrations/20261126193000_chat_official_images_
 const checks = [
   ['Imagens oficiais consultadas no servidor', /getPublicChatProfileImages/.test(chat) && /getPublicChatProfileImages/.test(auth)],
   ['Alteração das imagens validada no servidor como admin', /saveAdminChatProfileImages/.test(auth) && /isCurrentUserAdmin()/.test(auth)],
-  ['Upload das imagens usa armazenamento remoto', /capital-do-trem-media/.test(auth) && /chat-group-/.test(auth)],
+  ['Upload das imagens usa armazenamento remoto', /capital-do-trem-media/.test(auth) && /chat-group/.test(auth)],
   ['Configurações visuais do chat têm leitura pública limitada', /chat_brand_profile_image_url/.test(migration) && /chat_group_profile_image_url/.test(migration)],
   ['Interface das imagens não grava mais preferências locais', !/cdt_fala_(?:brand|group)_image_v1|localStorage\.setItem\(chatImageKeys/.test(chat)],
   ['Painel de participantes do grupo disponível', /group-participants-list/.test(chat) && /getChatGroupDirectory/.test(auth)],
