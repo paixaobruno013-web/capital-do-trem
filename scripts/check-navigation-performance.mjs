@@ -8,7 +8,7 @@ const checks=[
  [index.includes('nav.scrollBy({left:')&&!index.includes('t.scrollIntoView({block:\'nearest\''),'Move somente a navegação horizontal sem deslocar a página'],
  [index.includes('window.scrollTo(0,restoreY)'),'Restaura a posição da área ao retornar'],
  [!index.includes('}\\nnav#nav')&&!index.includes('}\\n.intro-smoke'),'Não deixa escapes de quebra de linha inválidos nas regras CSS da navegação e abertura'],
- [/nav#nav\\{position:fixed;z-index:500;left:0;right:0;bottom:0/.test(index),'Mantém a barra principal fixa na parte inferior no celular'],
+ [index.includes('nav#nav{position:fixed;z-index:500;left:0;right:0;bottom:0'),'Mantém a barra principal fixa na parte inferior no celular'],
  [/const CACHE='capital-do-trem-v(\d+)'/.test(sw)&&Number(sw.match(/const CACHE='capital-do-trem-v(\d+)'/)?.[1]||0)>=297,'Atualiza a versão do cache para evitar arquivos antigos após a atualização']
 ];
 for(const [ok,label] of checks){console.log((ok?'OK  ':'ERRO ')+label);if(!ok)process.exitCode=1;}
