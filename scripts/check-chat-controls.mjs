@@ -21,14 +21,14 @@ const checks = [
 
   ['FALA UAI sem slogan antigo nem frase complementar', !room.includes('FALA UAI da quebrada') && !room.includes('Artistas e Usuários Uai, juntos na mesma conversa.')],
   ['perfil individual superior abre a sala do grupo', /id="open-group-profile"/.test(room) && /aria-controls="capital-do-trem-room"/.test(room) && /toggleProfilePanel\(groupRoom,groupProfileButton,groupRoom.hidden\)/.test(room)],
-  ['perfil individual inferior abre a pesquisa de amizades', /id="open-friends-profile"/.test(room) && /aria-controls="fazer-amigos"/.test(room) && /toggleProfilePanel\(friendsPanel,friendsProfileButton,friendsPanel.hidden\)/.test(room)],
+  ['atalho inferior de amizades abre a pesquisa de perfis', /id="open-friends-profile"/.test(room) && /aria-controls="fazer-amigos"/.test(room) && /toggleProfilePanel\(friendsPanel,friendsProfileButton,friendsPanel.hidden\)/.test(room)],
   ['salas começam recolhidas e amizades podem ser fechadas', /id="capital-do-trem-room" class="panel chat-panel" hidden/.test(room) && /id="fazer-amigos" class="panel friends-panel" hidden/.test(room) && /close-friends-profile/.test(room)],
-  ['cache PWA avançado para v318', /capital-do-trem-v318/.test(worker)],
+  ['cache PWA avançado para v319', /capital-do-trem-v319/.test(worker)],
 
 
-  ['FALA UAI mantém grupo e amizades em cartões separados', /GRUPO • CAPITAL do TREM/.test(room) && /fazer amizades pela localização/.test(room)],
-  ['logo oficial branca aparece no perfil do grupo', /id="open-group-profile"/.test(room) && /<img src="\.\/marca\.svg" alt="Logo Capital do Trem">/.test(room)],
-  ['perfis públicos aparecem em faixa horizontal com status online e acesso ao perfil', /id="chat-profile-rail"/.test(room) && /id="chat-online-profiles"/.test(room) && /chat-online-profile\.is-online/.test(room) && /rede\.html\?perfil=/.test(room)],
+  ['FALA UAI mantém grupo e amizades em cartões separados e reposicionados', /id="open-group-card"/.test(room) && /id="open-friends-profile"/.test(room) && /fala-group-profile\{order:2/.test(room) && /fala-friends-profile\{order:7/.test(room)],
+  ['perfil da comunidade usa a foto cadastrada na área Perfil', /cdt-own-profile-image/.test(room) && /getMyBasicProfile\(\)/.test(room) && /avatar_url\|\|own.avatar_data/.test(room)],
+  ['faixa superior mostra somente perfis online e abre seus perfis', /id="chat-profile-rail"/.test(room) && /id="chat-online-profiles"/.test(room) && /online.has\(profile.user_id\)/.test(room) && /rede\.html\?perfil=/.test(room)],
   ['atalhos superiores e seletor de tema foram retirados da tela do chat', !/Pular para o conteúdo principal/.test(room) && !/<header class="fala-uai-clean-header"/.test(room) && !/id="theme"/.test(room)],
   ['presença do grupo exibe quem está online e indicador de digitação em tempo real', /id="group-live-presence"/.test(room) && /startUserPresence/.test(room) && /subscribeUserPresence/.test(room) && /capital-fala-uai-group-typing/.test(room) && /announceGroupTyping/.test(room)],
   ['diretório de amizades oferece ações SEGUIR e CONVERSAR com autenticação', /textContent='SEGUIR'/.test(room) && /textContent='CONVERSAR'/.test(room) && /profile_follows/.test(room) && /requestPrivateConversation/.test(room)],
