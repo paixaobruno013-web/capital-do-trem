@@ -70,7 +70,10 @@ jobs:
           openssl pkcs12 -in "$PKCS12" -passin env:APP_KEY_PASSWORD -clcerts -nokeys -out "$CERT"
           openssl pkey -in "$PRIVATE_KEY" -check -noout
           openssl x509 -in "$CERT" -noout -text | grep -q 'Public Key Algorithm: rsaEncryption'
-          echo "APP_KEY_PASSWORD=$APP_KEY_PASSWORD" >> "$GITHUB_ENV"
+          PRIVATE_PUBLIC="$(openssl pkey -in "$PRIVATE_KEY" -pubout -outform DER | sha256sum | awk '{print $1}')"
+          CERT_PUBLIC="$(openssl x509 -in "$CERT" -pubkey -noout | openssl pkey -pubin -outform DER | sha256sum | awk '{print $1}')"
+          test "$PRIVATE_PUBLIC" = "$CERT_PUBLIC"
+          echo "Chave RSA privada e certificado público correspondem; publicação assinada habilitada."
 
       - name: Configurar Node.js
         if: steps.native_guard.outputs.publish == 'true'
