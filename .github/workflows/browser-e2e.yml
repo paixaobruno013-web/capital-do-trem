@@ -60,3 +60,18 @@ jobs:
           SUPABASE_TEST_URL: ${{ secrets.SUPABASE_TEST_URL }}
           SUPABASE_TEST_ANON_KEY: ${{ secrets.SUPABASE_TEST_ANON_KEY }}
         run: node scripts/check-supabase-test-connection.mjs
+
+  chat-regression:
+    name: Regressão funcional do FALA UAI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Executar verificações de chat, anexos e privacidade
+        run: |
+          npm run test:chat
+          npm run build:web
