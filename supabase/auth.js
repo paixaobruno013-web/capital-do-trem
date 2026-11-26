@@ -1436,8 +1436,13 @@ export async function saveAdminChatProfileImages(files = {}) {
     if (!publicData?.publicUrl) throw new Error('Não foi possível gerar o endereço público da imagem.');
     rows.push({setting_key:kind==='brand'?'chat_brand_profile_image_url':'chat_group_profile_image_url',setting_value:publicData.publicUrl,updated_at:new Date().toISOString()});
   }
-  const { error } = await supabase.from('site_settings').upsert(rows,{onConflict:'setting_key'});
+  const { data: savedRows, error } = await supabase.from('site_settings')
+    .upsert(rows,{onConflict:'setting_key'})
+    .select('setting_key,setting_value');
   if (error) throw error;
+  if (!Array.isArray(savedRows) || savedRows.length !== rows.length) {
+    throw new Error('As imagens foram enviadas, mas não foi possível confirmar a gravação das configurações. Tente salvar novamente.');
+  }
   return await getPublicChatProfileImages();
 }
 
