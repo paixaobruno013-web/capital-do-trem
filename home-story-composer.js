@@ -499,14 +499,19 @@ el('home-story-ai-use')?.addEventListener('click', () => {
 
 async function publishToFeed() {
   if (!selectedFile || busy) return;
+  const feedButton = el('home-story-feed-publish');
+  busy = true;
+  if (feedButton) feedButton.disabled = true;
+  if (publish) publish.disabled = true;
+  if (saveButton) saveButton.disabled = true;
   const input = el('home-feed-media');
   const form = el('home-feed-composer');
   const caption = el('home-feed-text');
-  if (!input || !form || !caption || !window.DataTransfer) {
-    say('Não foi possível preparar a publicação no Feed neste aparelho.');
-    return;
-  }
   try {
+    if (!input || !form || !caption || typeof DataTransfer !== 'function') {
+      throw new Error('Não foi possível preparar a publicação no Feed neste aparelho.');
+    }
+    say('Preparando sua mídia para o Feed…');
     const file = await preparePhotoForExport(selectedFile);
     const transfer = new DataTransfer();
     transfer.items.add(file);
@@ -519,7 +524,12 @@ async function publishToFeed() {
     form.scrollIntoView({ behavior: 'smooth', block: 'center' });
     form.requestSubmit();
   } catch (error) {
-    say(error?.message || 'Não foi possível preparar a mídia para o Feed.');
+    say(error?.message || 'Não foi possível preparar a publicação no Feed.');
+  } finally {
+    busy = false;
+    if (feedButton) feedButton.disabled = false;
+    if (publish) publish.disabled = false;
+    if (saveButton) saveButton.disabled = false;
   }
 }
 
