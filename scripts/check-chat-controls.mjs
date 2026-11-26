@@ -22,6 +22,7 @@ const checks = [
   ['FALA UAI mantém o cartão superior do GRUPO • CAPITAL do TREM e o cartão inferior de amizades', /GRUPO • CAPITAL do TREM/.test(room) && /fazer amizades pela localização/.test(room) && /cdt-fala-uai-social-layout/.test(room)],
   ['presença do grupo exibe quem está online e indicador de digitação em tempo real', /id="group-live-presence"/.test(room) && /startUserPresence/.test(room) && /subscribeUserPresence/.test(room) && /capital-fala-uai-group-typing/.test(room) && /announceGroupTyping/.test(room)],
   ['diretório de amizades oferece ações SEGUIR e CONVERSAR com autenticação', /textContent='SEGUIR'/.test(room) && /textContent='CONVERSAR'/.test(room) && /profile_follows/.test(room) && /requestPrivateConversation/.test(room)],
+  ['botão CONVERSAR abre a conversa privada aceita ou informa que o convite aguarda aceite', /shareParams\.get\('user'\)/.test(privateChat) && /openConversation\(target\)/.test(privateChat) && /Seu convite foi enviado/.test(privateChat)],
   ['lista de amizades continua limitada a perfis públicos e não usa GPS nem distância exata', /getPublicProfiles\(\)/.test(room) && /não usamos GPS nem mostramos endereço ou distância exata/.test(room)],
   ['service worker distribui a atualização do FALA UAI pelo cache v316', /capital-do-trem-v316/.test(worker)],
 
