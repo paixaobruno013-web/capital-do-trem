@@ -9,6 +9,8 @@ const [auth, home, chat, migration, stories, privateChat] = await Promise.all([
   read('mensagens.html')
 ]);
 const checks = [
+  ['catálogo musical não é bloqueado por falha no link de download', /downloadResult.*catch\(error => \(\{ data: null, error \}\)\)/s.test(auth) && /streamResult\.error/.test(auth)],
+  ['tela de prévia dos Stories oculta ferramentas secundárias e mantém música acessível', /capital-story-clean-selection/.test(home) && /home-story-music-toggle/.test(home) && /home-story-composer\.has-selection/.test(home)],
   ['Stories pessoais salvam a duração selecionada da música', auth.includes('musicDurationSeconds = 15') && auth.includes('music_duration_seconds: Math.max(5')],
   ['barra de progresso do Story acompanha a duração do trecho musical', stories.includes('let storySeconds = 7') && stories.includes("progress.style.transition = 'transform ' + storySeconds + 's linear'")],
   ['compositor do Feed usa o campo simples solicitado e o seletor de galeria em quadrado', /placeholder="O que você deseja compartilhar"/.test(home) && /class="home-feed-gallery-picker"/.test(home) && /<span>＋<\/span>/.test(home)],
