@@ -19,6 +19,13 @@ const [room, enhancements, emoji, privateChat, worker, stories, home, auth, admi
 
 const checks = [
 
+  ['FALA UAI sem slogan antigo nem frase complementar', !room.includes('FALA UAI da quebrada') && !room.includes('Artistas e Usuários Uai, juntos na mesma conversa.')],
+  ['perfil individual superior abre a sala do grupo', /id="open-group-profile"/.test(room) && /aria-controls="capital-do-trem-room"/.test(room) && /toggleProfilePanel\(groupRoom,groupProfileButton,groupRoom.hidden\)/.test(room)],
+  ['perfil individual inferior abre a pesquisa de amizades', /id="open-friends-profile"/.test(room) && /aria-controls="fazer-amigos"/.test(room) && /toggleProfilePanel\(friendsPanel,friendsProfileButton,friendsPanel.hidden\)/.test(room)],
+  ['salas começam recolhidas e amizades podem ser fechadas', /id="capital-do-trem-room" class="panel chat-panel" hidden/.test(room) && /id="fazer-amigos" class="panel friends-panel" hidden/.test(room) && /close-friends-profile/.test(room)],
+  ['cache PWA avançado para v317', /capital-do-trem-v317/.test(worker)],
+
+
   ['FALA UAI mantém o cartão superior do GRUPO • CAPITAL do TREM e o cartão inferior de amizades', /GRUPO • CAPITAL do TREM/.test(room) && /fazer amizades pela localização/.test(room) && /cdt-fala-uai-social-layout/.test(room)],
   ['presença do grupo exibe quem está online e indicador de digitação em tempo real', /id="group-live-presence"/.test(room) && /startUserPresence/.test(room) && /subscribeUserPresence/.test(room) && /capital-fala-uai-group-typing/.test(room) && /announceGroupTyping/.test(room)],
   ['diretório de amizades oferece ações SEGUIR e CONVERSAR com autenticação', /textContent='SEGUIR'/.test(room) && /textContent='CONVERSAR'/.test(room) && /profile_follows/.test(room) && /requestPrivateConversation/.test(room)],
