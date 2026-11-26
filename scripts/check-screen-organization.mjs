@@ -14,7 +14,7 @@ const checks = [
  ['banner oficial de alto-falantes fica no topo de Músicas', musicArea.indexOf('class="music-section-banner"') > musicArea.indexOf('id="musicas"') && musicBanner.includes('src="./assets/banner-speakers.webp"') && musicBanner.includes('AQUI A MÚSICA NÃO PARA!')],
  ['capa personalizada continua disponível sem controles administrativos na tela pública', musicCover.includes('id="music-cover-preview"') && musicCover.includes('id="music-cover-area"') && !musicArea.includes('id="music-cover-upload"') && !musicArea.includes('music-cover-controls')],
  ['vídeos de descoberta ficam na Pesquisa, não misturados ao Feed', /home-youtube/.test(discovery) && !/<section class="card home-youtube"/.test(home.slice(home.indexOf('<section class="page active" id="inicio">'),home.indexOf('<section class="page" id="musicas">')))],
- ['atalho de amizades fica no Chat, sem duplicação na tela inicial', /id="fazer-amigos"/.test(chat) && !/class="card home-friends"/.test(home)],
+ ['grupo oficial e perfis para contatos privados ficam no Chat, sem descoberta por localização', /id="open-group-card"/.test(chat) && /id="chat-profile-rail"/.test(chat) && !/id="fazer-amigos"|id="open-friends-profile"/.test(chat) && !/class="card home-friends"/.test(home)],
  ['perfil oferece abas separadas para fotos e vídeos', /data-profile-view="photos"[^>]*aria-label="Fotos"/.test(profile) && /data-profile-view="videos"[^>]*aria-label="Vídeos"/.test(profile)],
  ['aba Fotos não mistura vídeos e aba Vídeos filtra apenas vídeos', profileScript.includes("const visibleMedia=media.filter(m=>view==='videos'?m.media_type==='video':view==='photos'?m.media_type!=='video':true)")],
 ];
