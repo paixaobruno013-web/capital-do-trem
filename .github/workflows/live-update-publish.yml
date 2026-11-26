@@ -22,39 +22,17 @@ jobs:
         id: native_guard
         shell: bash
         env:
-          BEFORE_SHA: ${{ github.event.before }}
-          CURRENT_SHA: ${{ github.sha }}
+          BEFORE_SHA: \${{ github.event.before }}
+          CURRENT_SHA: \${{ github.sha }}
         run: |
           set -euo pipefail
-          if [[ "$BEFORE_SHA" =~ ^0+$ ]]; then
+          if [[ -z "$BEFORE_SHA" || "$BEFORE_SHA" =~ ^0+$ ]]; then
             echo "publish=false" >> "$GITHUB_OUTPUT"
             echo "Publicação inicial ignorada; aguarda a instalação do mecanismo nativo."
             exit 0
           fi
           changed="$(git diff --name-only "$BEFORE_SHA" "$CURRENT_SHA")"
-          if printf '%s\n' "$changed" | grep -Eq '^(package.json|capacitor.config.ts|live-update-entry.js|live-update.js|scripts/prepare-web.mjs|scripts/configure-android-media.py|scripts/prepare-ios-info.py)          set -euo pipefail
-          cd www
-          zip -qr ../capital-do-trem-web-bundle.zip .
-          cd ..
-          test -s capital-do-trem-web-bundle.zip
-          sha256sum capital-do-trem-web-bundle.zip | awk '{print $1}' > capital-do-trem-web-bundle.sha256
-          test "$(wc -c < capital-do-trem-web-bundle.sha256)" -eq 65
-      - name: Publicar pacote remoto gratuito
-        if: steps.native_guard.outputs.publish == 'true'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: web-update-${{ github.run_number }}
-          name: "Capital do Trem — atualização web ${{ github.run_number }}"
-          body: |
-            Pacote web para atualização remota do Capital do Trem.
-            Compatível apenas com alterações HTML, CSS, JavaScript e arquivos web.
-            Integridade do ZIP validada por SHA-256.
-          files: |
-            capital-do-trem-web-bundle.zip
-            capital-do-trem-web-bundle.sha256
-          draft: false
-          prerelease: false
-; then
+          if printf '%s\n' "$changed" | grep -Eq '^(package\.json|capacitor\.config\.ts|live-update-entry\.js|live-update\.js|scripts/prepare-web\.mjs|scripts/configure-android-media\.py|scripts/prepare-ios-info\.py)$'; then
             echo "publish=false" >> "$GITHUB_OUTPUT"
             echo "Alteração nativa/de empacotamento detectada. Nenhum pacote OTA será publicado."
           else
@@ -89,10 +67,11 @@ jobs:
           sha256sum capital-do-trem-web-bundle.zip | awk '{print $1}' > capital-do-trem-web-bundle.sha256
           test "$(wc -c < capital-do-trem-web-bundle.sha256)" -eq 65
       - name: Publicar pacote remoto gratuito
+        if: steps.native_guard.outputs.publish == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: web-update-${{ github.run_number }}
-          name: "Capital do Trem — atualização web ${{ github.run_number }}"
+          tag_name: web-update-\${{ github.run_number }}
+          name: "Capital do Trem — atualização web \${{ github.run_number }}"
           body: |
             Pacote web para atualização remota do Capital do Trem.
             Compatível apenas com alterações HTML, CSS, JavaScript e arquivos web.
