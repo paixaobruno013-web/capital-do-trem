@@ -18,5 +18,6 @@ assert.match(diagnostic, /Exportar relatório/, 'diagnóstico deve permitir expo
 assert.match(diagnostic, /clearIncidents/, 'diagnóstico deve permitir limpar histórico');
 assert.match(update, /item\.kind==='javascript'\|\|item\.kind==='promise'/, 'tarefas longas e falhas de recursos não devem disparar falso alerta de instabilidade');
 assert.match(update, /duplicate\|\|recoveryShown/, 'erros repetidos em sequência devem ser deduplicados no alerta');
+assert.match(update, /window\.setInterval\(verifyRealConnection,30000\)/, 'sondagem periódica deve respeitar intervalo de 30 segundos para poupar dados e bateria');
 
 console.log('Monitoramento local de falhas e painel de diagnóstico verificados.');
