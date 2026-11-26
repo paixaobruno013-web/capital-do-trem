@@ -31,7 +31,10 @@ async function checkForUpdate() {
   if (Date.now() - lastCheck < CHECK_INTERVAL_MS) return;
 
   const latest = await fetchLatestBundle();
-  if (!latest) return;
+  if (!latest) {
+    localStorage.setItem(LAST_CHECK_KEY, String(Date.now()));
+    return;
+  }
 
   const current = await LiveUpdate.getCurrentBundle();
   if (current.bundleId === latest.bundleId) {
