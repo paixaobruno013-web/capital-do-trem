@@ -31,7 +31,7 @@ assert(updater.includes('await LiveUpdate.ready()'), 'O app precisa confirmar pr
 assert(updater.indexOf('await LiveUpdate.ready()') < updater.indexOf("if (Capacitor.getPlatform() !== 'android') return;"), 'A prontidão também precisa ser confirmada em WebViews nativas iOS.');
 assert(updater.includes('setNextBundle'), 'Pacote baixado precisa ser preparado para a próxima abertura.');
 assert(!updater.includes('LiveUpdate.reload()'), 'Atualização não pode reiniciar a interface no meio do uso.');
-assert(updater.includes('CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000'), 'Verificação deve respeitar intervalo para economizar bateria.');
+assert(updater.includes('CHECK_INTERVAL_MS = 15 * 60 * 1000'), 'Verificação deve respeitar intervalo para economizar bateria.');
 assert(updater.includes("document.addEventListener('visibilitychange'") && updater.includes("window.addEventListener('pageshow'"), 'O verificador deve consultar novamente quando o aplicativo retorna ao primeiro plano.');
 assert(updater.includes('updateCheckInFlight'), 'Consultas simultâneas precisam compartilhar uma única verificação.');
 assert(!publishWorkflow.includes('live-update-entry\\.js'), 'A lógica JavaScript do verificador deve poder ser atualizada por pacote OTA assinado, sem recompilar o aplicativo nativo.');
