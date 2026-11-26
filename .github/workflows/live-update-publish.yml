@@ -42,6 +42,19 @@ jobs:
             echo "publish=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Remover ponteiro legado que bloqueia atualizações antigas
+        if: steps.native_guard.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view web-update-8 >/dev/null 2>&1; then
+            gh release delete web-update-8 --yes --cleanup-tag
+            echo "Ponteiro antigo removido; instalações existentes poderão localizar a publicação atual."
+          else
+            echo "Ponteiro legado já removido."
+          fi
+
       - name: Assinar o pacote com a mesma chave do aplicativo Android
         if: steps.native_guard.outputs.publish == 'true'
         shell: bash
