@@ -2,28 +2,6 @@ name: Validar pacotes para Google Play e App Store
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '**.html'
-      - '**.js'
-      - '**.css'
-      - '**.json'
-      - '**.svg'
-      - '**.png'
-      - '**.webp'
-      - '**.jpg'
-      - '**.jpeg'
-      - '**.mp4'
-      - 'assets/**'
-      - 'supabase/**'
-      - 'scripts/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'capacitor.config.ts'
-      - 'manifest.webmanifest'
-      - 'sw.js'
-      - '.github/workflows/**'
 
 permissions:
   contents: read
