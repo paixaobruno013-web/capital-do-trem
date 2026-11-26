@@ -62,4 +62,5 @@ assert.match(home, /data-story-caption=/);
 assert.match(home, /sua foto e seu vídeo não são enviados/);
 assert.match(homeComposer, /querySelectorAll\('\[data-story-caption\]'\)/);
 assert.match(homeComposer, /Sugestão adicionada/);
+assert.match(homeComposer, /async function publishToFeed\(\)[\s\S]*?if \(!selectedFile \|\| busy\) return;[\s\S]*?busy = true;[\s\S]*?feedButton\.disabled = true;[\s\S]*?finally \{[\s\S]*?busy = false;[\s\S]*?feedButton\.disabled = false;/, 'A publicação de Story no Feed deve impedir toques duplicados e liberar os controles ao terminar.');
 console.log('Stories: botão +, seletor de mídia, prévia, avatar, catálogo musical, trecho, volume e reprodução verificados.');
