@@ -248,7 +248,6 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important;overscroll-behav
  <p>Escolha as imagens que aparecem neste aparelho.</p>
  <label for="chat-brand-image-file">Imagem do perfil Capital do Trem</label><input id="chat-brand-image-file" type="file" accept="image/*">
  <label for="chat-group-image-file">Imagem do perfil do GRUPO CAPITAL DO TREM</label><input id="chat-group-image-file" type="file" accept="image/*">
-  <label for="chat-friends-image-file">Imagem do perfil Fazer amizades pela localização</label><input id="chat-friends-image-file" type="file" accept="image/*">
  <div class="fala-chat-settings-actions"><button id="save-chat-images" type="button">Salvar todas as imagens</button><button id="reset-chat-images" class="alt" type="button">Restaurar imagens originais</button></div>
  <small id="chat-image-settings-status" role="status" aria-live="polite">As alterações ficam salvas somente neste aparelho.</small>
 </section>
@@ -264,7 +263,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important;overscroll-behav
   <p>Seus dados são protegidos durante a transmissão por HTTPS. Esta versão ainda não oferece criptografia ponta a ponta.</p>
 </div>
 <div id="gate" class="status" role="status" aria-live="polite">Verificando sua conta…</div><div id="chat-area" hidden><p id="chat-connection" class="status" role="status" aria-live="polite">Conectando à sala em tempo real…</p>
-<div class="actions" style="justify-content:flex-end;margin:8px 0"><button id="gallery-open" class="alt" type="button">🖼️ Galeria da conversa</button></div><section id="media-gallery" class="panel" hidden><div class="room-heading"><h3>Fotos e vídeos compartilhados</h3><button id="gallery-close" class="alt" type="button">Fechar</button></div><div id="media-gallery-grid" class="media-gallery-grid"></div><p id="gallery-empty" class="muted" hidden>Nenhuma foto ou vídeo compartilhado ainda.</p></section><div id="messages" aria-live="polite" aria-relevant="additions" aria-label="Mensagens do bate-papo"></div><form id="composer" class="composer"><div id="emoji-tray" data-emoji-picker data-input="#message"></div><label class="sr-only" for="message">Sua mensagem para o bate-papo</label><input id="message" maxlength="1000" autocomplete="off" placeholder="Escreva sua mensagem…" aria-describedby="message-counter"><input id="chat-attachment" type="file" accept="image/*,video/*,audio/*,application/pdf,text/plain,text/csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx" hidden><input id="chat-camera" type="file" accept="image/*,video/*" capture="environment" hidden><small id="attachment-name" class="muted" aria-live="polite"></small><label class="view-once-option"><input id="chat-view-once" type="checkbox"> 👁️ Visualização única (foto, vídeo ou áudio)</label><div id="chat-upload-progress" class="chat-upload-progress" hidden><span></span></div><small id="message-counter" class="muted" aria-live="polite">0/1000 caracteres</small><button id="camera-open" class="alt" type="button" aria-label="Anexar arquivo" aria-haspopup="true" aria-expanded="false">📎</button><button id="send" type="submit">Enviar</button></form><p id="status" class="status" role="status" aria-live="polite"></p></div></section><button id="open-group-card" class="fala-profile-card fala-group-profile" type="button" aria-controls="capital-do-trem-room" aria-expanded="false"><span class="fala-profile-avatar"><img src="./marca.svg" alt="Logo branco do grupo Capital do Trem"></span><span class="fala-profile-info"><strong>GRUPO • CAPITAL DO TREM</strong><small>Conversa oficial da comunidade</small></span><span class="fala-profile-arrow">›</span></button><section id="fazer-amigos" class="panel friends-panel" hidden><div class="room-heading"><div><span class="eyebrow">PESQUISAR PESSOAS</span><h2>fazer amizades pela localização</h2></div><button id="close-friends-profile" class="alt" type="button">Fechar</button></div><p class="muted">Conheça participantes que também fazem parte do Capital do Trem. Só aparecem pessoas que escolheram deixar o perfil público. A cidade é informada pela própria pessoa; não usamos GPS nem mostramos endereço ou distância exata.</p><label for="chat-friends-search">Buscar pessoas</label><input id="chat-friends-search" type="search" maxlength="80" placeholder="Nome, @usuário, cidade ou interesse"><label for="chat-friends-distance">Onde procurar</label><select id="chat-friends-distance"><option value="all">Todas as cidades</option><option value="same">Na minha cidade</option><option value="other">Em outras cidades</option></select><p id="chat-friends-count" class="status" aria-live="polite">Carregando participantes públicos…</p><div id="chat-friends-directory" class="friends-directory" aria-live="polite"><p class="muted">Carregando…</p></div><p class="muted">Respeite a privacidade e as escolhas de cada pessoa.</p></section><button id="open-friends-profile" class="fala-profile-card fala-friends-profile" type="button" aria-controls="fazer-amigos" aria-expanded="false"><span class="fala-profile-avatar"><img id="friends-profile-image" src="./assets/pwa-icon-192.png" alt="Perfil Fazer amizades pela localização"></span><span class="fala-profile-info"><strong>fazer amizades pela localização</strong><small>Descubra pessoas e pesquise perfis públicos</small></span><span class="fala-profile-arrow">›</span></button></main>
+<div class="actions" style="justify-content:flex-end;margin:8px 0"><button id="gallery-open" class="alt" type="button">🖼️ Galeria da conversa</button></div><section id="media-gallery" class="panel" hidden><div class="room-heading"><h3>Fotos e vídeos compartilhados</h3><button id="gallery-close" class="alt" type="button">Fechar</button></div><div id="media-gallery-grid" class="media-gallery-grid"></div><p id="gallery-empty" class="muted" hidden>Nenhuma foto ou vídeo compartilhado ainda.</p></section><div id="messages" aria-live="polite" aria-relevant="additions" aria-label="Mensagens do bate-papo"></div><form id="composer" class="composer"><div id="emoji-tray" data-emoji-picker data-input="#message"></div><label class="sr-only" for="message">Sua mensagem para o bate-papo</label><input id="message" maxlength="1000" autocomplete="off" placeholder="Escreva sua mensagem…" aria-describedby="message-counter"><input id="chat-attachment" type="file" accept="image/*,video/*,audio/*,application/pdf,text/plain,text/csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx" hidden><input id="chat-camera" type="file" accept="image/*,video/*" capture="environment" hidden><small id="attachment-name" class="muted" aria-live="polite"></small><label class="view-once-option"><input id="chat-view-once" type="checkbox"> 👁️ Visualização única (foto, vídeo ou áudio)</label><div id="chat-upload-progress" class="chat-upload-progress" hidden><span></span></div><small id="message-counter" class="muted" aria-live="polite">0/1000 caracteres</small><button id="camera-open" class="alt" type="button" aria-label="Anexar arquivo" aria-haspopup="true" aria-expanded="false">📎</button><button id="send" type="submit">Enviar</button></form><p id="status" class="status" role="status" aria-live="polite"></p></div></section><button id="open-group-card" class="fala-profile-card fala-group-profile" type="button" aria-controls="capital-do-trem-room" aria-expanded="false"><span class="fala-profile-avatar"><img src="./marca.svg" alt="Logo branco do grupo Capital do Trem"></span><span class="fala-profile-info"><strong>GRUPO • CAPITAL DO TREM</strong><small>Conversa oficial da comunidade</small></span><span class="fala-profile-arrow">›</span></button></main>
 <script type="module">
 import {getCurrentSession,getChatGroupMembership,joinChatGroup,leaveChatGroup,getChatMessages,sendChatMessage,subscribeChatMessages,uploadChatAttachment,reportChatParticipant,moderateChatParticipant,openViewOnceChatMedia,updateMyGroupMessage,deleteMyGroupMessage,initSupabase,startUserPresence,getOnlineUserIds,subscribeUserPresence} from './supabase/auth.js';
 const gate=document.getElementById('gate'),area=document.getElementById('chat-area'),connection=document.getElementById('chat-connection'),list=document.getElementById('messages'),form=document.getElementById('composer'),input=document.getElementById('message'),send=document.getElementById('send'),status=document.getElementById('status');
@@ -332,19 +331,19 @@ input.addEventListener('input',updateCounter);
 let unsubscribe=null,seen=new Set(),currentUserId=null;
 let stopPresence=null,watchPresence=null,groupTypingChannel=null,typingStopTimer=null;
 const onlineList=document.getElementById('group-online-list'),typingList=document.getElementById('group-typing-list');
-const groupProfileButton=document.getElementById('open-group-profile'),friendsProfileButton=document.getElementById('open-friends-profile'),friendsPanel=document.getElementById('fazer-amigos'),groupRoom=document.getElementById('capital-do-trem-room');
+const groupProfileButton=document.getElementById('open-group-profile'),groupRoom=document.getElementById('capital-do-trem-room');
 function toggleProfilePanel(panel,button,open){panel.hidden=!open;button.setAttribute('aria-expanded',String(open));if(open)panel.scrollIntoView({behavior:'smooth',block:'start'});}
 groupProfileButton.addEventListener('click',()=>toggleProfilePanel(groupRoom,groupProfileButton,groupRoom.hidden));
 const groupCardButton=document.getElementById('open-group-card');
  // Preferências visuais locais do chat: não alteram a imagem pública para os demais participantes.
- const chatImageKeys={brand:'cdt_fala_brand_image_v1',group:'cdt_fala_group_image_v1',friends:'cdt_fala_friends_image_v1'};
+ const chatImageKeys={brand:'cdt_fala_brand_image_v1',group:'cdt_fala_group_image_v1'};
  const brandImage=document.querySelector('#open-group-profile .chat-profile-chip-avatar img');
  const groupImage=document.querySelector('#open-group-card .fala-profile-avatar img');
-  const friendsImage=document.getElementById('friends-profile-image');
+
  const settingsPanel=document.getElementById('chat-image-settings');
  const settingsButton=document.getElementById('open-chat-settings');
  const settingsStatus=document.getElementById('chat-image-settings-status');
- const pendingChatImages={brand:null,group:null,friends:null};
+ const pendingChatImages={brand:null,group:null};
  function applySavedChatImages(){
   try{
    const brand=localStorage.getItem(chatImageKeys.brand),group=localStorage.getItem(chatImageKeys.group);
@@ -368,7 +367,7 @@ const groupCardButton=document.getElementById('open-group-card');
   if(data.length>900000)throw new Error('Essa imagem ficou muito grande. Escolha uma imagem menor.');
   return data;
  }
- for(const [key,id] of [['brand','chat-brand-image-file'],['group','chat-group-image-file'],['friends','chat-friends-image-file']]){
+ for(const [key,id] of [['brand','chat-brand-image-file'],['group','chat-group-image-file']]){
   document.getElementById(id)?.addEventListener('change',async event=>{
    try{pendingChatImages[key]=await prepareChatImage(event.target.files?.[0]);if(pendingChatImages[key])settingsStatus.textContent='Imagem selecionada. Toque em Salvar todas as imagens.';}
    catch(error){pendingChatImages[key]=null;settingsStatus.textContent=error.message;event.target.value='';}
@@ -377,18 +376,16 @@ const groupCardButton=document.getElementById('open-group-card');
  document.getElementById('save-chat-images')?.addEventListener('click',()=>{
   try{
    for(const key of ['brand','group','friends'])if(pendingChatImages[key])localStorage.setItem(chatImageKeys[key],pendingChatImages[key]);
-   applySavedChatImages();pendingChatImages.brand=null;pendingChatImages.group=null;pendingChatImages.friends=null;
-   document.getElementById('chat-brand-image-file').value='';document.getElementById('chat-group-image-file').value='';document.getElementById('chat-friends-image-file').value='';
+   applySavedChatImages();pendingChatImages.brand=null;pendingChatImages.group=null;
+    document.getElementById('chat-brand-image-file').value='';document.getElementById('chat-group-image-file').value='';
    settingsStatus.textContent='Todas as imagens selecionadas foram salvas neste aparelho.';
   }catch(error){settingsStatus.textContent='Não foi possível salvar. Tente imagens menores.';}
  });
  document.getElementById('reset-chat-images')?.addEventListener('click',()=>{
-  try{localStorage.removeItem(chatImageKeys.brand);localStorage.removeItem(chatImageKeys.group);localStorage.removeItem(chatImageKeys.friends);if(brandImage)brandImage.src='./assets/capital-do-trem-logo.jpg';if(groupImage)groupImage.src='./marca.svg';if(friendsImage)friendsImage.src='./assets/pwa-icon-192.png';pendingChatImages.brand=null;pendingChatImages.group=null;pendingChatImages.friends=null;document.getElementById('chat-brand-image-file').value='';document.getElementById('chat-group-image-file').value='';document.getElementById('chat-friends-image-file').value='';settingsStatus.textContent='Imagens originais restauradas neste aparelho.';}
+  try{localStorage.removeItem(chatImageKeys.brand);localStorage.removeItem(chatImageKeys.group);if(brandImage)brandImage.src='./assets/capital-do-trem-logo.jpg';if(groupImage)groupImage.src='./marca.svg';pendingChatImages.brand=null;pendingChatImages.group=null;document.getElementById('chat-brand-image-file').value='';document.getElementById('chat-group-image-file').value='';settingsStatus.textContent='Imagens originais restauradas neste aparelho.';}
   catch(error){settingsStatus.textContent='Não foi possível restaurar as imagens.';}
  });
 if(groupCardButton)groupCardButton.addEventListener('click',()=>toggleProfilePanel(groupRoom,groupCardButton,groupRoom.hidden));
-friendsProfileButton.addEventListener('click',()=>toggleProfilePanel(friendsPanel,friendsProfileButton,friendsPanel.hidden));
-document.getElementById('close-friends-profile').addEventListener('click',()=>toggleProfilePanel(friendsPanel,friendsProfileButton,false));
 const typingUsers=new Map();
 function renderTopProfileRail(ids){
  const root=document.getElementById('chat-online-profiles');if(!root)return;
@@ -583,55 +580,14 @@ try{if(localStorage.getItem('capitaldotrem_theme_v1')==='light')document.body.cl
 window.addEventListener('pagehide',()=>{saveChatState();if(unsubscribe)unsubscribe();if(watchPresence)watchPresence();if(stopPresence)stopPresence();if(groupTypingChannel)initSupabase().removeChannel(groupTypingChannel);if(typingStopTimer)clearTimeout(typingStopTimer);});
 </script><script type="module">
 (async()=>{
- const list=document.getElementById('chat-friends-directory'),search=document.getElementById('chat-friends-search'),distance=document.getElementById('chat-friends-distance'),count=document.getElementById('chat-friends-count');
- if(!list||!search||!distance||!count)return;
  try{
   const auth=await import('./supabase/auth.js');
-  const profiles=await auth.getPublicProfiles();
-  window.cdtPublicChatProfiles=profiles;
-  const session=await auth.getCurrentSession();
-  const own=session?.user?await auth.getMyBasicProfile():null;
-  const ownCity=String(own?.city||'').trim().toLocaleLowerCase('pt-BR');
-  const onlineIds=await auth.getOnlineUserIds().catch(()=>new Set());
-  window.cdtRenderChatProfileRail?.(onlineIds);
-
-  const supabase=auth.initSupabase();
-  const followedIds=new Set();
-  if(session?.user){const follows=await supabase.from('profile_follows').select('followed_id').eq('follower_id',session.user.id);if(!follows.error)(follows.data||[]).forEach(row=>followedIds.add(row.followed_id));}
-  const candidates=profiles.filter(profile=>profile.user_id!==session?.user?.id);
-  const render=()=>{
-   const term=search.value.trim().toLocaleLowerCase('pt-BR'),mode=distance.value;
-   const filtered=candidates.filter(profile=>{
-    const city=String(profile.city||'').trim().toLocaleLowerCase('pt-BR');
-    if(mode==='same'&&(!ownCity||city!==ownCity))return false;
-    if(mode==='other'&&(!ownCity||!city||city===ownCity))return false;
-    return [profile.display_name,profile.username,profile.city,profile.bio].some(value=>String(value||'').toLocaleLowerCase('pt-BR').includes(term));
-   });
-   list.replaceChildren();count.textContent=filtered.length+' pessoa(s) encontrada(s) • '+candidates.length+' perfil(is) público(s)';
-   if(!filtered.length){const empty=document.createElement('p');empty.className='muted';empty.textContent=mode==='same'&&!ownCity?'Informe sua cidade em Meu perfil para encontrar pessoas da mesma cidade.':'Ninguém encontrado com esse filtro. Tente buscar em todas as cidades.';list.append(empty);return;}
-   for(const profile of filtered){
-    const card=document.createElement('article');card.className='friend-person';
-    const avatar=document.createElement('span');avatar.className='friend-avatar';
-    if(profile.avatar_type==='photo'&&typeof profile.avatar_url==='string'&&profile.avatar_url.startsWith('https://')){const img=document.createElement('img');img.src=profile.avatar_url;img.alt='';img.loading='lazy';avatar.append(img);}
-    else avatar.textContent=profile.avatar_type==='character'?'🎭':Array.from((profile.display_name||'U').trim())[0]?.toLocaleUpperCase('pt-BR')||'U';
-    const copy=document.createElement('div');copy.className='friend-copy';
-    const name=document.createElement('strong');name.textContent=profile.display_name||'Participante do Capital do Trem';
-    const handle=document.createElement('small');handle.textContent='@'+(profile.username||'usuario');
-    const role=document.createElement('small');role.textContent=(profile.account_type==='artist'?'Artista / DJ':'Usuário Uai')+' • '+(profile.city||'Cidade não informada');
-    copy.append(name,handle,role);
-    if(profile.bio){const bio=document.createElement('p');bio.textContent=profile.bio;copy.append(bio);}
-    const online=document.createElement('small');online.className='friend-online';online.textContent=onlineIds.has(profile.user_id)?'● online':'○ offline';
-    const actions=document.createElement('div');actions.className='friend-actions';
-    const follow=document.createElement('button');follow.type='button';follow.className='btn alt';follow.textContent=followedIds.has(profile.user_id)?'SEGUINDO':'SEGUIR';
-    follow.addEventListener('click',async()=>{if(!session?.user){location.href='./conta.html';return;}follow.disabled=true;try{const existing=await supabase.from('profile_follows').select('follower_id').eq('follower_id',session.user.id).eq('followed_id',profile.user_id).maybeSingle();if(existing.error)throw existing.error;if(existing.data){const result=await supabase.from('profile_follows').delete().eq('follower_id',session.user.id).eq('followed_id',profile.user_id);if(result.error)throw result.error;followedIds.delete(profile.user_id);follow.textContent='SEGUIR';}else{const result=await supabase.from('profile_follows').insert({follower_id:session.user.id,followed_id:profile.user_id});if(result.error)throw result.error;followedIds.add(profile.user_id);follow.textContent='SEGUINDO';}}catch(error){count.textContent=error.message||'Não foi possível atualizar o seguir.';}finally{follow.disabled=false;}});
-    const talk=document.createElement('button');talk.type='button';talk.className='btn primary';talk.textContent='CONVERSAR';
-    talk.addEventListener('click',async()=>{talk.disabled=true;try{const conversation=await auth.requestPrivateConversation(profile.user_id);if(conversation.status==='accepted'){location.href='./mensagens.html?user='+encodeURIComponent(profile.user_id);}else{count.textContent='Convite enviado para '+(profile.display_name||'esse perfil')+'. A conversa será liberada quando a pessoa aceitar.';location.href='./mensagens.html';}}catch(error){count.textContent=error.message||'Não foi possível enviar o convite. Para conversar, os dois perfis precisam estar aptos a participar do grupo.';}finally{talk.disabled=false;}});
-    actions.append(follow,talk);copy.append(online,actions);
-    card.append(avatar,copy);list.append(card);
-   }
-  };
-  search.addEventListener('input',render);distance.addEventListener('change',render);render();const stopWatchingPresence=auth.subscribeUserPresence(next=>{onlineIds=next;render();});window.addEventListener('pagehide',()=>stopWatchingPresence());
- }catch(error){list.replaceChildren();const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar participantes agora. Confira a conexão e tente novamente.';list.append(message);count.textContent='Diretório temporariamente indisponível.';}
+  window.cdtPublicChatProfiles=await auth.getPublicProfiles();
+  const online=await auth.getOnlineUserIds();
+  window.cdtRenderChatProfileRail?.(online);
+  const stop=auth.subscribeUserPresence(ids=>window.cdtRenderChatProfileRail?.(ids));
+  window.addEventListener('pagehide',()=>stop());
+ }catch(error){console.warn('Perfis online temporariamente indisponíveis.',error);}
 })();
 </script>
 <script src="./emoji-picker.js" defer></script><script type="module" src="./chat-enhancements.js"></script><script src="./update.js" defer></script>
