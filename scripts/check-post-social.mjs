@@ -10,6 +10,10 @@ const [auth, home, chat, migration, stories] = await Promise.all([
 const checks = [
   ['Stories pessoais salvam a duração selecionada da música', auth.includes('musicDurationSeconds = 15') && auth.includes('music_duration_seconds: Math.max(5')],
   ['barra de progresso do Story acompanha a duração do trecho musical', stories.includes('let storySeconds = 7') && stories.includes("progress.style.transition = 'transform ' + storySeconds + 's linear'")],
+  ['compositor do Feed usa o campo simples solicitado e o seletor de galeria em quadrado', /placeholder="O que você deseja compartilhar"/.test(home) && /class="home-feed-gallery-picker"/.test(home) && /<span>＋<\/span>/.test(home)],
+  ['Feed oferece corte de foto e música do catálogo acima da prévia', /home-feed-crop-toggle/.test(home) && /home-feed-music-toggle/.test(home) && /cropImageToSquare/.test(await read('home-feed.js')) && /createMyStory/.test(await read('home-feed.js'))],
+  ['publicação permite compartilhar no Feed ou simultaneamente no Feed e Stories', /Compartilhar Feed<\/button>/.test(home) && /Compartilhar Feed \+ Story/.test(home) && /createMyStory\(\{file,caption:text/.test(await read('home-feed.js'))],
+  ['aro dos Stories fica parado e somente o LED vermelho percorre a borda', /homeStoryLedTravel/.test(home) && /home-story-ring:not\(\.seen\)::before/.test(home) && /animation:none!important/.test(home) && !/homeStoryRedOrbit/.test(home)],
   ['curtidas únicas por usuário e publicação', /primary key \(post_id, user_id\)/.test(migration)],
   ['curtidas só em publicações publicadas', /post_likes_insert_self[\s\S]*?status = 'published'/.test(migration)],
   ['comentários vinculados à conta e à publicação', /post_id uuid not null references public\.posts[\s\S]*?author_id uuid not null references auth\.users/.test(migration)],
