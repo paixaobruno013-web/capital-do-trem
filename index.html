@@ -1016,17 +1016,21 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <section class="page active" id="inicio"><section class="home-stories card" aria-labelledby="home-stories-title"><div class="home-stories-heading"><div><span class="eyebrow">MAQUINISTAS ONLINE</span><h2 id="home-stories-title">Stories da quebrada</h2></div><button id="home-story-add" type="button" aria-label="Criar Story" title="Criar Story">＋</button></div><div id="home-stories-list" class="home-stories-list" aria-label="Stories recentes"><p class="muted">Carregando Stories…</p></div></section>
 <section id="home-community-feed" class="card home-community-feed" aria-labelledby="home-community-feed-title">
  <div class="home-section-heading"><div><span class="eyebrow">CAPITAL DO TREM • COMUNIDADE</span><h2 id="home-community-feed-title">Feed dos Maquinistas</h2><p class="muted">As novidades, fotos e vídeos da nossa comunidade.</p></div><a class="btn alt" href="./rede.html">Meu perfil</a></div>
- <form id="home-feed-composer" class="home-feed-composer home-feed-composer-v2">
+ <form id="home-feed-composer" class="home-feed-composer home-feed-composer-v2 home-feed-composer-collapsed">
+<button id="home-feed-open" type="button" class="home-feed-open" aria-expanded="false" aria-controls="home-feed-composer-fields" aria-label="Abrir publicação">＋</button>
+<div id="home-feed-composer-fields" hidden>
+<div class="home-feed-expanded-head"><strong>Nova publicação</strong><button id="home-feed-collapse" type="button" class="home-feed-collapse">Fechar ×</button></div>
 <label class="sr-only" for="home-feed-text">O que você deseja compartilhar</label>
-<textarea id="home-feed-text" maxlength="1500" rows="3" placeholder="O que você deseja compartilhar"></textarea>
-<div class="home-feed-editor-tools"><button id="home-feed-crop-toggle" type="button" class="home-feed-tool-button" aria-pressed="false" disabled>✂ Editar / cortar</button><button id="home-feed-music-toggle" type="button" class="home-feed-tool-button">♫ Adicionar música</button></div>
-<label class="home-feed-gallery-picker" for="home-feed-media" aria-label="Buscar imagens ou vídeos na galeria"><span>＋</span><strong>Adicionar fotos ou vídeos</strong><small>Toque para abrir sua galeria</small></label>
+<textarea id="home-feed-text" maxlength="1500" rows="3" placeholder="Escreva algo ou adicione emojis…"></textarea>
+<div class="home-feed-editor-tools"><button id="home-feed-crop-toggle" type="button" class="home-feed-tool-button" aria-pressed="false" disabled>✂ Editar / cortar imagem</button><button id="home-feed-music-toggle" type="button" class="home-feed-tool-button">♫ Escolher música do catálogo</button></div>
+<label class="home-feed-gallery-picker" for="home-feed-media" aria-label="Buscar imagens ou vídeos na galeria"><span>＋</span><strong>Arquivo: foto ou vídeo</strong><small>Escolher na galeria ou nos arquivos do aparelho</small></label>
 <input id="home-feed-media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" hidden>
 <span id="home-feed-media-name" class="home-feed-media-name muted" hidden>Nenhuma mídia selecionada</span>
 <section id="home-feed-music-panel" class="home-feed-music-panel" hidden aria-label="Trilha musical da publicação"><label for="home-feed-music-select">Escolha uma música do catálogo</label><select id="home-feed-music-select"><option value="">Sem música</option></select><div class="home-feed-music-clip"><label for="home-feed-music-start">Começar em (segundos)</label><input id="home-feed-music-start" type="number" min="0" max="3600" step="1" value="0"><label for="home-feed-music-duration">Duração do trecho</label><select id="home-feed-music-duration"><option value="15">15 segundos</option><option value="30">30 segundos</option><option value="45">45 segundos</option><option value="60">60 segundos</option></select></div><audio id="home-feed-music-preview" controls preload="none" hidden></audio><p id="home-feed-music-status" class="muted" role="status">Escolha uma música publicada para acompanhar sua foto.</p></section>
-<section id="home-feed-preview" class="home-feed-preview" hidden><div class="home-feed-preview-top"><strong>PRÉVIA</strong><button id="home-feed-clear-media" type="button" class="home-feed-clear-media">Remover ×</button></div><div id="home-feed-preview-stage" class="home-feed-preview-stage"></div></section>
+<section id="home-feed-preview" class="home-feed-preview" hidden><div class="home-feed-preview-top"><strong>PRÉVIA da mídia</strong><button id="home-feed-clear-media" type="button" class="home-feed-clear-media">Remover ×</button></div><div id="home-feed-preview-stage" class="home-feed-preview-stage"></div><small class="muted">Fotos: ajuste quadrado. Vídeos: confira a prévia antes de publicar.</small></section>
 <div class="home-feed-publish-actions"><button class="btn primary home-feed-publish-v2" type="submit">Compartilhar Feed</button><button id="home-feed-publish-story" class="btn alt home-feed-publish-story" type="button" disabled>Compartilhar Feed + Story</button></div>
 <p id="home-feed-status" class="muted" role="status" aria-live="polite"></p>
+</div>
 </form>
  <div id="home-feed-list" class="home-feed-list" aria-live="polite"><p class="muted">Carregando publicações da comunidade…</p></div>
 </section>
@@ -1042,10 +1046,10 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <section class="music-section-banner" aria-label="AQUI A MÚSICA NÃO PARA!"><img src="./assets/banner-speakers.webp" alt="AQUI A MÚSICA NÃO PARA! — alto-falantes do Capital do Trem" loading="eager" decoding="async"></section>
 <section id="music-cover-area" class="card music-cover-area" aria-label="Capa da área Músicas" hidden><div id="music-cover-stage" style="position:relative;overflow:hidden;display:grid;place-items:center;min-height:110px;max-height:230px;border:1px solid #ed1c2466;border-radius:14px;background:#050505"><img id="music-cover-preview" alt="Capa personalizada da área Músicas" hidden style="display:block;width:100%;max-height:230px;object-position:50% 50%;object-fit:contain"><p id="music-cover-empty" class="muted" style="margin:22px;text-align:center">AQUI A MÚSICA NÃO PARA!</p></div></section>
 <p class="music-tagline">Seu universo do Funk. Sua comunidade. Seu som.</p>
-<nav class="music-quick-actions" aria-label="Atalhos da área de música">
-<a href="#song-catalog-search"><strong>Nome das</strong><span>músicas</span></a>
-<a href="#song-catalog-search"><strong>Nome dos</strong><span>artistas</span></a>
-<a href="#music-upload-file"><strong>Arquivo</strong><span>para publicar</span></a>
+<nav class="music-quick-actions" aria-label="Atalhos para enviar música">
+<a href="#music-upload-file"><strong>＋ Arquivo</strong><span>Enviar áudio</span></a>
+<a href="#music-upload-title"><strong>♫ Música</strong><span>Nome da faixa</span></a>
+<a href="#music-upload-artist"><strong>♬ Artista</strong><span>Nome do MC / DJ</span></a>
 </nav>
 <section id="music-upload-area" class="card music-upload-area" aria-labelledby="music-upload-heading">
  <div class="home-section-heading"><div><span class="eyebrow">ENVIE SEU SOM</span><h3 id="music-upload-heading">＋ Publicar música</h3><p class="muted">MCs e DJs podem enviar suas faixas diretamente por aqui. Cada envio é independente, mesmo quando a música já existe no catálogo.</p></div></div>
@@ -1055,8 +1059,6 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
   <input id="music-upload-file" type="file" accept="audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/x-wav,audio/ogg,.mp3,.m4a,.aac,.wav,.ogg" required>
   <label for="music-upload-title">Nome da música</label><input id="music-upload-title" maxlength="120" required placeholder="Título da faixa">
   <label for="music-upload-artist">Nome artístico / MC / DJ</label><input id="music-upload-artist" maxlength="100" required placeholder="Como seu público conhece você">
-  <label for="music-upload-producer">Produtor (opcional)</label><input id="music-upload-producer" maxlength="100" placeholder="Nome do produtor">
-  <label for="music-upload-description">Descrição (opcional)</label><textarea id="music-upload-description" maxlength="1000" rows="3" placeholder="Conte um pouco sobre a faixa"></textarea>
   <button class="btn primary" id="music-upload-submit" type="submit">Enviar música para o catálogo</button>
  </form>
  <p id="music-upload-status" class="muted" role="status" aria-live="polite"></p>
