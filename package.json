@@ -4,24 +4,27 @@
   "private": true,
   "description": "Aplicativo Capital do Trem para Android e iOS",
   "scripts": {
-    "build:web": "node scripts/prepare-web.mjs",
+    "build:web": "node scripts/prepare-web.mjs && esbuild live-update-entry.js --bundle --format=esm --target=es2020 --outfile=www/live-update.js",
     "cap:sync": "npm run build:web && cap sync",
     "cap:add:android": "cap add android",
     "cap:add:ios": "cap add ios",
     "android": "npm run cap:sync && cap open android",
     "ios": "npm run cap:sync && cap open ios",
     "test:chat": "node scripts/check-chat-controls.mjs && node scripts/check-chat-attachments.mjs && node scripts/check-view-once-chat.mjs && node scripts/check-chat-media-download-guard.mjs && node scripts/check-playlists-fala-uai.mjs",
-    "test:music": "node scripts/check-music-experience.mjs"
+    "test:music": "node scripts/check-music-experience.mjs",
+    "test:live-update": "node scripts/check-live-update.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.6.0",
     "@capacitor/core": "8.6.0",
     "@capacitor/ios": "8.6.0",
-    "@capacitor/haptics": "8.0.2"
+    "@capacitor/haptics": "8.0.2",
+    "@capawesome/capacitor-live-update": "8.10.0"
   },
   "devDependencies": {
     "@capacitor/cli": "8.6.0",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "esbuild": "0.25.12"
   },
   "engines": {
     "node": ">=22"
