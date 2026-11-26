@@ -11,7 +11,9 @@ assert.match(update, /connectionDebounceTimer=window\.setTimeout\([\s\S]*?\},130
 assert.match(update, /function showOnline\(\)[\s\S]*?displayOnline\(\);/, 'alerta online deve disparar imediatamente ao detectar o retorno');
 assert.match(update, /if\(confirmedOffline\|\|connectionDebounceTimer\)return/, 'eventos offline repetidos devem ser deduplicados');
 assert.match(update, /clearTimeout\(connectionDebounceTimer\)/, 'a recuperação rápida deve cancelar o alerta offline pendente');
-assert.match(update, /setInterval\(verifyRealConnection,1000\)/, 'a conexão deve ser monitorada automaticamente a cada segundo');
+assert.match(update, /const delay=lowPowerMode\(\)\?45000:30000/, 'a conexão deve usar monitoramento adaptativo de 30s e 45s em economia de bateria/dados');
+assert.match(update, /if\(document\.hidden\)return/, 'o monitoramento deve pausar em segundo plano');
+assert.match(update, /window\.addEventListener\('focus',resumeConnectionMonitor\)/, 'a conexão deve ser verificada ao retornar ao aplicativo');
 assert.match(update, /setTimeout\(\(\)=>\{alertBox\.style\.display='none';\},13000\)/, 'alerta de retorno deve permanecer visível por 13 segundos');
 
 assert.match(html, /OFFLINE_MUSIC_CATALOG_KEY/, 'metadados do catálogo devem ser guardados localmente');
