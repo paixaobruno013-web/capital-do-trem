@@ -1,5 +1,5 @@
 import {
-  initSupabase, getActiveAdminStories, getActiveUserStories,
+  initSupabase, getCurrentSession, getActiveAdminStories, getActiveUserStories,
   subscribeAdminStories, subscribeUserStories
 } from './supabase/auth.js';
 
@@ -22,6 +22,7 @@ let profileObserver;
 let lastTrigger = null;
 let activeStoryAudio = null;
 let activeStoryMusicTimer = null;
+let currentStoryUserId = '';
 
 function characterStoryAvatar(data) {
   const allowed = {
@@ -68,12 +69,20 @@ function renderHomeStoryTray() {
   const entries = [];
   const activeOfficial = officialStories.filter(s => new Date(s.expires_at).getTime() > Date.now());
   if (activeOfficial.length) entries.push({ id: 'official', name: 'Capital do Trem', stories: activeOfficial, official: true });
+  const userEntries = [];
   for (const [authorId, items] of groups) {
     const active = items.filter(s => new Date(s.expires_at).getTime() > Date.now());
     if (!active.length) continue;
+    const own = authorId === currentStoryUserId;
+    const unseen = active.some(s => !seen.has(s.id));
+    // Depois de assistir a todos os Stories de outra pessoa, libera espaço na fileira.
+    if (!own && !unseen) continue;
     const latest = active[active.length - 1];
-    entries.push({ id: authorId, name: latest.display_name || 'Usuário Uai', stories: active, avatar: latest.avatar_url || '', avatarType: latest.avatar_type || 'photo', avatarData: latest.avatar_data || null, latest });
+    userEntries.push({ id: authorId, name: latest.display_name || 'Usuário Uai', stories: active, avatar: latest.avatar_url || '', avatarType: latest.avatar_type || 'photo', avatarData: latest.avatar_data || null, latest, own, unseen });
   }
+  // O perfil do próprio usuário fica sempre acessível; os demais não vistos vêm em seguida.
+  userEntries.sort((a, b) => Number(b.own) - Number(a.own) || Number(b.unseen) - Number(a.unseen) || a.name.localeCompare(b.name, 'pt-BR'));
+  entries.push(...userEntries);
   tray.replaceChildren();
   if (!entries.length) {
     const empty = document.createElement('p');
@@ -177,6 +186,7 @@ function renderStory(index) {
   rememberSeen(story.id);
   updateOfficialRing();
   updateUserProfileRings();
+  renderHomeStoryTray();
   mediaBox.replaceChildren();
   clearTimeout(activeStoryMusicTimer); activeStoryMusicTimer = null;
   if (activeStoryAudio) { activeStoryAudio.pause(); activeStoryAudio.removeAttribute('src'); activeStoryAudio = null; }
@@ -314,6 +324,8 @@ if (viewer) {
   }
   try {
     initSupabase();
+    const session = await getCurrentSession();
+    currentStoryUserId = session?.user?.id || '';
     await refreshStories();
     let knownAdmin = new Set(officialStories.map(s => s.id));
     let knownUsers = new Set(userStories.map(s => s.id));
