@@ -20,6 +20,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Impedir publicação de mudanças nativas por OTA
         id: native_guard
         shell: bash
@@ -40,24 +41,60 @@ jobs:
           else
             echo "publish=true" >> "$GITHUB_OUTPUT"
           fi
-      - name: Assinar o pacote com a mesma chave do aplicativo Android\n        if: steps.native_guard.outputs.publish == 'true'\n        shell: bash\n        env:\n          APP_KEYSTORE_BASE64: ${{ secrets.ANDROID_APP_SIGNING_KEYSTORE_BASE64 }}\n          APP_STORE_PASSWORD: ${{ secrets.ANDROID_APP_SIGNING_STORE_PASSWORD }}\n          APP_KEY_ALIAS: ${{ secrets.ANDROID_APP_SIGNING_KEY_ALIAS }}\n          APP_KEY_PASSWORD: ${{ secrets.ANDROID_APP_SIGNING_KEY_PASSWORD }}\n        run: |\n          set -euo pipefail\n          umask 077\n          KEYSTORE=\"$RUNNER_TEMP/capital-do-trem-signing.jks\"\n          PKCS12=\"$RUNNER_TEMP/capital-do-trem-signing.p12\"\n          PRIVATE_KEY=\"$RUNNER_TEMP/capital-do-trem-live-update-private.pem\"\n          CERT=\"$RUNNER_TEMP/capital-do-trem-signing-cert.pem\"\n          printf '%s' \"$APP_KEYSTORE_BASE64\" | base64 --decode > \"$KEYSTORE\"\n          test -s \"$KEYSTORE\"\n          keytool -importkeystore -noprompt -srckeystore \"$KEYSTORE\" -srcstorepass \"$APP_STORE_PASSWORD\" -srcalias \"$APP_KEY_ALIAS\" -srckeypass \"$APP_KEY_PASSWORD\" -destkeystore \"$PKCS12\" -deststoretype PKCS12 -deststorepass \"$APP_KEY_PASSWORD\" -destkeypass \"$APP_KEY_PASSWORD\" >/dev/null\n          openssl pkcs12 -in \"$PKCS12\" -passin env:APP_KEY_PASSWORD -nocerts -nodes -out \"$PRIVATE_KEY\"\n          openssl pkcs12 -in \"$PKCS12\" -passin env:APP_KEY_PASSWORD -clcerts -nokeys -out \"$CERT\"\n          openssl pkey -in \"$PRIVATE_KEY\" -check -noout\n          openssl x509 -in \"$CERT\" -noout -pubkey | openssl pkey -pubin -text -noout | grep -q 'Public-Key'\n          echo \"Signing key and certificate extracted in a protected temporary directory.\"\n          echo \"APP_KEY_PASSWORD=$APP_KEY_PASSWORD\" >> \"$GITHUB_ENV\"\n      - name: Configurar Node.js
+
+      - name: Assinar o pacote com a mesma chave do aplicativo Android
+        if: steps.native_guard.outputs.publish == 'true'
+        shell: bash
+        env:
+          APP_KEYSTORE_BASE64: ${{ secrets.ANDROID_APP_SIGNING_KEYSTORE_BASE64 }}
+          APP_STORE_PASSWORD: ${{ secrets.ANDROID_APP_SIGNING_STORE_PASSWORD }}
+          APP_KEY_ALIAS: ${{ secrets.ANDROID_APP_SIGNING_KEY_ALIAS }}
+          APP_KEY_PASSWORD: ${{ secrets.ANDROID_APP_SIGNING_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          umask 077
+          for name in APP_KEYSTORE_BASE64 APP_STORE_PASSWORD APP_KEY_ALIAS APP_KEY_PASSWORD; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::Credencial protegida de assinatura ausente. A publicação remota foi bloqueada."
+              exit 1
+            fi
+          done
+          KEYSTORE="$RUNNER_TEMP/capital-do-trem-signing.jks"
+          PKCS12="$RUNNER_TEMP/capital-do-trem-signing.p12"
+          PRIVATE_KEY="$RUNNER_TEMP/capital-do-trem-live-update-private.pem"
+          CERT="$RUNNER_TEMP/capital-do-trem-signing-cert.pem"
+          printf '%s' "$APP_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE"
+          test -s "$KEYSTORE"
+          keytool -importkeystore -noprompt -srckeystore "$KEYSTORE" -srcstorepass "$APP_STORE_PASSWORD" -srcalias "$APP_KEY_ALIAS" -srckeypass "$APP_KEY_PASSWORD" -destkeystore "$PKCS12" -deststoretype PKCS12 -deststorepass "$APP_KEY_PASSWORD" -destkeypass "$APP_KEY_PASSWORD" >/dev/null
+          openssl pkcs12 -in "$PKCS12" -passin env:APP_KEY_PASSWORD -nocerts -nodes -out "$PRIVATE_KEY"
+          openssl pkcs12 -in "$PKCS12" -passin env:APP_KEY_PASSWORD -clcerts -nokeys -out "$CERT"
+          openssl pkey -in "$PRIVATE_KEY" -check -noout
+          openssl x509 -in "$CERT" -noout -text | grep -q 'Public Key Algorithm: rsaEncryption'
+          echo "APP_KEY_PASSWORD=$APP_KEY_PASSWORD" >> "$GITHUB_ENV"
+
+      - name: Configurar Node.js
         if: steps.native_guard.outputs.publish == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
       - name: Instalar dependências
         if: steps.native_guard.outputs.publish == 'true'
         run: npm install --no-audit --no-fund
+
       - name: Preparar os arquivos web
         if: steps.native_guard.outputs.publish == 'true'
         run: npm run build:web
+
       - name: Validar o mecanismo de atualização
         if: steps.native_guard.outputs.publish == 'true'
         run: npm run test:live-update
+
       - name: Validar o pacote PWA
         if: steps.native_guard.outputs.publish == 'true'
         run: node scripts/check-pwa.mjs
-      - name: Montar pacote web compatível com Capacitor
+
+      - name: Montar e assinar pacote web compatível com Capacitor
         if: steps.native_guard.outputs.publish == 'true'
         run: |
           set -euo pipefail
@@ -67,7 +104,10 @@ jobs:
           test -s capital-do-trem-web-bundle.zip
           sha256sum capital-do-trem-web-bundle.zip | awk '{print $1}' > capital-do-trem-web-bundle.sha256
           test "$(wc -c < capital-do-trem-web-bundle.sha256)" -eq 65
-          printf 'Pacote web para atualização remota do Capital do Trem.\nCompatível apenas com alterações HTML, CSS, JavaScript e arquivos web.\nSHA-256: %s\n' "$(cat capital-do-trem-web-bundle.sha256)" > release-notes.md
+          openssl dgst -sha256 -sign "$RUNNER_TEMP/capital-do-trem-live-update-private.pem" capital-do-trem-web-bundle.zip | base64 -w0 > capital-do-trem-web-bundle.sig
+          test -s capital-do-trem-web-bundle.sig
+          printf 'Pacote web para atualização remota do Capital do Trem.\nCompatível apenas com alterações HTML, CSS, JavaScript e arquivos web.\nSHA-256: %s\nRSA-SIGNATURE: %s\n' "$(cat capital-do-trem-web-bundle.sha256)" "$(cat capital-do-trem-web-bundle.sig)" > release-notes.md
+
       - name: Publicar pacote remoto gratuito
         if: steps.native_guard.outputs.publish == 'true'
         uses: softprops/action-gh-release@v2
@@ -77,6 +117,6 @@ jobs:
           body_path: release-notes.md
           files: |
             capital-do-trem-web-bundle.zip
-            capital-do-trem-web-bundle.sha256\n            capital-do-trem-web-bundle.sig
+            capital-do-trem-web-bundle.sha256
           draft: false
           prerelease: false
