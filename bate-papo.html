@@ -181,7 +181,7 @@ body.light .emoji-picker,body.light .emoji-full-panel,body.light .emoji-category
 main{display:flex;flex-direction:column}
 main>.chat-area-nav{order:0}
 main>#capital-do-trem-room{order:1}
-main>#fazer-amigos{order:2}
+main>#fazer-amigos{order:5}
 main>#private-conversations-shortcut{order:3}
 main>#chat-topics{order:4}
 #private-conversations-shortcut{border-color:#ed1c2488;background:linear-gradient(110deg,#1a090b,#090909);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -204,6 +204,7 @@ main>*{min-width:0;max-width:100%}
 .composer>*{min-width:0;max-width:100%}
 .composer input#message,.composer textarea{width:100%;min-width:0;max-width:100%}
 @media(max-width:480px){.chat-area-nav{grid-template-columns:minmax(0,1fr)}.message{max-width:94%}}
+.friends-panel{padding:10px!important;margin-top:10px!important;border-radius:13px!important}.friends-panel .room-heading{margin-bottom:5px;align-items:center}.friends-panel .room-heading h2{font-size:16px;margin:2px 0}.friends-panel .eyebrow{font-size:9px;letter-spacing:1px}.friends-panel .room-tag{font-size:9px;padding:4px 7px}.friends-panel>p.muted{font-size:12px;line-height:1.35;margin:6px 0}.friends-panel .friends-directory{gap:6px}.friends-panel .friend-person{padding:8px;gap:8px}.friends-panel .friend-avatar{width:38px;height:38px;flex-basis:38px;font-size:16px}.friends-panel .friend-copy p{font-size:12px}.friends-panel .friend-copy .btn{min-height:34px;padding:6px 10px;font-size:12px}
 </style><link rel="stylesheet" href="./capital-futurista.css?v=5">
 <link rel="stylesheet" href="./capital-modern-ui.css?v=1"><style>
 /* Correção de largura no FALA UAI: a conversa não deve arrastar a página inteira para os lados. */
@@ -249,9 +250,6 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important;overscroll-behav
   <button class="cdt-chat-row" type="button" data-open-view="capital-do-trem-room">
    <span class="cdt-chat-avatar logo"><img src="./marca.svg" alt=""></span><span class="cdt-chat-copy"><strong>GRUPO: CAPITAL DO TREM</strong><small>O ponto de encontro da comunidade</small></span><span class="cdt-chat-meta"><small>FALA UAI</small><b>›</b></span>
   </button>
-  <button class="cdt-chat-row" type="button" data-open-view="fazer-amigos">
-   <span class="cdt-chat-avatar friends">🤝</span><span class="cdt-chat-copy"><strong>FAZER AMIZADES POR LOCALIZAÇÃO</strong><small>Encontre pessoas da comunidade</small></span><span class="cdt-chat-meta"><small>COMUNIDADE</small><b>›</b></span>
-  </button>
   <button class="cdt-chat-row" type="button" data-open-view="private-conversations-shortcut">
    <span class="cdt-chat-avatar private">✉</span><span class="cdt-chat-copy"><strong>PRIVADO</strong><small>Suas conversas particulares</small></span><span class="cdt-chat-meta"><small>ABRIR</small><b>›</b></span>
   </button>
@@ -260,7 +258,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important;overscroll-behav
   </button>
  </div>
 </section>
-<nav class="chat-area-nav" aria-label="Áreas principais do FALA UAI"><a href="#capital-do-trem-room">👥 Grupo CAPITAL DO TREM</a><a href="#fazer-amigos">🤝 Fazer amizades por localização</a></nav>
+<nav class="chat-area-nav" aria-label="Área principal do FALA UAI"><a href="#capital-do-trem-room">👥 Grupo CAPITAL DO TREM</a></nav>
 <section id="capital-do-trem-room" class="panel chat-panel"><div class="room-heading"><div><span class="eyebrow">CAPITAL DO TREM • COMUNIDADE</span><h2>💬 Sala geral</h2></div><div style="display:flex;align-items:center;gap:8px"><span class="room-tag">FALA UAI</span><button id="leave-group" class="alt" type="button" hidden>Sair do grupo</button></div></div><div class="security-seal" role="note">
   <div class="security-seal-title"><span aria-hidden="true">🔒</span><span>Conexão criptografada</span><small>HTTPS</small></div>
   <p>Seus dados são protegidos durante a transmissão por HTTPS. Esta versão ainda não oferece criptografia ponta a ponta.</p>
