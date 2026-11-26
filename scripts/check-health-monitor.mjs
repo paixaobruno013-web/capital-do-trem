@@ -18,6 +18,12 @@ assert.match(diagnostic, /Exportar relatório/, 'diagnóstico deve permitir expo
 assert.match(diagnostic, /clearIncidents/, 'diagnóstico deve permitir limpar histórico');
 assert.match(update, /item\.kind==='javascript'\|\|item\.kind==='promise'/, 'tarefas longas e falhas de recursos não devem disparar falso alerta de instabilidade');
 assert.match(update, /duplicate\|\|recoveryShown/, 'erros repetidos em sequência devem ser deduplicados no alerta');
-assert.match(update, /window\.setInterval\(verifyRealConnection,30000\)/, 'sondagem periódica deve respeitar intervalo de 30 segundos para poupar dados e bateria');
+assert.match(update, /lowPowerMode\(\)\?45000:30000/, 'monitor deve reduzir a frequência automaticamente em economia de bateria/dados');
+assert.match(update, /if\(document\.hidden\)return/, 'sondagens devem ser pausadas quando o app está em segundo plano');
+assert.match(update, /battery\.addEventListener\('levelchange'/, 'mudanças no nível da bateria devem recalibrar o monitor');
+assert.match(update, /battery\.addEventListener\('chargingchange'/, 'estado de carregamento deve recalibrar o monitor');
+assert.match(update, /else resumeConnectionMonitor\(\)/, 'retorno ao primeiro plano deve verificar a conexão imediatamente');
+assert.match(update, /window\.addEventListener\('offline',showOffline\)/, 'evento offline do aparelho deve continuar acionando o alerta imediatamente');
+assert.match(update, /window\.addEventListener\('online',\(\)=>window\.setTimeout\(resumeConnectionMonitor,300\)\)/, 'evento online deve confirmar a conexão assim que a rede voltar');
 
 console.log('Monitoramento local de falhas e painel de diagnóstico verificados.');
