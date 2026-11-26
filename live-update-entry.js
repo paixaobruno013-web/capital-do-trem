@@ -18,14 +18,11 @@ async function fetchLatestBundle() {
   );
   if (!release) return null;
   const zip = release.assets?.find(asset => asset.name === 'capital-do-trem-web-bundle.zip');
-  const checksumAsset = release.assets?.find(asset => asset.name === 'capital-do-trem-web-bundle.sha256');
-  if (!zip?.browser_download_url || !checksumAsset?.browser_download_url) {
-    throw new Error('Pacote de atualização incompleto.');
+  const checksumMatch = String(release.body || '').match(/SHA-256:\\s*([a-f0-9]{64})/i);
+  if (!zip?.browser_download_url || !checksumMatch) {
+    throw new Error('Pacote de atualização incompleto ou sem SHA-256.');
   }
-  const checksumResponse = await fetch(checksumAsset.browser_download_url, { cache: 'no-store' });
-  if (!checksumResponse.ok) throw new Error('Não foi possível validar o pacote.');
-  const checksum = (await checksumResponse.text()).trim().split(/\s+/)[0].toLowerCase();
-  if (!/^[a-f0-9]{64}$/.test(checksum)) throw new Error('Código de integridade inválido.');
+  const checksum = checksumMatch[1].toLowerCase();
   return { bundleId: release.tag_name, url: zip.browser_download_url, checksum };
 }
 
