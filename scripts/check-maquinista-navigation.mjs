@@ -12,7 +12,7 @@ const checks=[
  [!v['bate-papo.html'].includes('fala-uai-player')&&!v['bate-papo.html'].includes('createCapitalMusicPlayer'),'Chat não mistura player musical'],
  [v['supabase/auth.js'].includes('getDiscussionTopics')&&v['supabase/auth.js'].includes('sendDiscussionMessage')&&v['chat-topics.js'].includes('subscribeDiscussionMessages'),'Salas por assunto suportam mensagens em tempo real'],
  [v['supabase/migrations/20261116170000_discussion_topics.sql'].includes('enable row level security')&&v['supabase/migrations/20261116170000_discussion_topics.sql'].includes('discussion_topic_messages_insert_members'),'Salas e mensagens têm RLS e participação obrigatória'],
- [v['rede.html'].includes('profile-only-tabs')&&v['rede.html'].includes('profile-verified-seal')&&v['rede.html'].includes('stat-followers')&&v['rede.html'].includes('stat-following'),'Perfil fica focado em dados pessoais, seguidores e selo'],
+ [v['rede.html'].includes('profile-hidden-data')&&v['rede.html'].includes('profile-verified-seal')&&v['rede.html'].includes('stat-followers')&&v['rede.html'].includes('stat-following'),'Perfil fica focado em dados pessoais, seguidores e selo'],
  [v['rede.js'].includes("eq('status','published')")&&v['rede.js'].includes('profile-verified-seal'),'Selo aparece apenas para artistas publicados/aprovados'],
  [v['conta.html'].includes('SEJA BEM-VINDO')&&v['conta.html'].includes('MAQUINISTA DESSE TREM'),'Cadastro recebe mensagem de boas-vindas do projeto'],
  [v['conta.html'].includes('nome, foto, nome de usuário e descrição são opcionais')&&!/<input id="basic-display-name"[^>]*required/.test(v['conta.html']),'Nome do perfil pode ficar em branco; o perfil continua automático'],
