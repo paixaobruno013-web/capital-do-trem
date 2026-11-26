@@ -243,6 +243,8 @@ jobs:
 
       - name: Verificar assinatura e integridade do APK
         shell: bash
+        env:
+          RELEASE_TAG: ${{ steps.release_meta.outputs.tag }}
         run: |
           set -euo pipefail
           APK="android/app/build/outputs/apk/release/app-release.apk"
