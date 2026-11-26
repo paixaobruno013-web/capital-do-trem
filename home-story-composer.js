@@ -128,12 +128,9 @@ async function startCamera() {
     let cameraStream;
     try {
       cameraStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { ideal: facingMode },
-          width: { ideal: 960 },
-          height: { ideal: 540 },
-          frameRate: { ideal: 24, max: 30 }
-        },
+        // Deixa o navegador escolher a resolução inicial mais rápida do aparelho.
+        // A imagem é otimizada depois da captura, sem atrasar a abertura da câmera.
+        video: { facingMode: { ideal: facingMode } },
         audio: false
       });
     } catch (firstError) {
@@ -266,8 +263,8 @@ function capturePhoto() {
   const captureZoom = hardwareZoomActive ? 1 : cameraZoom;
   const cropWidth = sourceWidth / captureZoom;
   const cropHeight = sourceHeight / captureZoom;
-  // 1280 px mantém boa nitidez para Stories e reduz o tempo de codificação em celulares.
-  const scale = Math.min(1, 1280 / Math.max(cropWidth, cropHeight));
+  // 960 px mantém nitidez adequada para Stories e acelera a prévia em celulares.
+  const scale = Math.min(1, 960 / Math.max(cropWidth, cropHeight));
   const canvas = document.createElement('canvas');
   canvas.width = Math.max(1, Math.round(cropWidth * scale));
   canvas.height = Math.max(1, Math.round(cropHeight * scale));
