@@ -29,7 +29,7 @@ const checks = [
   ['FALA UAI mantém grupo e amizades em cartões separados', /GRUPO • CAPITAL do TREM/.test(room) && /fazer amizades pela localização/.test(room)],
   ['logo oficial branca aparece no perfil do grupo', /id="open-group-profile"/.test(room) && /<img src="\.\/marca\.svg" alt="Logo Capital do Trem">/.test(room)],
   ['perfis públicos aparecem em faixa horizontal com status online e acesso ao perfil', /id="chat-profile-rail"/.test(room) && /id="chat-online-profiles"/.test(room) && /chat-online-profile\.is-online/.test(room) && /rede\.html\?perfil=/.test(room)],
-  ['atalhos superiores e seletor de tema foram retirados da tela do chat', !/Pular para o conteúdo principal/.test(room) && !/fala-uai-header-actions/.test(room) && !/id="theme"/.test(room)],
+  ['atalhos superiores e seletor de tema foram retirados da tela do chat', !/Pular para o conteúdo principal/.test(room) && !/<header class="fala-uai-clean-header"/.test(room) && !/id="theme"/.test(room)],
   ['presença do grupo exibe quem está online e indicador de digitação em tempo real', /id="group-live-presence"/.test(room) && /startUserPresence/.test(room) && /subscribeUserPresence/.test(room) && /capital-fala-uai-group-typing/.test(room) && /announceGroupTyping/.test(room)],
   ['diretório de amizades oferece ações SEGUIR e CONVERSAR com autenticação', /textContent='SEGUIR'/.test(room) && /textContent='CONVERSAR'/.test(room) && /profile_follows/.test(room) && /requestPrivateConversation/.test(room)],
   ['botão CONVERSAR abre a conversa privada aceita ou informa que o convite aguarda aceite', /shareParams\.get\('user'\)/.test(privateChat) && /openConversation\(target\)/.test(privateChat) && /Seu convite foi enviado/.test(privateChat)],
