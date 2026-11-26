@@ -298,7 +298,7 @@ header .actions .btn,header .actions button{min-height:36px;padding:6px 9px;font
 <section class="panel"><div class="section-title"><h2>Convites recebidos</h2><span class="pill" id="pending-count">0</span></div><div id="incoming" class="list"><p class="empty">Nenhum convite por enquanto.</p></div></section>
 <div class="layout" id="private-layout">
 <section class="panel" id="sidebar-panel"><div class="section-title"><h2>Pessoas da comunidade</h2><button id="refresh" type="button">Atualizar</button></div><p class="small">Só aparecem participantes ativos que já enviaram mensagem no Fala Trem. A outra pessoa precisa aceitar seu convite.</p><input id="search" type="search" placeholder="Buscar por nome ou cidade" aria-label="Buscar pessoas"><div id="people" class="list"><p class="empty">Carregando pessoas…</p></div><div class="section-title" style="margin-top:18px"><h2>Conversas</h2><span class="pill">Grupo + privadas</span></div><p class="small">O grupo oficial fica no topo. Para iniciar uma conversa privada, os dois precisam participar e já ter enviado mensagem no grupo.</p><input id="conversation-search" type="search" placeholder="Buscar conversa pelo nome" aria-label="Buscar conversa" style="margin:8px 0"><div id="conversations" class="list"><p class="empty">Carregando…</p></div></section>
-<section class="panel" id="thread-panel"><div class="section-title"><div style="display:flex;align-items:center;gap:9px;min-width:0"><button id="back-to-list" type="button" aria-label="Voltar às conversas">‹</button><div><h2 id="chat-title">Escolha uma conversa</h2><span class="small" id="thread-presence">Escolha o grupo ou uma conversa privada</span><span class="small typing-indicator" id="typing-indicator" aria-live="polite" hidden></span></div></div><button id="leave-group" type="button" hidden>Sair do grupo</button><button id="block" type="button" hidden>Bloquear</button></div><p class="small" id="chat-hint">Selecione uma conversa aceita para enviar mensagens privadas.</p>
+<section class="panel" id="thread-panel"><div class="section-title"><div style="display:flex;align-items:center;gap:9px;min-width:0"><button id="back-to-list" type="button" aria-label="Voltar às conversas">‹</button><div><h2 id="chat-title">Escolha uma conversa</h2><span class="small" id="thread-presence">Escolha o grupo ou uma conversa privada</span><span class="small typing-indicator" id="typing-indicator" aria-live="polite" hidden></span></div></div><button id="leave-group" type="button" hidden>Sair do grupo</button><button id="block" type="button" hidden>Bloquear</button></div><p class="small" id="chat-hint">Selecione uma conversa aceita para enviar mensagens privadas.</p><div class="actions" style="justify-content:flex-start;margin:8px 0"><button id="private-gallery-open" type="button" hidden>🖼️ Ver fotos e vídeos desta conversa</button></div><section class="panel" id="private-media-gallery" hidden><div class="section-title"><h3>Fotos e vídeos compartilhados</h3><button id="private-gallery-close" type="button">Fechar</button></div><div id="private-media-gallery-grid" class="media-gallery-grid"></div><p id="private-media-gallery-empty" class="empty" hidden>Nenhuma foto ou vídeo compartilhado ainda.</p></section>
 <p class="notice" id="shared-content-hint" hidden>Conteúdo pronto para compartilhar. Escolha uma conversa privada aceita, confira a mensagem e toque em enviar.</p>
 <div class="security-seal" role="note">
   <div class="security-seal-title"><span aria-hidden="true">🔒</span><span>Conexão criptografada</span><small>HTTPS</small></div>
@@ -519,6 +519,7 @@ function drawGroupMessage(m){
 async function openGroupConversation(){
  clearSubscription();active=null;activeGroup=true;$('private-layout').classList.add('chat-open');
  $('chat-title').textContent='GRUPO: CAPITAL DO TREM';
+ $('private-gallery-open').hidden=false;$('private-media-gallery').hidden=true;
  $('block').hidden=true;$('leave-group').hidden=!state.isGroupMember;
  $('compose').hidden=!state.isGroupMember;$('message').maxLength=1000;$('message').placeholder='Mensagem para todo o grupo…';
  drawConversations();
@@ -539,7 +540,7 @@ async function openGroupConversation(){
 async function openConversation(c){
   if(sharedDraft&&!$('message').value.trim()){$('message').value=sharedDraft;$('status').textContent='Link preparado. Confira e toque em enviar para compartilhar nesta conversa privada.';$('message').focus();}
 
- clearSubscription();active=c;activeGroup=false;$('private-layout').classList.add('chat-open');$('chat-title').textContent=personName(partner(c));$('thread-presence').textContent=onlineIds.has(partner(c))?'● Online agora':'Conversa privada • somente vocês dois';$('message').maxLength=2000;$('message').placeholder='Escreva sua mensagem privada…';$('chat-hint').textContent='Conversa privada • somente vocês dois podem acessar';$('block').hidden=false;$('leave-group').hidden=true;$('compose').hidden=false;$('messages').replaceChildren(node('p','empty','Carregando mensagens…'));drawConversations();
+ clearSubscription();active=c;activeGroup=false;$('private-gallery-open').hidden=false;$('private-media-gallery').hidden=true;$('private-layout').classList.add('chat-open');$('chat-title').textContent=personName(partner(c));$('thread-presence').textContent=onlineIds.has(partner(c))?'● Online agora':'Conversa privada • somente vocês dois';$('message').maxLength=2000;$('message').placeholder='Escreva sua mensagem privada…';$('chat-hint').textContent='Conversa privada • somente vocês dois podem acessar';$('block').hidden=false;$('leave-group').hidden=true;$('compose').hidden=false;$('messages').replaceChildren(node('p','empty','Carregando mensagens…'));drawConversations();
  try{
   const rows=await getPrivateMessages(c.id);$('messages').replaceChildren();rows.forEach(drawMessage);
   unsubscribe=await subscribePrivateMessages(c.id,m=>drawMessage(m),s=>{if(s==='CHANNEL_ERROR'||s==='TIMED_OUT')$('status').textContent='Conexão instável. Atualize a página para reconectar.';});
@@ -551,11 +552,32 @@ async function openConversation(c){
  }
  catch(e){$('messages').replaceChildren(node('p','empty',e.message||'Não foi possível carregar as mensagens.'));}
 }
+
+// Galeria da conversa atual: as consultas privadas são filtradas pelo RLS dos participantes aceitos.
+const privateGalleryButton=$('private-gallery-open'),privateGallery=$('private-media-gallery'),privateGalleryGrid=$('private-media-gallery-grid'),privateGalleryEmpty=$('private-media-gallery-empty');
+async function showCurrentConversationGallery(){
+ if(!activeGroup&&!active)return;
+ privateGallery.hidden=false;privateGalleryGrid.replaceChildren();privateGalleryEmpty.hidden=true;
+ try{
+  const rows=activeGroup?await getChatMessages(100):await getPrivateMessages(active.id);
+  const items=rows.filter(item=>!item.view_once&&item.attachment_url&&['image','video'].includes(item.attachment_type));
+  for(const item of items){
+   const link=node('a');link.href=item.attachment_url;link.target='_blank';link.rel='noopener noreferrer';link.setAttribute('aria-label',item.attachment_type==='video'?'Abrir vídeo compartilhado':'Abrir foto compartilhada');
+   if(item.attachment_type==='video'){const video=node('video');video.src=item.attachment_url;video.controls=true;video.playsInline=true;video.preload='metadata';link.append(video);}
+   else{const img=node('img');img.src=item.attachment_url;img.alt='Foto compartilhada na conversa';img.loading='lazy';link.append(img);}
+   privateGalleryGrid.append(link);
+  }
+  privateGalleryEmpty.hidden=items.length>0;
+ }catch(error){privateGalleryEmpty.hidden=false;privateGalleryEmpty.textContent=error.message||'Não foi possível carregar a galeria.';}
+}
+privateGalleryButton?.addEventListener('click',showCurrentConversationGallery);
+$('private-gallery-close')?.addEventListener('click',()=>privateGallery.hidden=true);
+
 async function refresh(){
  state=await getPrivateConversationData();
  try{onlineIds=await getOnlineUserIds();}catch(error){/* Mantém o último status disponível quando a rede oscilar. */}
  drawIncoming();drawPeople();drawConversations();updateThreadPresence();
- if(active&&!activeGroup){const fresh=state.conversations.find(c=>c.id===active.id);if(fresh?.status==='accepted')active=fresh;else{active=null;clearSubscription();$('private-layout').classList.remove('chat-open');$('chat-title').textContent='Escolha uma conversa';$('compose').hidden=true;$('block').hidden=true;}}
+ if(active&&!activeGroup){const fresh=state.conversations.find(c=>c.id===active.id);if(fresh?.status==='accepted')active=fresh;else{active=null;clearSubscription();$('private-gallery-open').hidden=true;$('private-media-gallery').hidden=true;$('private-layout').classList.remove('chat-open');$('chat-title').textContent='Escolha uma conversa';$('compose').hidden=true;$('block').hidden=true;}}
  if(activeGroup&&!state.isGroupMember){clearSubscription();await openGroupConversation();}
 }
 function mountInboxSections(){
