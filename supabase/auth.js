@@ -1447,9 +1447,10 @@ export async function getChatGroupDirectory() {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para ver os participantes.');
-  const { data: ids, error: idsError } = await supabase.rpc('active_chat_group_member_ids');
-  if (idsError) throw idsError;
-  const memberIds = (ids || []).map(row => typeof row === 'string' ? row : row.user_id).filter(Boolean);
+  const { data: members, error: membersError } = await supabase.from('chat_group_members')
+    .select('user_id').is('left_at', null).order('joined_at', { ascending:true }).limit(500);
+  if (membersError) throw membersError;
+  const memberIds = (members || []).map(row => row.user_id).filter(Boolean);
   if (!memberIds.length) return { count:0, participants:[] };
   const { data: profiles, error: profilesError } = await supabase.from('profiles')
     .select('user_id,display_name,username,avatar_type,avatar_url,avatar_data')
