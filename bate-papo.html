@@ -243,7 +243,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important;overscroll-behav
 </head><body class="cdt-fala-uai-page">
 <main id="main-content">
 <div id="chat-profile-rail" class="chat-profile-rail" aria-label="Perfis da comunidade">
-<button id="open-group-profile" class="chat-profile-chip chat-group-chip" type="button" aria-controls="capital-do-trem-room" aria-expanded="false" aria-label="Abrir conversa do grupo Capital do Trem">
+<button id="open-group-profile" class="chat-profile-chip chat-group-chip" type="button" aria-controls="capital-do-trem-room" aria-expanded="false" aria-label="Abrir comunidade Capital do Trem">
 <span class="chat-profile-chip-avatar"><img class="cdt-own-profile-image" src="./assets/capital-do-trem-logo.jpg" alt="Perfil Capital do Trem"></span>
 <span class="chat-profile-chip-name">GRUPO • CAPITAL do TREM</span>
 <span class="chat-profile-chip-status">Grupo oficial</span>
@@ -336,7 +336,8 @@ function renderTopProfileRail(ids){
  const known=window.cdtPublicChatProfiles||[];
  const online=new Set([...ids].filter(id=>id!==currentUserId));
  root.replaceChildren();
- known.filter(profile=>profile.user_id!==currentUserId).forEach(profile=>{
+ if(!online.size){const empty=document.createElement('span');empty.className='chat-online-profile-status';empty.textContent='Ninguém online agora';root.append(empty);}
+ known.filter(profile=>profile.user_id!==currentUserId&&online.has(profile.user_id)).forEach(profile=>{
   const link=document.createElement('a');link.className='chat-online-profile'+(online.has(profile.user_id)?' is-online':'');
   link.href='./rede.html?perfil='+encodeURIComponent(profile.user_id);
   link.setAttribute('aria-label','Abrir perfil de '+(profile.display_name||'participante')+(online.has(profile.user_id)?', online':''));
@@ -754,7 +755,7 @@ body.cdt-fala-uai-page .fala-uai-clean-header,.skip-link{display:none!important}
 <style id="cdt-fala-uai-profile-reposition-v319">
 body.cdt-fala-uai-page .chat-profile-chip-avatar{width:58px!important;height:58px!important;border-width:2px!important}
 body.cdt-fala-uai-page .chat-profile-chip-avatar img{width:100%;height:100%;object-fit:cover!important;padding:0!important;border-radius:50%}
-body.cdt-fala-uai-page .fala-group-profile{min-height:88px!important;margin:0!important;border-color:#ed1c24!important;background:linear-gradient(105deg,#321014,#090909 78%)!important}
+body.cdt-fala-uai-page .fala-group-profile{order:2!important;min-height:88px!important;margin:0!important;border-color:#ed1c24!important;background:linear-gradient(105deg,#321014,#090909 78%)!important}
 body.cdt-fala-uai-page .fala-group-profile .fala-profile-avatar{width:60px!important;height:60px!important;flex:0 0 60px!important;overflow:hidden!important;background:#080808!important;border:2px solid #ed1c24!important;border-radius:50%!important;box-shadow:0 0 13px #ed1c2455!important}
 body.cdt-fala-uai-page .fala-group-profile .fala-profile-avatar img{width:100%;height:100%;object-fit:cover!important;border-radius:50%}
 body.cdt-fala-uai-page .fala-friends-profile{order:7!important;margin-top:18px!important;margin-bottom:14px!important;min-height:82px!important}
