@@ -44,7 +44,7 @@ const checks = [
   ['mensagens do bate-papo geral usam imagens emoji com fallback', /function appendEmojiText\(/.test(room) && /appendEmojiText\(body,part\)/.test(room)],
   ['conversas privadas e grupo renderizam emojis com suporte visual ampliado', /function appendEmojiText\(/.test(privateChat) && /appendEmojiText\(body,m\.content\|\|''\)/.test(privateChat) && /appendEmojiText\(body,m\.content\|\|''\)/.test(privateChat)],
   ['service worker inclui os módulos de chat e mensagens privadas', /chat-enhancements\.js/.test(worker) && /emoji-picker\.js/.test(worker) && /mensagens\.html/.test(worker)],
-  ['aviso de nova versão exibe identidade 🚂', /🚂 TEM ATUALIZAÇÃO NOVA NO TREM/.test(await read('update.js')) && /🚂 ATUALIZAR AGORA/.test(await read('update.js'))],
+  ['aviso compacto de atualização exibe identidade 🚂 e botão vermelho', /🚂 NOVA ATUALIZAÇÃO DISPONÍVEL/.test(await read('update.js')) && /button.textContent='ATUALIZAR'/.test(await read('update.js')) && /background:#ed1c24/.test(await read('update.js'))],
 
   ['seletor mantém campo de mensagem e envio visíveis enquanto aberto', !privateChat.includes('#compose.emoji-open #message,#compose.emoji-open #send,#compose.emoji-open #private-emoji-toggle{display:none}') && !room.includes('.composer.emoji-open #message,.composer.emoji-open #camera-open,.composer.emoji-open #record-audio,.composer.emoji-open #send,.composer.emoji-open .chat-tools{display:none!important}')],
   ['seletor insere emoji na posição do cursor e atualiza recentes', emoji.includes("setRangeText(e,start,end,'end')") && emoji.includes('remember(e)')],
