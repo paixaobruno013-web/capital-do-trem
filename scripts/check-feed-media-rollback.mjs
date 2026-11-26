@@ -14,7 +14,7 @@ const checks = [
   ['upload error aborts before media row insert', submit.includes('if(uploaded.error)throw uploaded.error;')],
   ['post_media insert failure aborts publication', submit.includes("supabase.from('post_media').insert(") && submit.includes('if(row.error)throw row.error;')],
   ['uploaded orphan file is removed after failure', submit.includes("storage.from('capital-do-trem-social').remove([uploadedPath])")],
-  ['rollback cleanup errors are caught and logged without hiding original error', submit.includes('catch(cleanupError){console.error') && submit.includes("status.textContent='Falha ao '+publishStage:")],
+  ['rollback cleanup errors are caught and logged without hiding original error', submit.includes('catch(cleanupError){console.error') && submit.includes("status.textContent='Falha ao '+publishStage+': '")],
   ['incomplete post is deleted after upload or attachment failure', submit.includes('if(createdPost?.id){try{await deleteMyPost(createdPost.id);}')],
   ['submit button is restored after success or failure', submit.includes('finally{button.disabled=false;if(storyPublishButton)storyPublishButton.disabled=!fileInput?.files?.length;}')],
   ['post deletion function exists in Supabase module', auth.includes('export async function deleteMyPost(')],
