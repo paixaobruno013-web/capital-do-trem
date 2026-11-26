@@ -1,4 +1,17 @@
 (() => {
+  // Em todas as áreas, a navegação principal fica somente na barra inferior.
+  const cleanup = document.createElement('style');
+  cleanup.id = 'capital-top-navigation-cleanup';
+  cleanup.textContent = `
+    body > header { display: none !important; }
+    body > main { padding-top: 8px !important; }
+    .chat-area-nav { display: none !important; }
+    @media (max-width: 600px) {
+      body > main { padding-left: 10px !important; padding-right: 10px !important; }
+    }
+  `;
+  if (!document.getElementById(cleanup.id)) document.head.append(cleanup);
+
   // A página inicial já possui a navegação original (#nav). Não criar uma segunda barra.
   if (document.querySelector('nav#nav')) return;
 
