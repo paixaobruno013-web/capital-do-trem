@@ -59,7 +59,7 @@ const checks = [
   ['seletor oferece categorias e recentes', /Mais usados/.test(emoji) && /emoji-category-tabs/.test(emoji) && /renderRecent\(\)/.test(emoji)],
   ['seletor usa imagens Twemoji com fallback para ampliar compatibilidade de emojis', emoji.includes('cdn.jsdelivr.net/gh/jdecked/twemoji') && /emoji-fallback/.test(emoji)],
   ['nenhuma área de descoberta de amizades aparece no FALA UAI', !/id="fazer-amigos"/.test(room) && !/id="open-friends-profile"/.test(room) && !/Fazer amizades pela localização/i.test(room)],
-  ['conversas privadas permanecem em área própria, separadas do grupo', /mensagens\.html\?user=/.test(privateChat) && /requestPrivateConversation/.test(auth)],
+  ['conversas privadas continuam individuais e só abrem após aceite do convite', /requestPrivateConversation/.test(auth) && /requestedUserId=shareParams\.get\('user'\)/.test(privateChat) && /if\(target\)await openConversation\(target\)/.test(privateChat)],
   ['presença online usa canal Realtime compartilhado e acompanha entrada e saída em tempo real', /capital-do-trem-user-presence/.test(auth) && /presenceChannel\.track/.test(auth) && /subscribeUserPresence/.test(auth) && /presenceState\(\)/.test(auth)],
   ['conversa privada transmite eventos de digitação sem gravar mensagens falsas', /subscribePrivateTyping/.test(auth) && /event: 'typing'/.test(auth) && /channel\.send/.test(auth)],
   ['FALA UAI mostra o indicador “está digitando” e atualiza status online ao vivo', /id="typing-indicator"/.test(privateChat) && / está digitando…/.test(privateChat) && /addEventListener\('input',announceTyping\)/.test(privateChat) && /subscribeUserPresence\(next=>/.test(privateChat)],
