@@ -968,15 +968,14 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 @media(max-width:560px){.music-library-columns{grid-template-columns:minmax(0,1fr);gap:10px}.music-library-columns section{padding:11px}.music-library-row{min-height:64px;padding:9px}.music-library-row:before{flex-basis:38px;width:38px;height:38px}.music-library-row strong{font-size:12px}.music-library-row button{min-width:38px;padding:6px 9px}}
 </style>
 <style>
-/* Stories não vistos: aro vermelho com luz em movimento, sem animar itens já vistos. */
-@keyframes homeStoryRedOrbit { to { transform: rotate(360deg); } }
-.home-story-ring:not(.seen) {
-  background: conic-gradient(from 0deg,#ff252f 0 18%,#5b080d 24%,#fff 30%,#ed1c24 38%,#5b080d 55%,#ff343d 68%,#fff 74%,#ed1c24 82%,#5b080d 92%,#ff252f);
-  box-shadow: 0 0 9px #ed1c2490, 0 0 20px #ed1c2450;
-  animation: homeStoryRedOrbit 2.4s linear infinite;
-}
-.home-story-ring.seen { background:#666; box-shadow:none; animation:none; }
-@media(prefers-reduced-motion:reduce){.home-story-ring:not(.seen){animation:none}}
+/* Stories: o aro fica parado; somente um LED vermelho percorre a borda. */
+@keyframes homeStoryLedTravel{to{transform:rotate(360deg)}}
+.home-story-ring{position:relative;isolation:isolate;background:#26090c;animation:none!important;overflow:visible}
+.home-story-ring:not(.seen)::before{content:"";position:absolute;inset:0;border-radius:50%;z-index:0;background:conic-gradient(from 0deg,transparent 0 86%,#ed1c24 90%,#ff5961 92%,#fff 93%,transparent 95% 100%);animation:homeStoryLedTravel 2.4s linear infinite;filter:drop-shadow(0 0 4px #ed1c24) drop-shadow(0 0 8px #ed1c24);pointer-events:none}
+.home-story-ring .home-story-avatar{position:relative;z-index:1;width:calc(100% - 6px);height:calc(100% - 6px)}
+.home-story-ring.seen{background:#666;box-shadow:none;animation:none!important}
+.home-story-ring.seen::before{display:none}
+@media(prefers-reduced-motion:reduce){.home-story-ring:not(.seen)::before{animation:none}}
 </style>
 </head>
 <body>
@@ -1018,25 +1017,17 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <section id="home-community-feed" class="card home-community-feed" aria-labelledby="home-community-feed-title">
  <div class="home-section-heading"><div><span class="eyebrow">CAPITAL DO TREM • COMUNIDADE</span><h2 id="home-community-feed-title">Feed dos Maquinistas</h2><p class="muted">As novidades, fotos e vídeos da nossa comunidade.</p></div><a class="btn alt" href="./rede.html">Meu perfil</a></div>
  <form id="home-feed-composer" class="home-feed-composer home-feed-composer-v2">
-  <div class="home-feed-composer-heading">
-   <div class="home-feed-compose-mark" aria-hidden="true">🚂</div>
-   <div class="home-feed-compose-intro"><span class="eyebrow">SUA VOZ NA COMUNIDADE</span><strong>O que vamos compartilhar hoje?</strong><small>Publique uma ideia, novidade, foto ou vídeo para os Maquinistas.</small></div>
-   <span class="home-feed-public-pill">FEED</span>
-  </div>
-  <label class="sr-only" for="home-feed-text">O que você quer compartilhar?</label>
-  <textarea id="home-feed-text" maxlength="1500" rows="4" placeholder="O que está acontecendo, Maquinista? Conte pra gente…"></textarea>
-  <div class="home-feed-compose-actions home-feed-compose-actions-v2">
-   <label class="home-feed-pick home-feed-pick-v2" for="home-feed-media"><span aria-hidden="true">＋</span><span><strong>Adicionar mídia</strong><small>Foto ou vídeo</small></span></label>
-   <input id="home-feed-media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" hidden>
-   <span id="home-feed-media-name" class="home-feed-media-name muted">Nenhuma mídia selecionada</span>
-   <button id="home-feed-music-toggle" class="btn alt" type="button">♫ Adicionar música</button>
-   <button class="btn primary home-feed-publish home-feed-publish-v2" type="submit"><span aria-hidden="true">↗</span> Publicar</button>
-  </div>
-  <section id="home-feed-music-panel" class="home-feed-music-panel" hidden aria-label="Trilha musical da publicação"><label for="home-feed-music-select">Escolha uma música publicada de qualquer perfil</label><select id="home-feed-music-select"><option value="">Sem música</option></select><div class="home-feed-music-clip"><label for="home-feed-music-start">Começar em (segundos)</label><input id="home-feed-music-start" type="number" min="0" max="3600" step="1" value="0"><label for="home-feed-music-duration">Duração do trecho</label><select id="home-feed-music-duration"><option value="15">15 segundos</option><option value="30">30 segundos</option><option value="45">45 segundos</option><option value="60">60 segundos</option></select></div><audio id="home-feed-music-preview" controls preload="none" hidden></audio><p id="home-feed-music-status" class="muted" role="status">A música será anexada à publicação com foto.</p></section>
-  <div id="home-feed-preview" class="home-feed-preview" hidden><div class="home-feed-preview-top"><strong>PRÉVIA DA PUBLICAÇÃO</strong><button id="home-feed-clear-media" type="button" class="home-feed-clear-media">Remover mídia ×</button></div><div id="home-feed-preview-stage" class="home-feed-preview-stage"></div></div>
-  <div class="home-feed-caption-meta"><span>Compartilhe com respeito e fortaleça a cena.</span><span id="home-feed-char-count">0/1500</span></div>
-  <p id="home-feed-status" class="muted" role="status" aria-live="polite"></p>
- </form>
+<label class="sr-only" for="home-feed-text">O que você deseja compartilhar</label>
+<textarea id="home-feed-text" maxlength="1500" rows="3" placeholder="O que você deseja compartilhar"></textarea>
+<div class="home-feed-editor-tools"><button id="home-feed-crop-toggle" type="button" class="home-feed-tool-button" aria-pressed="false" disabled>✂ Editar / cortar</button><button id="home-feed-music-toggle" type="button" class="home-feed-tool-button">♫ Adicionar música</button></div>
+<label class="home-feed-gallery-picker" for="home-feed-media" aria-label="Buscar imagens ou vídeos na galeria"><span>＋</span><strong>Adicionar fotos ou vídeos</strong><small>Toque para abrir sua galeria</small></label>
+<input id="home-feed-media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" hidden>
+<span id="home-feed-media-name" class="home-feed-media-name muted" hidden>Nenhuma mídia selecionada</span>
+<section id="home-feed-music-panel" class="home-feed-music-panel" hidden aria-label="Trilha musical da publicação"><label for="home-feed-music-select">Escolha uma música do catálogo</label><select id="home-feed-music-select"><option value="">Sem música</option></select><div class="home-feed-music-clip"><label for="home-feed-music-start">Começar em (segundos)</label><input id="home-feed-music-start" type="number" min="0" max="3600" step="1" value="0"><label for="home-feed-music-duration">Duração do trecho</label><select id="home-feed-music-duration"><option value="15">15 segundos</option><option value="30">30 segundos</option><option value="45">45 segundos</option><option value="60">60 segundos</option></select></div><audio id="home-feed-music-preview" controls preload="none" hidden></audio><p id="home-feed-music-status" class="muted" role="status">Escolha uma música publicada para acompanhar sua foto.</p></section>
+<section id="home-feed-preview" class="home-feed-preview" hidden><div class="home-feed-preview-top"><strong>PRÉVIA</strong><button id="home-feed-clear-media" type="button" class="home-feed-clear-media">Remover ×</button></div><div id="home-feed-preview-stage" class="home-feed-preview-stage"></div></section>
+<div class="home-feed-publish-actions"><button class="btn primary home-feed-publish-v2" type="submit">Compartilhar Feed</button><button id="home-feed-publish-story" class="btn alt home-feed-publish-story" type="button" disabled>Compartilhar Feed + Story</button></div>
+<p id="home-feed-status" class="muted" role="status" aria-live="polite"></p>
+</form>
  <div id="home-feed-list" class="home-feed-list" aria-live="polite"><p class="muted">Carregando publicações da comunidade…</p></div>
 </section>
 <section class="card home-event-feed" id="home-event-feed" aria-labelledby="home-event-feed-title" hidden>
