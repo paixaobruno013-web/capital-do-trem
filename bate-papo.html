@@ -181,8 +181,9 @@ body.light .emoji-picker,body.light .emoji-full-panel,body.light .emoji-category
 main{display:flex;flex-direction:column}
 main>.chat-area-nav{order:0}
 main>#capital-do-trem-room{order:1}
-main>#fazer-amigos{order:5}
+main>#fazer-amigos{order:2}
 main>#private-conversations-shortcut{order:3}
+main>.chat-area-nav-bottom{order:6}
 main>#chat-topics{order:4}
 #private-conversations-shortcut{border-color:#ed1c2488;background:linear-gradient(110deg,#1a090b,#090909);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 #private-conversations-shortcut h2{margin:0;font-size:18px}
@@ -239,12 +240,12 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important;overscroll-behav
 .composer input#message{width:100%;min-width:0;max-width:100%}
 @media(max-width:480px){#main-content{padding-left:10px;padding-right:10px}.chat-panel,.friends-panel{padding:10px}.composer{gap:3px;padding:5px}.composer button{min-width:0;padding:6px 2px}}
 </style>
-</head><body>
+</head><body class="cdt-fala-uai-page">
 <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
 <header><img src="./marca.svg" alt="Capital do Trem"><div class="chat-brand"><span class="chat-live-dot" aria-hidden="true"></span><span>FALA UAI</span><small>O ponto de encontro da comunidade</small></div><h1>FALA UAI da quebrada</h1><p class="muted">Artistas e Usuários Uai, juntos na mesma conversa.</p><div class="actions"><a class="btn alt" href="./index.html">Início</a><a class="btn alt" href="./conta.html">Minha conta</a><a class="btn alt" href="./avatar.html">Meu avatar</a><a class="btn" href="./mensagens.html">✉️ Minhas conversas</a><button class="alt" id="theme" type="button">☀️ Claro</button></div></header>
 <main id="main-content">
 <nav class="chat-area-nav" aria-label="Área principal do FALA UAI"><a href="#capital-do-trem-room">👥 GRUPO • CAPITAL do TREM</a></nav>
-<section id="capital-do-trem-room" class="panel chat-panel"><div class="room-heading"><div><span class="eyebrow">CAPITAL DO TREM • COMUNIDADE</span><h2>💬 Sala geral</h2></div><div style="display:flex;align-items:center;gap:8px"><span class="room-tag">FALA UAI</span><button id="leave-group" class="alt" type="button" hidden>Sair do grupo</button></div></div><div class="security-seal" role="note">
+<section id="capital-do-trem-room" class="panel chat-panel"><div class="room-heading"><div><span class="eyebrow">CAPITAL DO TREM • COMUNIDADE</span><h2>GRUPO • CAPITAL do TREM</h2></div><div style="display:flex;align-items:center;gap:8px"><span class="room-tag">FALA UAI</span><button id="leave-group" class="alt" type="button" hidden>Sair do grupo</button></div></div><div id="group-live-presence" class="group-live-presence" aria-live="polite"><div><strong>● online</strong><span id="group-online-list">Verificando participantes…</span></div><div><strong>✍ digitando</strong><span id="group-typing-list">Ninguém digitando agora</span></div></div><div class="security-seal" role="note">
   <div class="security-seal-title"><span aria-hidden="true">🔒</span><span>Conexão criptografada</span><small>HTTPS</small></div>
   <p>Seus dados são protegidos durante a transmissão por HTTPS. Esta versão ainda não oferece criptografia ponta a ponta.</p>
 </div>
@@ -265,9 +266,9 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important;overscroll-behav
   <p id="topic-message-status" class="status" role="status" aria-live="polite"></p>
  </section>
 </section>
-<section id="fazer-amigos" class="panel friends-panel"><div class="room-heading"><div><span class="eyebrow">CAPITAL DO TREM • CONEXÕES</span><h2>🤝 Fazer amigos</h2></div><span class="room-tag">Comunidade</span></div><p class="muted">Conheça participantes que também fazem parte do Capital do Trem. Só aparecem pessoas que escolheram deixar o perfil público. A cidade é informada pela própria pessoa; não usamos GPS nem mostramos endereço ou distância exata.</p><label for="chat-friends-search">Buscar pessoas</label><input id="chat-friends-search" type="search" maxlength="80" placeholder="Nome, @usuário, cidade ou interesse"><label for="chat-friends-distance">Onde procurar</label><select id="chat-friends-distance"><option value="all">Todas as cidades</option><option value="same">Na minha cidade</option><option value="other">Em outras cidades</option></select><p id="chat-friends-count" class="status" aria-live="polite">Carregando participantes públicos…</p><div id="chat-friends-directory" class="friends-directory" aria-live="polite"><p class="muted">Carregando…</p></div><p class="muted">Respeite a privacidade e as escolhas de cada pessoa.</p></section><nav class="chat-area-nav chat-area-nav-bottom" aria-label="Fazer amizades pela localização"><a href="#fazer-amigos">🤝 fazer amizades pela localização</a></nav></main>
+<section id="fazer-amigos" class="panel friends-panel"><div class="room-heading"><div><span class="eyebrow">CAPITAL DO TREM • CONEXÕES</span><h2>fazer amizades pela localização</h2></div><span class="room-tag">Comunidade</span></div><p class="muted">Conheça participantes que também fazem parte do Capital do Trem. Só aparecem pessoas que escolheram deixar o perfil público. A cidade é informada pela própria pessoa; não usamos GPS nem mostramos endereço ou distância exata.</p><label for="chat-friends-search">Buscar pessoas</label><input id="chat-friends-search" type="search" maxlength="80" placeholder="Nome, @usuário, cidade ou interesse"><label for="chat-friends-distance">Onde procurar</label><select id="chat-friends-distance"><option value="all">Todas as cidades</option><option value="same">Na minha cidade</option><option value="other">Em outras cidades</option></select><p id="chat-friends-count" class="status" aria-live="polite">Carregando participantes públicos…</p><div id="chat-friends-directory" class="friends-directory" aria-live="polite"><p class="muted">Carregando…</p></div><p class="muted">Respeite a privacidade e as escolhas de cada pessoa.</p></section><nav class="chat-area-nav chat-area-nav-bottom" aria-label="Fazer amizades pela localização"><a href="#fazer-amigos">🤝 fazer amizades pela localização</a></nav></main>
 <script type="module">
-import {getCurrentSession,getChatGroupMembership,joinChatGroup,leaveChatGroup,getChatMessages,sendChatMessage,subscribeChatMessages,uploadChatAttachment,reportChatParticipant,moderateChatParticipant,openViewOnceChatMedia,updateMyGroupMessage,deleteMyGroupMessage} from './supabase/auth.js';
+import {getCurrentSession,getChatGroupMembership,joinChatGroup,leaveChatGroup,getChatMessages,sendChatMessage,subscribeChatMessages,uploadChatAttachment,reportChatParticipant,moderateChatParticipant,openViewOnceChatMedia,updateMyGroupMessage,deleteMyGroupMessage,initSupabase,startUserPresence,getOnlineUserIds,subscribeUserPresence} from './supabase/auth.js';
 const gate=document.getElementById('gate'),area=document.getElementById('chat-area'),connection=document.getElementById('chat-connection'),list=document.getElementById('messages'),form=document.getElementById('composer'),input=document.getElementById('message'),send=document.getElementById('send'),status=document.getElementById('status');
 const counter=document.getElementById('message-counter'),attachmentInput=document.getElementById('chat-attachment'),cameraInput=document.getElementById('chat-camera'),attachmentName=document.getElementById('attachment-name');
 let selectedAttachment=null;
@@ -331,6 +332,46 @@ removeAttachmentButton.addEventListener('click',clearSelectedAttachment);
 function updateCounter(){counter.textContent=`${input.value.length}/1000 caracteres`;}
 input.addEventListener('input',updateCounter);
 let unsubscribe=null,seen=new Set(),currentUserId=null;
+let stopPresence=null,watchPresence=null,groupTypingChannel=null,typingStopTimer=null;
+const onlineList=document.getElementById('group-online-list'),typingList=document.getElementById('group-typing-list');
+const typingUsers=new Map();
+function renderGroupPresence(ids){
+ const known=window.cdtPublicChatProfiles||[];
+ const names=[...ids].filter(id=>id!==currentUserId).map(id=>known.find(p=>p.user_id===id)?.display_name||'Participante').slice(0,8);
+ if(onlineList)onlineList.textContent=names.length?names.join(' · '):'Nenhum outro participante online';
+}
+function renderGroupTyping(){
+ const known=window.cdtPublicChatProfiles||[];
+ const names=[...typingUsers.keys()].filter(id=>id!==currentUserId).map(id=>known.find(p=>p.user_id===id)?.display_name||'Alguém');
+ if(typingList)typingList.textContent=names.length?names.slice(0,4).join(', ')+' está digitando…':'Ninguém digitando agora';
+}
+async function startGroupLiveIndicators(){
+ try{stopPresence=await startUserPresence();}catch(error){console.warn('Presença online indisponível.',error);}
+ try{
+  const initial=await getOnlineUserIds();renderGroupPresence(initial);
+  watchPresence=subscribeUserPresence(renderGroupPresence);
+ }catch(error){if(onlineList)onlineList.textContent='Status online indisponível no momento';}
+ try{
+  const supabase=initSupabase();
+  groupTypingChannel=supabase.channel('capital-fala-uai-group-typing');
+  groupTypingChannel.on('broadcast',{event:'typing'},event=>{
+   const payload=event?.payload||{};
+   if(!payload.user_id||payload.user_id===currentUserId)return;
+   if(payload.typing===true)typingUsers.set(payload.user_id,Date.now());
+   else typingUsers.delete(payload.user_id);
+   renderGroupTyping();
+  }).subscribe();
+ }catch(error){console.warn('Indicador de digitação indisponível.',error);}
+}
+function announceGroupTyping(){
+ if(!groupTypingChannel||!currentUserId)return;
+ groupTypingChannel.send({type:'broadcast',event:'typing',payload:{user_id:currentUserId,typing:true}}).catch(()=>{});
+ if(typingStopTimer)clearTimeout(typingStopTimer);
+ typingStopTimer=setTimeout(()=>groupTypingChannel?.send({type:'broadcast',event:'typing',payload:{user_id:currentUserId,typing:false}}).catch(()=>{}),1600);
+}
+input.addEventListener('input',announceGroupTyping);
+input.addEventListener('blur',()=>{if(typingStopTimer)clearTimeout(typingStopTimer);groupTypingChannel?.send({type:'broadcast',event:'typing',payload:{user_id:currentUserId,typing:false}}).catch(()=>{});});
+
 const MAX_VISIBLE_MESSAGES=100;
 function emojiAssetUrl(value){const code=Array.from(value).map(ch=>ch.codePointAt(0).toString(16)).filter(code=>code!=='fe0f').join('-');return 'https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/'+code+'.svg'}
 function appendEmojiText(target,value){
@@ -446,7 +487,7 @@ let sending=false;form.addEventListener('submit',async e=>{e.preventDefault();if
 
 try{
  const session=await getCurrentSession();
- currentUserId=session?.user?.id||null;
+ currentUserId=session?.user?.id||null; if(session)startGroupLiveIndicators();
  if(!session){gate.textContent='Para participar do bate-papo, entre ou crie sua conta.';const link=document.createElement('a');link.className='btn';link.href='./conta.html';link.textContent='Entrar / Criar conta';gate.append(document.createTextNode(' '),link);}
  else {const membership=await getChatGroupMembership();if(membership.isMember)await startGroupChat();else showJoinGate();}
 }catch(e){gate.textContent=e.message||'Não foi possível conectar ao Fala Trem agora. Confira sua internet e tente novamente.';console.error(e);}
@@ -462,7 +503,7 @@ async function showGallery(){gallery.hidden=false;galleryGrid.replaceChildren();
 document.getElementById('gallery-open').addEventListener('click',showGallery);document.getElementById('gallery-close').addEventListener('click',()=>gallery.hidden=true);
 
 const theme=document.getElementById('theme');try{if(localStorage.getItem('capitaldotrem_theme_v1')==='light')document.body.classList.add('light');}catch{}function label(){const light=document.body.classList.contains('light');theme.textContent=light?'🌙 Escuro':'☀️ Claro';theme.setAttribute('aria-pressed',String(light));document.querySelector('meta[name="theme-color"]').content=light?'#f5f5f5':'#050505';}label();theme.addEventListener('click',()=>{const next=document.body.classList.contains('light')?'dark':'light';document.body.classList.toggle('light',next==='light');try{localStorage.setItem('capitaldotrem_theme_v1',next);}catch{}label();});window.addEventListener('storage',event=>{if(event.key==='capitaldotrem_theme_v1'){document.body.classList.toggle('light',event.newValue==='light');label();}});
-window.addEventListener('pagehide',()=>{saveChatState();if(unsubscribe)unsubscribe();});
+window.addEventListener('pagehide',()=>{saveChatState();if(unsubscribe)unsubscribe();if(watchPresence)watchPresence();if(stopPresence)stopPresence();if(groupTypingChannel)initSupabase().removeChannel(groupTypingChannel);if(typingStopTimer)clearTimeout(typingStopTimer);});
 </script><script type="module">
 (async()=>{
  const list=document.getElementById('chat-friends-directory'),search=document.getElementById('chat-friends-search'),distance=document.getElementById('chat-friends-distance'),count=document.getElementById('chat-friends-count');
@@ -470,9 +511,12 @@ window.addEventListener('pagehide',()=>{saveChatState();if(unsubscribe)unsubscri
  try{
   const auth=await import('./supabase/auth.js');
   const profiles=await auth.getPublicProfiles();
+  window.cdtPublicChatProfiles=profiles;
   const session=await auth.getCurrentSession();
   const own=session?.user?await auth.getMyBasicProfile():null;
   const ownCity=String(own?.city||'').trim().toLocaleLowerCase('pt-BR');
+  const onlineIds=await auth.getOnlineUserIds().catch(()=>new Set());
+  const supabase=auth.initSupabase();
   const candidates=profiles.filter(profile=>profile.user_id!==session?.user?.id);
   const render=()=>{
    const term=search.value.trim().toLocaleLowerCase('pt-BR'),mode=distance.value;
@@ -495,7 +539,13 @@ window.addEventListener('pagehide',()=>{saveChatState();if(unsubscribe)unsubscri
     const role=document.createElement('small');role.textContent=(profile.account_type==='artist'?'Artista / DJ':'Usuário Uai')+' • '+(profile.city||'Cidade não informada');
     copy.append(name,handle,role);
     if(profile.bio){const bio=document.createElement('p');bio.textContent=profile.bio;copy.append(bio);}
-    const action=document.createElement('a');action.className='btn alt';action.href='./mensagens.html';action.textContent='Koe Fala Tu';copy.append(action);
+    const online=document.createElement('small');online.className='friend-online';online.textContent=onlineIds.has(profile.user_id)?'● online':'○ offline';
+    const actions=document.createElement('div');actions.className='friend-actions';
+    const follow=document.createElement('button');follow.type='button';follow.className='btn alt';follow.textContent='SEGUIR';
+    follow.addEventListener('click',async()=>{follow.disabled=true;try{const existing=await supabase.from('profile_follows').select('follower_id').eq('follower_id',session.user.id).eq('followed_id',profile.user_id).maybeSingle();if(existing.error)throw existing.error;if(existing.data){const result=await supabase.from('profile_follows').delete().eq('follower_id',session.user.id).eq('followed_id',profile.user_id);if(result.error)throw result.error;follow.textContent='SEGUIR';}else{const result=await supabase.from('profile_follows').insert({follower_id:session.user.id,followed_id:profile.user_id});if(result.error)throw result.error;follow.textContent='SEGUINDO';}}catch(error){count.textContent=error.message||'Não foi possível atualizar o seguir.';}finally{follow.disabled=false;}});
+    const talk=document.createElement('button');talk.type='button';talk.className='btn primary';talk.textContent='CONVERSAR';
+    talk.addEventListener('click',async()=>{talk.disabled=true;try{const conversation=await auth.requestPrivateConversation(profile.user_id);if(conversation.status==='accepted'){location.href='./mensagens.html?user='+encodeURIComponent(profile.user_id);}else{count.textContent='Convite enviado para '+(profile.display_name||'esse perfil')+'. A conversa será liberada quando a pessoa aceitar.';location.href='./mensagens.html';}}catch(error){count.textContent=error.message||'Não foi possível enviar o convite. Para conversar, os dois perfis precisam estar aptos a participar do grupo.';}finally{talk.disabled=false;}});
+    actions.append(follow,talk);copy.append(online,actions);
     card.append(avatar,copy);list.append(card);
    }
   };
@@ -612,3 +662,22 @@ body.cdt-inbox-mode #main-content,body.cdt-inbox-mode #main-content *{box-sizing
 <script src="./file-picker-guard.js" defer></script>
 <script src="./mobile-bottom-nav.js" defer></script>
 </body></html>
+<style id="cdt-fala-uai-social-layout">
+body.cdt-fala-uai-page .chat-area-nav{display:grid!important;grid-template-columns:minmax(0,1fr)!important;width:100%!important;max-width:760px!important;margin:12px auto!important;padding:0 12px!important}
+body.cdt-fala-uai-page .chat-area-nav a{min-height:58px!important;justify-content:flex-start!important;border:1px solid #ed1c24!important;border-radius:15px!important;background:linear-gradient(105deg,#4b1018,#100b0c 78%)!important;box-shadow:0 0 15px #ed1c2426!important;font-size:15px!important;letter-spacing:.25px}
+body.cdt-fala-uai-page .chat-area-nav-bottom a{background:linear-gradient(105deg,#161616,#090909)!important;border-color:#ed1c2477!important;font-size:14px!important;text-transform:none!important}
+body.cdt-fala-uai-page #capital-do-trem-room .room-heading h2{font-size:clamp(17px,4.5vw,22px);letter-spacing:.35px}
+body.cdt-fala-uai-page .group-live-presence{display:grid;gap:8px;margin:10px 0 13px;padding:10px 12px;border:1px solid #ed1c244d;border-radius:13px;background:linear-gradient(110deg,#16090b,#090909)}
+body.cdt-fala-uai-page .group-live-presence>div{display:grid;grid-template-columns:92px minmax(0,1fr);gap:8px;align-items:start;font-size:12px}
+body.cdt-fala-uai-page .group-live-presence strong{color:#ff6870;font-size:11px;white-space:nowrap}
+body.cdt-fala-uai-page .group-live-presence span{color:#ddd;overflow-wrap:anywhere}
+body.cdt-fala-uai-page #fazer-amigos{order:2!important}
+body.cdt-fala-uai-page #fazer-amigos .room-heading h2{text-transform:none;font-size:clamp(16px,4vw,20px);letter-spacing:0}
+body.cdt-fala-uai-page .friend-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+body.cdt-fala-uai-page .friend-actions button{min-height:34px;padding:6px 10px;font-size:11px;letter-spacing:.35px}
+body.cdt-fala-uai-page .friend-online{font-size:11px;color:#8ee6a8}
+body.cdt-fala-uai-page .friends-directory{display:grid;gap:8px}
+body.cdt-fala-uai-page .friend-person{align-items:center}
+body.cdt-fala-uai-page main>.chat-area-nav-bottom{order:6!important}
+@media(max-width:480px){body.cdt-fala-uai-page .group-live-presence>div{grid-template-columns:82px minmax(0,1fr)}}
+</style>
