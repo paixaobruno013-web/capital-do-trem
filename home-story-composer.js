@@ -161,8 +161,10 @@ async function startCamera() {
     live.playsInline = true;
     live.preload = 'auto';
     // Registrar os eventos antes de associar o stream e chamar play evita perder loadeddata.
+    let cameraReady = false;
     const markCameraReady = () => {
-      if (requestId !== cameraRequestId || !modal?.classList.contains('is-open')) return;
+      if (cameraReady || requestId !== cameraRequestId || !modal?.classList.contains('is-open')) return;
+      cameraReady = true;
       message.textContent = 'Câmera aberta • escolha Foto, Vídeo ou Álbum';
       say('Câmera pronta. Escolha um efeito ou capture sua mídia.');
     };
@@ -171,10 +173,10 @@ async function startCamera() {
     live.srcObject = stream;
     live.hidden = false;
     applyEffect();
-    await live.play();
-    if (live.readyState >= 2 && live.videoWidth > 0) markCameraReady();
     message.textContent = 'Câmera conectada • preparando a prévia…';
     say('A câmera está iniciando. Você já pode escolher uma mídia do álbum.');
+    await live.play();
+    if (live.readyState >= 2 && live.videoWidth > 0) markCameraReady();
     return true;
   } catch (error) {
     if (requestId !== cameraRequestId || !modal?.classList.contains('is-open')) return false;
@@ -276,8 +278,10 @@ function capturePhoto() {
   context.drawImage(live,
     (sourceWidth - cropWidth) / 2, (sourceHeight - cropHeight) / 2, cropWidth, cropHeight,
     0, 0, canvas.width, canvas.height);
+  // Mantém o último quadro congelado visível enquanto o JPEG é codificado,
+  // evitando uma tela vazia entre o toque e a prévia final.
   live.pause();
-  live.hidden = true;
+  live.hidden = false;
   photoPreview.hidden = true;
   message.textContent = 'Sua foto';
   say('Foto capturada • otimizando imagem…');
