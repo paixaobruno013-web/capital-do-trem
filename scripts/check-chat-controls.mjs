@@ -26,8 +26,8 @@ const checks = [
   ['cache PWA avançado para v320', /capital-do-trem-v320/.test(worker)],
 
 
-  ['FALA UAI mantém grupo e amizades em cartões separados e reposicionados', /id="open-group-card"/.test(room) && /id="open-friends-profile"/.test(room) && /fala-group-profile\{order:2/.test(room) && /fala-friends-profile\{order:7/.test(room)],
-  ['perfil da comunidade usa a foto cadastrada na área Perfil', /cdt-own-profile-image/.test(room) && /getMyBasicProfile\(\)/.test(room) && /avatar_url\|\|own.avatar_data/.test(room)],
+  ['grupo usa marca branca e amizades ficam em atalho inferior compacto', /id="open-group-card"/.test(room) && /src="\.\/marca\.svg" alt="Logo branco do grupo Capital do Trem"/.test(room) && /fala-friends-profile\{display:flex!important/.test(room) && /<\/section><button id="open-friends-profile"/.test(room)],
+  ['marca preta do Capital do Trem fica no topo e usuários online ao lado em tamanho menor', /src="\.\/assets\/capital-do-trem-logo\.jpg" alt="Perfil Capital do Trem"/.test(room) && /chat-online-profile-avatar\{width:40px/.test(room) && /online.has\(profile.user_id\)/.test(room)],
   ['faixa superior mostra somente perfis online e abre seus perfis', /id="chat-profile-rail"/.test(room) && /id="chat-online-profiles"/.test(room) && /online.has\(profile.user_id\)/.test(room) && /rede\.html\?perfil=/.test(room)],
   ['atalhos superiores e seletor de tema foram retirados da tela do chat', !/Pular para o conteúdo principal/.test(room) && !/<header class="fala-uai-clean-header"/.test(room) && !/id="theme"/.test(room)],
   ['presença do grupo exibe quem está online e indicador de digitação em tempo real', /id="group-live-presence"/.test(room) && /startUserPresence/.test(room) && /subscribeUserPresence/.test(room) && /capital-fala-uai-group-typing/.test(room) && /announceGroupTyping/.test(room)],
