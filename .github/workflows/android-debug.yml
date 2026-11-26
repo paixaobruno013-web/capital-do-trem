@@ -2,52 +2,6 @@ name: Gerar APK de teste do Capital do Trem
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main, feat/google-email-auth-only, melhorias-stories-navegacao-icone, correcoes-alertas-offline-playlist, ia-camera-comandos-rapidos, first-update/online-offline-and-social]
-    paths:
-      - '**.html'
-      - '**.js'
-      - '**.css'
-      - '**.json'
-      - '**.svg'
-      - '**.png'
-      - '**.webp'
-      - '**.jpg'
-      - '**.jpeg'
-      - '**.py'
-      - '**.mp4'
-      - 'package-lock.json'
-      - '.github/workflows/**'
-      - 'index.html'
-      - 'youtube-feed.js'
-      - 'event-social-composer.js'
-      - 'home-story-composer.js'
-      - 'offline.html'
-      - 'conta.html'
-      - 'capital-futurista.css'
-      - 'rede.js'
-      - 'rede.html'
-      - 'admin.html'
-      - 'privacidade.html'
-      - 'bate-papo.html'
-      - 'chat-enhancements.js'
-      - 'stories-ui.js'
-      - 'admin-stories.js'
-      - 'account-stories.js'
-      - 'avatar.html'
-      - 'mensagens.html'
-      - 'diagnostico.html'
-      - 'marca.svg'
-      - 'manifest.webmanifest'
-      - 'sw.js'
-      - 'update.js'
-      - 'supabase/**'
-      - 'supabase/auth.js'
-      - 'scripts/**'
-      - 'assets/**'
-      - 'package.json'
-      - 'capacitor.config.ts'
-      - '.github/workflows/android-debug.yml'
 
 permissions:
   contents: read
