@@ -2,8 +2,8 @@ import { Capacitor } from '@capacitor/core';
 import { LiveUpdate } from '@capawesome/capacitor-live-update';
 
 const RELEASES_API = 'https://api.github.com/repos/paixaobruno013-web/capital-do-trem/releases?per_page=50';
-const CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
-const LAST_CHECK_KEY = 'capitaldotrem_live_update_last_check_v1';
+const CHECK_INTERVAL_MS = 15 * 60 * 1000;
+const LAST_CHECK_KEY = 'capitaldotrem_live_update_last_check_v2';
 let updateCheckInFlight = null;
 
 async function fetchLatestBundle() {
