@@ -247,7 +247,9 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important;overscroll-behav
  <div class="fala-chat-settings-heading"><strong>Imagens do FALA UAI</strong><button id="close-chat-settings" class="alt" type="button">Fechar</button></div>
  <p>Imagens oficiais compartilhadas com todos os usuários. Somente o administrador pode alterar.</p>
  <label for="chat-brand-image-file">Imagem oficial do perfil Capital do Trem</label><input id="chat-brand-image-file" type="file" accept="image/*">
+ <button id="save-chat-brand-image" type="button" disabled>Salvar foto do perfil do chat</button>
  <label for="chat-group-image-file">Imagem oficial do GRUPO CAPITAL DO TREM</label><input id="chat-group-image-file" type="file" accept="image/*">
+ <button id="save-chat-group-image" type="button" disabled>Salvar foto do grupo</button>
  <div class="fala-chat-settings-actions"><button id="save-chat-images" type="button">Salvar todas as imagens</button></div>
  <small id="chat-image-settings-status" role="status" aria-live="polite">As alterações serão publicadas para todos depois de salvar.</small>
 </section>
@@ -360,14 +362,38 @@ const groupCardButton=document.getElementById('open-group-card');
  for(const [key,fileInput] of [['brand',brandFile],['group',groupFile]]){
   fileInput?.addEventListener('change',event=>{
    const file=event.target.files?.[0]||null;
+   const saveOneButton=document.getElementById(key==='brand'?'save-chat-brand-image':'save-chat-group-image');
    if(file&&(!file.type.startsWith('image/')||file.size>5*1024*1024)){
     pendingChatImages[key]=null;event.target.value='';
+    if(saveOneButton)saveOneButton.disabled=true;
     settingsStatus.textContent='Escolha uma imagem válida de até 5 MB.';return;
    }
    pendingChatImages[key]=file;
-   if(file)settingsStatus.textContent='Imagem selecionada. Toque em Salvar para publicar para todos.';
+   if(saveOneButton)saveOneButton.disabled=!file;
+   if(file)settingsStatus.textContent='Imagem selecionada. Toque no botão de salvar correspondente a esta imagem.';
   });
  }
+ async function saveOneChatImage(key){
+  const file=pendingChatImages[key];
+  const button=document.getElementById(key==='brand'?'save-chat-brand-image':'save-chat-group-image');
+  const fileInput=key==='brand'?brandFile:groupFile;
+  if(!file){settingsStatus.textContent='Escolha a imagem antes de salvar.';return;}
+  if(button)button.disabled=true;
+  settingsStatus.textContent=key==='brand'?'Salvando a foto do perfil do chat…':'Salvando a foto do grupo…';
+  try{
+   const images=await saveAdminChatProfileImages({[key]:file});
+   applyChatImages(images);
+   pendingChatImages[key]=null;
+   if(fileInput)fileInput.value='';
+   settingsStatus.textContent=key==='brand'?'Foto do perfil do chat salva e publicada para todos.':'Foto do GRUPO CAPITAL DO TREM salva e publicada para todos.';
+  }catch(error){
+   settingsStatus.textContent=(error?.message||'Não foi possível salvar a imagem.')+' Se o arquivo já foi enviado, ele será mantido até concluir a gravação.';
+  }finally{
+   if(button)button.disabled=!pendingChatImages[key];
+  }
+ }
+ document.getElementById('save-chat-brand-image')?.addEventListener('click',()=>saveOneChatImage('brand'));
+ document.getElementById('save-chat-group-image')?.addEventListener('click',()=>saveOneChatImage('group'));
  settingsButton?.addEventListener('click',()=>{if(!adminCanEdit)return;settingsPanel.hidden=!settingsPanel.hidden;settingsButton.setAttribute('aria-expanded',String(!settingsPanel.hidden));});
  document.getElementById('close-chat-settings')?.addEventListener('click',()=>{settingsPanel.hidden=true;settingsButton?.setAttribute('aria-expanded','false');});
  document.getElementById('save-chat-images')?.addEventListener('click',async()=>{
