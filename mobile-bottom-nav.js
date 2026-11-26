@@ -3,12 +3,21 @@
   const cleanup = document.createElement('style');
   cleanup.id = 'capital-top-navigation-cleanup';
   cleanup.textContent = `
+    /* O cabeçalho antigo e os atalhos superiores saem; o conteúdo ocupa o espaço liberado. */
     body > header { display: none !important; }
-    body > main { padding-top: 8px !important; }
     .chat-area-nav { display: none !important; }
-    @media (max-width: 600px) {
+    html { scroll-padding-top: 8px !important; scroll-padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important; }
+    body { min-height: 100vh; min-height: 100svh; padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)) !important; }
+    body > main {
+      padding-top: 8px !important;
+      padding-bottom: calc(24px + 88px + env(safe-area-inset-bottom, 0px)) !important;
+      margin-top: 0 !important;
+    }
+    @media (max-width: 759px) {
       body > main { padding-left: 10px !important; padding-right: 10px !important; }
     }
+    /* O espaço final de cada tela fica livre para a barra fixa, sem cobrir conteúdo. */
+    body > main > :last-child { scroll-margin-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
   `;
   if (!document.getElementById(cleanup.id)) document.head.append(cleanup);
 
