@@ -189,12 +189,7 @@
   check:verifyRealConnection,
   getState:()=>({deviceOnline:navigator.onLine,verifiedOnline:lastProbeOnline,lastCheckAt:lastProbeAt})
  };
- window.addEventListener('online',()=>window.setTimeout(verifyRealConnection,300));
- window.addEventListener('offline',showOffline);
- window.addEventListener('pageshow',verifyRealConnection);
- window.addEventListener('focus',verifyRealConnection);
- navigator.connection?.addEventListener?.('change',verifyRealConnection);
- document.addEventListener('visibilitychange',()=>{if(!document.hidden)verifyRealConnection();});
+ // Eventos de retomada e rede são registrados pelo monitor adaptativo abaixo, sem listeners duplicados.
  // Monitor adaptativo: pausa sondagens em segundo plano e reduz a frequência com bateria baixa/economia de dados.
  let connectionProbeTimer=null,batteryStatus=null;
  const lowPowerMode=()=>Boolean((batteryStatus&&!batteryStatus.charging&&batteryStatus.level<=0.2)||navigator.connection?.saveData||/^(slow-2g|2g)$/.test(navigator.connection?.effectiveType||''));
