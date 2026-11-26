@@ -11,7 +11,7 @@ const checks=[
  [home.includes('music-play-button')&&home.includes('musicPlayer.playSong(song)')&&home.includes("querySelector('.ct-player-fullscreen')?.click()"),'Catálogo e biblioteca iniciam o player unificado'],
  [rede.includes('id="rede-music-player"')&&redeJs.includes("createCapitalMusicPlayer('rede-music-player'"),'Rede social tem player 3D integrado'],
  [redeJs.includes('musicPlayer.playSong(song)'),'Faixas da rede social usam os controles do player'],
- [chat.includes('id="chat-topics"')&&chat.includes('Grupo CAPITAL DO TREM')&&!chat.includes('id="fala-uai-player"'),'Chat permanece dedicado às conversas e ao grupo CAPITAL DO TREM'],
+ [chat.includes('id="chat-topics"')&&chat.includes('GRUPO • CAPITAL do TREM')&&!chat.includes('id="fala-uai-player"'),'Chat permanece dedicado às conversas e ao grupo CAPITAL DO TREM'],
  [chat.includes('id="fazer-amigos"')&&chat.includes('./mensagens.html'),'Chat oferece amizades e conversas privadas'],
  [player.includes('MÚSICAS DISPONÍVEIS')&&player.includes('catalogSelect.addEventListener')&&player.includes('Escolha uma música publicada'),'Player oferece automaticamente o catálogo completo para escolha de faixa'],
  [auth.includes('export async function getPublishedSongs')&&auth.includes('.range(from,from + pageSize - 1)')&&auth.includes('storage.createSignedUrls(paths, 60 * 60)'),'Catálogo público busca todas as músicas publicadas em lotes e prepara links de reprodução'],
