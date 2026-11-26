@@ -3,6 +3,9 @@ import {loadPostMusic,createPostMusicControl} from './post-music.js';
 const supabase=initSupabase();
 const $=id=>document.getElementById(id);
 const root=$('home-feed-list'),form=$('home-feed-composer'),status=$('home-feed-status'),fileInput=$('home-feed-media'),fileName=$('home-feed-media-name'),preview=$('home-feed-preview'),previewStage=$('home-feed-preview-stage'),clearMedia=$('home-feed-clear-media'),caption=$('home-feed-text'),cropToggle=$('home-feed-crop-toggle'),storyPublishButton=$('home-feed-publish-story');
+const composerOpen=$('home-feed-open'),composerFields=$('home-feed-composer-fields'),composerCollapse=$('home-feed-collapse');
+function setComposerExpanded(expanded){if(!composerFields||!form)return;composerFields.hidden=!expanded;form.classList.toggle('home-feed-composer-collapsed',!expanded);composerOpen?.setAttribute('aria-expanded',String(expanded));if(composerOpen)composerOpen.hidden=expanded;if(expanded)caption?.focus({preventScroll:true});else if(composerOpen)composerOpen.hidden=false;}
+composerOpen?.addEventListener('click',()=>setComposerExpanded(true));composerCollapse?.addEventListener('click',()=>setComposerExpanded(false));
 const musicToggle=$('home-feed-music-toggle'),musicPanel=$('home-feed-music-panel'),musicSelect=$('home-feed-music-select'),musicStart=$('home-feed-music-start'),musicDuration=$('home-feed-music-duration'),musicPreview=$('home-feed-music-preview'),musicStatus=$('home-feed-music-status');
 let feedSongs=[],feedSongsLoaded=false,selectedFeedSongId='',cropSelectedImage=false;
 function resetFeedMusicPreview(){if(musicPreview){musicPreview.pause();musicPreview.removeAttribute('src');musicPreview.hidden=true;}}
@@ -128,7 +131,7 @@ if(root&&form){
     feedPublished=true;
     if(alsoStory){try{const start=Math.max(0,Math.min(3600,Number(musicStart?.value)||0)),duration=Math.max(5,Math.min(60,Number(musicDuration?.value)||15));const story=await createMyStory({file,caption:text,musicSongId:selectedFeedSongId,musicStartSeconds:start,musicDurationSeconds:duration});document.dispatchEvent(new CustomEvent('capital:stories-updated',{detail:{id:story.id}}));}
      catch(storyError){status.textContent='Feed publicado! Mas o Story não foi publicado: '+(storyError.message||'tente novamente.');await load();return;}}
-    caption.value='';clearSelectedMedia();selectedFeedSongId='';if(musicSelect)musicSelect.value='';resetFeedMusicPreview();status.textContent=alsoStory?'Compartilhado no Feed e nos Stories! ❤️':'Publicação compartilhada no Feed! ❤️';await load();
+    caption.value='';clearSelectedMedia();selectedFeedSongId='';if(musicSelect)musicSelect.value='';resetFeedMusicPreview();setComposerExpanded(false);status.textContent=alsoStory?'Compartilhado no Feed e nos Stories! ❤️':'Publicação compartilhada no Feed! ❤️';await load();
    }catch(error){if(!feedPublished){if(uploadedPath){try{const {error:removeError}=await supabase.storage.from('capital-do-trem-social').remove([uploadedPath]);if(removeError)console.error('Falha ao remover mídia órfã do Feed.',removeError);}catch(cleanupError){console.error('Falha ao limpar mídia órfã do Feed.',cleanupError);}}
     if(createdPost?.id){try{await deleteMyPost(createdPost.id);}catch(cleanupError){console.error('Falha ao reverter publicação incompleta.',cleanupError);}}}
     status.textContent=error.message||'Não foi possível publicar.';
