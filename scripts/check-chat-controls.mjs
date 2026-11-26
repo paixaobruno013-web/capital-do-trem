@@ -25,7 +25,7 @@ const checks = [
   ['sala oficial do grupo começa recolhida', /id="capital-do-trem-room" class="panel chat-panel" hidden/.test(room) && !/id="fazer-amigos"/.test(room)],
   ['cache PWA usa versão identificada e atualizável', /const CACHE='capital-do-trem-v[0-9]+'/.test(worker)],
   ['configurações permitem escolher foto dos dois perfis oficiais do chat', /id="chat-brand-image-file"/.test(room) && /id="chat-group-image-file"/.test(room) && !/chat-friends-image-file|friends-profile-image/.test(room)],
-  ['salvar todas persiste e restaura as duas imagens oficiais', /cdt_fala_brand_image_v1/.test(room) && /cdt_fala_group_image_v1/.test(room) && /for\(const key of \['brand','group'\]\)/.test(room) && /Todas as imagens selecionadas foram salvas neste aparelho/.test(room)],
+  ['salvar publica as duas imagens oficiais no servidor e restringe a alteração ao administrador', /saveAdminChatProfileImages/.test(room) && /getPublicChatProfileImages/.test(room) && /adminCanEdit/.test(room) && /Imagens oficiais salvas e publicadas para todos os usuários/.test(room)],
 
 
   ['grupo usa marca branca e é o único grupo coletivo exibido', /id="open-group-card"/.test(room) && /src="\.\/marca\.svg" alt="Logo branco do grupo Capital do Trem"/.test(room) && !/id="fazer-amigos"|id="open-friends-profile"/.test(room)],
