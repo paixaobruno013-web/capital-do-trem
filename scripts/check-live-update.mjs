@@ -5,6 +5,7 @@ const config = await readFile('capacitor.config.ts', 'utf8');
 const html = await readFile('index.html', 'utf8');
 const sw = await readFile('sw.js', 'utf8');
 const updater = await readFile('live-update-entry.js', 'utf8');
+const publishWorkflow = await readFile('.github/workflows/live-update-publish.yml', 'utf8');
 
 const assert = (condition, message) => {
   if (!condition) throw new Error(message);
@@ -31,6 +32,9 @@ assert(updater.indexOf('await LiveUpdate.ready()') < updater.indexOf("if (Capaci
 assert(updater.includes('setNextBundle'), 'Pacote baixado precisa ser preparado para a próxima abertura.');
 assert(!updater.includes('LiveUpdate.reload()'), 'Atualização não pode reiniciar a interface no meio do uso.');
 assert(updater.includes('CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000'), 'Verificação deve respeitar intervalo para economizar bateria.');
+assert(updater.includes("document.addEventListener('visibilitychange'") && updater.includes("window.addEventListener('pageshow'"), 'O verificador deve consultar novamente quando o aplicativo retorna ao primeiro plano.');
+assert(updater.includes('updateCheckInFlight'), 'Consultas simultâneas precisam compartilhar uma única verificação.');
+assert(!publishWorkflow.includes('live-update-entry\\.js'), 'A lógica JavaScript do verificador deve poder ser atualizada por pacote OTA assinado, sem recompilar o aplicativo nativo.');
 const noReleaseBlock = updater.slice(updater.indexOf('if (!latest) {'), updater.indexOf('const current =', updater.indexOf('if (!latest) {')));
 assert(noReleaseBlock.includes('LAST_CHECK_KEY'), 'Ausência de release também precisa respeitar o intervalo de consulta.');
 
