@@ -18,15 +18,15 @@ const [room, enhancements, emoji, privateChat, worker, stories, home, auth, admi
 ]);
 
 const checks = [
-  ['botão Chat da página inicial abre a nova caixa de entrada do FALA UAI', /class=\"nav-chat\" href=\"\.\/bate-papo\.html\"/.test(home)],
-  ['navegação móvel abre a nova caixa de entrada do FALA UAI', /label: 'Chat', icon: '💬', href: '\.\/bate-papo\.html'/.test(await read('mobile-bottom-nav.js'))],
-  ['atalho Privado da nova caixa continua direcionando às conversas privadas', /data-open-view=\"private-conversations-shortcut\"/.test(room) && /href=\"\.\/mensagens\.html\"/.test(room)],
-  ['FALA UAI abre primeiro uma caixa de conversas em lista vertical, sem promover amizades por localização', /id="cdt-chat-inbox"/.test(room) && /class="cdt-chat-row"/.test(room) && /Todas as conversas/.test(room) && !/data-open-view="fazer-amigos"/.test(room)],
-  ['caixa de entrada apresenta grupo oficial, privado e assuntos; amizades ficam na parte inferior', /data-open-view="capital-do-trem-room"/.test(room) && !/data-open-view="fazer-amigos"/.test(room) && /data-open-view="private-conversations-shortcut"/.test(room) && /data-open-view="chat-topics"/.test(room) && /const ids=\['capital-do-trem-room','fazer-amigos','private-conversations-shortcut','chat-topics'\]/.test(room)],
-  ['logo oficial é usada no avatar do grupo da Capital do Trem', /cdt-chat-avatar logo[^>]*>[\s\S]*?src="\.\/marca\.svg"/.test(room)],
-  ['navegação da caixa abre áreas existentes e oferece retorno à lista', /const ids=\['capital-do-trem-room','fazer-amigos','private-conversations-shortcut','chat-topics'\]/.test(room) && /Todas as conversas/.test(room) && /showInbox\(\)/.test(room)],
-  ['caixa de entrada trava o eixo horizontal e preserva rolagem vertical em celulares', /body\.cdt-inbox-mode\{[^}]*overflow-x:hidden/.test(room) && /body\.cdt-inbox-mode\{[^}]*touch-action:pan-y/.test(room) && /body\.cdt-inbox-mode #main-content\{display:block!important/.test(room)],
-  ['linhas e textos da caixa se adaptam a telas estreitas sem estourar largura', /cdt-chat-row\{overflow:hidden;touch-action:pan-y\}/.test(room) && /@media\(max-width:380px\)/.test(room) && /overflow-wrap:anywhere/.test(room)],
+  ['botão Chat da página inicial abre o FALA UAI', /class=\"nav-chat\" href=\"\.\/bate-papo\.html\"/.test(home)],
+  ['navegação móvel abre o FALA UAI', /label: 'Chat', icon: '💬', href: '\.\/bate-papo\.html'/.test(await read('mobile-bottom-nav.js'))],
+  ['atalhos visíveis mantêm somente o Grupo e a opção inferior de amizades', /GRUPO • CAPITAL DO TREM/.test(room) && /🤝 fazer amizades pela localização/.test(room) && !/id="cdt-chat-inbox"/.test(room)],
+  ['atalho PRIVADO não aparece como cartão ou ícone separado', !/data-open-view="private-conversations-shortcut"/.test(room) && !/id="private-conversations-shortcut"/.test(room) && !/<strong>PRIVADO<\/strong>/.test(room)],
+  ['bate-papo por assuntos permanece funcional sem atalho externo', /id="chat-topics"/.test(room) && /id="topic-create-form"/.test(room) && !/data-open-view="chat-topics"/.test(room)],
+  ['grupo oficial continua sendo a primeira sala com identidade da comunidade', /id="capital-do-trem-room"/.test(room) && /GRUPO • CAPITAL DO TREM/.test(room) && /CAPITAL DO TREM • COMUNIDADE/.test(room)],
+  ['amizades pela localização ficam no rodapé com texto todo em minúsculas', /class="chat-area-nav chat-area-nav-bottom"[\s\S]*?fazer amizades pela localização/.test(room) && /href="#fazer-amigos"/.test(room)],
+  ['navegação simplificada não injeta cartões de retorno nem caixa de entrada antiga', !room.includes('cdt-inbox-navigation') && !room.includes('cdt-view-back') && !room.includes('Todas as conversas')],
+  ['chat preserva rolagem vertical e impede arrasto lateral em celulares', /overflow-x:hidden!important/.test(room) && /touch-action:pan-y/.test(room) && /overflow-wrap:anywhere/.test(room)],
 
   ['chat geral possui formulário e campo de mensagem', /id="composer"/.test(room) && /id="message"/.test(room)],
   ['mensagens próprias são diferenciadas visualmente e alinhadas à direita', /if\(m\.author_id===currentUserId\)box\.classList\.add\('message-own'\)/.test(room) && /#messages \.message\.message-own\{align-self:flex-end/.test(room)],
