@@ -2,6 +2,11 @@ name: Publicar CAPITAL DO TREM — APK Android direto
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/release-triggers/android-v1.0.4'
 
 permissions:
   contents: write
@@ -45,7 +50,7 @@ jobs:
           if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
             RELEASE_VERSION="$RELEASE_VERSION_INPUT"
           else
-            RELEASE_VERSION="$(tr -d '[:space:]' < .github/release-triggers/android-v1.0.3)"
+            RELEASE_VERSION="$(tr -d '[:space:]' < .github/release-triggers/android-v1.0.4)"
           fi
           if [[ ! "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
             echo "::error::Informe uma versão válida, como 1.0.0."
