@@ -4,6 +4,7 @@ import { LiveUpdate } from '@capawesome/capacitor-live-update';
 const RELEASES_API = 'https://api.github.com/repos/paixaobruno013-web/capital-do-trem/releases?per_page=50';
 const CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
 const LAST_CHECK_KEY = 'capitaldotrem_live_update_last_check_v1';
+let updateCheckInFlight = null;
 
 async function fetchLatestBundle() {
   const response = await fetch(RELEASES_API, {
@@ -64,6 +65,19 @@ async function checkForUpdate() {
   console.info('[Capital do Trem] Atualização preparada para a próxima abertura.');
 }
 
+function checkForUpdateSingleFlight() {
+  if (!updateCheckInFlight) {
+    updateCheckInFlight = checkForUpdate()
+      .catch(error => {
+        console.warn('[Capital do Trem] Atualização remota adiada; o aplicativo continua funcionando.', error);
+      })
+      .finally(() => {
+        updateCheckInFlight = null;
+      });
+  }
+  return updateCheckInFlight;
+}
+
 async function startLiveUpdates() {
   if (!Capacitor.isNativePlatform() ||
       !Capacitor.isPluginAvailable('LiveUpdate')) return;
@@ -79,12 +93,15 @@ async function startLiveUpdates() {
   // O iPhone Safari/PWA não usa este plugin; a atualização nativa fica restrita ao Android.
   if (Capacitor.getPlatform() !== 'android') return;
 
-  try {
-    await checkForUpdate();
-  } catch (error) {
-    // Falhas de rede ou do servidor nunca bloqueiam o aplicativo em uso.
-    console.warn('[Capital do Trem] Atualização remota adiada; o aplicativo continua funcionando.', error);
-  }
+  // Verifica na abertura e novamente quando o usuário retorna ao aplicativo.
+  // O intervalo de seis horas evita consultas repetidas e economiza bateria/dados.
+  void checkForUpdateSingleFlight();
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') void checkForUpdateSingleFlight();
+  });
+  window.addEventListener('pageshow', () => {
+    if (document.visibilityState === 'visible') void checkForUpdateSingleFlight();
+  });
 }
 
 void startLiveUpdates();
