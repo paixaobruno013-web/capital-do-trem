@@ -47,6 +47,7 @@ const files = [
   'manifest.webmanifest',
   'sw.js',
   'update.js',
+  'live-update.js',
   'supabase/auth.js'
 ];
 
