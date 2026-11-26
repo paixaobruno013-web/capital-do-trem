@@ -196,8 +196,8 @@
  navigator.connection?.addEventListener?.('change',verifyRealConnection);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)verifyRealConnection();});
  window.setTimeout(verifyRealConnection,500);
- // Verifica a internet a cada segundo enquanto o app está visível; perda de rede do aparelho gera alerta imediato e falha do acesso à internet recebe confirmação curta.
- window.setInterval(verifyRealConnection,1000);
+ // Verifica a internet periodicamente sem sondagens excessivas; foco, retomada e eventos de rede continuam verificando imediatamente.
+ window.setInterval(verifyRealConnection,30000);
  if(!supportsServiceWorkerUpdates||!('serviceWorker' in navigator))return;
  let registration=null,reloading=false;
  const banner=document.createElement('aside');
