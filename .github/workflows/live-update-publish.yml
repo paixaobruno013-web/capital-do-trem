@@ -118,5 +118,6 @@ jobs:
           files: |
             capital-do-trem-web-bundle.zip
             capital-do-trem-web-bundle.sha256
+            capital-do-trem-web-bundle.sig
           draft: false
           prerelease: false
