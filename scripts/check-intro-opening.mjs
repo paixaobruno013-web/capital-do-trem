@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 const [index, admin, auth] = await Promise.all([
   readFile(new URL('../index.html', import.meta.url), 'utf8'),
   readFile(new URL('../admin.html', import.meta.url), 'utf8'),
+const storyComposer = await readFile(new URL('../home-story-composer.js', import.meta.url), 'utf8');
   readFile(new URL('../supabase/auth.js', import.meta.url), 'utf8')
 ]);
 const pickerGuard = await readFile(new URL('../file-picker-guard.js', import.meta.url), 'utf8');
@@ -9,7 +10,7 @@ const checks = [
   ['retorno do seletor restaura a rota antes da abertura', /const FILE_PICKER_RETURN_KEY/.test(index) && /FILE_PICKER_RETURN_URL_KEY/.test(index) && /intro-smoke-skip/.test(index) && /file-picker-guard\.js/.test(index)],
   ['Minha conta carrega a proteção do seletor', /file-picker-guard\.js/.test(await readFile(new URL('../conta.html', import.meta.url), 'utf8'))],
   ['proteção persiste somente campos não sensíveis e nunca tenta restaurar arquivos', /DRAFT_PREFIX/.test(await readFile(new URL('../file-picker-guard.js', import.meta.url), 'utf8')) && /'file','password','hidden'/.test(await readFile(new URL('../file-picker-guard.js', import.meta.url), 'utf8'))],
-  ['branding remoto prioriza o cache e limita a espera inicial a 1,8 segundo', /const branding=cachedBranding\\|\\|await Promise\\.race\\(\\[brandingRequest,brandingTimeout\\]\\)/.test(index) && /setTimeout\\(\\(\\)=>resolve\\(null\\),1800\\)/.test(index)],
+  ['branding remoto prioriza o cache e limita a espera inicial a 1,8 segundo', index.includes('const branding=cachedBranding||await Promise.race([brandingRequest,brandingTimeout])') && index.includes('setTimeout(resolve=>window.setTimeout(()=>resolve(null),1800)')],
   ['vídeo de abertura usa o endereço único publicado sem duplicar parâmetros de cache', /video\.src=currentOpeningVideo/.test(index) && !/cdt_opening=/.test(index)],
   ['camadas de vídeos antigos são removidas antes de inserir a abertura atual', /querySelectorAll\('video, \.opening-video-background, \.opening-video-fallback'\)/.test(index)],
   ['bloqueio da marca antiga é ativado no head antes da abertura', index.indexOf("classList.add('intro-brand-pending')") < index.indexOf('<body')],
@@ -30,11 +31,11 @@ const checks = [
   ['abertura por imagem encerra sem acessar variável de vídeo inexistente', /const finish=\(\)=>\{if\(finished\)return;finished=true;progress=100;paint\(\);screen\.querySelector\('video'\)\?\.pause\(\);/.test(index)],
   ['restauração localiza campos pelo id real ou pelo name, sem usar namedItem para id', pickerGuard.includes('Array.from(form.elements||[]).find') && !pickerGuard.includes('form.elements.namedItem(selector.slice(1))')],
   ['restauração também roda após DOMContentLoaded e em pageshow', pickerGuard.includes("if(document.readyState==='loading')") && pickerGuard.includes("window.addEventListener('pageshow',restoreForms)")],
-  ['Stories deixa o navegador escolher a resolução inicial para abrir a câmera mais rápido', /video: \\{ facingMode: \\{ ideal: facingMode \\} \\}/.test(await readFile(new URL('../home-story-composer.js', import.meta.url), 'utf8')) && !/width: \\{ ideal: 960 \\}/.test(await readFile(new URL('../home-story-composer.js', import.meta.url), 'utf8'))],
+  ['Stories deixa o navegador escolher a resolução inicial para abrir a câmera mais rápido', storyComposer.includes('video: { facingMode: { ideal: facingMode } }') && !storyComposer.includes('width: { ideal: 960 }')],
   ['Stories registra loadeddata e canplay antes de chamar play', /addEventListener\('loadeddata', markCameraReady[\s\S]*?addEventListener\('canplay', markCameraReady[\s\S]*?await live\.play\(\)/.test(await readFile(new URL('../home-story-composer.js', import.meta.url), 'utf8'))],
   ['Stories não solicita zoom do hardware durante a abertura inicial da câmera', !(await readFile(new URL('../home-story-composer.js', import.meta.url), 'utf8')).split('function openComposer()')[0].includes('hardwareZoomActive = await applyZoomToTrack()')],
   ['Stories mantém o quadro capturado visível durante a codificação da foto', /live\.pause\(\);\s*live\.hidden = false;\s*photoPreview\.hidden = true;/.test(await readFile(new URL('../home-story-composer.js', import.meta.url), 'utf8'))],
-  ['Stories reduz o tamanho de codificação para prévia mais rápida sem eliminar a qualidade', /960 \\/ Math\\.max\\(cropWidth, cropHeight\\)/.test(await readFile(new URL('../home-story-composer.js', import.meta.url), 'utf8')) && /}, 'image\\/jpeg', 0\\.78\\)/.test(await readFile(new URL('../home-story-composer.js', import.meta.url), 'utf8'))]
+  ['Stories reduz o tamanho de codificação para prévia mais rápida sem eliminar a qualidade', storyComposer.includes('960 / Math.max(cropWidth, cropHeight)') && storyComposer.includes("}, 'image/jpeg', 0.78)")]
 ];
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO ') + name);
 if (checks.some(([, ok]) => !ok)) process.exit(1);
