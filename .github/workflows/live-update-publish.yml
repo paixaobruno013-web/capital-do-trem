@@ -1,0 +1,126 @@
+name: Publicar atualização web do Capital do Trem
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: capital-do-trem-live-update
+  cancel-in-progress: false
+
+jobs:
+  publish-web-bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Impedir publicação de mudanças nativas por OTA
+        id: native_guard
+        shell: bash
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          CURRENT_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$BEFORE_SHA" || "$BEFORE_SHA" =~ ^0+$ ]]; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "Publicação inicial ignorada; aguarda a instalação do mecanismo nativo."
+            exit 0
+          fi
+          changed="$(git diff --name-only "$BEFORE_SHA" "$CURRENT_SHA")"
+          if printf '%s\n' "$changed" | grep -Eq '^(package\.json|capacitor\.config\.ts|live-update-entry\.js|live-update\.js|scripts/prepare-web\.mjs|scripts/configure-android-media\.py|scripts/prepare-ios-info\.py)$'; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "Alteração nativa/de empacotamento detectada. Nenhum pacote OTA será publicado."
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Assinar o pacote com a mesma chave do aplicativo Android
+        if: steps.native_guard.outputs.publish == 'true'
+        shell: bash
+        env:
+          APP_KEYSTORE_BASE64: ${{ secrets.ANDROID_APP_SIGNING_KEYSTORE_BASE64 }}
+          APP_STORE_PASSWORD: ${{ secrets.ANDROID_APP_SIGNING_STORE_PASSWORD }}
+          APP_KEY_ALIAS: ${{ secrets.ANDROID_APP_SIGNING_KEY_ALIAS }}
+          APP_KEY_PASSWORD: ${{ secrets.ANDROID_APP_SIGNING_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          umask 077
+          for name in APP_KEYSTORE_BASE64 APP_STORE_PASSWORD APP_KEY_ALIAS APP_KEY_PASSWORD; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::Credencial protegida de assinatura ausente. A publicação remota foi bloqueada."
+              exit 1
+            fi
+          done
+          KEYSTORE="$RUNNER_TEMP/capital-do-trem-signing.jks"
+          PKCS12="$RUNNER_TEMP/capital-do-trem-signing.p12"
+          PRIVATE_KEY="$RUNNER_TEMP/capital-do-trem-live-update-private.pem"
+          CERT="$RUNNER_TEMP/capital-do-trem-signing-cert.pem"
+          printf '%s' "$APP_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE"
+          test -s "$KEYSTORE"
+          keytool -importkeystore -noprompt -srckeystore "$KEYSTORE" -srcstorepass "$APP_STORE_PASSWORD" -srcalias "$APP_KEY_ALIAS" -srckeypass "$APP_KEY_PASSWORD" -destkeystore "$PKCS12" -deststoretype PKCS12 -deststorepass "$APP_KEY_PASSWORD" -destkeypass "$APP_KEY_PASSWORD" >/dev/null
+          openssl pkcs12 -in "$PKCS12" -passin env:APP_KEY_PASSWORD -nocerts -nodes -out "$PRIVATE_KEY"
+          openssl pkcs12 -in "$PKCS12" -passin env:APP_KEY_PASSWORD -clcerts -nokeys -out "$CERT"
+          openssl pkey -in "$PRIVATE_KEY" -check -noout
+          openssl x509 -in "$CERT" -noout -text | grep -q 'Public Key Algorithm: rsaEncryption'
+          PRIVATE_PUBLIC="$(openssl pkey -in "$PRIVATE_KEY" -pubout -outform DER | sha256sum | awk '{print $1}')"
+          CERT_PUBLIC="$(openssl x509 -in "$CERT" -pubkey -noout | openssl pkey -pubin -outform DER | sha256sum | awk '{print $1}')"
+          test "$PRIVATE_PUBLIC" = "$CERT_PUBLIC"
+          echo "Chave RSA privada e certificado público correspondem; publicação assinada habilitada."
+
+      - name: Configurar Node.js
+        if: steps.native_guard.outputs.publish == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar dependências
+        if: steps.native_guard.outputs.publish == 'true'
+        run: npm install --no-audit --no-fund
+
+      - name: Preparar os arquivos web
+        if: steps.native_guard.outputs.publish == 'true'
+        run: npm run build:web
+
+      - name: Validar o mecanismo de atualização
+        if: steps.native_guard.outputs.publish == 'true'
+        run: npm run test:live-update
+
+      - name: Validar o pacote PWA
+        if: steps.native_guard.outputs.publish == 'true'
+        run: node scripts/check-pwa.mjs
+
+      - name: Montar e assinar pacote web compatível com Capacitor
+        if: steps.native_guard.outputs.publish == 'true'
+        run: |
+          set -euo pipefail
+          cd www
+          zip -qr ../capital-do-trem-web-bundle.zip .
+          cd ..
+          test -s capital-do-trem-web-bundle.zip
+          sha256sum capital-do-trem-web-bundle.zip | awk '{print $1}' > capital-do-trem-web-bundle.sha256
+          test "$(wc -c < capital-do-trem-web-bundle.sha256)" -eq 65
+          openssl dgst -sha256 -sign "$RUNNER_TEMP/capital-do-trem-live-update-private.pem" capital-do-trem-web-bundle.zip | base64 -w0 > capital-do-trem-web-bundle.sig
+          test -s capital-do-trem-web-bundle.sig
+          printf 'Pacote web para atualização remota do Capital do Trem.\nCompatível apenas com alterações HTML, CSS, JavaScript e arquivos web.\nSHA-256: %s\nRSA-SIGNATURE: %s\n' "$(cat capital-do-trem-web-bundle.sha256)" "$(cat capital-do-trem-web-bundle.sig)" > release-notes.md
+
+      - name: Publicar pacote remoto gratuito
+        if: steps.native_guard.outputs.publish == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: web-update-${{ github.run_number }}
+          name: "Capital do Trem — atualização web ${{ github.run_number }}"
+          body_path: release-notes.md
+          files: |
+            capital-do-trem-web-bundle.zip
+            capital-do-trem-web-bundle.sha256
+            capital-do-trem-web-bundle.sig
+          draft: false
+          prerelease: false

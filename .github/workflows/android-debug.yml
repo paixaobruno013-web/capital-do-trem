@@ -1,6 +1,8 @@
-name: Gerar APK de teste do Capital do Trem
+name: Validar integração nativa Android do Capital do Trem
 
 on:
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -11,8 +13,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-debug-apk:
-    name: Compilar APK Android de teste
+  android-native-validation:
+    name: Compilar e validar integração Android
     runs-on: ubuntu-latest
     steps:
       - name: Baixar o código
@@ -42,6 +44,8 @@ jobs:
         run: node scripts/check-health-monitor.mjs
       - name: Preparar arquivos web
         run: npm run build:web
+      - name: Validar mecanismo de atualização remota
+        run: npm run test:live-update
       - name: Criar projeto Android
         run: npx cap add android
       - name: Preparar ícones com a logo oficial do Capital do Trem
@@ -56,11 +60,11 @@ jobs:
         run: npx cap sync android
       - name: Permitir áudio automático no WebView Android
         run: python scripts/configure-android-media.py android
-      - name: Compilar APK de teste com novas tentativas para falhas temporárias do Maven Central
+      - name: Validar compilação nativa Android com novas tentativas para falhas temporárias do Maven Central
         working-directory: android
         run: |
           for attempt in 1 2 3; do
-            echo "Tentativa $attempt de 3 para compilar o APK"
+            echo "Tentativa $attempt de 3 para validar a compilação Android"
             if ./gradlew --no-daemon --max-workers=2 assembleDebug; then
               exit 0
             fi
@@ -70,10 +74,3 @@ jobs:
             fi
           done
           exit 1
-      - name: Publicar APK como artefato de teste
-        uses: actions/upload-artifact@v4
-        with:
-          name: capital-do-trem-android-debug
-          path: android/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
-          retention-days: 14

@@ -23,6 +23,8 @@ jobs:
         run: npm run build:web
       - name: Conferir arquivos e ícones do PWA
         run: node scripts/check-pwa.mjs
+      - name: Verificar atualização remota e proteção de rollback
+        run: npm run test:live-update
       - name: Verificar idioma Português (Brasil) em todo o aplicativo
         run: node scripts/check-brazilian-portuguese.mjs
       - name: Verificar compatibilidade iOS PWA e cache privado
