@@ -18,6 +18,9 @@ const [room, enhancements, emoji, privateChat, worker, stories, home, auth, admi
 ]);
 
 const checks = [
+  ['botão Chat da página inicial abre a nova caixa de entrada do FALA UAI', /class=\"nav-chat\" href=\"\.\/bate-papo\.html\"/.test(home)],
+  ['navegação móvel abre a nova caixa de entrada do FALA UAI', /label: 'Chat', icon: '💬', href: '\.\/bate-papo\.html'/.test(await read('mobile-bottom-nav.js'))],
+  ['atalho Privado da nova caixa continua direcionando às conversas privadas', /data-open-view=\"private-conversations-shortcut\"/.test(room) && /href=\"\.\/mensagens\.html\"/.test(room)],
   ['FALA UAI abre primeiro uma caixa de conversas em lista vertical', /id="cdt-chat-inbox"/.test(room) && /class="cdt-chat-row"/.test(room) && /Todas as conversas/.test(room)],
   ['caixa de entrada apresenta grupo oficial, amizades, privado e assuntos dentro do painel', /data-open-view="capital-do-trem-room"/.test(room) && /data-open-view="fazer-amigos"/.test(room) && /data-open-view="private-conversations-shortcut"/.test(room) && /data-open-view="chat-topics"/.test(room) && /const ids=\['capital-do-trem-room','fazer-amigos','private-conversations-shortcut','chat-topics'\]/.test(room)],
   ['logo oficial é usada no avatar do grupo da Capital do Trem', /cdt-chat-avatar logo[^>]*>[\s\S]*?src="\.\/marca\.svg"/.test(room)],
