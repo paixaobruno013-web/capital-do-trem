@@ -517,6 +517,8 @@ window.addEventListener('pagehide',()=>{saveChatState();if(unsubscribe)unsubscri
   const ownCity=String(own?.city||'').trim().toLocaleLowerCase('pt-BR');
   const onlineIds=await auth.getOnlineUserIds().catch(()=>new Set());
   const supabase=auth.initSupabase();
+  const followedIds=new Set();
+  if(session?.user){const follows=await supabase.from('profile_follows').select('followed_id').eq('follower_id',session.user.id);if(!follows.error)(follows.data||[]).forEach(row=>followedIds.add(row.followed_id));}
   const candidates=profiles.filter(profile=>profile.user_id!==session?.user?.id);
   const render=()=>{
    const term=search.value.trim().toLocaleLowerCase('pt-BR'),mode=distance.value;
@@ -541,8 +543,8 @@ window.addEventListener('pagehide',()=>{saveChatState();if(unsubscribe)unsubscri
     if(profile.bio){const bio=document.createElement('p');bio.textContent=profile.bio;copy.append(bio);}
     const online=document.createElement('small');online.className='friend-online';online.textContent=onlineIds.has(profile.user_id)?'● online':'○ offline';
     const actions=document.createElement('div');actions.className='friend-actions';
-    const follow=document.createElement('button');follow.type='button';follow.className='btn alt';follow.textContent='SEGUIR';
-    follow.addEventListener('click',async()=>{follow.disabled=true;try{const existing=await supabase.from('profile_follows').select('follower_id').eq('follower_id',session.user.id).eq('followed_id',profile.user_id).maybeSingle();if(existing.error)throw existing.error;if(existing.data){const result=await supabase.from('profile_follows').delete().eq('follower_id',session.user.id).eq('followed_id',profile.user_id);if(result.error)throw result.error;follow.textContent='SEGUIR';}else{const result=await supabase.from('profile_follows').insert({follower_id:session.user.id,followed_id:profile.user_id});if(result.error)throw result.error;follow.textContent='SEGUINDO';}}catch(error){count.textContent=error.message||'Não foi possível atualizar o seguir.';}finally{follow.disabled=false;}});
+    const follow=document.createElement('button');follow.type='button';follow.className='btn alt';follow.textContent=followedIds.has(profile.user_id)?'SEGUINDO':'SEGUIR';
+    follow.addEventListener('click',async()=>{if(!session?.user){location.href='./conta.html';return;}follow.disabled=true;try{const existing=await supabase.from('profile_follows').select('follower_id').eq('follower_id',session.user.id).eq('followed_id',profile.user_id).maybeSingle();if(existing.error)throw existing.error;if(existing.data){const result=await supabase.from('profile_follows').delete().eq('follower_id',session.user.id).eq('followed_id',profile.user_id);if(result.error)throw result.error;followedIds.delete(profile.user_id);follow.textContent='SEGUIR';}else{const result=await supabase.from('profile_follows').insert({follower_id:session.user.id,followed_id:profile.user_id});if(result.error)throw result.error;followedIds.add(profile.user_id);follow.textContent='SEGUINDO';}}catch(error){count.textContent=error.message||'Não foi possível atualizar o seguir.';}finally{follow.disabled=false;}});
     const talk=document.createElement('button');talk.type='button';talk.className='btn primary';talk.textContent='CONVERSAR';
     talk.addEventListener('click',async()=>{talk.disabled=true;try{const conversation=await auth.requestPrivateConversation(profile.user_id);if(conversation.status==='accepted'){location.href='./mensagens.html?user='+encodeURIComponent(profile.user_id);}else{count.textContent='Convite enviado para '+(profile.display_name||'esse perfil')+'. A conversa será liberada quando a pessoa aceitar.';location.href='./mensagens.html';}}catch(error){count.textContent=error.message||'Não foi possível enviar o convite. Para conversar, os dois perfis precisam estar aptos a participar do grupo.';}finally{talk.disabled=false;}});
     actions.append(follow,talk);copy.append(online,actions);
