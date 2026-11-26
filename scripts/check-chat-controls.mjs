@@ -23,7 +23,7 @@ const checks = [
   ['perfil individual superior abre a sala do grupo', /id="open-group-profile"/.test(room) && /aria-controls="capital-do-trem-room"/.test(room) && /toggleProfilePanel\(groupRoom,groupProfileButton,groupRoom.hidden\)/.test(room)],
   ['atalho inferior de amizades abre a pesquisa de perfis', /id="open-friends-profile"/.test(room) && /aria-controls="fazer-amigos"/.test(room) && /toggleProfilePanel\(friendsPanel,friendsProfileButton,friendsPanel.hidden\)/.test(room)],
   ['salas começam recolhidas e amizades podem ser fechadas', /id="capital-do-trem-room" class="panel chat-panel" hidden/.test(room) && /id="fazer-amigos" class="panel friends-panel" hidden/.test(room) && /close-friends-profile/.test(room)],
-  ['cache PWA avançado para v319', /capital-do-trem-v319/.test(worker)],
+  ['cache PWA avançado para v320', /capital-do-trem-v320/.test(worker)],
 
 
   ['FALA UAI mantém grupo e amizades em cartões separados e reposicionados', /id="open-group-card"/.test(room) && /id="open-friends-profile"/.test(room) && /fala-group-profile\{order:2/.test(room) && /fala-friends-profile\{order:7/.test(room)],
