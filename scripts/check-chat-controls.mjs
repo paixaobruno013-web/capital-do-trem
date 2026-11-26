@@ -25,10 +25,10 @@ const checks = [
   ['sala oficial do grupo começa recolhida', /id="capital-do-trem-room" class="panel chat-panel" hidden/.test(room) && !/id="fazer-amigos"/.test(room)],
   ['cache PWA usa versão identificada e atualizável', /const CACHE='capital-do-trem-v[0-9]+'/.test(worker)],
   ['configurações permitem escolher foto dos dois perfis oficiais do chat', /id="chat-brand-image-file"/.test(room) && /id="chat-group-image-file"/.test(room) && !/chat-friends-image-file|friends-profile-image/.test(room)],
-  ['salvar todas persiste e restaura as duas imagens oficiais', /cdt_fala_brand_image_v1/.test(room) && /cdt_fala_group_image_v1/.test(room) && /\['brand','group'\]/.test(room) && /Todas as imagens selecionadas foram salvas neste aparelho/.test(room)],
+  ['salvar todas persiste e restaura as duas imagens oficiais', /cdt_fala_brand_image_v1/.test(room) && /cdt_fala_group_image_v1/.test(room) && /for\(const key of \['brand','group'\]\)/.test(room) && /Todas as imagens selecionadas foram salvas neste aparelho/.test(room)],
 
 
-  ['grupo usa marca branca e é o único grupo coletivo exibido', /id="open-group-card"/.test(room) && /src="\.\/marca\.svg" alt="Logo branco do grupo Capital do Trem"/.test(room) && !/fala-friends-profile/.test(room)],
+  ['grupo usa marca branca e é o único grupo coletivo exibido', /id="open-group-card"/.test(room) && /src="\.\/marca\.svg" alt="Logo branco do grupo Capital do Trem"/.test(room) && !/id="fazer-amigos"|id="open-friends-profile"/.test(room)],
   ['marca preta do Capital do Trem fica no topo e usuários online ao lado em tamanho menor', /src="\.\/assets\/capital-do-trem-logo\.jpg" alt="Perfil Capital do Trem"/.test(room) && /chat-online-profile-avatar\{width:40px/.test(room) && /online.has\(profile.user_id\)/.test(room)],
   ['faixa superior mostra somente perfis online e abre seus perfis', /id="chat-profile-rail"/.test(room) && /id="chat-online-profiles"/.test(room) && /online.has\(profile.user_id\)/.test(room) && /rede\.html\?perfil=/.test(room)],
   ['atalhos superiores e seletor de tema foram retirados da tela do chat', !/Pular para o conteúdo principal/.test(room) && !/<header class="fala-uai-clean-header"/.test(room) && !/id="theme"/.test(room)],
