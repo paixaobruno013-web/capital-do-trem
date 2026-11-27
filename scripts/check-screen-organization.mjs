@@ -11,7 +11,7 @@ const musicBanner = musicArea.match(/<section class="music-section-banner"[^>]*>
 const musicCover = musicArea.match(/<section id="music-cover-area"[^>]*>[\s\S]*?<\/section>/)?.[0] || '';
 const checks = [
  ['Feed social é a página inicial e aparece na navegação', /data-page="inicio"[^>]*>⌂ Feed/.test(home) && /id="home-community-feed"/.test(home)],
- ['banner oficial de alto-falantes fica no topo de Músicas', musicArea.indexOf('class="music-section-banner"') > musicArea.indexOf('id="musicas"') && musicBanner.includes('src="./assets/banner-speakers.webp?v=374"') && musicBanner.includes('AQUI A MÚSICA NÃO PARA!')],
+ ['banner oficial de alto-falantes fica no topo de Músicas', musicArea.indexOf('class="music-section-banner"') > musicArea.indexOf('id="musicas"') && musicBanner.includes('src="./assets/banner-speakers.webp?v=375"') && musicBanner.includes('AQUI A MÚSICA NÃO PARA!')],
  ['capa personalizada continua disponível sem controles administrativos na tela pública', musicCover.includes('id="music-cover-preview"') && musicCover.includes('id="music-cover-area"') && !musicArea.includes('id="music-cover-upload"') && !musicArea.includes('music-cover-controls')],
  ['vídeos de descoberta ficam na Pesquisa, não misturados ao Feed', /home-youtube/.test(discovery) && !/<section class="card home-youtube"/.test(home.slice(home.indexOf('<section class="page active" id="inicio">'),home.indexOf('<section class="page" id="musicas">')))],
  ['grupo oficial e perfis para contatos privados ficam no Chat, sem descoberta por localização', /id="open-group-card"/.test(chat) && /id="chat-profile-rail"/.test(chat) && !/id="fazer-amigos"|id="open-friends-profile"/.test(chat) && !/class="card home-friends"/.test(home)],
