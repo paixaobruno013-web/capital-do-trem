@@ -43,7 +43,9 @@ const checks = [
   ['vídeo de abertura não mostra imagem ou poster antes do vídeo', /video\.removeAttribute\('poster'\)/.test(home) && !/const openingPoster=document\.createElement\('img'\)/.test(home) && !/const fallback=document\.createElement\('img'\)/.test(home)],
   ['marca sobreposta fica oculta quando há vídeo de abertura', /if\(brand\)brand\.style\.display='none'/.test(home)],
   ['Feed principal mostra publicações sem painel de descrição da conta', /class=\"home-community-feed\" aria-label=\"Publicações ativas do Feed\"/.test(home) && !/home-section-heading[^]*Feed dos Maquinistas/.test(home)],
-  ['menu de três pontos do perfil oferece atalhos horizontais para áreas da conta', /profile-account-shortcuts/.test(await read('rede.html')) && /flex-direction:row/.test(await read('rede.html')) && /my-stories-panel/.test(await read('rede.html')) && /set-password-form/.test(await read('rede.html'))],
+  ['menu de três pontos do perfil reúne acessos da conta e apoiadores em lista vertical', /profile-account-shortcuts/.test(await read('rede.html')) && /flex-direction:column/.test(await read('rede.html')) && /my-stories-panel/.test(await read('rede.html')) && /set-password-form/.test(await read('rede.html')) && /apoiadores\.html/.test(await read('rede.html')) && /admin-apoiadores\.html/.test(await read('rede.html'))],
+  ['ferramentas verticais dos Stories reabrem expandidas ao iniciar o compositor', /home-story-tools-rail/.test(home) && /tools-collapsed','effects-collapsed/.test(await read('home-story-composer.js'))],
+  ['ações inferiores dos Stories ficam limitadas a Story ou Story + Feed', /id="home-story-publish"[^>]*>Postar no Story/.test(home) && /id="home-story-feed-publish"[^>]*>Story \+ Feed/.test(home)],
   ['ícone do Instagram usa degradê no bloco inteiro, com símbolo branco', /\.instagram-button \.instagram-mark\{[^}]*background:linear-gradient/.test(home) && /-webkit-text-fill-color:#fff/.test(home)],
   ['locomotiva e três vagões permanecem na abertura', /opening-wagon-rear/.test(home) && /opening-wagon-dancers/.test(home) && /opening-wagon-front/.test(home) && /opening-locomotive/.test(home)]
 ];
