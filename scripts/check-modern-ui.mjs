@@ -51,7 +51,7 @@ assert.ok(css.includes('#home-feed-open>span:last-child') && css.includes('align
   css.includes('white-space:nowrap!important') && css.includes('font-size:clamp(12px,3.5vw,14px)!important'),
   'O texto No que está pensando? precisa ficar menor e em uma única linha ao lado do avatar');
 assert.ok(css.includes('#musicas .music-section-banner') && css.includes('aspect-ratio:auto!important') &&
-  css.includes('object-fit:contain!important') && css.includes('object-position:50% 50%!important') &&
+  css.includes('object-fit:contain!important') && css.includes('object-position:center!important') &&
   css.includes('clip-path:none!important') && css.includes('max-height:none!important'),
   'A capa de Músicas precisa preservar a proporção original e não sofrer cortes ou deslocamentos');
 assert.ok(home.includes('id="home-feed-open"') && home.includes('home-feed-composer-collapsed'),
