@@ -145,7 +145,7 @@ function mountStoryMusicPicker() {
   label.textContent = 'Música do catálogo';
   musicSelect = document.createElement('select');
   musicSelect.id = 'my-story-music-song';
-  const normalize = value => String(value || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLocaleLowerCase('pt-BR').trim();
+  const normalize = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR').trim();
   const renderOptions = () => {
     const query = normalize(musicSearch.value);
     const selected = musicSelect.value;
