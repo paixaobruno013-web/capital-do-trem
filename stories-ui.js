@@ -13,6 +13,7 @@ const profileDirectory = document.getElementById('community-profiles');
 const SEEN_KEY = 'capitaldotrem_stories_seen_v3';
 let officialStories = [];
 let userStories = [];
+let publicProfiles = [];
 let stories = [];
 let currentIndex = 0;
 let advanceTimer = null;
@@ -65,23 +66,21 @@ function renderHomeStoryTray() {
   const tray = document.getElementById('home-stories-list');
   if (!tray) return;
   const groups = userStoryGroups();
-  const seen = seenIds();
   const entries = [];
   const activeOfficial = officialStories.filter(s => new Date(s.expires_at).getTime() > Date.now());
-  if (activeOfficial.length) entries.push({ id: 'official', name: 'Capital do Trem', stories: activeOfficial, official: true });
+  if (activeOfficial.length) entries.push({ id: 'official', name: 'Capital do Trem', stories: activeOfficial, official: true, hasStories: true });
+  const profileById = new Map(publicProfiles.map(profile => [profile.user_id, profile]));
+  const allUserIds = new Set([...profileById.keys(), ...groups.keys()]);
   const userEntries = [];
-  for (const [authorId, items] of groups) {
-    const active = items.filter(s => new Date(s.expires_at).getTime() > Date.now());
-    if (!active.length) continue;
-    const own = authorId === currentStoryUserId;
-    const unseen = active.some(s => !seen.has(s.id));
-    // Depois de assistir a todos os Stories de outra pessoa, libera espaço na fileira.
-    if (!own && !unseen) continue;
+  for (const authorId of allUserIds) {
+    const profile = profileById.get(authorId);
+    const active = (groups.get(authorId) || []).filter(s => new Date(s.expires_at).getTime() > Date.now());
     const latest = active[active.length - 1];
-    userEntries.push({ id: authorId, name: latest.display_name || 'Usuário Uai', stories: active, avatar: latest.avatar_url || '', avatarType: latest.avatar_type || 'photo', avatarData: latest.avatar_data || null, latest, own, unseen });
+    const own = authorId === currentStoryUserId;
+    const name = profile?.display_name || latest?.display_name || profile?.username || 'Usuário Uai';
+    userEntries.push({ id: authorId, name, stories: active, avatar: profile?.avatar_url || latest?.avatar_url || '', avatarType: profile?.avatar_type || latest?.avatar_type || 'photo', avatarData: profile?.avatar_data || latest?.avatar_data || null, own, hasStories: active.length > 0 });
   }
-  // O perfil do próprio usuário fica sempre acessível; os demais não vistos vêm em seguida.
-  userEntries.sort((a, b) => Number(b.own) - Number(a.own) || Number(b.unseen) - Number(a.unseen) || a.name.localeCompare(b.name, 'pt-BR'));
+  userEntries.sort((a, b) => Number(b.own) - Number(a.own) || Number(b.hasStories) - Number(a.hasStories) || a.name.localeCompare(b.name, 'pt-BR'));
   entries.push(...userEntries);
   tray.replaceChildren();
   if (!entries.length) {
@@ -95,9 +94,9 @@ function renderHomeStoryTray() {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'home-story-item';
-    button.setAttribute('aria-label', 'Ver Stories de ' + entry.name);
+    button.setAttribute('aria-label', entry.hasStories ? 'Ver Stories de ' + entry.name : 'Abrir perfil de ' + entry.name + '. Sem Stories publicados.');
     const ring = document.createElement('span');
-    ring.className = 'home-story-ring' + (entry.stories.every(s => seen.has(s.id)) ? ' seen' : '');
+    ring.className = 'home-story-ring ' + (entry.hasStories ? 'has-stories' : 'no-stories');
     const avatar = document.createElement('span');
     avatar.className = 'home-story-avatar';
     const imageUrl = entry.official ? '' : (entry.avatarType === 'character' && entry.avatarData ? characterStoryAvatar(entry.avatarData) : entry.avatar);
@@ -116,7 +115,7 @@ function renderHomeStoryTray() {
     name.className = 'home-story-name';
     name.textContent = entry.name;
     button.append(ring, name);
-    button.addEventListener('click', () => openViewer(entry.stories, 'Stories de ' + entry.name, button));
+    button.addEventListener('click', () => { if (entry.hasStories) openViewer(entry.stories, 'Stories de ' + entry.name, button); else window.location.href = './rede.html?perfil=' + encodeURIComponent(entry.id); });
     tray.append(button);
   }
 }
@@ -268,22 +267,27 @@ async function refreshStories({ notify = false, previousAdmin = new Set(), previ
     const [admins, users] = await Promise.all([getActiveAdminStories(), getActiveUserStories()]);
     officialStories = admins;
     userStories = users;
-    const authorIds = [...new Set(users.map(story => story.author_id).filter(Boolean))];
-    if (authorIds.length) {
-      try {
-        const supabase = initSupabase();
-        const { data: profiles, error: profilesError } = await supabase.from('profiles')
-          .select('user_id,avatar_type,avatar_url,avatar_data')
-          .eq('is_public', true).in('user_id', authorIds);
-        if (profilesError) throw profilesError;
-        const profileById = new Map((profiles || []).map(item => [item.user_id, item]));
-        userStories = users.map(story => {
-          const person = profileById.get(story.author_id);
-          return person ? { ...story, avatar_type: person.avatar_type, avatar_url: person.avatar_url, avatar_data: person.avatar_data } : story;
-        });
-      } catch (profileError) {
-        console.info('Avatares públicos dos Stories indisponíveis:', profileError?.message || profileError);
+    try {
+      const supabase = initSupabase();
+      const profiles = [];
+      const pageSize = 100;
+      for (let from = 0; ; from += pageSize) {
+        const { data, error } = await supabase.from('profiles')
+          .select('user_id,display_name,username,avatar_type,avatar_url,avatar_data')
+          .eq('is_public', true).order('display_name', { ascending: true })
+          .range(from, from + pageSize - 1);
+        if (error) throw error;
+        profiles.push(...(data || []));
+        if (!data || data.length < pageSize) break;
       }
+      publicProfiles = profiles;
+      const profileById = new Map(profiles.map(item => [item.user_id, item]));
+      userStories = users.map(story => {
+        const person = profileById.get(story.author_id);
+        return person ? { ...story, display_name: person.display_name || story.display_name, username: person.username || story.username, avatar_type: person.avatar_type, avatar_url: person.avatar_url, avatar_data: person.avatar_data } : story;
+      });
+    } catch (profileError) {
+      console.info('Diretório de perfis públicos dos Stories indisponível:', profileError?.message || profileError);
     }
     updateOfficialRing();
     updateUserProfileRings();
