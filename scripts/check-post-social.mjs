@@ -18,6 +18,8 @@ const checks = [
   ['Feed evita consultas sociais em todos os cartões durante a abertura', !/try\{const social=await getPostSocial\(post\.id\)/.test(await read('home-feed.js')) && /Os dados sociais são buscados somente quando a pessoa interage/.test(await read('home-feed.js'))],
   ['Feed pausa vídeos quando sai do app e respeita economia de dados', /visibilitychange/.test(await read('home-feed.js')) && /navigator\.connection\?\.saveData/.test(await read('home-feed.js')) && /video\.preload='none'/.test(await read('home-feed.js'))],
   ['Stories libera a câmera ao selecionar uma mídia', /if \(selectedFile\) releaseCameraResources\(\)/.test(await read('home-story-composer.js'))],
+  ['Mídias antigas do Feed usam o bucket social como padrão', /item\.bucket_id\|\|'capital-do-trem-social'/.test(await read('rede.js'))],
+  ['Feed social respeita economia de dados e pausa em segundo plano', /navigator\.connection\?\.saveData/.test(await read('rede.js')) && /visibilitychange/.test(await read('rede.js')) && /video\.preload='none'/.test(await read('rede.js'))],
   ['Feed informa em qual etapa a publicação falhou', /publishStage='criar a publicação no Feed'/.test(await read('home-feed.js')) && /Falha ao '\+publishStage/.test(await read('home-feed.js'))],
   ['publicação permite compartilhar no Feed ou simultaneamente no Feed e Stories', /Compartilhar Feed<\/button>/.test(home) && /Compartilhar Feed \+ Story/.test(home) && /createMyStory\(\{file,caption:text/.test(await read('home-feed.js'))],
   ['aro dos Stories fica parado e somente o LED vermelho percorre a borda', /homeStoryLedTravel/.test(home) && /home-story-ring:not\(\.seen\)::before/.test(home) && /animation:none!important/.test(home) && !/homeStoryRedOrbit/.test(home)],
