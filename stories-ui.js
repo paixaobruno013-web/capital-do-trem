@@ -97,7 +97,7 @@ function renderHomeStoryTray() {
     button.className = 'home-story-item';
     button.setAttribute('aria-label', entry.hasStories ? 'Ver Stories de ' + entry.name : 'Abrir perfil de ' + entry.name + '. Sem Stories publicados.');
     const ring = document.createElement('span');
-    ring.className = 'home-story-ring ' + (entry.own ? 'own-profile' : (entry.hasStories ? 'has-stories' : 'no-stories'));
+    ring.className = 'home-story-ring ' + (entry.own ? 'own-profile ' : '') + (entry.hasStories ? 'has-stories' : 'no-stories');
     const avatar = document.createElement('span');
     avatar.className = 'home-story-avatar';
     const imageUrl = entry.official ? '' : (entry.avatarType === 'character' && entry.avatarData ? characterStoryAvatar(entry.avatarData) : entry.avatar);
