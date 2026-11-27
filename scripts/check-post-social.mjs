@@ -40,8 +40,11 @@ const checks = [
   ['faixa de contatos online usa somente perfis públicos', /getPublicProfiles\(\)/.test(chat) && /\.eq\('is_public', true\)/.test(auth)],
   ['conversas individuais continuam vinculadas a convite e aceite', /requestPrivateConversation/.test(auth) && /requestedUserId=shareParams\.get\('user'\)/.test(privateChat) && /status==='accepted'/.test(privateChat)],
   ['conversa privada abre em tela própria, separada do grupo oficial', /requestedUserId=shareParams\.get\('user'\)/.test(privateChat) && /openConversation\(target\)/.test(privateChat) && /status==='accepted'/.test(privateChat) && !/id="fazer-amigos"|id="open-friends-profile"/.test(chat)],
-  ['vídeo de abertura usa imagem de segurança enquanto carrega, sem camada extra de logo', /video\.poster=currentOpeningImage\|\|'\.\/marca\.svg'/.test(home) && !/const posterLayer\s*=/.test(home)],
+  ['vídeo de abertura não mostra imagem ou poster antes do vídeo', /video\.removeAttribute\('poster'\)/.test(home) && !/const openingPoster=document\.createElement\('img'\)/.test(home) && !/const fallback=document\.createElement\('img'\)/.test(home)],
   ['marca sobreposta fica oculta quando há vídeo de abertura', /if\(brand\)brand\.style\.display='none'/.test(home)],
+  ['Feed principal mostra publicações sem painel de descrição da conta', /class=\"home-community-feed\" aria-label=\"Publicações ativas do Feed\"/.test(home) && !/home-section-heading[^]*Feed dos Maquinistas/.test(home)],
+  ['menu de três pontos do perfil oferece atalhos horizontais para áreas da conta', /profile-account-shortcuts/.test(await read('rede.html')) && /flex-direction:row/.test(await read('rede.html')) && /my-stories-panel/.test(await read('rede.html')) && /set-password-form/.test(await read('rede.html'))],
+  ['ícone do Instagram usa degradê no bloco inteiro, com símbolo branco', /\.instagram-button \.instagram-mark\{[^}]*background:linear-gradient/.test(home) && /-webkit-text-fill-color:#fff/.test(home)],
   ['locomotiva e três vagões permanecem na abertura', /opening-wagon-rear/.test(home) && /opening-wagon-dancers/.test(home) && /opening-wagon-front/.test(home) && /opening-locomotive/.test(home)]
 ];
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'ERRO') + ' ' + name);
