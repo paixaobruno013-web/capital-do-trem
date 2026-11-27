@@ -12,7 +12,7 @@ const checks = [
   ['Feed mostra mídia em galeria horizontal', js.includes('home-feed-post-gallery') && html.includes('.home-feed-post-gallery{display:flex')],
   ['edição de foto exporta uma nova imagem', js.includes('ctx.filter=') && js.includes('canvas.toBlob')],
   ['corte de foto é aplicado no arquivo antes de publicar', js.includes('cropImageToSquare(files[0])')],
-  ['cache foi atualizado para a nova interface', Number(sw.match(/capital-do-trem-v(\\d+)/)?.[1]||0)>=350]
+  ['cache foi atualizado para a nova interface', Number(sw.match(/capital-do-trem-v(\d+)/)?.[1]||0)>=350]
 ];
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'FAIL') + ' ' + name);
 const failed = checks.filter(([, ok]) => !ok);
