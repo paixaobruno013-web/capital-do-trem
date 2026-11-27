@@ -68,7 +68,6 @@ function renderHomeStoryTray() {
   const groups = userStoryGroups();
   const entries = [];
   const activeOfficial = officialStories.filter(s => new Date(s.expires_at).getTime() > Date.now());
-  if (activeOfficial.length) entries.push({ id: 'official', name: 'Capital do Trem', stories: activeOfficial, official: true, hasStories: true });
   const profileById = new Map(publicProfiles.map(profile => [profile.user_id, profile]));
   const allUserIds = new Set([...profileById.keys(), ...groups.keys()]);
   const userEntries = [];
@@ -81,7 +80,9 @@ function renderHomeStoryTray() {
     userEntries.push({ id: authorId, name, stories: active, avatar: profile?.avatar_url || latest?.avatar_url || '', avatarType: profile?.avatar_type || latest?.avatar_type || 'photo', avatarData: profile?.avatar_data || latest?.avatar_data || null, own, hasStories: active.length > 0 });
   }
   userEntries.sort((a, b) => Number(b.own) - Number(a.own) || Number(b.hasStories) - Number(a.hasStories) || a.name.localeCompare(b.name, 'pt-BR'));
+  // O perfil do próprio usuário fica sempre na primeira posição; os Stories oficiais vêm depois.
   entries.push(...userEntries);
+  if (activeOfficial.length) entries.push({ id: 'official', name: 'Capital do Trem', stories: activeOfficial, official: true, hasStories: true });
   tray.replaceChildren();
   if (!entries.length) {
     const empty = document.createElement('p');
@@ -96,7 +97,7 @@ function renderHomeStoryTray() {
     button.className = 'home-story-item';
     button.setAttribute('aria-label', entry.hasStories ? 'Ver Stories de ' + entry.name : 'Abrir perfil de ' + entry.name + '. Sem Stories publicados.');
     const ring = document.createElement('span');
-    ring.className = 'home-story-ring ' + (entry.hasStories ? 'has-stories' : 'no-stories');
+    ring.className = 'home-story-ring ' + (entry.own ? 'own-profile' : (entry.hasStories ? 'has-stories' : 'no-stories'));
     const avatar = document.createElement('span');
     avatar.className = 'home-story-avatar';
     const imageUrl = entry.official ? '' : (entry.avatarType === 'character' && entry.avatarData ? characterStoryAvatar(entry.avatarData) : entry.avatar);
@@ -280,6 +281,14 @@ async function refreshStories({ notify = false, previousAdmin = new Set(), previ
         if (profilesError) throw profilesError;
         profiles.push(...(data || []));
         if (!data || data.length < pageSize) break;
+      }
+      // Mesmo se o próprio perfil estiver privado, ele aparece apenas para a própria conta no primeiro lugar.
+      if (currentStoryUserId && !profiles.some(item => item.user_id === currentStoryUserId)) {
+        const { data: ownProfile, error: ownProfileError } = await supabase.from('profiles')
+          .select('user_id,display_name,username,avatar_type,avatar_url,avatar_data')
+          .eq('user_id', currentStoryUserId).maybeSingle();
+        if (ownProfileError) throw ownProfileError;
+        if (ownProfile) profiles.unshift(ownProfile);
       }
       publicProfiles = profiles;
       const profileById = new Map(profiles.map(item => [item.user_id, item]));
