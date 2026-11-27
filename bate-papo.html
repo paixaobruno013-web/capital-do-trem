@@ -253,6 +253,16 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important;overscroll-behav
  <div class="fala-chat-settings-actions"><button id="save-chat-images" type="button">Salvar todas as imagens</button></div>
  <small id="chat-image-settings-status" role="status" aria-live="polite">As alterações serão publicadas para todos depois de salvar.</small>
 </section>
+<div class="fala-inbox-header">
+ <h1>Chats</h1>
+ <div class="fala-profile-menu-wrap">
+  <button id="fala-profile-menu-button" class="fala-profile-menu-button" type="button" aria-label="Mais opções do perfil" aria-expanded="false" aria-controls="fala-profile-menu">⋯</button>
+  <div id="fala-profile-menu" class="fala-profile-menu" hidden>
+   <button id="fala-change-avatar" type="button">Alterar foto de perfil</button>
+  </div>
+  <input id="fala-avatar-file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+ </div>
+</div>
 <div id="chat-profile-rail" class="chat-profile-rail" aria-label="Grupo e perfis online para conversas privadas">
 <button id="open-group-profile" class="chat-profile-chip chat-group-chip" type="button" aria-controls="capital-do-trem-room" aria-expanded="false" aria-label="Abrir comunidade Capital do Trem">
 <span class="chat-profile-chip-avatar"><img src="./assets/capital-do-trem-logo.jpg" alt="Perfil GRUPO • CAPITAL DO TREM"></span>
@@ -268,8 +278,47 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important;overscroll-behav
 <div id="gate" class="status" role="status" aria-live="polite">Verificando sua conta…</div><div id="chat-area" hidden><p id="chat-connection" class="status" role="status" aria-live="polite">Conectando à sala em tempo real…</p>
 <div class="actions" style="justify-content:flex-end;margin:8px 0"><button id="gallery-open" class="alt" type="button">🖼️ Galeria da conversa</button></div><section id="media-gallery" class="panel" hidden><div class="room-heading"><h3>Fotos e vídeos compartilhados</h3><button id="gallery-close" class="alt" type="button">Fechar</button></div><div id="media-gallery-grid" class="media-gallery-grid"></div><p id="gallery-empty" class="muted" hidden>Nenhuma foto ou vídeo compartilhado ainda.</p></section><div id="messages" aria-live="polite" aria-relevant="additions" aria-label="Mensagens do bate-papo"></div><form id="composer" class="composer"><div id="emoji-tray" data-emoji-picker data-input="#message"></div><label class="sr-only" for="message">Sua mensagem para o bate-papo</label><input id="message" maxlength="1000" autocomplete="off" placeholder="Escreva sua mensagem…" aria-describedby="message-counter"><input id="chat-attachment" type="file" accept="image/*,video/*,audio/*,application/pdf,text/plain,text/csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx" hidden><input id="chat-camera" type="file" accept="image/*,video/*" capture="environment" hidden><small id="attachment-name" class="muted" aria-live="polite"></small><label class="view-once-option"><input id="chat-view-once" type="checkbox"> 👁️ Visualização única (foto, vídeo ou áudio)</label><div id="chat-upload-progress" class="chat-upload-progress" hidden><span></span></div><small id="message-counter" class="muted" aria-live="polite">0/1000 caracteres</small><button id="camera-open" class="alt" type="button" aria-label="Anexar arquivo" aria-haspopup="true" aria-expanded="false">📎</button><button id="send" type="submit">Enviar</button></form><p id="status" class="status" role="status" aria-live="polite"></p></div></section><button id="open-group-card" class="fala-profile-card fala-group-profile" type="button" aria-controls="capital-do-trem-room" aria-expanded="false"><span class="fala-profile-avatar"><img src="./marca.svg" alt="Logo branco do grupo Capital do Trem"></span><span class="fala-profile-info"><strong>GRUPO • CAPITAL DO TREM</strong><small>Conversa oficial da comunidade</small></span><span class="fala-profile-arrow">›</span></button></main>
 <script type="module">
-import {getCurrentSession,getChatGroupMembership,joinChatGroup,leaveChatGroup,getChatMessages,sendChatMessage,subscribeChatMessages,uploadChatAttachment,reportChatParticipant,moderateChatParticipant,openViewOnceChatMedia,updateMyGroupMessage,deleteMyGroupMessage,initSupabase,startUserPresence,getOnlineUserIds,subscribeUserPresence,isCurrentUserAdmin,getPublicChatProfileImages,saveAdminChatProfileImages,getChatGroupDirectory} from './supabase/auth.js';
+import {getCurrentSession,getChatGroupMembership,joinChatGroup,leaveChatGroup,getChatMessages,sendChatMessage,subscribeChatMessages,uploadChatAttachment,reportChatParticipant,moderateChatParticipant,openViewOnceChatMedia,updateMyGroupMessage,deleteMyGroupMessage,initSupabase,startUserPresence,getOnlineUserIds,subscribeUserPresence,isCurrentUserAdmin,getPublicChatProfileImages,saveAdminChatProfileImages,getChatGroupDirectory,getMyAvatar,uploadMyAvatar,saveMyAvatar} from './supabase/auth.js';
 const gate=document.getElementById('gate'),area=document.getElementById('chat-area'),connection=document.getElementById('chat-connection'),list=document.getElementById('messages'),form=document.getElementById('composer'),input=document.getElementById('message'),send=document.getElementById('send'),status=document.getElementById('status');
+ // Menu de três pontos: alteração da foto do próprio perfil, sincronizada com a conta.
+ const profileMenuButton=document.getElementById('fala-profile-menu-button');
+ const profileMenu=document.getElementById('fala-profile-menu');
+ const changeAvatarButton=document.getElementById('fala-change-avatar');
+ const avatarFileInput=document.getElementById('fala-avatar-file');
+ profileMenuButton?.addEventListener('click',()=>{
+  const open=profileMenu?.hidden===true;
+  if(profileMenu)profileMenu.hidden=!open;
+  profileMenuButton.setAttribute('aria-expanded',String(open));
+ });
+ document.addEventListener('click',event=>{
+  if(!event.target.closest('.fala-profile-menu-wrap')){
+   if(profileMenu)profileMenu.hidden=true;
+   profileMenuButton?.setAttribute('aria-expanded','false');
+  }
+ });
+ changeAvatarButton?.addEventListener('click',()=>{
+  if(profileMenu)profileMenu.hidden=true;
+  profileMenuButton?.setAttribute('aria-expanded','false');
+  avatarFileInput?.click();
+ });
+ avatarFileInput?.addEventListener('change',async()=>{
+  const file=avatarFileInput.files?.[0];if(!file)return;
+  if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){
+   alert('Escolha uma foto JPG, PNG ou WebP de até 5 MB.');avatarFileInput.value='';return;
+  }
+  if(changeAvatarButton)changeAvatarButton.disabled=true;
+  try{
+   const uploaded=await uploadMyAvatar(file);
+   await saveMyAvatar({type:'photo',path:uploaded.path});
+   if(changeAvatarButton)changeAvatarButton.textContent='Foto atualizada';
+   avatarFileInput.value='';
+  }catch(error){
+   alert(error?.message||'Não foi possível atualizar sua foto de perfil.');
+  }finally{
+   if(changeAvatarButton)changeAvatarButton.disabled=false;
+  }
+ });
+
 const counter=document.getElementById('message-counter'),attachmentInput=document.getElementById('chat-attachment'),cameraInput=document.getElementById('chat-camera'),attachmentName=document.getElementById('attachment-name');
 let selectedAttachment=null;
 const CHAT_DRAFT_KEY='capitaldotrem_fala_trem_draft_v3';
