@@ -39,8 +39,12 @@ if(root&&form){
   return '';
  }
  function initials(name){return Array.from(safe(name).trim()||'U').slice(0,2).join('').toUpperCase()}
- const feedVideoObserver=typeof IntersectionObserver==='function'?new IntersectionObserver(entries=>{for(const entry of entries){const video=entry.target;if(entry.isIntersecting&&entry.intersectionRatio>=0.6){video.muted=true;const others=[...document.querySelectorAll('.home-feed-media[data-feed-autoplay]')].filter(item=>item!==video);for(const other of others)other.pause();video.play().catch(()=>{video.dataset.autoplayBlocked='true'});}else{video.pause();}}},{threshold:[0,0.6,1]}):null;
- function observeFeedVideo(video){video.muted=true;video.playsInline=true;video.preload='metadata';video.controls=true;video.dataset.feedAutoplay='true';if(feedVideoObserver)feedVideoObserver.observe(video);}
+ const feedAutoplayAllowed=()=>document.visibilityState==='visible'&&!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches&&!navigator.connection?.saveData;
+ const pauseFeedVideos=()=>document.querySelectorAll('.home-feed-media[data-feed-autoplay]').forEach(video=>video.pause());
+ document.addEventListener('visibilitychange',()=>{if(document.visibilityState!=='visible')pauseFeedVideos();});
+ window.addEventListener('pagehide',pauseFeedVideos);
+ const feedVideoObserver=typeof IntersectionObserver==='function'?new IntersectionObserver(entries=>{for(const entry of entries){const video=entry.target;if(entry.isIntersecting&&entry.intersectionRatio>=0.6&&feedAutoplayAllowed()){const others=[...document.querySelectorAll('.home-feed-media[data-feed-autoplay]')].filter(item=>item!==video);for(const other of others)other.pause();video.preload='metadata';video.play().catch(()=>{video.dataset.autoplayBlocked='true'});}else{video.pause();}}},{threshold:[0,0.6,1]}):null;
+ function observeFeedVideo(video){video.muted=true;video.playsInline=true;video.preload='none';video.controls=true;video.dataset.feedAutoplay='true';if(feedVideoObserver)feedVideoObserver.observe(video);}
  async function signedMedia(rows){
   const map=new Map(),groups=new Map();
   for(const row of rows){const bucket=row.bucket_id||'capital-do-trem-social';const list=groups.get(bucket)||[];list.push(row);groups.set(bucket,list)}
@@ -54,7 +58,7 @@ if(root&&form){
  async function load(){
   root.innerHTML='<p class="muted">Atualizando o Feed dos Maquinistas…</p>';
   try{
-   const {data:posts,error:postsError}=await supabase.from('posts').select('id,author_id,content,created_at').eq('status','published').order('created_at',{ascending:false}).limit(60);if(postsError)throw postsError;
+   const {data:posts,error:postsError}=await supabase.from('posts').select('id,author_id,content,created_at').eq('status','published').order('created_at',{ascending:false}).limit(30);if(postsError)throw postsError;
    if(!posts.length){root.innerHTML='<p class="muted">Ainda não há publicações. Seja o primeiro Maquinista a compartilhar uma novidade!</p>';return}
    const ids=posts.map(p=>p.id),authors=[...new Set(posts.map(p=>p.author_id))];
    const [mediaQ,profilesQ,artistsQ]=await Promise.all([
@@ -94,7 +98,8 @@ if(root&&form){
     const actions=document.createElement('div');actions.className='home-feed-actions';
     const like=document.createElement('button');like.type='button';like.textContent='♡ Curtir';
     const comments=document.createElement('button');comments.type='button';comments.textContent='💬 Comentários';
-    try{const social=await getPostSocial(post.id);like.textContent=(social.liked?'♥':'♡')+' '+social.likeCount+' curtidas';comments.textContent='💬 '+social.comments.length+' comentários'}catch{}
+    // Não consultar curtidas e comentários para cada cartão durante a abertura do Feed.
+    // Os dados sociais são buscados somente quando a pessoa interage.
     like.addEventListener('click',async()=>{like.disabled=true;try{await togglePostLike(post.id);const social=await getPostSocial(post.id);like.textContent=(social.liked?'♥':'♡')+' '+social.likeCount+' curtidas'}catch(error){status.textContent=error.message||'Entre na sua conta para curtir.'}finally{like.disabled=false}});
     comments.addEventListener('click',async()=>{try{const social=await getPostSocial(post.id);const current=social.comments.map(c=>(c.author_name||'Maquinista')+': '+c.content).join('\n');const value=prompt((current?'Comentários existentes:\n'+current+'\n\n':'')+'Escreva seu comentário:');if(value?.trim()){await addPostComment(post.id,value);const updated=await getPostSocial(post.id);comments.textContent='💬 '+updated.comments.length+' comentários';status.textContent='Comentário publicado!'}}catch(error){status.textContent=error.message||'Não foi possível comentar.'}});
     if(currentUser?.id===post.author_id){
