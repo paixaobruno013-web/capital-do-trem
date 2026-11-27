@@ -126,13 +126,30 @@ function openProfileImage(src,alt){
  }
  const image=profileImageViewer.querySelector('img');image.src=src;image.alt=alt||'Imagem do perfil';profileImageViewer.hidden=false;document.body.classList.add('profile-image-viewer-open');profileImageViewer.querySelector('button').focus();
 }
+function showProfileImageActions(el,label,onChange){
+ const src=el.currentSrc||el.src||'';
+ const sheet=document.createElement('div');
+ sheet.setAttribute('role','dialog');sheet.setAttribute('aria-modal','true');sheet.setAttribute('aria-label','Opções da '+label);
+ sheet.style.cssText='position:fixed;inset:0;z-index:12000;display:flex;align-items:flex-end;justify-content:center;padding:18px;background:#000b';
+ const panel=document.createElement('div');
+ panel.style.cssText='width:min(420px,100%);padding:18px;border:1px solid #ed1c24;border-radius:18px;background:#101010;color:#fff;box-shadow:0 12px 40px #000c;display:grid;gap:10px';
+ const heading=document.createElement('strong');heading.textContent=label==='foto de perfil'?'Foto de perfil':'Foto de capa';heading.style.cssText='font-size:16px;margin-bottom:4px';
+ const makeButton=(text,primary,action,disabled=false)=>{const button=document.createElement('button');button.type='button';button.textContent=text;button.disabled=disabled;button.style.cssText='min-height:48px;padding:11px 14px;border:1px solid '+(primary?'#ed1c24':'#444')+';border-radius:11px;background:'+(primary?'#ed1c24':'#202020')+';color:#fff;font:700 14px system-ui;opacity:'+(disabled?'.45':'1');button.addEventListener('click',()=>{sheet.remove();action?.()});return button};
+ const close=()=>sheet.remove();
+ panel.append(heading,makeButton('Ver imagem ampliada',false,()=>openProfileImage(src,label),!src),makeButton(label==='foto de perfil'?'Trocar foto de perfil':'Trocar foto de capa',true,onChange));
+ panel.append(makeButton('Cancelar',false,close));
+ sheet.append(panel);sheet.addEventListener('click',event=>{if(event.target===sheet)close()});
+ const onKey=event=>{if(event.key==='Escape'&&sheet.isConnected){close();document.removeEventListener('keydown',onKey)}};
+ document.addEventListener('keydown',onKey);document.body.append(sheet);
+ panel.querySelector('button:not(:disabled)')?.focus();
+}
 function makeProfileImageOpenable(el,label,onActivate=null){
  if(!el)return;
  el.tabIndex=0;el.setAttribute('role','button');
  const canChange=typeof onActivate==='function';
- el.setAttribute('aria-label',canChange?'Trocar '+label+' do seu perfil':'Ampliar '+label);
- el.title=canChange?'Toque para escolher outra imagem':'Toque para ampliar';
- const open=()=>{if(canChange){onActivate();return;}openProfileImage(el.currentSrc||el.src,label)};
+ el.setAttribute('aria-label',canChange?'Abrir opções da '+label:'Ampliar '+label);
+ el.title=canChange?'Toque para ampliar ou trocar':'Toque para ampliar';
+ const open=()=>{if(canChange){showProfileImageActions(el,label,onActivate);return;}openProfileImage(el.currentSrc||el.src,label)};
  el.onclick=open;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}};
 }
 function openProfilePostMedia(src,type,label,buildActions){
