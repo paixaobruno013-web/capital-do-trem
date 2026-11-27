@@ -1,5 +1,15 @@
 import { test, expect } from '@playwright/test';
 
+// Os testes de navegação usam o banco real apenas para conferir a integração leve.
+// Arquivos de mídia do Storage não devem ser baixados pelo Chromium de CI: isso
+// consome a franquia de egress de produção sem testar a reprodução no aparelho.
+test.beforeEach(async ({ page }) => {
+  await page.route('**/storage/v1/object/**', async route => {
+    if (route.request().method() === 'GET') return route.abort();
+    return route.continue();
+  });
+});
+
 test('abre a página inicial e navega para Música e volta ao Feed', async ({ page }) => {
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push({ message: error.message, stack: error.stack }));
