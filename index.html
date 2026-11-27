@@ -2856,7 +2856,7 @@ window.addEventListener('capital-do-trem:song-published',refreshMyUploads);
  const musicImage=document.getElementById('music-section-banner-image');
  const homeStatus=document.getElementById('home-area-cover-status');
  const musicStatus=document.getElementById('music-area-cover-status');
- const DEFAULT_MUSIC_COVER='./assets/banner-speakers.webp';
+ const DEFAULT_MUSIC_COVER='./assets/banner-speakers.webp?v=372';
  const SAFE_PREFIX='https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/';
  const setStatus=(node,message)=>{if(node)node.textContent=message};
  const validUrl=value=>typeof value==='string'&&value.startsWith(SAFE_PREFIX)?value:'';
