@@ -134,12 +134,39 @@ function mountStoryMusicPicker() {
   const hint = document.createElement('p');
   hint.className = 'muted';
   hint.textContent = 'Escolha uma faixa publicada no catálogo do Capital do Trem. Use apenas músicas próprias ou autorizadas.';
+  const searchLabel = document.createElement('label');
+  searchLabel.textContent = 'Pesquisar por música ou artista';
+  const musicSearch = document.createElement('input');
+  musicSearch.type = 'search';
+  musicSearch.id = 'my-story-music-search';
+  musicSearch.placeholder = 'Digite o nome da música ou MC/DJ';
+  musicSearch.autocomplete = 'off';
   const label = document.createElement('label');
   label.textContent = 'Música do catálogo';
   musicSelect = document.createElement('select');
   musicSelect.id = 'my-story-music-song';
-  musicSelect.append(new Option('Publicar sem música', ''));
-  for (const song of storySongs) musicSelect.append(new Option(song.artist_name + ' — ' + song.title, song.id));
+  const normalize = value => String(value || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLocaleLowerCase('pt-BR').trim();
+  const renderOptions = () => {
+    const query = normalize(musicSearch.value);
+    const selected = musicSelect.value;
+    const matches = storySongs.filter(song => normalize(song.title).includes(query) || normalize(song.artist_name).includes(query));
+    musicSelect.replaceChildren(new Option('Publicar sem música', ''));
+    for (const song of matches) musicSelect.add(new Option(song.artist_name + ' — ' + song.title, song.id));
+    if (selected && matches.some(song => song.id === selected)) musicSelect.value = selected;
+    else if (selected) {
+      musicSelect.value = '';
+      musicPreview.pause();
+      musicPreview.removeAttribute('src');
+      musicPreview.hidden = true;
+    }
+    const result = wrap.querySelector('[data-story-music-results]');
+    if (result) result.textContent = matches.length + (matches.length === 1 ? ' música encontrada.' : ' músicas encontradas.');
+  };
+  const results = document.createElement('p');
+  results.className = 'muted';
+  results.dataset.storyMusicResults = '';
+  musicSearch.addEventListener('input', renderOptions);
+  renderOptions();
   const startLabel = document.createElement('label');
   startLabel.textContent = 'Começar a música em (segundos)';
   musicStart = document.createElement('input');
@@ -162,7 +189,7 @@ function mountStoryMusicPicker() {
   musicStart.addEventListener('change', () => { if (musicPreview.src) { try { musicPreview.currentTime = Number(musicStart.value) || 0; } catch {} } });
   musicVolume.addEventListener('input', () => { if (musicPreview) musicPreview.volume = Number(musicVolume.value); });
   if (!storySongs.length) { const empty = document.createElement('p'); empty.className = 'muted'; empty.textContent = 'O catálogo ainda não tem músicas publicadas disponíveis. Você pode publicar o Story normalmente sem trilha.'; wrap.append(heading, hint, empty); }
-  else wrap.append(heading, hint, label, musicSelect, startLabel, musicStart, durationLabel, musicDuration, volumeLabel, musicVolume, musicPreview);
+  else wrap.append(heading, hint, searchLabel, musicSearch, results, label, musicSelect, startLabel, musicStart, durationLabel, musicDuration, volumeLabel, musicVolume, musicPreview);
   const caption = document.getElementById('my-story-caption');
   composeFields.insertBefore(wrap, caption?.parentElement || composeFields.firstChild);
 }
