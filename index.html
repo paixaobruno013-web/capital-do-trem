@@ -1367,6 +1367,7 @@ function go(id){
  document.body.classList.toggle('music-page-active',id==='musicas');
  // Usa a tela realmente ativa para evitar estado em memória defasado no WebView.
  const current=pages.find(page=>page.classList.contains('active'))||pages.find(page=>page.id===activePageId);
+ if(current===target){activePageId=target.id;return;}
  if(current){
   pageScrollPositions.set(current.id,window.scrollY||window.pageYOffset||0);
   // Evita áudio/vídeo continuando em segundo plano depois de sair da área.
