@@ -92,7 +92,7 @@
    })();
   }
   if(!playedThisOutage&&audioUnlocked){playedThisOutage=true;playTrainHorn();}
-  // O aviso fica visível por 5 segundos; o estado offline permanece ativo para as áreas que funcionam sem rede.
+  // O aviso visual offline permanece por 13 segundos; o estado offline continua ativo até a internet voltar.
   offlineTimer=window.setTimeout(()=>{alertBox.style.display='none';},13000);
  }
  function showOffline(){
