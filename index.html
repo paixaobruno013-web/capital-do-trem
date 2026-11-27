@@ -2853,7 +2853,6 @@ window.addEventListener('capital-do-trem:song-published',refreshMyUploads);
   if(!session){if(homeMenu)homeMenu.hidden=true;if(musicMenu)musicMenu.hidden=true;return;}
   if(homeMenu)homeMenu.hidden=false;
   if(musicMenu)musicMenu.hidden=false;
-  await api.getMyBasicProfile();
   const covers=await api.getMyAreaCovers();
   apply('home',covers.home_cover_url);
   apply('music',covers.music_cover_url);
