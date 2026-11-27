@@ -3,6 +3,10 @@ import { getCurrentSession, isCurrentUserArtistOrAdmin, bootstrapFirstAdmin, upl
 const $ = id => document.getElementById(id);
 const form = $('music-upload-form');
 const access = $('music-upload-access');
+const uploadArea = $('music-upload-area');
+const uploadShortcuts = document.querySelector('.music-quick-actions');
+const myUploads = $('my-uploaded-songs-panel');
+const setUploadVisibility = allowed => { if(uploadArea)uploadArea.hidden=!allowed; if(uploadShortcuts)uploadShortcuts.hidden=!allowed; if(myUploads)myUploads.hidden=!allowed; };
 const status = $('music-upload-status');
 const fileInput = $('music-upload-file');
 const submit = $('music-upload-submit');
@@ -34,6 +38,7 @@ if (form && access && status && fileInput && submit) {
     if (accessCheckInProgress) return;
     accessCheckInProgress = true;
     retry.hidden = true;
+    setUploadVisibility(false);
     form.hidden = true;
     access.hidden = false;
     access.textContent = 'Conferindo sua conta e suas permissões…';
@@ -68,6 +73,7 @@ if (form && access && status && fileInput && submit) {
       }
       access.hidden = true;
       form.hidden = false;
+      setUploadVisibility(true);
     } catch (error) {
       form.hidden = true;
       access.hidden = false;
@@ -83,6 +89,7 @@ if (form && access && status && fileInput && submit) {
   const stopWatchingAuth = watchAuthChanges(({ event }) => {
     if (event === 'SIGNED_IN') prepareUpload();
     if (event === 'SIGNED_OUT') {
+      setUploadVisibility(false);
       form.hidden = true;
       access.hidden = false;
       access.textContent = 'Entre na sua conta de MC/DJ para enviar músicas.';
