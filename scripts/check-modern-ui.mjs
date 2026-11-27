@@ -37,6 +37,16 @@ assert.ok(prepare.includes("'chat-modern.css'") && prepare.includes("'capital-fu
   'Os estilos específicos do chat e de Músicas precisam entrar no pacote www/Android/iOS');
 assert.ok(sw.includes("'./chat-modern.css'") && sw.includes("'./capital-futurista.css'"),
   'Os estilos específicos do chat e de Músicas precisam estar no cache complementar do PWA');
+assert.ok(home.includes('class="home-social-access"') && home.includes('https://www.youtube.com/@capitaldotrem') && home.includes('https://www.instagram.com/capital.do.trem/'),
+  'A tela inicial precisa exibir os acessos oficiais ao YouTube e Instagram');
+const profile = read('../rede.html');
+assert.ok(profile.includes('class="profile-dream-signature"') &&
+  profile.includes('SEJA O MAQUINISTA DO SEU PRÓPRIO SONHO!') &&
+  profile.includes('Sua história. Seu caminho. Seu destino.') &&
+  css.includes('.profile-dream-signature'),
+  'As duas frases oficiais precisam aparecer visivelmente na área de Perfil');
+assert.ok(home.includes('class="home-social-access"') && css.includes('.home-social-access-link'),
+  'Os atalhos de redes sociais precisam ter estilo visível na tela inicial');
 assert.ok(home.includes('id="home-feed-open"') && home.includes('home-feed-composer-collapsed'),
   'A entrada para criar publicação deve ficar em uma linha antes de abrir o editor');
 assert.ok(css.includes('overflow-x:clip') && css.includes('.home-feed-post-gallery,.home-feed-preview-gallery'),
