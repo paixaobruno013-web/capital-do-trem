@@ -156,3 +156,69 @@ body *{min-width:0}
   object-fit:contain!important;
   object-position:top center!important;
 }
+
+
+/* Correção de visibilidade: preservar espaço real para a frase do Feed. */
+#home-feed-open{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:9px!important;
+  overflow:visible!important;
+}
+#home-feed-open .home-feed-entry-avatar{
+  flex:0 0 34px!important;
+}
+#home-feed-open>span:last-child{
+  display:block!important;
+  flex:1 1 auto!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:100%!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  font-size:12px!important;
+  line-height:1.25!important;
+  letter-spacing:0!important;
+  text-align:left!important;
+}
+
+/* A capa é uma única imagem; o menu fica sobreposto sem dividir sua largura. */
+#musicas .music-section-banner{
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:auto!important;
+  align-items:start!important;
+  justify-items:stretch!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  aspect-ratio:16 / 9!important;
+  overflow:hidden!important;
+  padding:0!important;
+  background:#050505!important;
+}
+#musicas .music-section-banner>img#music-section-banner-image{
+  position:relative!important;
+  display:block!important;
+  grid-column:1!important;
+  grid-row:1!important;
+  width:100%!important;
+  height:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  max-height:none!important;
+  object-fit:contain!important;
+  object-position:top center!important;
+  align-self:start!important;
+  justify-self:stretch!important;
+}
+#musicas .music-section-banner>.music-area-cover-menu{
+  position:absolute!important;
+  z-index:5!important;
+  top:8px!important;
+  right:8px!important;
+}
