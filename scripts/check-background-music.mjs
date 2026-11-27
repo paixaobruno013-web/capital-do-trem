@@ -6,7 +6,8 @@ const checks=[
  [persistent.includes("document.body.append(root)")&&persistent.includes("ROOT_ID='capital-music-player'"),'Move o player musical para fora das páginas que alternam'],
  [persistent.includes('position:fixed')&&persistent.includes('ct-player-ready'),'Mantém controles compactos visíveis nas outras áreas'],
  [persistent.includes("audio.addEventListener('play',reveal)"),'Mantém o dock disponível durante a reprodução e após pausar'],
- [player.includes('function configureMediaSession()')&&player.includes("['play',()=>audio.play()]")&&player.includes("['nexttrack',()=>step(1)]"),'Expõe comandos de mídia do sistema'],
+ [player.includes('function configureMediaSession()')&&player.includes("['play',()=>playCurrent()]")&&player.includes("['nexttrack',()=>step(1)]"),'Expõe comandos de mídia do sistema'],
+ [player.includes('function ensureAudioSource()')&&player.includes('function playCurrent()')&&player.includes('if(autoplay)playCurrent()')&&!/audio\.src=url;audio\.load\(\);title/.test(player),'Só solicita o arquivo musical quando a pessoa inicia a reprodução'],
  [player.includes("['seekto',details=>")&&player.includes("['seekbackward',details=>"),'Suporta busca pela tela de bloqueio quando disponível'],
  [prepare.includes("'persistent-music-player.js'"),'Inclui o módulo no pacote Android/PWA'],
  [sw.includes("'./persistent-music-player.js'"),'Inclui o módulo no cache offline']
