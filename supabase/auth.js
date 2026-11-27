@@ -818,7 +818,7 @@ export async function getMyBasicProfile() {
   if (userError) throw userError;
   if (!user) throw new Error('Entre na sua conta para acessar seu perfil.');
   const { data, error } = await supabase.from('profiles')
-    .select('user_id, display_name, username, account_type, bio, city, is_public, avatar_type, avatar_url, avatar_path, avatar_data, cover_url, cover_path, home_cover_url, home_cover_path, music_cover_url, music_cover_path')
+    .select('user_id, display_name, username, account_type, bio, city, is_public, avatar_type, avatar_url, avatar_path, avatar_data, cover_url, cover_path')
     .eq('user_id', user.id).maybeSingle();
   if (error) throw error;
   // Perfil existente é devolvido imediatamente: não bloquear a tela com RPCs
@@ -2468,11 +2468,23 @@ export async function moveSongInMyPlaylist(playlistId,songId,direction) {
  return true;
 }
 
-// Capas pessoais das áreas Início e Músicas. Cada usuário só altera os próprios campos e arquivos.
+// Capas pessoais em tabela isolada, protegida por RLS: cada usuário acessa apenas as próprias preferências.
 const PERSONAL_AREA_COVERS = {
- home: { url: 'home_cover_url', path: 'home_cover_path', label: 'tela inicial' },
- music: { url: 'music_cover_url', path: 'music_cover_path', label: 'área Músicas' }
+ home: { url: 'home_cover_url', path: 'home_cover_path' },
+ music: { url: 'music_cover_url', path: 'music_cover_path' }
 };
+
+export async function getMyAreaCovers() {
+ const supabase=initSupabase();
+ const {data:{user},error:userError}=await supabase.auth.getUser();
+ if(userError)throw userError;
+ if(!user)throw new Error('Entre na sua conta para acessar suas capas.');
+ const {data,error}=await supabase.from('user_area_covers')
+  .select('home_cover_url,home_cover_path,music_cover_url,music_cover_path')
+  .eq('user_id',user.id).maybeSingle();
+ if(error)throw error;
+ return data||{home_cover_url:null,music_cover_url:null};
+}
 
 export async function saveMyAreaCover(kind, file) {
  const config=PERSONAL_AREA_COVERS[kind];
@@ -2490,14 +2502,16 @@ export async function saveMyAreaCover(kind, file) {
  if(uploadError)throw uploadError;
  const {data:publicData}=supabase.storage.from('capital-do-trem-media').getPublicUrl(path);
  if(!publicData?.publicUrl){await supabase.storage.from('capital-do-trem-media').remove([path]).catch(()=>{});throw new Error('Não foi possível obter a imagem enviada.');}
- const {data:previous,error:readError}=await supabase.from('profiles').select(config.path).eq('user_id',user.id).single();
+ const {data:previous,error:readError}=await supabase.from('user_area_covers').select(config.path).eq('user_id',user.id).maybeSingle();
  if(readError){await supabase.storage.from('capital-do-trem-media').remove([path]).catch(()=>{});throw readError;}
- const payload={[config.url]:publicData.publicUrl,[config.path]:path};
- const {data:saved,error:saveError}=await supabase.from('profiles').update(payload).eq('user_id',user.id).select(config.url+','+config.path).single();
- if(saveError){await supabase.storage.from('capital-do-trem-media').remove([path]).catch(()=>{});throw saveError;}
+ const payload={user_id:user.id,[config.url]:publicData.publicUrl,[config.path]:path,updated_at:new Date().toISOString()};
+ const write=previous
+  ? await supabase.from('user_area_covers').update(payload).eq('user_id',user.id)
+  : await supabase.from('user_area_covers').insert(payload);
+ if(write.error){await supabase.storage.from('capital-do-trem-media').remove([path]).catch(()=>{});throw write.error;}
  const oldPath=previous?.[config.path];
  if(oldPath&&oldPath!==path&&oldPath.startsWith(user.id+'/cover/'))await supabase.storage.from('capital-do-trem-media').remove([oldPath]).catch(()=>{});
- return saved;
+ return {[config.url]:publicData.publicUrl,[config.path]:path};
 }
 
 export async function resetMyAreaCover(kind) {
@@ -2507,11 +2521,12 @@ export async function resetMyAreaCover(kind) {
  const {data:{user},error:userError}=await supabase.auth.getUser();
  if(userError)throw userError;
  if(!user)throw new Error('Entre na sua conta para restaurar a capa.');
- const {data:previous,error:readError}=await supabase.from('profiles').select(config.path).eq('user_id',user.id).single();
+ const {data:previous,error:readError}=await supabase.from('user_area_covers').select(config.path).eq('user_id',user.id).maybeSingle();
  if(readError)throw readError;
- const payload={[config.url]:null,[config.path]:null};
- const {error}=await supabase.from('profiles').update(payload).eq('user_id',user.id);
- if(error)throw error;
+ if(previous){
+  const {error}=await supabase.from('user_area_covers').update({[config.url]:null,[config.path]:null,updated_at:new Date().toISOString()}).eq('user_id',user.id);
+  if(error)throw error;
+ }
  const oldPath=previous?.[config.path];
  if(oldPath&&oldPath.startsWith(user.id+'/cover/'))await supabase.storage.from('capital-do-trem-media').remove([oldPath]).catch(()=>{});
  return true;
