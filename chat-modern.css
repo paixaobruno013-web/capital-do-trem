@@ -7,6 +7,11 @@ body.cdt-fala-uai-page .chat-profile-chip{flex:0 0 auto;min-width:64px;border:0!
 body.cdt-fala-uai-page .chat-profile-chip-avatar{width:54px!important;height:54px!important;border:2px solid #ef4d55!important;box-shadow:0 4px 14px #0007!important}
 body.cdt-fala-uai-page #messages{height:min(62vh,660px)!important;min-height:300px!important;padding:14px!important;border:1px solid #ffffff0c!important;border-radius:20px!important;background:linear-gradient(180deg,#20242e,#181b23)!important;gap:10px!important}
 body.cdt-fala-uai-page #messages>*{max-width:min(86%,560px)}
+body.cdt-fala-uai-page #messages .message{align-self:flex-start;max-width:min(86%,560px);padding:10px 12px;border:1px solid #ffffff0d;border-radius:15px 15px 15px 4px;background:#11151d;color:#f3f4f7;box-shadow:0 5px 14px #0004}
+body.cdt-fala-uai-page #messages .message-own{align-self:flex-end;border:0;border-radius:15px 15px 4px 15px;background:linear-gradient(135deg,#fa5a60,#e83f49);color:#fff}
+body.cdt-fala-uai-page #messages .message-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+body.cdt-fala-uai-page #messages .message-avatar{width:26px;height:26px;flex:0 0 26px;border-radius:50%;overflow:hidden;background:#303644}
+body.cdt-fala-uai-page #messages .message-avatar img{width:100%;height:100%;object-fit:cover}
 body.cdt-fala-uai-page #messages .mine,body.cdt-fala-uai-page #messages [data-own="true"]{align-self:flex-end;background:linear-gradient(135deg,#fa5a60,#e83f49)!important;color:#fff!important;border-radius:15px 15px 4px 15px!important;box-shadow:0 5px 14px #0004}
 body.cdt-fala-uai-page #messages .theirs,body.cdt-fala-uai-page #messages [data-own="false"]{align-self:flex-start;background:#11151d!important;color:#f3f4f7!important;border:1px solid #ffffff0d!important;border-radius:15px 15px 15px 4px!important}
 body.cdt-fala-uai-page .composer{display:grid!important;grid-template-columns:minmax(0,1fr) 44px 72px!important;gap:8px!important;padding:9px!important;border:1px solid #ffffff12!important;border-radius:18px!important;background:#20242e!important;box-shadow:0 10px 26px #0005!important}
