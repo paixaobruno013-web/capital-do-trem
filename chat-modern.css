@@ -86,3 +86,17 @@ body.cdt-fala-uai-page #composer #send{grid-column:3!important;grid-row:1!import
 body.cdt-fala-uai-page #composer #attachment-name,body.cdt-fala-uai-page #composer .view-once-option,body.cdt-fala-uai-page #composer #chat-upload-progress,body.cdt-fala-uai-page #composer #message-counter{grid-column:1/-1!important}
 body.cdt-fala-uai-page #composer #attachment-name:empty{display:none}
 @media(max-width:480px){body.cdt-fala-uai-page #capital-do-trem-room{padding:9px!important}body.cdt-fala-uai-page #messages{height:57vh!important;min-height:250px!important}body.cdt-fala-uai-page #composer{grid-template-columns:minmax(0,1fr) 38px 48px!important;gap:5px!important}body.cdt-fala-uai-page #composer #camera-open{width:38px!important;height:38px!important;min-height:38px!important}body.cdt-fala-uai-page #composer #send{width:48px!important;height:38px!important;min-height:38px!important}}
+
+/* FALA UAI: engrenagem é o único menu superior; grupo e online lado a lado */
+body.cdt-fala-uai-page .fala-profile-menu-wrap,body.cdt-fala-uai-page .fala-profile-menu-button,body.cdt-fala-uai-page .fala-profile-menu{display:none!important}
+body.cdt-fala-uai-page .fala-inbox-header{padding:7px 4px 8px!important}
+body.cdt-fala-uai-page #chat-profile-rail{display:flex!important;align-items:center!important;flex-wrap:nowrap!important;gap:8px!important;min-height:64px!important;padding:4px 2px 9px!important;overflow:hidden!important}
+body.cdt-fala-uai-page #open-group-profile{flex:0 0 42px!important;width:42px!important;min-width:42px!important;height:42px!important;min-height:42px!important;padding:0!important;margin:0!important}
+body.cdt-fala-uai-page #open-group-profile .chat-profile-chip-avatar{width:40px!important;height:40px!important;border-width:1px!important}
+body.cdt-fala-uai-page #open-group-profile .chat-profile-chip-avatar img{padding:3px!important}
+body.cdt-fala-uai-page #chat-online-profiles{display:flex!important;align-items:center!important;flex:1 1 auto!important;min-width:0!important;gap:9px!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none!important}
+body.cdt-fala-uai-page #chat-online-profiles .chat-online-profile{flex:0 0 48px!important;width:48px!important;gap:2px!important;padding:0!important}
+body.cdt-fala-uai-page #chat-online-profiles .chat-online-profile-avatar{width:36px!important;height:36px!important}
+body.cdt-fala-uai-page #chat-online-profiles .chat-online-profile-name{max-width:48px!important;font-size:9px!important}
+body.cdt-fala-uai-page #chat-online-profiles .chat-online-profile-status{font-size:9px!important}
+body.cdt-fala-uai-page #chat-online-profiles .chat-online-profile-dot{width:9px!important;height:9px!important;right:0!important;bottom:0!important}
