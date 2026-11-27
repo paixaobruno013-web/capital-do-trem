@@ -53,6 +53,10 @@ jobs:
         run: node scripts/check-latest-music-upload-migration.mjs
       - name: Verificar capa personalizável da área Músicas
         run: node scripts/check-music-cover.mjs
+      - name: Verificar compositor, galeria e editor do Feed
+        run: |
+          node --check home-feed.js
+          node scripts/check-feed-composer.mjs
       - name: Verificar capas pessoais de perfil, início e músicas
         run: node scripts/check-personal-area-covers.mjs
       - name: Verificar sintaxe do módulo Supabase
