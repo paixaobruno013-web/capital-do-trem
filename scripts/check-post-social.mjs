@@ -37,7 +37,7 @@ const checks = [
   ['API de leitura e contagem das interações', /export async function getPostSocial[\s\S]*?likeCount:likes\.count/.test(auth)],
   ['API de curtir e descurtir', /export async function togglePostLike[\s\S]*?post_likes/.test(auth)],
   ['API de comentários com limite de 1.000 caracteres', /export async function addPostComment[\s\S]*?clean\.length>1000/.test(auth)],
-  ['mural mostra botão de curtir e contagem', /module\.getPostSocial\(item\.id\)[\s\S]*?socialState\.liked[\s\S]*?socialState\.likeCount/.test(profile)],
+  ['mural mostra botão de curtir e contagem', /like\.textContent=.*socialState\.likeCount/.test(profile) && /module\.getPostSocial\(item\.id\)/.test(profile) && /like\.addEventListener\('click'/.test(profile)],
   ['mural mostra lista e formulário de comentários', /Comentários[\s\S]*?post-comment-form[\s\S]*?addPostComment\(item\.id/.test(profile)],
   ['compartilhamento privado continua disponível', /Koe Fala Tu[\s\S]*?share_text/.test(profile)],
   ['descoberta por localização removida e sem atalho na tela inicial', !/data-page="amigos"/.test(home) && !/id="fazer-amigos"|id="open-friends-profile"/.test(chat)],
