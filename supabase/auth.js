@@ -892,7 +892,7 @@ export async function saveMyBasicProfile(profile) {
   };
   const { data, error } = await supabase.from('profiles')
     .upsert(payload, { onConflict: 'user_id' })
-    .select('user_id, display_name, username, account_type, bio, city, is_public, avatar_type, avatar_url, avatar_path, avatar_data, cover_url, cover_path, home_cover_url, home_cover_path, music_cover_url, music_cover_path').single();
+    .select('user_id, display_name, username, account_type, bio, city, is_public, avatar_type, avatar_url, avatar_path, avatar_data, cover_url, cover_path').single();
   if (error) throw error;
   return data;
 }
