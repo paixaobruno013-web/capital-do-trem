@@ -11,7 +11,7 @@ const checks = [
   ['falhas limpam os arquivos já enviados', js.includes('remove(uploadedPaths)')],
   ['Feed mostra mídia em galeria horizontal', js.includes('home-feed-post-gallery') && html.includes('.home-feed-post-gallery{display:flex')],
   ['edição aplica brilho, contraste e cores a todas as fotos selecionadas', js.includes('const sources=selectedFiles.filter(file=>file.type.startsWith(\'image/\'))') && js.includes('editedImageFiles.push') && js.includes('ctx.filter=') && js.includes('canvas.toBlob')],
-  ['corte quadrado é aplicado a todas as fotos antes de publicar', js.includes('files=await Promise.all(files.map(async file=>') && js.includes('return cropImageToSquare(file)')],
+  ['corte quadrado é aplicado a todas as fotos antes de publicar', js.includes('files=await Promise.all(files.map(async file=>') && js.includes('return cropImageToSquare(file)') && js.includes('cropSelectedImage?await cropImageToSquare(sources[index]):sources[index]')],
   ['cache foi atualizado para a nova interface', Number(sw.match(/capital-do-trem-v(\d+)/)?.[1]||0)>=350]
 ];
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'FAIL') + ' ' + name);
