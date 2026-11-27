@@ -590,17 +590,29 @@ function mountStoryMusicPreview() {
   musicPreview.style.cssText = 'display:block;width:100%;margin-top:10px';
   musicPanel.append(musicPreview);
 }
+function normalizeStoryMusicSearch(value) {
+  return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR').trim();
+}
 function renderStorySongOptions() {
   if (!musicSelect) return;
-  const query = String(musicSearch?.value || '').trim().toLocaleLowerCase('pt-BR');
+  const query = normalizeStoryMusicSearch(musicSearch?.value);
   const selected = selectedStoryMusicId;
   const playlistId = playlistSelect?.value || '';
   const playlistIds = playlistId ? new Set((storyPlaylists.find(item => item.id === playlistId)?.songs || []).map(item => item.song_id)) : null;
-  const filtered = storySongs.filter(song => (!playlistIds || playlistIds.has(song.id)) && [song.title, song.artist_name].some(value => String(value || '').toLocaleLowerCase('pt-BR').includes(query)));
+  const eligible = storySongs.filter(song => !playlistIds || playlistIds.has(song.id));
+  const filtered = eligible.filter(song => [song.title, song.artist_name].some(value => normalizeStoryMusicSearch(value).includes(query)));
+  const selectedSong = eligible.find(song => song.id === selected);
   musicSelect.replaceChildren(new Option('Sem música', ''));
+  if (selectedSong && !filtered.some(song => song.id === selected)) {
+    musicSelect.add(new Option('Selecionada: ' + selectedSong.title + ' — ' + selectedSong.artist_name, selectedSong.id));
+  }
   for (const song of filtered) musicSelect.add(new Option(song.title + ' — ' + song.artist_name, song.id));
-  if (filtered.some(song => song.id === selected)) musicSelect.value = selected;
-  else { selectedStoryMusicId = ''; musicSelect.value = ''; if (musicPreview) { musicPreview.pause(); musicPreview.removeAttribute('src'); musicPreview.hidden = true; } }
+  if (selectedSong) musicSelect.value = selected;
+  else if (selected) {
+    selectedStoryMusicId = '';
+    musicSelect.value = '';
+    if (musicPreview) { musicPreview.pause(); musicPreview.removeAttribute('src'); musicPreview.hidden = true; }
+  }
   if (musicStatus && storySongsLoaded) musicStatus.textContent = filtered.length
     ? filtered.length + ' música(s) disponíveis nesta seleção. Escolha uma faixa para seu Story.'
     : 'Nenhuma música encontrada nesta seleção.';
