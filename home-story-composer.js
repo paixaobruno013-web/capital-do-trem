@@ -188,7 +188,9 @@ async function startCamera() {
 }
 function openComposer() {
   if (!modal || busy) return;
-  modal.classList.remove('has-selection');
+  modal.classList.remove('has-selection','tools-collapsed','effects-collapsed');
+  toolsToggle?.setAttribute('aria-expanded','true');
+  effectsToggle?.setAttribute('aria-expanded','true');
   modal.classList.add('is-open');
   modal.setAttribute('aria-hidden', 'false');
   window.CapitalVolumeBridge?.setStoryCameraOpen?.(true);
