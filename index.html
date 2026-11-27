@@ -1081,17 +1081,27 @@ body:not(.light) header::before,body.light header::before{background-image:linea
  <form id="home-feed-composer" class="home-feed-composer home-feed-composer-v2 home-feed-composer-collapsed">
 <div class="home-feed-composer-entry">
 <button id="home-feed-open" type="button" class="home-feed-open" aria-expanded="false" aria-controls="home-feed-composer-fields"><span class="home-feed-entry-avatar" aria-hidden="true">👤</span><span>No que você está pensando?</span></button>
-<div class="home-feed-quick-actions" aria-label="Atalhos para criar publicação">
-<button type="button" data-feed-quick-media="image">▧ Foto</button><button type="button" data-feed-quick-media="video">▹ Vídeo</button>
-</div>
+
 </div>
 <div id="home-feed-composer-fields" hidden>
 <div class="home-feed-expanded-head"><strong>Criar publicação</strong><button id="home-feed-collapse" type="button" class="home-feed-collapse">Fechar ×</button></div>
 <label class="sr-only" for="home-feed-text">No que você está pensando?</label>
 <textarea id="home-feed-text" maxlength="1500" rows="3" placeholder="No que você está pensando?"></textarea>
-<div class="home-feed-editor-tools"><button id="home-feed-crop-toggle" type="button" class="home-feed-tool-button" aria-pressed="false" disabled>✂ Editar / cortar imagem</button><button id="home-feed-music-toggle" type="button" class="home-feed-tool-button">♫ Adicionar música</button></div>
-<label class="home-feed-gallery-picker" for="home-feed-media" aria-label="Adicionar fotos ou vídeos da galeria"><span>＋</span><strong>Adicionar foto ou vídeo</strong><small>Escolher na galeria ou nos arquivos do aparelho</small></label>
-<input id="home-feed-media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" hidden>
+<div class="home-feed-editor-tools" aria-label="Ferramentas da publicação">
+<button id="home-feed-music-toggle" type="button" class="home-feed-tool-button">♫ Música</button>
+<button id="home-feed-edit-toggle" type="button" class="home-feed-tool-button" disabled>✦ Editar</button>
+<button id="home-feed-crop-toggle" type="button" class="home-feed-tool-button" aria-pressed="false" disabled>✂ Cortar</button>
+</div>
+<label class="home-feed-gallery-picker" for="home-feed-media" aria-label="Adicionar até dez fotos ou um vídeo da galeria"><span>＋</span><strong>Adicionar mídia</strong><small>Escolha até 10 fotos para montar sua galeria</small></label>
+<input id="home-feed-media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" multiple hidden>
+<section id="home-feed-edit-panel" class="home-feed-music-panel" hidden aria-label="Melhorar qualidade da foto">
+<strong>Melhorar imagem</strong>
+<label for="home-feed-brightness">Brilho</label><input id="home-feed-brightness" type="range" min="50" max="150" value="100">
+<label for="home-feed-contrast">Contraste</label><input id="home-feed-contrast" type="range" min="50" max="150" value="100">
+<label for="home-feed-saturation">Cores</label><input id="home-feed-saturation" type="range" min="0" max="200" value="100">
+<button id="home-feed-edit-apply" type="button" class="home-feed-tool-button">Aplicar ajustes</button>
+<p class="muted">Os ajustes melhoram a aparência; não recuperam detalhes que não existem no arquivo original.</p>
+</section>
 <span id="home-feed-media-name" class="home-feed-media-name muted" hidden>Nenhuma mídia selecionada</span>
 <section id="home-feed-music-panel" class="home-feed-music-panel" hidden aria-label="Trilha musical da publicação"><label for="home-feed-playlist-select">Origem da música</label><select id="home-feed-playlist-select"><option value="">Catálogo completo</option></select><label for="home-feed-music-select">Escolha uma música do catálogo ou da playlist</label><select id="home-feed-music-select"><option value="">Sem música</option></select><div class="home-feed-music-clip"><label for="home-feed-music-start">Começar em (segundos)</label><input id="home-feed-music-start" type="number" min="0" max="3600" step="1" value="0"><label for="home-feed-music-duration">Duração do trecho</label><select id="home-feed-music-duration"><option value="15">15 segundos</option><option value="30">30 segundos</option><option value="45">45 segundos</option><option value="60">60 segundos</option></select></div><audio id="home-feed-music-preview" controls preload="none" hidden></audio><p id="home-feed-music-status" class="muted" role="status">Escolha uma música publicada para acompanhar sua foto.</p></section>
 <section id="home-feed-preview" class="home-feed-preview" hidden><div class="home-feed-preview-top"><strong>PRÉVIA da mídia</strong><button id="home-feed-clear-media" type="button" class="home-feed-clear-media">Remover ×</button></div><div id="home-feed-preview-stage" class="home-feed-preview-stage"></div><small class="muted">Fotos: ajuste quadrado. Vídeos: confira a prévia antes de publicar.</small></section>
