@@ -8,6 +8,7 @@ const [update, html, player] = await Promise.all([
 ]);
 
 assert.match(update, /connectionDebounceTimer=window\.setTimeout\([\s\S]*?\},13000\)/, 'alerta offline deve aguardar 13 segundos contínuos');
+assert.match(update, /const delay=\(connectionDebounceTimer\|\|confirmedOffline\)\?1000:\(lowPowerMode\(\)\?10000:5000\)/, 'monitoramento ativo deve verificar a cada 5 segundos e a cada segundo durante queda/recuperação');
 assert.match(update, /function showOnline\(\)[\s\S]*?displayOnline\(\);/, 'alerta online deve disparar imediatamente ao detectar o retorno');
 assert.match(update, /if\(confirmedOffline\|\|connectionDebounceTimer\)return/, 'eventos offline repetidos devem ser deduplicados');
 assert.match(update, /clearTimeout\(connectionDebounceTimer\)/, 'a recuperação rápida deve cancelar o alerta offline pendente');
