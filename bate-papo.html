@@ -522,7 +522,13 @@ function appendViewOnceAttachment(container,message){
  container.append(button);
 }
 function addMessage(m){
+let groupHornContext=null,groupSoundReady=false;
+function unlockGroupHorn(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;if(!groupHornContext)groupHornContext=new C();if(groupHornContext.state==='suspended')groupHornContext.resume().catch(()=>{});}catch{}}
+window.addEventListener('pointerdown',unlockGroupHorn,{once:true,passive:true});
+function playGroupTrainHorn(){try{const c=groupHornContext;if(!c||c.state!=='running')return;const t=c.currentTime,g=c.createGain();g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.34,t+.06);g.gain.setValueAtTime(.34,t+1.02);g.gain.linearRampToValueAtTime(.0001,t+1.38);g.connect(c.destination);[196,246.94,293.66].forEach((f,i)=>{const o=c.createOscillator(),v=c.createGain();o.type='sawtooth';o.frequency.setValueAtTime(f,t);o.detune.value=i*4;v.gain.value=.18;o.connect(v);v.connect(g);o.start(t);o.stop(t+1.4);});}catch{}}
+
  if(!m||!m.id||seen.has(m.id))return;
+  if(groupSoundReady&&m.author_id!==currentUserId)playGroupTrainHorn();
  const wasNearBottom=list.scrollHeight-list.scrollTop-list.clientHeight<90;
  seen.add(m.id);
  const box=document.createElement('article');box.className='message';if(m.author_id===currentUserId)box.classList.add('message-own');box.dataset.createdAt=m.created_at||'';box.dataset.messageId=m.id;
@@ -594,8 +600,8 @@ async function startGroupChat(){
   if(!historyReady)pendingRealtime.push(message);
   else addMessage(message);
  },connectionStatus=>{if(connectionStatus==='SUBSCRIBED')connection.textContent='Conectado: novas mensagens aparecem automaticamente.';else if(connectionStatus==='CHANNEL_ERROR'||connectionStatus==='TIMED_OUT')connection.textContent='Conexão instável. O chat está tentando se reconectar.';else if(connectionStatus==='CLOSED')connection.textContent='Conexão encerrada. Entre novamente no grupo para reconectar.';else connection.textContent='Conectando à sala em tempo real…';});
- const messages=await getChatMessages(80);list.replaceChildren();seen.clear();messages.forEach(addMessage);
- historyReady=true;
+ const messages=await getChatMessages(80);groupSoundReady=false;list.replaceChildren();seen.clear();messages.forEach(addMessage);
+ historyReady=true;groupSoundReady=true;
  pendingRealtime.sort((a,b)=>new Date(a.created_at||0)-new Date(b.created_at||0)).forEach(addMessage);
  if(savedChatState)requestAnimationFrame(()=>{list.scrollTop=Number(savedChatState.listScroll)||list.scrollHeight;window.scrollTo(0,Number(savedChatState.pageScroll)||0);});
 }
