@@ -17,7 +17,7 @@ musicSelect?.addEventListener('change',()=>{selectedFeedSongId=musicSelect.value
 const previewUrls=[];
 function clearSelectedMedia(){previewUrls.forEach(url=>URL.revokeObjectURL(url));previewUrls.length=0;selectedFiles=[];editedImageFile=null;if(fileInput)fileInput.value='';if(fileName){fileName.textContent='Nenhuma mídia selecionada';fileName.hidden=true;}if(previewStage)previewStage.replaceChildren();if(preview)preview.hidden=true;cropSelectedImage=false;if(cropToggle){cropToggle.setAttribute('aria-pressed','false');cropToggle.disabled=true;}if(editToggle)editToggle.disabled=true;if(editPanel)editPanel.hidden=true;if(storyPublishButton)storyPublishButton.disabled=true;}
 function renderSelectedMedia(files){
- clearSelectedMedia();const chosen=Array.from(files||[]);if(!chosen.length)return;
+ const chosen=Array.from(files||[]);clearSelectedMedia();if(!chosen.length)return;
  const hasVideo=chosen.some(file=>file.type.startsWith('video/'));
  if(hasVideo&&chosen.length>1){status.textContent='Escolha um vídeo por publicação ou até 10 fotos.';if(fileInput)fileInput.value='';return;}
  if(chosen.length>10){status.textContent='O limite é de 10 fotos por publicação.';if(fileInput)fileInput.value='';return;}
