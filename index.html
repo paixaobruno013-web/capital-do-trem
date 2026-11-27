@@ -1820,54 +1820,6 @@ updateConnectionStatus();
   }
  }catch(error){const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar a vitrine de artistas agora. Tente novamente em instantes.';container.replaceChildren(message);}
 })();
-// Mural público: somente divulgações aprovadas pela equipe.
-(async()=>{
- const container=document.getElementById('public-posts');
- try{
-  const module=await import('./supabase/auth.js');
-  module.initSupabase();
-  const items=await module.getPublishedPosts();
-  const supabase=module.initSupabase();
-  const mediaQuery=items.length?await supabase.from('post_media').select('post_id,storage_path,media_type').in('post_id',items.map(item=>item.id)).order('sort_order'):{data:[],error:null};
-  if(mediaQuery.error)throw mediaQuery.error;
-  const mediaByPost=new Map();
-  for(const media of mediaQuery.data||[]){const rows=mediaByPost.get(media.post_id)||[];const url=supabase.storage.from('capital-do-trem-media').getPublicUrl(media.storage_path).data.publicUrl;rows.push({...media,url});mediaByPost.set(media.post_id,rows);}
-  container.replaceChildren();
-  if(!items.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Ainda não há publicações recentes. Seja o primeiro a compartilhar!';container.append(empty);return;}
-  const session=await module.getCurrentSession();
-  const savedLogin=document.getElementById('saved-publications-login'),savedList=document.getElementById('saved-publications-list'),savedStatus=document.getElementById('saved-publications-status');
-  let savedIds=new Set();
-  if(session){savedLogin.hidden=true;savedList.hidden=false;try{savedIds=new Set((await module.getMySavedPosts()).map(post=>post.id));}catch(error){savedStatus.textContent='Não foi possível carregar sua coleção agora.';}}
-  const renderSaved=async()=>{if(!session)return;try{const saved=await module.getMySavedPosts();savedIds=new Set(saved.map(post=>post.id));savedList.replaceChildren();if(!saved.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Você ainda não salvou publicações. Use “Salvar” no mural.';savedList.append(empty);return;}for(const post of saved){const row=document.createElement('article');row.className='item';const title=document.createElement('strong');title.textContent='Divulgação da comunidade';const body=document.createElement('p');body.textContent=post.content;const date=document.createElement('small');date.className='muted';date.textContent=new Date(post.created_at).toLocaleDateString('pt-BR');row.append(title,body,date);savedList.append(row);}}catch(error){savedStatus.textContent='Falha ao atualizar sua coleção.';}};
-  for(const item of items){
-   const card=document.createElement('article');card.className='item';
-   const heading=document.createElement('h3');heading.textContent='Divulgação da comunidade';
-   const body=document.createElement('p');body.textContent=item.content;
-   const date=document.createElement('small');date.className='muted';date.textContent=new Date(item.created_at).toLocaleDateString('pt-BR');
-   card.append(heading,body,date);
-   for(const media of mediaByPost.get(item.id)||[]){const visual=document.createElement(media.media_type==='video'?'video':'img');visual.src=media.url;visual.style.cssText='display:block;width:100%;max-height:520px;object-fit:contain;border-radius:10px;background:#050505;margin:10px 0';if(media.media_type==='video'){visual.controls=true;visual.playsInline=true;}else visual.alt='Foto publicada pela comunidade';card.append(visual);}
-   const actions=document.createElement('div');actions.className='post-actions';
-   const share=document.createElement('button');share.type='button';share.className='btn alt';share.textContent='↗ Compartilhar';share.addEventListener('click',async()=>{const data={title:'Capital do Trem • Comunidade',text:item.content,url:location.href};try{if(navigator.share)await navigator.share(data);else{await navigator.clipboard.writeText(data.text+' '+data.url);share.textContent='✓ Copiado';}}catch(error){if(error.name!=='AbortError')share.textContent='Não foi possível compartilhar';}});
-   actions.append(share);
-   const like=document.createElement('button');like.type='button';like.className='btn alt';like.textContent='❤️ Curtir';actions.append(like);
-   const social=document.createElement('div');social.className='post-social';social.style.cssText='width:100%;margin-top:10px';
-   const commentsTitle=document.createElement('strong');commentsTitle.textContent='Comentários';social.append(commentsTitle);
-   const commentList=document.createElement('div');commentList.className='list';commentList.style.margin='8px 0';social.append(commentList);
-   const commentStatus=document.createElement('small');commentStatus.className='muted';commentStatus.setAttribute('role','status');social.append(commentStatus);
-   let socialState={likeCount:0,liked:false,comments:[]};
-   const paintSocial=()=>{like.textContent=(socialState.liked?'❤️ Curtido':'❤️ Curtir')+' · '+socialState.likeCount;commentList.replaceChildren();if(!socialState.comments.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Seja o primeiro a comentar.';commentList.append(empty);}for(const comment of socialState.comments){const row=document.createElement('div');row.className='item';const who=document.createElement('strong');who.textContent=comment.author_name||'Usuário Uai';const message=document.createElement('p');message.textContent=comment.content;const when=document.createElement('small');when.className='muted';when.textContent=new Date(comment.created_at).toLocaleString('pt-BR');row.append(who,message,when);commentList.append(row);}};
-   module.getPostSocial(item.id).then(state=>{socialState=state;paintSocial();}).catch(()=>{commentStatus.textContent='Interações temporariamente indisponíveis.';});
-   like.addEventListener('click',async()=>{if(!session){commentStatus.textContent='Entre na sua conta para curtir.';return;}like.disabled=true;try{socialState.liked=await module.togglePostLike(item.id);const fresh=await module.getPostSocial(item.id);socialState=fresh;paintSocial();}catch(error){commentStatus.textContent=error.message||'Não foi possível registrar a curtida.';}finally{like.disabled=false;}});
-   if(session){const form=document.createElement('form');form.className='post-comment-form';form.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-top:8px';const field=document.createElement('input');field.type='text';field.maxLength=1000;field.required=true;field.placeholder='Escreva um comentário...';field.setAttribute('aria-label','Escreva um comentário');field.style.flex='1 1 180px';const send=document.createElement('button');send.type='submit';send.className='btn alt';send.textContent='Comentar';form.append(field,send);form.addEventListener('submit',async event=>{event.preventDefault();send.disabled=true;try{await module.addPostComment(item.id,field.value);field.value='';socialState=await module.getPostSocial(item.id);paintSocial();commentStatus.textContent='Comentário publicado.';}catch(error){commentStatus.textContent=error.message||'Não foi possível comentar.';}finally{send.disabled=false;}});social.append(form);}
-   card.append(social);
-   const sendPrivate=document.createElement('a');sendPrivate.className='btn alt';sendPrivate.textContent='💬 Koe Fala Tu';sendPrivate.href='./mensagens.html?share_text='+encodeURIComponent(('Divulgação da comunidade\\n'+item.content).slice(0,1400));actions.append(sendPrivate);
-   if(session){const save=document.createElement('button');save.type='button';save.className='btn alt';const label=()=>{save.textContent=savedIds.has(item.id)?'🔖 Salvo':'＋ Salvar';};label();save.addEventListener('click',async()=>{save.disabled=true;try{const isSaved=await module.toggleSavedPost(item.id);if(isSaved)savedIds.add(item.id);else savedIds.delete(item.id);label();savedStatus.textContent=isSaved?'Adicionado à sua coleção.':'Removido dos itens salvos.';await renderSaved();}catch(error){savedStatus.textContent=error.message||'Não foi possível salvar.';}finally{save.disabled=false;}});actions.append(save);}
-   card.append(actions);container.append(card);
-  }
-  if(session)await renderSaved(); }catch(error){
-  const message=document.createElement('p');message.className='muted';message.textContent='Não foi possível carregar o mural compartilhado agora. Tente novamente em instantes.';container.replaceChildren(message);
- }
-})();
 function renderHomeEventFeed(events){
  const feed=document.getElementById('home-event-feed');
  const list=document.getElementById('home-event-feed-list');
