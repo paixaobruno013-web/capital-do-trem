@@ -91,6 +91,8 @@ function clearPreview() {
 }
 function setSelected(file) {
   selectedFile = file || null;
+  // Ao escolher uma mídia, desligar câmera e trilhas imediatamente para poupar bateria.
+  if (selectedFile) releaseCameraResources();
   modal?.classList.toggle('has-selection', Boolean(file));
   const aiResult = el('home-story-ai-result'); if (aiResult) aiResult.textContent = 'A análise só acontece quando você tocar no botão. A foto será enviada ao serviço de IA para processamento e não será salva pelo app.';
   const aiUse = el('home-story-ai-use'); if (aiUse) aiUse.hidden = true;
