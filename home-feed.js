@@ -54,11 +54,11 @@ if(root&&form){
   return '';
  }
  function initials(name){return Array.from(safe(name).trim()||'U').slice(0,2).join('').toUpperCase()}
- const feedAutoplayAllowed=()=>document.visibilityState==='visible'&&!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches&&!navigator.connection?.saveData;
+ const feedAutoplayAllowed=()=>false; // Vídeos só carregam quando o usuário toca em reproduzir, evitando consumo automático de dados.
  const pauseFeedVideos=()=>document.querySelectorAll('.home-feed-media[data-feed-autoplay]').forEach(video=>video.pause());
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState!=='visible')pauseFeedVideos();});
  window.addEventListener('pagehide',pauseFeedVideos);
- const feedVideoObserver=typeof IntersectionObserver==='function'?new IntersectionObserver(entries=>{for(const entry of entries){const video=entry.target;if(entry.isIntersecting&&entry.intersectionRatio>=0.6&&feedAutoplayAllowed()){const others=[...document.querySelectorAll('.home-feed-media[data-feed-autoplay]')].filter(item=>item!==video);for(const other of others)other.pause();video.preload='metadata';video.play().catch(()=>{video.dataset.autoplayBlocked='true'});}else{video.pause();}}},{threshold:[0,0.6,1]}):null;
+ const feedVideoObserver=typeof IntersectionObserver==='function'?new IntersectionObserver(entries=>{for(const entry of entries){const video=entry.target;if(entry.isIntersecting&&entry.intersectionRatio>=0.6&&feedAutoplayAllowed()){const others=[...document.querySelectorAll('.home-feed-media[data-feed-autoplay]')].filter(item=>item!==video);for(const other of others)other.pause();video.pause();}else{video.pause();}}},{threshold:[0,0.6,1]}):null;
  function observeFeedVideo(video){video.muted=true;video.playsInline=true;video.preload='none';video.controls=true;video.dataset.feedAutoplay='true';if(feedVideoObserver)feedVideoObserver.observe(video);}
  async function signedMedia(rows){
   const map=new Map(),groups=new Map();
@@ -190,7 +190,7 @@ if(searchRoot){
     const q=(search?.value||'').toLocaleLowerCase('pt-BR');
     const filtered=items.filter(item=>{const author=people.get(item.post?.author_id)||{};return [item.post?.content,author.display_name,author.username].some(v=>String(v??'').toLocaleLowerCase('pt-BR').includes(q))});
     filtered.sort(()=>Math.random()-.5);searchRoot.replaceChildren();
-    for(const item of filtered.slice(0,24)){const card=document.createElement('article');card.className='home-video-card';const video=document.createElement('video');video.src=item.url;video.controls=true;video.playsInline=true;video.preload='metadata';const caption=document.createElement('p');caption.textContent=item.post?.content||'Vídeo da comunidade';const author=document.createElement('small');const p=people.get(item.post?.author_id);author.textContent=p?.display_name||'Maquinista';card.append(video,caption,author);searchRoot.append(card)}
+    for(const item of filtered.slice(0,24)){const card=document.createElement('article');card.className='home-video-card';const video=document.createElement('video');video.src=item.url;video.controls=true;video.playsInline=true;video.preload='none';const caption=document.createElement('p');caption.textContent=item.post?.content||'Vídeo da comunidade';const author=document.createElement('small');const p=people.get(item.post?.author_id);author.textContent=p?.display_name||'Maquinista';card.append(video,caption,author);searchRoot.append(card)}
     if(!filtered.length)searchRoot.textContent='Nenhum vídeo encontrado com essa busca.';
    };
    search?.addEventListener('input',render);render();
