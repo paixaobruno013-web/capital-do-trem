@@ -528,6 +528,7 @@ async function publishToFeed() {
     const transfer = new DataTransfer();
     transfer.items.add(file);
     input.files = transfer.files;
+    form.dataset.storyMusicSongId = selectedStoryMusicId || '';
     const currentCaption = el('home-story-caption')?.value.trim() || '';
     caption.value = currentCaption || '📸 Publicação compartilhada pelo Estúdio de Câmera';
     caption.dispatchEvent(new Event('input', { bubbles: true }));
@@ -575,8 +576,10 @@ const musicToggle = el('home-story-music-toggle');
 const musicPanel = el('home-story-music-panel');
 const musicSelect = el('home-story-music-select');
 const musicSearch = el('home-story-music-search');
+const playlistSelect = el('home-story-playlist-select');
 const musicStatus = el('home-story-music-status');
 let musicPreview = null;
+let storyPlaylists = [];
 function mountStoryMusicPreview() {
   if (!musicPanel || musicPreview) return;
   musicPreview = document.createElement('audio');
@@ -591,25 +594,29 @@ function renderStorySongOptions() {
   if (!musicSelect) return;
   const query = String(musicSearch?.value || '').trim().toLocaleLowerCase('pt-BR');
   const selected = selectedStoryMusicId;
-  const filtered = storySongs.filter(song =>
-    [song.title, song.artist_name].some(value => String(value || '').toLocaleLowerCase('pt-BR').includes(query))
-  );
+  const playlistId = playlistSelect?.value || '';
+  const playlistIds = playlistId ? new Set((storyPlaylists.find(item => item.id === playlistId)?.songs || []).map(item => item.song_id)) : null;
+  const filtered = storySongs.filter(song => (!playlistIds || playlistIds.has(song.id)) && [song.title, song.artist_name].some(value => String(value || '').toLocaleLowerCase('pt-BR').includes(query)));
   musicSelect.replaceChildren(new Option('Sem música', ''));
   for (const song of filtered) musicSelect.add(new Option(song.title + ' — ' + song.artist_name, song.id));
   if (filtered.some(song => song.id === selected)) musicSelect.value = selected;
   if (musicStatus && storySongsLoaded) musicStatus.textContent = filtered.length
-    ? filtered.length + ' música(s) do catálogo. Escolha uma faixa para seu Story.'
-    : 'Nenhuma música encontrada com esse nome.';
+    ? filtered.length + ' música(s) disponíveis nesta seleção. Escolha uma faixa para seu Story.'
+    : 'Nenhuma música encontrada nesta seleção.';
 }
 musicSearch?.addEventListener('input', renderStorySongOptions);
+playlistSelect?.addEventListener('change', renderStorySongOptions);
 musicToggle?.addEventListener('click', async () => {
   musicPanel.hidden = !musicPanel.hidden;
   if (musicPanel.hidden || storySongsLoaded) return;
   musicToggle.disabled = true;
   if (musicStatus) musicStatus.textContent = 'Carregando músicas publicadas…';
   try {
-    const songs = await auth.getPublishedSongs();
+    const [songs, playlists] = await Promise.all([auth.getPublishedSongs(), auth.getMyPlaylists().catch(error => { console.warn('Playlists indisponíveis; mantendo o catálogo.', error); return []; })]);
     storySongs = songs;
+    storyPlaylists = playlists;
+    playlistSelect?.replaceChildren(new Option('Catálogo completo', ''));
+    for (const playlist of storyPlaylists) playlistSelect?.add(new Option('Playlist: ' + playlist.name, playlist.id));
     storySongsLoaded = true;
     renderStorySongOptions();
     musicSearch?.focus();
