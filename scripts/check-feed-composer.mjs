@@ -10,8 +10,8 @@ const checks = [
   ['fotos são enviadas em sequência e vinculadas em ordem', js.includes('for(let index=0;index<files.length;index++)') && js.includes('sort_order:index') && js.includes('insert(mediaRows)')],
   ['falhas limpam os arquivos já enviados', js.includes('remove(uploadedPaths)')],
   ['Feed mostra mídia em galeria horizontal', js.includes('home-feed-post-gallery') && html.includes('.home-feed-post-gallery{display:flex')],
-  ['edição de foto exporta uma nova imagem', js.includes('ctx.filter=') && js.includes('canvas.toBlob')],
-  ['corte de foto é aplicado no arquivo antes de publicar', js.includes('cropImageToSquare(files[0])')],
+  ['edição aplica brilho, contraste e cores a todas as fotos selecionadas', js.includes('const sources=selectedFiles.filter(file=>file.type.startsWith(\'image/\'))') && js.includes('editedImageFiles.push') && js.includes('ctx.filter=') && js.includes('canvas.toBlob')],
+  ['corte quadrado é aplicado a todas as fotos antes de publicar', js.includes('files=await Promise.all(files.map(async file=>') && js.includes('return cropImageToSquare(file)')],
   ['cache foi atualizado para a nova interface', Number(sw.match(/capital-do-trem-v(\d+)/)?.[1]||0)>=350]
 ];
 for (const [name, ok] of checks) console.log((ok ? 'OK  ' : 'FAIL') + ' ' + name);
