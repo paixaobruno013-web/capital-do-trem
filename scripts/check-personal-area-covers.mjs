@@ -10,7 +10,7 @@ const [index, profileHtml, profileJs, auth, migration, accessMigration, sw, prep
 const checks = [
   ['tela inicial mantém a capa original instalada por padrão', index.includes("var(--cdt-personal-home-cover,url('./assets/favela-header.webp'))")],
   ['tela inicial oferece menu de três pontos e seletor de imagem', index.includes('id="home-area-cover-menu"') && index.includes('id="home-area-cover-file"')],
-  ['área Músicas mantém a arte original como padrão', index.includes('id="music-section-banner-image" src="./assets/banner-speakers.webp?v=373"')],
+  ['área Músicas mantém a arte original como padrão', index.includes('id="music-section-banner-image" src="./assets/banner-speakers.webp?v=374"')],
   ['área Músicas oferece menu de três pontos e seletor independente', index.includes('id="music-area-cover-menu"') && index.includes('id="music-area-cover-file"')],
   ['cada capa pode ser restaurada independentemente', index.includes('home-area-cover-reset') && index.includes('music-area-cover-reset')],
   ['preferências pessoais continuam na conta e Músicas usa sempre a arte original', index.includes('getMyAreaCovers()') && index.includes('saveMyAreaCover(kind,file)') && index.includes('resetMyAreaCover(\'home\')') && index.includes("musicImage.src=DEFAULT_MUSIC_COVER") && !index.includes("apply('music',covers.music_cover_url)") && !index.includes("connect(musicInput,'music',musicStatus,musicMenu)")],
