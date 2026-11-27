@@ -62,3 +62,47 @@ body *{min-width:0}
 .profile-dream-line{display:block;max-width:100%;text-align:center;white-space:normal;overflow-wrap:anywhere;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-weight:800;line-height:1.4}
 .profile-dream-line:first-child{font-size:clamp(11px,3vw,14px)}
 .profile-dream-line:last-child{font-size:clamp(11px,2.9vw,13px)}
+
+
+/* Correções de enquadramento solicitadas: campo de publicação e capa musical. */
+#home-feed-open{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  text-align:left!important;
+}
+#home-feed-open .home-feed-entry-avatar{
+  align-self:center!important;
+  flex:0 0 34px!important;
+}
+#home-feed-open>span:last-child{
+  display:flex!important;
+  flex:1 1 auto!important;
+  min-width:0!important;
+  align-items:center!important;
+  align-self:stretch!important;
+  line-height:1.25!important;
+  text-align:left!important;
+}
+#musicas .music-section-banner{
+  position:relative!important;
+  display:block!important;
+  width:100%!important;
+  aspect-ratio:16 / 9!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow:hidden!important;
+  border-radius:16px!important;
+  background:#050505!important;
+}
+#musicas .music-section-banner>img#music-section-banner-image{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  max-height:none!important;
+  aspect-ratio:auto!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  background:#050505!important;
+}
