@@ -691,9 +691,18 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
 .home-community-feed .home-feed-composer-collapsed .home-feed-composer-entry{padding:12px;border:1px solid rgba(255,255,255,.12);border-radius:16px;background:rgba(16,16,18,.94);box-shadow:0 5px 18px rgba(0,0,0,.22)}
 .home-community-feed .home-feed-composer-collapsed .home-feed-open{display:flex;width:100%;height:46px;min-height:46px;margin:0;align-items:center;justify-content:flex-start;gap:11px;padding:0 10px;border:1px solid rgba(255,255,255,.13);border-radius:24px;background:#242428;color:#ddd;font-size:14px;font-weight:500;box-shadow:none}
 .home-feed-entry-avatar{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border-radius:50%;background:linear-gradient(145deg,#ed1c24,#790b12);font-size:18px}
-.home-feed-quick-actions{display:flex;gap:8px;margin-top:10px}
-.home-feed-quick-actions button{flex:1;min-height:38px;border:0;border-radius:10px;background:rgba(237,28,36,.10);color:#fff;font-weight:700}
-.home-feed-quick-actions button:active{background:rgba(237,28,36,.24)}
+.home-feed-editor-tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0}
+.home-feed-editor-tools .home-feed-tool-button{min-width:0;min-height:42px;padding:8px 5px;border:1px solid rgba(237,28,36,.55);border-radius:11px;background:#151515;color:#fff;font-weight:800}
+.home-feed-editor-tools .home-feed-tool-button:disabled{opacity:.45}
+.home-feed-gallery-picker{display:flex;min-height:118px;flex-direction:column;align-items:center;justify-content:center;gap:5px;margin:10px 0;padding:12px;border:1px dashed #ed1c24;border-radius:15px;background:rgba(237,28,36,.08);text-align:center;cursor:pointer}
+.home-feed-gallery-picker>span{display:grid;place-items:center;width:54px;height:54px;border-radius:12px;background:#ed1c24;color:white;font-size:36px;font-weight:400;line-height:1}
+.home-feed-gallery-picker strong{font-size:14px}.home-feed-gallery-picker small{color:#aaa;font-size:12px}
+.home-feed-preview-gallery{display:flex;gap:9px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;padding-bottom:7px}
+.home-feed-preview-gallery .home-feed-preview-media{flex:0 0 82%;max-width:82%;scroll-snap-align:center}
+.home-feed-post-gallery{display:flex;gap:0;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:thin;scrollbar-color:#ed1c24 #181818}
+.home-feed-post-slide{flex:0 0 100%;min-width:0;scroll-snap-align:center}
+.home-feed-post-slide .home-feed-media{display:block;width:100%;max-height:70vh;object-fit:contain;background:#080808}
+.home-feed-post-gallery::-webkit-scrollbar{height:4px}.home-feed-post-gallery::-webkit-scrollbar-thumb{background:#ed1c24;border-radius:8px}
 .home-community-feed .home-feed-list,.home-community-feed #home-feed-list{display:grid;gap:12px}
 
 /* Instagram: identidade visual em degradê rosa e roxo */
