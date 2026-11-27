@@ -1232,6 +1232,7 @@ if(smokeIntro){
 // O navegador exige uma interação do usuário antes de liberar áudio.
 const introToggle=document.getElementById('intro-sound-toggle');
 const introStatus=document.getElementById('intro-sound-status');
+if(introToggle&&introStatus){
 const INTRO_SOUND_KEY='capitaldotrem_intro_sound_v1';
 let introEnabled=true;try{introEnabled=localStorage.getItem(INTRO_SOUND_KEY)!=='off';}catch{}
 let introPlayed=false;
@@ -1355,6 +1356,7 @@ function unlockIntroFromGesture(event){
 document.addEventListener('pointerdown',unlockIntroFromGesture,{capture:true,passive:true});
 document.addEventListener('keydown',unlockIntroFromGesture,{capture:true});
 updateIntroControl();
+}
 
 const pages=[...document.querySelectorAll('.page')],tabs=[...document.querySelectorAll('[data-page]')];
 const pageScrollPositions=new Map();
