@@ -517,8 +517,14 @@ async function publishToFeed() {
     if (!input || !form || !caption || typeof DataTransfer !== 'function') {
       throw new Error('Não foi possível preparar a publicação no Feed neste aparelho.');
     }
-    say('Preparando sua mídia para o Feed…');
+    say('Publicando no Story e preparando o Feed…');
     const file = await preparePhotoForExport(selectedFile);
+    const storySaved = await auth.createMyStory({
+      file,
+      caption: [el('home-story-caption').value.trim().slice(0,65), [...(el('home-story-friends')?.selectedOptions || [])].map(option => option.dataset.tag || option.textContent).filter(Boolean).length ? 'Marcando: '+[...(el('home-story-friends')?.selectedOptions || [])].map(option => option.dataset.tag || option.textContent).filter(Boolean).join(', ').slice(0,50) : '', el('home-story-link')?.value.trim() ? 'Divulgação: '+el('home-story-link').value.trim().slice(0,110) : ''].filter(Boolean).join(' | ').slice(0,280),
+      musicSongId: selectedStoryMusicId
+    });
+    document.dispatchEvent(new CustomEvent('capital:stories-updated', { detail: { id: storySaved.id } }));
     const transfer = new DataTransfer();
     transfer.items.add(file);
     input.files = transfer.files;
@@ -530,7 +536,7 @@ async function publishToFeed() {
     form.scrollIntoView({ behavior: 'smooth', block: 'center' });
     form.requestSubmit();
   } catch (error) {
-    say(error?.message || 'Não foi possível preparar a publicação no Feed.');
+    say(error?.message || 'Não foi possível publicar no Story + Feed.');
   } finally {
     busy = false;
     if (feedButton) feedButton.disabled = false;
