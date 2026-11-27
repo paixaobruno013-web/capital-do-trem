@@ -58,6 +58,11 @@ assert.ok(css.includes('overflow-x:clip') && css.includes('.home-feed-post-galle
   'As telas devem permanecer fixas na largura do aparelho, liberando deslize apenas nas galerias de publicações');
 assert.ok(chat.includes('accept="image/*,video/*,audio/*"') && !chat.includes('application/pdf,text/plain,text/csv'),
   'O chat deve manter fotos, vídeos e áudio sem oferecer envio de documentos');
+assert.ok(chatStyles.includes('#capital-do-trem-room:not([hidden])') &&
+  chatStyles.includes('height:100dvh!important') &&
+  chatStyles.includes('#messages') && chatStyles.includes('flex:1 1 0!important') &&
+  chatStyles.includes('#composer') && chatStyles.includes('overflow-y:auto!important'),
+  'A conversa do FALA UAI precisa ocupar a tela, rolar mensagens e manter o campo de envio acessível');
 assert.ok(chatStyles.includes('.fala-profile-menu-button') && chatStyles.includes('display:none!important'),
   'Os três pontinhos do chat devem permanecer removidos; configurações ficam na engrenagem');
 assert.ok(chat.includes('href="./chat-modern.css?v=1"') &&
