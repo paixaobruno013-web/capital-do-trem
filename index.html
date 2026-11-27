@@ -1371,7 +1371,7 @@ function go(id){
  if(current){
   pageScrollPositions.set(current.id,window.scrollY||window.pageYOffset||0);
   // Evita áudio/vídeo continuando em segundo plano depois de sair da área.
-  current.querySelectorAll('audio,video').forEach(media=>{try{media.pause();}catch{}});
+  current.querySelectorAll('audio,video').forEach(media=>{if(media.closest('#capital-music-player'))return;try{media.pause();}catch{}});
  }
  activePageId=target.id;
  pages.forEach(page=>page.classList.toggle('active',page===target));
