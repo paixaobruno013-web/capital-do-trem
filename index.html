@@ -2853,9 +2853,10 @@ window.addEventListener('capital-do-trem:song-published',refreshMyUploads);
   if(!session){if(homeMenu)homeMenu.hidden=true;if(musicMenu)musicMenu.hidden=true;return;}
   if(homeMenu)homeMenu.hidden=false;
   if(musicMenu)musicMenu.hidden=false;
-  const profile=await api.getMyBasicProfile();
-  apply('home',profile.home_cover_url);
-  apply('music',profile.music_cover_url);
+  await api.getMyBasicProfile();
+  const covers=await api.getMyAreaCovers();
+  apply('home',covers.home_cover_url);
+  apply('music',covers.music_cover_url);
   const connect=(input,kind,status,menu)=>{
    input?.addEventListener('change',async()=>{
     const file=input.files?.[0];if(!file)return;
