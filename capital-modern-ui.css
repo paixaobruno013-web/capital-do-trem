@@ -106,3 +106,41 @@ body *{min-width:0}
   object-position:center!important;
   background:#050505!important;
 }
+
+/* Ajuste fino do campo de publicação: frase completa em uma única linha. */
+#home-feed-open{
+  gap:10px!important;
+  padding-right:12px!important;
+}
+#home-feed-open>span:last-child{
+  flex:1 1 0!important;
+  min-width:0!important;
+  width:0!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:clip!important;
+  font-size:clamp(11px,3.2vw,13px)!important;
+  line-height:1.2!important;
+  letter-spacing:0!important;
+  text-align:left!important;
+}
+
+/* A arte oficial de Músicas fica inteira, com a frase da própria capa legível. */
+#musicas .music-section-banner{
+  aspect-ratio:16 / 9!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+  background:#050505!important;
+}
+#musicas .music-section-banner>img#music-section-banner-image{
+  width:100%!important;
+  height:100%!important;
+  max-width:100%!important;
+  max-height:none!important;
+  object-fit:contain!important;
+  object-position:center center!important;
+}
