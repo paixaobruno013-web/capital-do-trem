@@ -975,8 +975,8 @@ body.light header.header-has-custom-background::before{
 // Se o Android encerrar o processo enquanto a câmera nativa está aberta, retoma a conversa em vez de reiniciar na página inicial.
 try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(localStorage.getItem(key)||0);if(started&&Date.now()-started<3*60*1000){localStorage.removeItem(key);location.replace('./bate-papo.html?retorno-camera=1');}}catch(error){}
 </script>
-<link rel="stylesheet" href="./capital-futurista.css?v=6">
-<link rel="stylesheet" href="./capital-modern-ui.css?v=3">
+<link rel="stylesheet" href="./capital-futurista.css?v=7">
+<link rel="stylesheet" href="./capital-modern-ui.css?v=4">
 <style>.music-section-banner{width:100%;margin:0 0 14px;aspect-ratio:16/9;background:#000;overflow:hidden;border-radius:14px}.music-section-banner img{display:block;width:100%;height:100%;aspect-ratio:16/9;object-fit:contain;background:#000}.music-upload-area{display:block;margin:0 0 14px;border:1px solid rgba(237,28,36,.42);background:linear-gradient(155deg,#171012,#090909);box-shadow:0 10px 28px rgba(0,0,0,.25)}.music-upload-area .home-section-heading{margin-bottom:10px}.music-upload-area form{display:grid;gap:9px}.music-upload-area form[hidden]{display:none!important}.music-upload-area input[type=file]{display:block;width:100%;min-height:48px;padding:10px;border:1px dashed rgba(237,28,36,.65);border-radius:12px;background:#100d0e;color:#fff}.music-upload-area button[type=submit]{width:100%;min-height:48px;border-radius:13px;font-weight:800;letter-spacing:.02em}.music-section-banner{aspect-ratio:auto;max-height:none;overflow:visible;border-radius:12px}.music-section-banner img{width:100%;height:auto;max-height:190px;object-fit:contain;object-position:center;background:#000}.my-uploaded-song{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;margin:8px 0}.my-uploaded-song-main{min-width:0;flex:1}.my-uploaded-song-main strong{display:block;overflow-wrap:anywhere}.my-uploaded-song-actions{display:flex;gap:7px;flex-wrap:wrap}.my-uploaded-song audio{width:100%;max-width:380px;margin-top:8px}.my-uploaded-song-actions button{min-height:38px;padding:7px 10px}</style><style>.home-story-extra-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:10px 0}.home-story-extra-actions button{min-width:0;padding:9px 5px;border:1px solid #ed1c2466;border-radius:10px;background:#171717;color:#fff;font-weight:750;font-size:12px}.home-story-extra-actions button:focus-visible{outline:2px solid #fff;outline-offset:2px}#home-story-music-panel,#home-story-friends-panel,#home-story-link-panel{padding:10px;margin:7px 0;border:1px solid #ed1c244d;border-radius:10px;background:#111}#home-story-music-panel select,#home-story-music-panel input,#home-story-friends-panel input,#home-story-friends-panel select,#home-story-link-panel input{width:100%;min-height:42px;margin-top:6px;padding:9px;border-radius:8px;border:1px solid #444;background:#080808;color:#fff}</style>
 <style>
 /* Catálogo de músicas: manter a organização existente e dar destaque às faixas já publicadas. */
@@ -1130,7 +1130,7 @@ body:not(.light) header::before,body.light header::before{background-image:linea
 <section class="page" id="musicas">
 <div class="music-brandbar" aria-label="Capital do Trem ao vivo"><strong>CAPITAL DO TREM</strong><span><i aria-hidden="true"></i> AO VIVO</span></div>
 <section class="music-section-banner" aria-label="AQUI A MÚSICA NÃO PARA!">
- <img id="music-section-banner-image" src="./assets/banner-speakers.webp?v=372" alt="AQUI A MÚSICA NÃO PARA! — alto-falantes do Capital do Trem" loading="eager" decoding="async">
+ <img id="music-section-banner-image" src="./assets/banner-speakers.webp?v=373" alt="AQUI A MÚSICA NÃO PARA! — alto-falantes do Capital do Trem" loading="eager" decoding="async">
  <details class="personal-area-cover-menu music-area-cover-menu" id="music-area-cover-menu">
   <summary aria-label="Personalizar capa da área Músicas" title="Personalizar capa da área Músicas">⋮</summary>
   <div class="personal-area-cover-options">
@@ -2856,7 +2856,7 @@ window.addEventListener('capital-do-trem:song-published',refreshMyUploads);
  const musicImage=document.getElementById('music-section-banner-image');
  const homeStatus=document.getElementById('home-area-cover-status');
  const musicStatus=document.getElementById('music-area-cover-status');
- const DEFAULT_MUSIC_COVER='./assets/banner-speakers.webp?v=372';
+ const DEFAULT_MUSIC_COVER='./assets/banner-speakers.webp?v=373';
  const SAFE_PREFIX='https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/';
  const setStatus=(node,message)=>{if(node)node.textContent=message};
  const validUrl=value=>typeof value==='string'&&value.startsWith(SAFE_PREFIX)?value:'';
