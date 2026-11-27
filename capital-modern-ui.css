@@ -41,3 +41,10 @@ nav#nav button.active,nav#nav a.active{color:#fff!important;background:linear-gr
  #messages{height:min(57svh,560px);min-height:220px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
+
+
+/* Telas travadas na largura do aparelho: rolagem lateral fica restrita às galerias de publicações. */
+html,body{width:100%;max-width:100%;overflow-x:clip!important;overscroll-behavior-x:none}
+body{min-width:0}
+body *{min-width:0}
+.home-feed-post-gallery,.home-feed-preview-gallery{max-width:100%;overflow-x:auto!important;overscroll-behavior-x:contain;touch-action:pan-x}
