@@ -3,8 +3,8 @@ import { readFile } from 'node:fs/promises';
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
 const [index, profileHtml, profileJs, auth, migration, accessMigration, sw, prepare] = await Promise.all([
   read('index.html'), read('rede.html'), read('rede.js'), read('supabase/auth.js'),
-  read('supabase/migrations/20261127130000_private_user_area_covers.sql'),
-  read('supabase/migrations/20261127140000_restrict_user_area_covers_anon.sql'), read('sw.js'), read('scripts/prepare-web.mjs')
+  read('supabase/migrations/20261127114152_private_user_area_covers.sql'),
+  read('supabase/migrations/20261127114606_restrict_user_area_covers_anon.sql'), read('sw.js'), read('scripts/prepare-web.mjs')
 ]);
 
 const checks = [
