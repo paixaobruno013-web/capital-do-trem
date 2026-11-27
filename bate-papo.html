@@ -271,7 +271,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important;overscroll-behav
 </button>
 <div id="chat-online-profiles" class="chat-online-profiles" aria-label="Perfis públicos da comunidade"></div>
 </div>
-<section id="capital-do-trem-room" class="panel chat-panel" hidden><div class="room-heading"><div><span class="eyebrow">SALA DE CONVERSA</span><h2>GRUPO • CAPITAL do TREM</h2></div><div style="display:flex;align-items:center;gap:8px"><button id="leave-group" class="alt" type="button" hidden>Sair do grupo</button></div></div><section class="panel" id="group-profile-tools"><div class="room-heading"><h3>Perfil do grupo</h3><button id="group-participants-open" class="alt" type="button">Ver participantes</button></div><p id="group-participants-count" class="muted">Participantes do GRUPO • CAPITAL DO TREM</p><div id="group-participants-list" class="media-gallery-grid" hidden></div></section><div id="group-live-presence" class="group-live-presence" aria-live="polite"><div><strong>● online</strong><span id="group-online-list">Verificando participantes…</span></div><div><strong>✍ digitando</strong><span id="group-typing-list">Ninguém digitando agora</span></div></div><div class="security-seal" role="note" hidden>
+<section id="capital-do-trem-room" class="panel chat-panel" hidden><div class="room-heading fala-active-chat-header"><div class="fala-active-chat-identity"><span class="fala-active-chat-avatar"><img id="fala-active-chat-avatar-image" src="./assets/capital-do-trem-logo.jpg" alt="Grupo Capital do Trem"></span><span><h2>GRUPO • CAPITAL DO TREM</h2><small>Comunidade</small></span></div><div style="display:flex;align-items:center;gap:8px"><button id="leave-group" class="alt" type="button" hidden>Sair do grupo</button></div></div><section class="panel" id="group-profile-tools"><div class="room-heading"><h3>Perfil do grupo</h3><button id="group-participants-open" class="alt" type="button">Ver participantes</button></div><p id="group-participants-count" class="muted">Participantes do GRUPO • CAPITAL DO TREM</p><div id="group-participants-list" class="media-gallery-grid" hidden></div></section><div id="group-live-presence" class="group-live-presence" aria-live="polite"><div><strong>● online</strong><span id="group-online-list">Verificando participantes…</span></div><div><strong>✍ digitando</strong><span id="group-typing-list">Ninguém digitando agora</span></div></div><div class="security-seal" role="note" hidden>
   <div class="security-seal-title"><span aria-hidden="true">🔒</span><span>Conexão criptografada</span><small>HTTPS</small></div>
   <p>Seus dados são protegidos durante a transmissão por HTTPS. Esta versão ainda não oferece criptografia ponta a ponta.</p>
 </div>
@@ -398,6 +398,7 @@ const groupCardButton=document.getElementById('open-group-card');
  function applyChatImages(images){
   if(images?.brand&&brandImage)brandImage.src=images.brand;
   if(images?.group&&groupImage)groupImage.src=images.group;
+  const activeAvatar=document.getElementById('fala-active-chat-avatar-image');if(images?.group&&activeAvatar)activeAvatar.src=images.group;
  }
  async function loadChatImages(){
   try{applyChatImages(await getPublicChatProfileImages());}
