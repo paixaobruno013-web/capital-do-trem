@@ -624,7 +624,9 @@ function mountInboxSections(){
 }
 mountInboxSections();
 $('search').addEventListener('input',drawPeople);$('conversation-search').addEventListener('input',drawConversations);$('refresh').addEventListener('click',async()=>{try{await refresh();$('status').textContent='Lista atualizada.';}catch(e){$('status').textContent=e.message;}});
-$('message').addEventListener('input',announceTyping);
+$('message').addEventListener('input',()=>{const field=$('message');field.style.height='auto';field.style.height=Math.min(field.scrollHeight,160)+'px';announceTyping();});
+$('message').addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey&&!event.isComposing){event.preventDefault();$('compose').requestSubmit();}});
+
 $('message').addEventListener('blur',()=>{if(typingTimeout){clearTimeout(typingTimeout);typingTimeout=null;}if(typingChannel)typingChannel.send(false).catch(()=>{});});
 $('compose').addEventListener('submit',async e=>{
  e.preventDefault();if(!active&&!activeGroup)return;
