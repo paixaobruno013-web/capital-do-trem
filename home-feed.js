@@ -103,12 +103,16 @@ if(root&&form){
     if(verified.has(post.author_id)){const seal=document.createElement('span');seal.className='home-verified-seal';seal.textContent='✓';seal.title='Artista verificado pela Capital do Trem';seal.setAttribute('aria-label','Artista verificado');author.append(seal)}
     header.append(avatar,author);card.append(header);
     let text=null;if(post.content){text=document.createElement('p');text.className='home-feed-post-text';text.textContent=post.content;card.append(text)}
-    for(const item of media.get(post.id)||[]){
-     if(!item.url)continue;
-     const el=document.createElement(item.media_type==='video'?'video':'img');
-     el.className='home-feed-media';el.src=item.url;el.loading='lazy';
-     if(item.media_type==='video'){observeFeedVideo(el)}else{el.alt=item.alt_text||post.content||'Foto publicada na comunidade';el.tabIndex=0;el.title='Toque para ampliar (opcional)';el.addEventListener('click',()=>{const viewer=document.createElement('div');viewer.style.cssText='position:fixed;inset:0;z-index:9999;background:#000e;display:grid;place-items:center;padding:16px';const image=document.createElement('img');image.src=item.url;image.alt=el.alt;image.style.cssText='max-width:100%;max-height:100%;object-fit:contain';const close=document.createElement('button');close.type='button';close.textContent='Fechar';close.style.cssText='position:absolute;top:16px;right:16px;padding:10px 14px;border:1px solid #fff;border-radius:22px;background:#111;color:#fff';close.addEventListener('click',()=>viewer.remove());viewer.addEventListener('click',event=>{if(event.target===viewer)viewer.remove()});viewer.append(image,close);document.body.append(viewer)});}
-     card.append(el);
+    const postMedia=(media.get(post.id)||[]).filter(item=>item.url);
+    if(postMedia.length){
+     const gallery=document.createElement('div');gallery.className='home-feed-post-gallery';gallery.setAttribute('aria-label',postMedia.length+' mídias. Deslize para o lado para ver todas.');
+     for(const item of postMedia){
+      const slide=document.createElement('div');slide.className='home-feed-post-slide';
+      const el=document.createElement(item.media_type==='video'?'video':'img');el.className='home-feed-media';el.src=item.url;el.loading='lazy';
+      if(item.media_type==='video')observeFeedVideo(el);else{el.alt=item.alt_text||post.content||'Foto publicada na comunidade';el.tabIndex=0;el.title='Toque para ampliar (opcional)';el.addEventListener('click',()=>{const viewer=document.createElement('div');viewer.style.cssText='position:fixed;inset:0;z-index:9999;background:#000e;display:grid;place-items:center;padding:16px';const image=document.createElement('img');image.src=item.url;image.alt=el.alt;image.style.cssText='max-width:100%;max-height:100%;object-fit:contain';const close=document.createElement('button');close.type='button';close.textContent='Fechar';close.style.cssText='position:absolute;top:16px;right:16px;padding:10px 14px;border:1px solid #fff;border-radius:22px;background:#111;color:#fff';close.addEventListener('click',()=>viewer.remove());viewer.addEventListener('click',event=>{if(event.target===viewer)viewer.remove()});viewer.append(image,close);document.body.append(viewer)});}
+      slide.append(el);gallery.append(slide);
+     }
+     card.append(gallery);
     }
     if(postMusic.has(post.id))card.append(createPostMusicControl(postMusic.get(post.id)));
     const actions=document.createElement('div');actions.className='home-feed-actions';
@@ -144,13 +148,12 @@ if(root&&form){
    if(selectedFeedSongId&&(!files.length||!files.some(file=>file.type.startsWith('image/')))){status.textContent='Para anexar música no Feed, escolha pelo menos uma foto.';return}
    for(const file of files){const max=file.type.startsWith('image/')?10*1024*1024:50*1024*1024;if(file.size>max){status.textContent='Arquivo muito grande para publicar: '+file.name;return}}
    const button=form.querySelector('button[type=submit]');button.disabled=true;if(storyPublishButton)storyPublishButton.disabled=true;status.textContent='Publicando…';
-   let createdPost=null,uploadedPath=null,feedPublished=false,publishStage='validar a conta';
+   let createdPost=null,uploadedPaths=[],feedPublished=false,publishStage='validar a conta';
    try{
     status.textContent='Confirmando sua conta…';
     const session=await getCurrentSession();if(!session?.user)throw new Error('Entre na sua conta para publicar no Feed.');
     publishStage='criar a publicação no Feed';status.textContent='Criando publicação…';
     createdPost=await submitMyPost(text||'📸 Nova publicação na comunidade');
-    const uploadedPaths=[];
     if(files.length){const mediaRows=[];for(let index=0;index<files.length;index++){const file=files[index];publishStage='enviar mídia '+(index+1)+' de '+files.length;status.textContent='Enviando mídia '+(index+1)+' de '+files.length+'…';const ext=({'image/jpeg':'jpg','image/png':'png','image/webp':'webp','video/mp4':'mp4','video/webm':'webm','video/quicktime':'mov'})[file.type];const path=session.user.id+'/posts/'+crypto.randomUUID()+'.'+ext;const uploaded=await supabase.storage.from('capital-do-trem-social').upload(path,file,{contentType:file.type,cacheControl:'3600',upsert:false});if(uploaded.error)throw uploaded.error;uploadedPaths.push(path);mediaRows.push({post_id:createdPost.id,owner_id:session.user.id,bucket_id:'capital-do-trem-social',storage_path:path,media_type:file.type.startsWith('video/')?'video':'image',mime_type:file.type,byte_size:file.size,alt_text:text.slice(0,200),sort_order:index});}
      publishStage='vincular mídias à publicação';status.textContent='Finalizando a galeria…';const row=await supabase.from('post_media').insert(mediaRows);if(row.error)throw row.error;}
     const songToPublish=selectedFeedSongId||form.dataset.storyMusicSongId||'';
@@ -159,7 +162,7 @@ if(root&&form){
     if(alsoStory){try{publishStage='publicar também nos Stories';status.textContent='Publicação no Feed concluída. Enviando aos Stories…';const start=Math.max(0,Math.min(3600,Number(musicStart?.value)||0)),duration=Math.max(5,Math.min(60,Number(musicDuration?.value)||15));const story=await createMyStory({file:files[0],caption:text,musicSongId:songToPublish,musicStartSeconds:start,musicDurationSeconds:duration});document.dispatchEvent(new CustomEvent('capital:stories-updated',{detail:{id:story.id}}));}
      catch(storyError){status.textContent='Feed publicado! Mas o Story não foi publicado: '+(storyError.message||'tente novamente.');await load();return;}}
     caption.value='';clearSelectedMedia();selectedFeedSongId='';delete form.dataset.storyMusicSongId;if(musicSelect)musicSelect.value='';resetFeedMusicPreview();setComposerExpanded(false);status.textContent=alsoStory?'Compartilhado no Feed e nos Stories! ❤️':'Publicação compartilhada no Feed! ❤️';await load();
-   }catch(error){if(!feedPublished){if(typeof uploadedPaths!=='undefined'&&uploadedPaths.length){try{const {error:removeError}=await supabase.storage.from('capital-do-trem-social').remove(uploadedPaths);if(removeError)console.error('Falha ao remover mídias órfãs do Feed.',removeError);}catch(cleanupError){console.error('Falha ao limpar mídias órfãs do Feed.',cleanupError);}}
+   }catch(error){if(!feedPublished){if(uploadedPaths.length){try{const {error:removeError}=await supabase.storage.from('capital-do-trem-social').remove(uploadedPaths);if(removeError)console.error('Falha ao remover mídias órfãs do Feed.',removeError);}catch(cleanupError){console.error('Falha ao limpar mídias órfãs do Feed.',cleanupError);}}
     if(createdPost?.id){try{await deleteMyPost(createdPost.id);}catch(cleanupError){console.error('Falha ao reverter publicação incompleta.',cleanupError);}}}
     status.textContent='Falha ao '+publishStage+': '+(error.message||'não foi possível concluir.');
    }finally{button.disabled=false;if(storyPublishButton)storyPublishButton.disabled=!selectedFiles.length||selectedFiles.length!==1;}
