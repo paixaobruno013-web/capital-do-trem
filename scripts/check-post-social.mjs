@@ -25,6 +25,7 @@ const checks = [
   ['Stories libera a câmera ao selecionar uma mídia', /if \(selectedFile\) releaseCameraResources\(\)/.test(await read('home-story-composer.js'))],
   ['Mídias antigas do Feed usam o bucket social como padrão', /item\.bucket_id\|\|'capital-do-trem-social'/.test(await read('rede.js'))],
   ['Feed social pausa vídeos em segundo plano e exige toque manual para reproduzir', /const feedAutoplayAllowed=\(\)=>false/.test(await read('rede.js')) && /visibilitychange/.test(await read('rede.js')) && /video\.preload='none'/.test(await read('rede.js'))],
+  ['Feed carrega fotos somente quando se aproximam da tela', /el\.loading='lazy';el\.decoding='async';el\.fetchPriority='low'/.test(await read('rede.js'))],
   ['Feed informa em qual etapa a publicação falhou', /publishStage='criar a publicação no Feed'/.test(await read('home-feed.js')) && /Falha ao '\+publishStage/.test(await read('home-feed.js'))],
   ['publicação permite compartilhar no Feed ou no Feed + Stories com mídia única', /Compartilhar Feed<\/button>/.test(home) && /Compartilhar Feed \+ Story/.test(home) && /files.length!==1/.test(await read('home-feed.js')) && /createMyStory\(\{file:files\[0\],caption:text/.test(await read('home-feed.js'))],
   ['aro dos Stories fica parado e somente o LED vermelho percorre a borda', /homeStoryLedTravel/.test(home) && /home-story-ring:not\(\.seen\)::before/.test(home) && /animation:none!important/.test(home) && !/homeStoryRedOrbit/.test(home)],
