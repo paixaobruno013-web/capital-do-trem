@@ -1361,9 +1361,10 @@ const pageScrollPositions=new Map();
 let activePageId=pages.find(page=>page.classList.contains('active'))?.id||'inicio';
 function go(id){
  const target=pages.find(page=>page.id===id);
+ if(!target)return;
  document.body.classList.toggle('music-page-active',id==='musicas');
- if(!target||target.id===activePageId)return;
- const current=pages.find(page=>page.id===activePageId);
+ // Usa a tela realmente ativa para evitar estado em memória defasado no WebView.
+ const current=pages.find(page=>page.classList.contains('active'))||pages.find(page=>page.id===activePageId);
  if(current){
   pageScrollPositions.set(current.id,window.scrollY||window.pageYOffset||0);
   // Evita áudio/vídeo continuando em segundo plano depois de sair da área.
