@@ -600,6 +600,7 @@ function renderStorySongOptions() {
   musicSelect.replaceChildren(new Option('Sem música', ''));
   for (const song of filtered) musicSelect.add(new Option(song.title + ' — ' + song.artist_name, song.id));
   if (filtered.some(song => song.id === selected)) musicSelect.value = selected;
+  else { selectedStoryMusicId = ''; musicSelect.value = ''; if (musicPreview) { musicPreview.pause(); musicPreview.removeAttribute('src'); musicPreview.hidden = true; } }
   if (musicStatus && storySongsLoaded) musicStatus.textContent = filtered.length
     ? filtered.length + ' música(s) disponíveis nesta seleção. Escolha uma faixa para seu Story.'
     : 'Nenhuma música encontrada nesta seleção.';
