@@ -16,6 +16,7 @@ const [room, enhancements, emoji, privateChat, worker, stories, home, auth, admi
   read('.github/workflows/android-debug.yml'),
   read('.github/workflows/ios-build.yml')
 ]);
+const styles = await read('chat-modern.css');
 
 const checks = [
 
