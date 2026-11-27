@@ -106,42 +106,7 @@ body *{min-width:0}
   text-align:left!important;
 }
 
-/* A imagem usa sua proporção natural: nenhuma metade é escondida ou cortada. */
-#musicas .music-section-banner{
-  position:relative!important;
-  display:block!important;
-  width:100%!important;
-  max-width:100%!important;
-  height:auto!important;
-  min-height:0!important;
-  max-height:none!important;
-  aspect-ratio:auto!important;
-  overflow:visible!important;
-  padding:0!important;
-  background:#050505!important;
-}
-#musicas .music-section-banner>img#music-section-banner-image{
-  position:relative!important;
-  display:block!important;
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
-  height:auto!important;
-  min-height:0!important;
-  max-height:none!important;
-  aspect-ratio:auto!important;
-  object-fit:unset!important;
-  object-position:center!important;
-  margin:0!important;
-}
-#musicas .music-section-banner>.music-area-cover-menu{
-  position:absolute!important;
-  z-index:5!important;
-  top:8px!important;
-  right:8px!important;
-}
-
-/* Capa de Músicas: neutraliza recortes e deslocamentos herdados de estilos antigos. */
+/* Banner de Músicas: uma única regra de layout, respeitando a proporção original da arte. */
 #musicas .music-section-banner{
   display:block!important;
   position:relative!important;
@@ -155,12 +120,12 @@ body *{min-width:0}
   overflow:visible!important;
   padding:0!important;
   margin:0 0 14px!important;
+  background:#050505!important;
   transform:none!important;
 }
 #musicas .music-section-banner > img#music-section-banner-image{
-  position:static!important;
-  inset:auto!important;
   display:block!important;
+  position:static!important;
   float:none!important;
   box-sizing:border-box!important;
   width:100%!important;
@@ -170,31 +135,14 @@ body *{min-width:0}
   min-height:0!important;
   max-height:none!important;
   aspect-ratio:auto!important;
-  object-fit:initial!important;
-  object-position:50% 50%!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  clip-path:none!important;
   transform:none!important;
   margin:0!important;
-  clip-path:none!important;
 }
 #musicas .music-section-banner > .music-area-cover-menu{
   position:absolute!important;
   inset:8px 8px auto auto!important;
   z-index:10!important;
-}
-
-/* Banner musical: proporção natural da arte original, sem corte em Android, iPhone ou navegador. */
-#musicas .music-section-banner,
-#musicas .music-section-banner > img#music-section-banner-image{
-  height:auto!important;
-  min-height:0!important;
-  max-height:none!important;
-  aspect-ratio:auto!important;
-}
-#musicas .music-section-banner > img#music-section-banner-image{
-  display:block!important;
-  width:100%!important;
-  object-fit:contain!important;
-  object-position:center!important;
-  clip-path:none!important;
-  transform:none!important;
 }
