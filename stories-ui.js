@@ -276,7 +276,8 @@ async function refreshStories({ notify = false, previousAdmin = new Set(), previ
           .select('user_id,display_name,username,avatar_type,avatar_url,avatar_data')
           .eq('is_public', true).order('display_name', { ascending: true })
           .range(from, from + pageSize - 1);
-        if (error) throw error;
+        const profilesError = error;
+        if (profilesError) throw profilesError;
         profiles.push(...(data || []));
         if (!data || data.length < pageSize) break;
       }
