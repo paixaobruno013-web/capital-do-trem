@@ -2874,7 +2874,8 @@ window.addEventListener('capital-do-trem:song-published',refreshMyUploads);
   if(musicMenu)musicMenu.hidden=false;
   const covers=await api.getMyAreaCovers();
   apply('home',covers.home_cover_url);
-  apply('music',covers.music_cover_url);
+  // A área Músicas volta a usar a arte original completa; a preferência antiga fica preservada.
+  if(musicImage)musicImage.src=DEFAULT_MUSIC_COVER;
   const connect=(input,kind,status,menu)=>{
    input?.addEventListener('change',async()=>{
     const file=input.files?.[0];if(!file)return;
@@ -2892,19 +2893,14 @@ window.addEventListener('capital-do-trem:song-published',refreshMyUploads);
    });
   };
   connect(homeInput,'home',homeStatus,homeMenu);
-  connect(musicInput,'music',musicStatus,musicMenu);
+  // Personalização da capa musical pausada para manter a arte original sem cortes.
   document.getElementById('home-area-cover-reset')?.addEventListener('click',async event=>{
    const button=event.currentTarget;button.disabled=true;setStatus(homeStatus,'Restaurando a capa original…');
    try{await api.resetMyAreaCover('home');apply('home',null);setStatus(homeStatus,'Capa original restaurada.');if(homeMenu)homeMenu.open=false;}
    catch(error){setStatus(homeStatus,error.message||'Não foi possível restaurar a capa.');}
    finally{button.disabled=false;}
   });
-  document.getElementById('music-area-cover-reset')?.addEventListener('click',async event=>{
-   const button=event.currentTarget;button.disabled=true;setStatus(musicStatus,'Restaurando a capa original…');
-   try{await api.resetMyAreaCover('music');apply('music',null);setStatus(musicStatus,'Capa original restaurada.');if(musicMenu)musicMenu.open=false;}
-   catch(error){setStatus(musicStatus,error.message||'Não foi possível restaurar a capa.');}
-   finally{button.disabled=false;}
-  });
+  // A capa musical permanece fixa na imagem original do aplicativo.
  }catch(error){setStatus(homeStatus,error.message||'Personalização indisponível no momento.');setStatus(musicStatus,error.message||'Personalização indisponível no momento.');}
 })();
 </script>
