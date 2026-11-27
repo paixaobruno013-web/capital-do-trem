@@ -1,8 +1,9 @@
 import { readFile } from 'node:fs/promises';
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
-const [auth, home, chat, migration, stories, privateChat] = await Promise.all([
+const [auth, home, profile, chat, migration, stories, privateChat] = await Promise.all([
   read('supabase/auth.js'),
   read('index.html'),
+  read('rede.html'),
   read('bate-papo.html'),
   read('supabase/migrations/20261111143000_post_likes_comments.sql'),
   read('stories-ui.js'),
@@ -36,9 +37,9 @@ const checks = [
   ['API de leitura e contagem das interações', /export async function getPostSocial[\s\S]*?likeCount:likes\.count/.test(auth)],
   ['API de curtir e descurtir', /export async function togglePostLike[\s\S]*?post_likes/.test(auth)],
   ['API de comentários com limite de 1.000 caracteres', /export async function addPostComment[\s\S]*?clean\.length>1000/.test(auth)],
-  ['mural mostra botão de curtir e contagem', /getPostSocial\(item\.id\)[\s\S]*?Curtido[\s\S]*?likeCount/.test(home)],
-  ['mural mostra lista e formulário de comentários', /Comentários[\s\S]*?post-comment-form[\s\S]*?addPostComment\(item\.id/.test(home)],
-  ['compartilhamento privado continua disponível', /Koe Fala Tu[\s\S]*?share_text/.test(home)],
+  ['mural mostra botão de curtir e contagem', /getPostSocial\(item\.id\)[\s\S]*?Curtido[\s\S]*?likeCount/.test(profile)],
+  ['mural mostra lista e formulário de comentários', /Comentários[\s\S]*?post-comment-form[\s\S]*?addPostComment\(item\.id/.test(profile)],
+  ['compartilhamento privado continua disponível', /Koe Fala Tu[\s\S]*?share_text/.test(profile)],
   ['descoberta por localização removida e sem atalho na tela inicial', !/data-page="amigos"/.test(home) && !/id="fazer-amigos"|id="open-friends-profile"/.test(chat)],
   ['busca geográfica e filtros de cidade não aparecem mais no FALA UAI', !/chat-friends-search|chat-friends-distance|chat-friends-directory/.test(chat)],
   ['faixa de contatos online usa somente perfis públicos', /getPublicProfiles\(\)/.test(chat) && /\.eq\('is_public', true\)/.test(auth)],
