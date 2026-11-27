@@ -33,24 +33,26 @@ export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null
  const status=document.createElement('p');status.className='ct-player-status';status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.textContent='Escolha uma faixa para começar a ouvir.';
  const audio=document.createElement('audio');audio.preload='none';audio.hidden=true;
  shell.append(progressWrap,controls,status,audio);root.append(shell);
- let catalog=[],queue=[],index=0,playlists=[],lastRecordedSongId=null;
+ let catalog=[],queue=[],index=0,playlists=[],lastRecordedSongId=null,pendingAudioUrl='';
  const current=()=>queue[index]||null;
+ function ensureAudioSource(){const url=safeAudioUrl(pendingAudioUrl||current()?.audio_url);if(!url)return false;if(audio.dataset.loadedUrl!==url){audio.src=url;audio.dataset.loadedUrl=url;audio.load()}return true}
+ function playCurrent(){if(!current()){status.textContent='Escolha uma música no catálogo ou uma playlist.';return Promise.resolve()}if(!ensureAudioSource()){status.textContent='O áudio desta faixa está indisponível.';return Promise.resolve()}return audio.play()}
  function setCurrent(song,{autoplay=false}={}){
   lastRecordedSongId=null;
-  if(!song){audio.pause();audio.removeAttribute('src');audio.load();title.textContent='Escolha uma música';artist.textContent='Artista da comunidade';producer.hidden=true;range.value='0';elapsed.textContent='0:00';duration.textContent='0:00';play.textContent='▶';status.textContent='Nenhuma faixa disponível nesta seleção.';return}
+  if(!song){audio.pause();pendingAudioUrl='';audio.removeAttribute('src');delete audio.dataset.loadedUrl;audio.load();title.textContent='Escolha uma música';artist.textContent='Artista da comunidade';producer.hidden=true;range.value='0';elapsed.textContent='0:00';duration.textContent='0:00';play.textContent='▶';status.textContent='Nenhuma faixa disponível nesta seleção.';return}
   const url=safeAudioUrl(song.audio_url);if(!url){status.textContent='O áudio desta faixa está indisponível.';return}
-  audio.pause();audio.src=url;audio.load();title.textContent=song.title||'Faixa sem título';artist.textContent=song.artist_name||'Artista da comunidade';producer.textContent=song.producer_name?'Produção: '+song.producer_name:'';producer.hidden=!song.producer_name;
+  audio.pause();pendingAudioUrl=url;audio.removeAttribute('src');delete audio.dataset.loadedUrl;audio.load();title.textContent=song.title||'Faixa sem título';artist.textContent=song.artist_name||'Artista da comunidade';producer.textContent=song.producer_name?'Produção: '+song.producer_name:'';producer.hidden=!song.producer_name;
   artTitle.textContent=song.title||'FAIXA MUSICAL';artArtist.textContent=(song.artist_name||'ARTISTA DA COMUNIDADE').toUpperCase();
   if(catalogSelect&&song.id)catalogSelect.value=song.id;
   art.dataset.songId=song.id||'';const trackHue=String((String(song.id||song.title||'trem').split('').reduce((n,ch)=>n+ch.charCodeAt(0),0)*7)%360);art.style.setProperty('--art-hue',trackHue);artWrap.style.setProperty('--art-hue',trackHue);
   range.value='0';elapsed.textContent='0:00';duration.textContent='0:00';play.textContent='▶';status.textContent='Faixa '+(index+1)+' de '+queue.length+' • pronta para tocar.';
   if('mediaSession' in navigator){try{navigator.mediaSession.metadata=new MediaMetadata({title:song.title||'Capital do Trem',artist:song.artist_name||'Artista da comunidade',album:'Capital do Trem',artwork:[{src:'./marca.svg',sizes:'any',type:'image/svg+xml'}]});}catch{}}
-  if(autoplay)audio.play().catch(()=>{status.textContent='Toque em reproduzir para ouvir esta faixa.'});
+  if(autoplay)playCurrent().catch(()=>{status.textContent='Toque em reproduzir para ouvir esta faixa.'});
  }
  function setQueue(items,start=0,{autoplay=false}={}){queue=(items||[]).filter(song=>safeAudioUrl(song.audio_url));index=Math.max(0,Math.min(start,queue.length-1));setCurrent(current(),{autoplay});}
  function playSong(song){const found=catalog.findIndex(item=>item.id===song?.id);if(found>=0&&safeAudioUrl(song.audio_url)===safeAudioUrl(catalog[found].audio_url)){setQueue(catalog,found,{autoplay:true});return}setQueue([song],0,{autoplay:true});}
  function step(amount){if(!queue.length)return;index=(index+amount+queue.length)%queue.length;setCurrent(current(),{autoplay:true});}
- play.addEventListener('click',()=>{if(!current()){status.textContent='Escolha uma música no catálogo ou uma playlist.';return}if(audio.paused)audio.play().catch(()=>{status.textContent='Não foi possível iniciar a reprodução. Tente novamente.'});else audio.pause()});
+ play.addEventListener('click',()=>{if(audio.paused)playCurrent().catch(()=>{status.textContent='Não foi possível iniciar a reprodução. Tente novamente.'});else audio.pause()});
  previous.addEventListener('click',()=>{if(audio.currentTime>3){audio.currentTime=0;return}step(-1)});
  next.addEventListener('click',()=>step(1));
  mute.addEventListener('click',()=>{audio.muted=!audio.muted;mute.textContent=audio.muted?'🔇':'🔊';mute.setAttribute('aria-label',audio.muted?'Ativar som':'Silenciar')});
@@ -64,7 +66,7 @@ export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null
  fullscreen.addEventListener('click',()=>setFullscreen(!root.classList.contains('ct-player-fullscreen')));
  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&root.classList.contains('ct-player-fullscreen'))setFullscreen(false)});
  function updateMediaPosition(){if(!('mediaSession' in navigator)||!Number.isFinite(audio.duration)||audio.duration<=0)return;try{navigator.mediaSession.setPositionState({duration:audio.duration,playbackRate:audio.playbackRate,position:Math.min(audio.currentTime,audio.duration)})}catch{}}
- function configureMediaSession(){if(!('mediaSession' in navigator))return;const actions=[['play',()=>audio.play()],['pause',()=>audio.pause()],['previoustrack',()=>step(-1)],['nexttrack',()=>step(1)],['seekbackward',details=>{audio.currentTime=Math.max(0,audio.currentTime-(details.seekOffset||10))}],['seekforward',details=>{audio.currentTime=Math.min(audio.duration||Infinity,audio.currentTime+(details.seekOffset||10))}],['seekto',details=>{if(Number.isFinite(details.seekTime))audio.currentTime=Math.max(0,Math.min(audio.duration||Infinity,details.seekTime))}]];for(const [action,handler] of actions){try{navigator.mediaSession.setActionHandler(action,handler)}catch{}}}
+ function configureMediaSession(){if(!('mediaSession' in navigator))return;const actions=[['play',()=>playCurrent()],['pause',()=>audio.pause()],['previoustrack',()=>step(-1)],['nexttrack',()=>step(1)],['seekbackward',details=>{audio.currentTime=Math.max(0,audio.currentTime-(details.seekOffset||10))}],['seekforward',details=>{audio.currentTime=Math.min(audio.duration||Infinity,audio.currentTime+(details.seekOffset||10))}],['seekto',details=>{if(Number.isFinite(details.seekTime))audio.currentTime=Math.max(0,Math.min(audio.duration||Infinity,details.seekTime))}]];for(const [action,handler] of actions){try{navigator.mediaSession.setActionHandler(action,handler)}catch{}}}
  audio.addEventListener('play',()=>{if(current()&&typeof onPlay==='function'&&lastRecordedSongId!==current().id){lastRecordedSongId=current().id;onPlay(current())}shell.classList.add('is-playing');play.textContent='Ⅱ';play.setAttribute('aria-label','Pausar');status.textContent='Tocando agora';if('mediaSession' in navigator){try{navigator.mediaSession.playbackState='playing';configureMediaSession();updateMediaPosition()}catch{}}});
  audio.addEventListener('pause',()=>{shell.classList.remove('is-playing');play.textContent='▶';play.setAttribute('aria-label','Reproduzir');if('mediaSession' in navigator){try{navigator.mediaSession.playbackState='paused'}catch{}}});
  audio.addEventListener('ended',()=>{if('mediaSession' in navigator){try{navigator.mediaSession.playbackState='none'}catch{}}if(queue.length>1)step(1);else{play.textContent='↻';status.textContent='Faixa finalizada.'}});
@@ -79,7 +81,7 @@ export function createCapitalMusicPlayer(rootId,{showPlaylists=false,onPlay=null
     if(freshUrl){
      song.audio_url=freshUrl;
      const catalogSong=catalog.find(item=>item.id===song.id);if(catalogSong)catalogSong.audio_url=freshUrl;
-     audio.src=freshUrl;audio.load();
+     pendingAudioUrl=freshUrl;audio.pause();audio.removeAttribute('src');delete audio.dataset.loadedUrl;audio.load();
      status.textContent='Link atualizado. Toque em reproduzir para tentar novamente.';
      return;
     }
