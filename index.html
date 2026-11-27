@@ -1635,9 +1635,9 @@ document.getElementById('compartilhar-site')?.addEventListener('click',async()=>
 let installPrompt=null;
 const installButton=document.getElementById('instalar-app');
 window.addEventListener('beforeinstallprompt',event=>{
- event.preventDefault();installPrompt=event;installButton.hidden=false;
+ event.preventDefault();installPrompt=event;if(installButton)installButton.hidden=false;
 });
-installButton.addEventListener('click',async()=>{
+installButton?.addEventListener('click',async()=>{
  const ua=navigator.userAgent||'';
  const isIOS=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
  const isStandalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
