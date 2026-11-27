@@ -144,3 +144,15 @@ body *{min-width:0}
   object-fit:contain!important;
   object-position:center center!important;
 }
+
+
+/* Alinha a capa musical pelo topo, mantendo a arte inteira visível. */
+#musicas .music-section-banner{
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+}
+#musicas .music-section-banner>img#music-section-banner-image{
+  object-fit:contain!important;
+  object-position:top center!important;
+}
