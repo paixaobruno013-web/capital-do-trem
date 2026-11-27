@@ -1,0 +1,37 @@
+/* FALA UAI — identidade visual moderna baseada na referência enviada */
+body.cdt-fala-uai-page{--chat-bg:#171a22;--chat-surface:#20242e;--chat-surface-2:#272c37;--chat-red:#ef4d55;--chat-text:#f7f7fa;--chat-muted:#aeb4c1;background:radial-gradient(ellipse at 50% 0%,#303644 0,#191c25 52%,#12141a 100%)!important;color:var(--chat-text)!important}
+body.cdt-fala-uai-page #main-content{width:min(1120px,100%);margin:0 auto;padding:18px 14px 34px}
+body.cdt-fala-uai-page .chat-brand,body.cdt-fala-uai-page .room-heading,body.cdt-fala-uai-page .chat-panel,body.cdt-fala-uai-page .friends-panel{background:linear-gradient(145deg,#252a35,#1a1e27)!important;border:1px solid #ffffff0c!important;border-radius:20px!important;box-shadow:0 14px 34px #0005!important}
+body.cdt-fala-uai-page .chat-profile-rail{display:flex;gap:10px;overflow-x:auto;padding:10px 2px 14px;scrollbar-width:none}
+body.cdt-fala-uai-page .chat-profile-chip{flex:0 0 auto;min-width:64px;border:0!important;background:transparent!important;color:#f4f4f7!important;box-shadow:none!important}
+body.cdt-fala-uai-page .chat-profile-chip-avatar{width:54px!important;height:54px!important;border:2px solid #ef4d55!important;box-shadow:0 4px 14px #0007!important}
+body.cdt-fala-uai-page #messages{height:min(62vh,660px)!important;min-height:300px!important;padding:14px!important;border:1px solid #ffffff0c!important;border-radius:20px!important;background:linear-gradient(180deg,#20242e,#181b23)!important;gap:10px!important}
+body.cdt-fala-uai-page #messages>*{max-width:min(86%,560px)}
+body.cdt-fala-uai-page #messages .mine,body.cdt-fala-uai-page #messages [data-own="true"]{align-self:flex-end;background:linear-gradient(135deg,#fa5a60,#e83f49)!important;color:#fff!important;border-radius:15px 15px 4px 15px!important;box-shadow:0 5px 14px #0004}
+body.cdt-fala-uai-page #messages .theirs,body.cdt-fala-uai-page #messages [data-own="false"]{align-self:flex-start;background:#11151d!important;color:#f3f4f7!important;border:1px solid #ffffff0d!important;border-radius:15px 15px 15px 4px!important}
+body.cdt-fala-uai-page .composer{display:grid!important;grid-template-columns:minmax(0,1fr) 44px 72px!important;gap:8px!important;padding:9px!important;border:1px solid #ffffff12!important;border-radius:18px!important;background:#20242e!important;box-shadow:0 10px 26px #0005!important}
+body.cdt-fala-uai-page .composer input#message{min-height:44px!important;border:0!important;border-radius:999px!important;background:#171b24!important;color:#fff!important;padding:10px 15px!important}
+body.cdt-fala-uai-page .composer button{min-height:44px!important;border:0!important;border-radius:50%!important;background:#2d3340!important;color:#fff!important}
+body.cdt-fala-uai-page .composer button#send{border-radius:999px!important;background:var(--chat-red)!important;font-weight:800!important}
+body.cdt-fala-uai-page input[type=search],body.cdt-fala-uai-page input[type=text]{border:1px solid #ffffff13!important;border-radius:999px!important;background:#171b24!important;color:#fff!important}
+body.cdt-fala-uai-page .chat-panel,body.cdt-fala-uai-page .friends-panel{padding:14px!important}
+body.cdt-fala-uai-page .chat-brand small,body.cdt-fala-uai-page .muted{color:var(--chat-muted)!important}
+body.cdt-fala-uai-page button:focus-visible,body.cdt-fala-uai-page a:focus-visible{outline:2px solid #ff7278!important;outline-offset:3px}
+@media(max-width:620px){body.cdt-fala-uai-page #main-content{padding:10px 9px 26px}body.cdt-fala-uai-page #messages{height:58vh!important;min-height:250px!important;padding:10px!important}body.cdt-fala-uai-page .composer{grid-template-columns:minmax(0,1fr) 40px 62px!important;gap:5px!important;padding:7px!important}body.cdt-fala-uai-page .chat-profile-chip-avatar{width:48px!important;height:48px!important}}
+/* Mensagens privadas: lista e conversa seguem a mesma linguagem visual */
+body:has(#private-layout){--bg:#171a22;--panel:#20242e;--panel2:#272c37;--fg:#f7f7fa;--muted:#aeb4c1;--line:#ffffff12;--red:#ef4d55;background:radial-gradient(ellipse at 50% 0%,#303644 0,#191c25 52%,#12141a 100%)!important;color:var(--fg)!important}
+body:has(#private-layout) header{background:transparent!important;border-bottom:1px solid #ffffff12!important}
+body:has(#private-layout) main#main{max-width:1180px!important}
+body:has(#private-layout) #private-layout{grid-template-columns:minmax(270px,.82fr) minmax(0,1.55fr)!important;gap:12px!important}
+body:has(#private-layout) #sidebar-panel,body:has(#private-layout) #thread-panel{min-width:0;border:1px solid #ffffff0c!important;border-radius:20px!important;background:linear-gradient(145deg,#252a35,#1a1e27)!important;box-shadow:0 14px 34px #0005!important;padding:14px!important}
+body:has(#private-layout) #search,body:has(#private-layout) #conversation-search{border-radius:999px!important;background:#171b24!important;color:#fff!important;border:1px solid #ffffff12!important}
+body:has(#private-layout) .person,body:has(#private-layout) .conversation{min-height:68px!important;border-radius:14px!important;padding:9px!important}
+body:has(#private-layout) .conversation[aria-current=true]{background:linear-gradient(100deg,#ef4d5533,#ef4d5508)!important;box-shadow:inset 3px 0 #ef4d55!important}
+body:has(#private-layout) #messages{height:min(62vh,660px)!important;min-height:300px!important;padding:14px!important;border-radius:18px!important;background:linear-gradient(180deg,#20242e,#181b23)!important;border:1px solid #ffffff0c!important;gap:10px!important}
+body:has(#private-layout) .bubble{max-width:86%!important;padding:10px 13px!important;border-radius:15px 15px 15px 4px!important;background:#11151d!important;color:#f3f4f7!important;border:1px solid #ffffff0d!important;box-shadow:0 4px 12px #0003}
+body:has(#private-layout) .bubble.mine{align-self:flex-end!important;background:linear-gradient(135deg,#fa5a60,#e83f49)!important;color:#fff!important;border:0!important;border-radius:15px 15px 4px 15px!important}
+body:has(#private-layout) .compose{display:grid!important;grid-template-columns:42px 42px minmax(0,1fr) 48px!important;align-items:center;gap:6px!important;padding:8px!important;border:1px solid #ffffff12!important;border-radius:18px!important;background:#20242e!important}
+body:has(#private-layout) .compose input#message{min-height:42px!important;border:0!important;border-radius:999px!important;background:#171b24!important;color:#fff!important;padding:10px 14px!important}
+body:has(#private-layout) .compose button{min-height:42px!important;border-radius:50%!important;background:#2d3340!important;color:#fff!important;border:0!important}
+body:has(#private-layout) .compose button#send{background:#ef4d55!important}
+@media(max-width:720px){body:has(#private-layout) #private-layout{grid-template-columns:minmax(0,1fr)!important}body:has(#private-layout) .layout:not(.chat-open) #thread-panel{display:none!important}body:has(#private-layout) .layout.chat-open #sidebar-panel{display:none!important}body:has(#private-layout) .layout.chat-open #thread-panel{display:flex!important}}
