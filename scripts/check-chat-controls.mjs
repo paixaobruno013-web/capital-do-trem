@@ -29,7 +29,7 @@ const checks = [
 
 
   ['grupo usa marca branca e é o único grupo coletivo exibido', /id="open-group-card"/.test(room) && /src="\.\/marca\.svg" alt="Logo branco do grupo Capital do Trem"/.test(room) && !/id="fazer-amigos"|id="open-friends-profile"/.test(room)],
-  ['marca preta do Capital do Trem fica no topo e usuários online ao lado em tamanho menor', /src="\.\/assets\/capital-do-trem-logo\.jpg" alt="Perfil Capital do Trem"/.test(room) && /chat-online-profile-avatar\{width:40px/.test(room) && /online.has\(profile.user_id\)/.test(room)],
+  ['ícone pequeno do GRUPO • CAPITAL DO TREM fica à esquerda e usuários online aparecem ao lado em tamanho menor', /id="open-group-profile"[\s\S]*?chat-profile-chip-avatar[\s\S]*?capital-do-trem-logo\.jpg/.test(room) && /id="chat-online-profiles"/.test(room) && /chat-online-profile-avatar\{width:36px/.test(styles) && /online.has\(profile.user_id\)/.test(room)],
   ['faixa superior mostra somente perfis online e abre seus perfis', /id="chat-profile-rail"/.test(room) && /id="chat-online-profiles"/.test(room) && /online.has\(profile.user_id\)/.test(room) && /rede\.html\?perfil=/.test(room)],
   ['atalhos superiores e seletor de tema foram retirados da tela do chat', !/Pular para o conteúdo principal/.test(room) && !/<header class="fala-uai-clean-header"/.test(room) && !/id="theme"/.test(room)],
   ['presença do grupo exibe quem está online e indicador de digitação em tempo real', /id="group-live-presence"/.test(room) && /startUserPresence/.test(room) && /subscribeUserPresence/.test(room) && /capital-fala-uai-group-typing/.test(room) && /announceGroupTyping/.test(room)],
