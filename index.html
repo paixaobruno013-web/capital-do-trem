@@ -688,7 +688,12 @@ body.light .home-shortcuts button,body.light .home-shortcuts a{background:linear
 /* Feed principal: fluxo livre, sem painel de conta ou cabeçalho entre as publicações. */
 .home-community-feed{display:block;margin:10px 0 80px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
 .home-community-feed .home-feed-composer{margin:0 0 10px;padding:0;border:0;background:transparent;box-shadow:none}
-.home-community-feed .home-feed-composer-collapsed .home-feed-open{display:flex;width:42px;height:42px;min-height:42px;margin:0 0 10px auto;align-items:center;justify-content:center;border:1px solid rgba(237,28,36,.7);border-radius:50%;background:#ed1c24;color:#fff;font-size:26px;box-shadow:0 0 12px rgba(237,28,36,.25)}
+.home-community-feed .home-feed-composer-collapsed .home-feed-composer-entry{padding:12px;border:1px solid rgba(255,255,255,.12);border-radius:16px;background:rgba(16,16,18,.94);box-shadow:0 5px 18px rgba(0,0,0,.22)}
+.home-community-feed .home-feed-composer-collapsed .home-feed-open{display:flex;width:100%;height:46px;min-height:46px;margin:0;align-items:center;justify-content:flex-start;gap:11px;padding:0 10px;border:1px solid rgba(255,255,255,.13);border-radius:24px;background:#242428;color:#ddd;font-size:14px;font-weight:500;box-shadow:none}
+.home-feed-entry-avatar{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border-radius:50%;background:linear-gradient(145deg,#ed1c24,#790b12);font-size:18px}
+.home-feed-quick-actions{display:flex;gap:8px;margin-top:10px}
+.home-feed-quick-actions button{flex:1;min-height:38px;border:0;border-radius:10px;background:rgba(237,28,36,.10);color:#fff;font-weight:700}
+.home-feed-quick-actions button:active{background:rgba(237,28,36,.24)}
 .home-community-feed .home-feed-list,.home-community-feed #home-feed-list{display:grid;gap:12px}
 
 /* Instagram: identidade visual em degradê rosa e roxo */
@@ -1046,13 +1051,18 @@ try{const key='capitaldotrem_return_to_chat_after_camera';const started=Number(l
 <section id="home-community-feed" class="home-community-feed" aria-label="Publicações ativas do Feed">
  
  <form id="home-feed-composer" class="home-feed-composer home-feed-composer-v2 home-feed-composer-collapsed">
-<button id="home-feed-open" type="button" class="home-feed-open" aria-expanded="false" aria-controls="home-feed-composer-fields" aria-label="Abrir publicação">＋</button>
+<div class="home-feed-composer-entry">
+<button id="home-feed-open" type="button" class="home-feed-open" aria-expanded="false" aria-controls="home-feed-composer-fields"><span class="home-feed-entry-avatar" aria-hidden="true">👤</span><span>No que você está pensando?</span></button>
+<div class="home-feed-quick-actions" aria-label="Atalhos para criar publicação">
+<button type="button" data-feed-quick-media="image">▧ Foto</button><button type="button" data-feed-quick-media="video">▹ Vídeo</button>
+</div>
+</div>
 <div id="home-feed-composer-fields" hidden>
-<div class="home-feed-expanded-head"><strong>Nova publicação</strong><button id="home-feed-collapse" type="button" class="home-feed-collapse">Fechar ×</button></div>
-<label class="sr-only" for="home-feed-text">O que você deseja compartilhar</label>
-<textarea id="home-feed-text" maxlength="1500" rows="3" placeholder="O que você deseja compartilhar"></textarea>
-<div class="home-feed-editor-tools"><button id="home-feed-crop-toggle" type="button" class="home-feed-tool-button" aria-pressed="false" disabled>✂ Editar / cortar imagem</button><button id="home-feed-music-toggle" type="button" class="home-feed-tool-button">♫ Escolher música do catálogo</button></div>
-<label class="home-feed-gallery-picker" for="home-feed-media" aria-label="Buscar imagens ou vídeos na galeria"><span>＋</span><strong>Arquivo: foto ou vídeo</strong><small>Escolher na galeria ou nos arquivos do aparelho</small></label>
+<div class="home-feed-expanded-head"><strong>Criar publicação</strong><button id="home-feed-collapse" type="button" class="home-feed-collapse">Fechar ×</button></div>
+<label class="sr-only" for="home-feed-text">No que você está pensando?</label>
+<textarea id="home-feed-text" maxlength="1500" rows="3" placeholder="No que você está pensando?"></textarea>
+<div class="home-feed-editor-tools"><button id="home-feed-crop-toggle" type="button" class="home-feed-tool-button" aria-pressed="false" disabled>✂ Editar / cortar imagem</button><button id="home-feed-music-toggle" type="button" class="home-feed-tool-button">♫ Adicionar música</button></div>
+<label class="home-feed-gallery-picker" for="home-feed-media" aria-label="Adicionar fotos ou vídeos da galeria"><span>＋</span><strong>Adicionar foto ou vídeo</strong><small>Escolher na galeria ou nos arquivos do aparelho</small></label>
 <input id="home-feed-media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" hidden>
 <span id="home-feed-media-name" class="home-feed-media-name muted" hidden>Nenhuma mídia selecionada</span>
 <section id="home-feed-music-panel" class="home-feed-music-panel" hidden aria-label="Trilha musical da publicação"><label for="home-feed-playlist-select">Origem da música</label><select id="home-feed-playlist-select"><option value="">Catálogo completo</option></select><label for="home-feed-music-select">Escolha uma música do catálogo ou da playlist</label><select id="home-feed-music-select"><option value="">Sem música</option></select><div class="home-feed-music-clip"><label for="home-feed-music-start">Começar em (segundos)</label><input id="home-feed-music-start" type="number" min="0" max="3600" step="1" value="0"><label for="home-feed-music-duration">Duração do trecho</label><select id="home-feed-music-duration"><option value="15">15 segundos</option><option value="30">30 segundos</option><option value="45">45 segundos</option><option value="60">60 segundos</option></select></div><audio id="home-feed-music-preview" controls preload="none" hidden></audio><p id="home-feed-music-status" class="muted" role="status">Escolha uma música publicada para acompanhar sua foto.</p></section>
