@@ -145,7 +145,7 @@ if(root&&form){
    if(alsoStory&&files[0]&&files[0].size>(files[0].type.startsWith('video/')?20:8)*1024*1024){status.textContent=files[0].type.startsWith('video/')?'Para compartilhar também no Story, o vídeo deve ter até 20 MB.':'Para compartilhar também no Story, a foto deve ter até 8 MB.';return}
    if(cropSelectedImage&&files[0]?.type.startsWith('image/')){try{status.textContent='Preparando o corte da primeira foto…';files[0]=await cropImageToSquare(files[0]);}catch(error){status.textContent=error.message;return}}
    if(editedImageFile&&files[0]?.type.startsWith('image/'))files[0]=editedImageFile;
-   if(selectedFeedSongId&&(!files.length||!files.some(file=>file.type.startsWith('image/')))){status.textContent='Para anexar música no Feed, escolha pelo menos uma foto.';return}
+   if(selectedFeedSongId&&(!files.length||!files.some(file=>file.type.startsWith('image/')))){status.textContent='Para anexar música no Feed, escolha também uma foto.';return}
    for(const file of files){const max=file.type.startsWith('image/')?10*1024*1024:50*1024*1024;if(file.size>max){status.textContent='Arquivo muito grande para publicar: '+file.name;return}}
    const button=form.querySelector('button[type=submit]');button.disabled=true;if(storyPublishButton)storyPublishButton.disabled=true;status.textContent='Publicando…';
    let createdPost=null,uploadedPaths=[],feedPublished=false,publishStage='validar a conta';
