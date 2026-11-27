@@ -128,6 +128,17 @@
   playedThisOutage=false;offlineFeedbackSent=false;
   try{if(typeof navigator.vibrate==='function')navigator.vibrate(0);}catch(error){}
   if(!alertBox.isConnected)return;
+  // O retorno também recebe confirmação tátil e a corneta, quando o navegador
+  // já liberou áudio após uma interação anterior do usuário.
+  (async()=>{
+   try{
+    const nativeHaptics=window.Capacitor?.Plugins?.Haptics;
+    if(nativeHaptics?.vibrate&&window.Capacitor?.isNativePlatform?.())await nativeHaptics.vibrate({duration:450});
+    else if(typeof navigator.vibrate==='function')navigator.vibrate([160,90,160]);
+   }catch(error){try{if(typeof navigator.vibrate==='function')navigator.vibrate([160,90,160]);}catch{}}
+  })();
+  if(audioUnlocked)playTrainHorn();
+  playedThisOutage=false;
   alertTitle.textContent='ONLINE';
    alertTitle.style.color='#48e08b';
   alertDetail.textContent='🚂 CONEXÃO RESTABELECIDA! A INTERNET VOLTOU.';
