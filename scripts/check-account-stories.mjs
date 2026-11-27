@@ -37,7 +37,7 @@ assert.match(storyViewer, /story\.music_duration_seconds/);
 assert.match(script, /Pesquisar por música ou artista/);
 assert.match(script, /my-story-music-search/);
 assert.match(script, /musicSearch\.addEventListener\('input', renderOptions\)/);
-assert.match(script, /function renderOptions\(\)/);
+assert.match(script, /const renderOptions = \(\) => \{/);
 assert.match(script, /normalize\('NFD'\)/);
 assert.match(script, /data-story-music-results/);
 assert.match(script, /Colocar música no Story/);
