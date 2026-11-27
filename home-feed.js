@@ -73,7 +73,8 @@ if(root&&form){
    const media=new Map();
    for(const row of mediaQ.data||[]){const key=row.post_id,list=media.get(key)||[];list.push({...row,url:urls.get((row.bucket_id||'capital-do-trem-social')+':'+row.storage_path)});media.set(key,list)}
    root.replaceChildren();
-   for(const post of posts){
+   const visiblePosts=posts.filter(post=>(media.get(post.id)||[]).some(item=>item.url&&['image','video'].includes(item.media_type)));
+   for(const post of visiblePosts){
     const profile=people.get(post.author_id)||{display_name:'Maquinista do Capital do Trem'};
     const card=document.createElement('article');card.className='home-feed-post';
     const header=document.createElement('header');header.className='home-feed-post-head';
