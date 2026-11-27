@@ -47,8 +47,9 @@ assert.ok(profile.includes('class="profile-dream-signature"') &&
   'As duas frases oficiais precisam aparecer visivelmente na área de Perfil');
 assert.ok(home.includes('class="home-social-access"') && css.includes('.home-social-access-link'),
   'Os atalhos de redes sociais precisam ter estilo visível na tela inicial');
-assert.ok(css.includes('#home-feed-open>span:last-child') && css.includes('align-items:center!important'),
-  'O texto No que está pensando? precisa ficar alinhado verticalmente ao avatar');
+assert.ok(css.includes('#home-feed-open>span:last-child') && css.includes('align-items:center!important') &&
+  css.includes('white-space:nowrap!important') && css.includes('font-size:clamp(11px,3.2vw,13px)!important'),
+  'O texto No que está pensando? precisa ficar menor e em uma única linha ao lado do avatar');
 assert.ok(css.includes('#musicas .music-section-banner') && css.includes('aspect-ratio:16 / 9!important') &&
   css.includes('object-fit:contain!important') && css.includes('max-height:none!important'),
   'A capa de Músicas precisa aparecer inteira, sem corte');
