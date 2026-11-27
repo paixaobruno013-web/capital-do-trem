@@ -181,3 +181,20 @@ body *{min-width:0}
   inset:8px 8px auto auto!important;
   z-index:10!important;
 }
+
+/* Banner musical: proporção natural da arte original, sem corte em Android, iPhone ou navegador. */
+#musicas .music-section-banner,
+#musicas .music-section-banner > img#music-section-banner-image{
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  aspect-ratio:auto!important;
+}
+#musicas .music-section-banner > img#music-section-banner-image{
+  display:block!important;
+  width:100%!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  clip-path:none!important;
+  transform:none!important;
+}
