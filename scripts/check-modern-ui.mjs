@@ -6,6 +6,9 @@ const home = read('../index.html');
 const chat = read('../bate-papo.html');
 const inbox = read('../mensagens.html');
 const css = read('../capital-modern-ui.css');
+const chatStyles = read('../chat-modern.css');
+const musicStyles = read('../capital-futurista.css');
+const musicUpload = read('../music-upload.js');
 const prepare = read('./prepare-web.mjs');
 const sw = read('../sw.js');
 const update = read('../update.js');
@@ -30,6 +33,23 @@ for (const [html, token] of [
 
 assert.ok(prepare.includes("'capital-modern-ui.css'"),
   'A folha visual precisa ser copiada para o pacote www/Android/iOS');
+assert.ok(prepare.includes("'chat-modern.css'") && prepare.includes("'capital-futurista.css'"),
+  'Os estilos específicos do chat e de Músicas precisam entrar no pacote www/Android/iOS');
+assert.ok(sw.includes("'./chat-modern.css'") && sw.includes("'./capital-futurista.css'"),
+  'Os estilos específicos do chat e de Músicas precisam estar no cache complementar do PWA');
+assert.ok(chat.includes('href="./chat-modern.css?v=1"') &&
+  chatStyles.includes('#chat-profile-rail') &&
+  chatStyles.includes('#open-group-profile') &&
+  chatStyles.includes('#chat-online-profiles'),
+  'O FALA UAI precisa carregar o alinhamento compacto do grupo e dos perfis online');
+assert.ok(home.includes('<section id="music-upload-area" class="card music-upload-area" hidden') &&
+  musicUpload.includes('isCurrentUserArtistOrAdmin()') &&
+  musicUpload.includes('setUploadVisibility(false)') &&
+  musicUpload.includes('setUploadVisibility(true)'),
+  'O painel de envio musical deve iniciar oculto e só aparecer após validar conta de artista/MC/DJ ou administrador');
+assert.ok(musicStyles.includes('#musicas #music-upload-area') &&
+  musicStyles.includes('#musicas #published-song-catalog'),
+  'A identidade visual nova precisa atingir o painel de envio e o catálogo musical reais');
 assert.ok(sw.includes("'./capital-modern-ui.css'"),
   'A folha visual precisa integrar o cache complementar do PWA');
 assert.match(sw, /capital-do-trem-v[0-9]+/,
