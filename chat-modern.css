@@ -108,3 +108,110 @@ body.cdt-fala-uai-page #chat-profile-rail{width:100%;max-width:100%;overflow:hid
 body.cdt-fala-uai-page #chat-online-profiles{min-width:0;max-width:100%;flex-wrap:wrap!important;overflow:hidden!important}
 body:has(#private-layout) #private-layout,body:has(#private-layout) #sidebar-panel,body:has(#private-layout) #thread-panel{min-width:0;max-width:100%}
 body.cdt-fala-uai-page .fala-profile-menu-wrap,body.cdt-fala-uai-page .fala-profile-menu-button,body.cdt-fala-uai-page .fala-profile-menu{display:none!important}
+
+
+/* FALA UAI: conversa em tela fixa, com mensagens roláveis e envio sempre acessível. */
+body.cdt-fala-uai-page:has(#capital-do-trem-room:not([hidden])){
+  overflow:hidden!important;
+}
+body.cdt-fala-uai-page:has(#capital-do-trem-room:not([hidden])) #main-content{
+  position:static!important;
+  width:100%!important;
+  max-width:100%!important;
+  margin:0!important;
+  padding:0!important;
+}
+body.cdt-fala-uai-page:has(#capital-do-trem-room:not([hidden])) #main-content>:not(#capital-do-trem-room):not(.fala-chat-settings-bar):not(#chat-image-settings){
+  display:none!important;
+}
+body.cdt-fala-uai-page:has(#capital-do-trem-room:not([hidden])) .fala-chat-settings-bar{
+  position:fixed!important;
+  z-index:1202!important;
+  top:env(safe-area-inset-top,0px)!important;
+  right:10px!important;
+  margin:0!important;
+}
+body.cdt-fala-uai-page:has(#capital-do-trem-room:not([hidden])) #chat-image-settings:not([hidden]){
+  position:fixed!important;
+  z-index:1203!important;
+  top:54px!important;
+  right:10px!important;
+  left:10px!important;
+  max-height:calc(100dvh - 70px)!important;
+  overflow:auto!important;
+}
+body.cdt-fala-uai-page #capital-do-trem-room:not([hidden]){
+  position:fixed!important;
+  z-index:1200!important;
+  inset:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:0!important;
+  width:100%!important;
+  height:100vh!important;
+  height:100dvh!important;
+  max-width:none!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:calc(env(safe-area-inset-top,0px) + 8px) 10px calc(env(safe-area-inset-bottom,0px) + 8px)!important;
+  overflow:hidden!important;
+  border:0!important;
+  border-radius:0!important;
+  box-sizing:border-box!important;
+  background:#171b24!important;
+}
+body.cdt-fala-uai-page #capital-do-trem-room:not([hidden])>.fala-active-chat-header{
+  flex:0 0 auto!important;
+  min-height:54px!important;
+  padding:5px 56px 10px 2px!important;
+  margin:0 0 8px!important;
+}
+body.cdt-fala-uai-page #capital-do-trem-room:not([hidden]) #gate{
+  flex:0 0 auto!important;
+}
+body.cdt-fala-uai-page #capital-do-trem-room:not([hidden]) #chat-area:not([hidden]){
+  display:flex!important;
+  flex:1 1 auto!important;
+  flex-direction:column!important;
+  min-height:0!important;
+  height:auto!important;
+  overflow:hidden!important;
+  gap:5px!important;
+}
+body.cdt-fala-uai-page #capital-do-trem-room:not([hidden]) #chat-connection{
+  flex:0 0 auto!important;
+  margin:0!important;
+  padding:2px 5px!important;
+  font-size:10px!important;
+}
+body.cdt-fala-uai-page #capital-do-trem-room:not([hidden]) #chat-area>.actions,
+body.cdt-fala-uai-page #capital-do-trem-room:not([hidden]) #media-gallery{
+  flex:0 0 auto!important;
+  max-height:25dvh!important;
+  overflow:auto!important;
+}
+body.cdt-fala-uai-page #capital-do-trem-room:not([hidden]) #messages{
+  flex:1 1 0!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+}
+body.cdt-fala-uai-page #capital-do-trem-room:not([hidden]) #composer{
+  position:relative!important;
+  z-index:2!important;
+  flex:0 0 auto!important;
+  margin:7px 0 0!important;
+  padding-bottom:max(7px,env(safe-area-inset-bottom,0px))!important;
+}
+body.cdt-fala-uai-page #capital-do-trem-room:not([hidden]) #status{
+  flex:0 0 auto!important;
+  max-height:38px!important;
+  overflow:auto!important;
+  margin:2px 0 0!important;
+  font-size:11px!important;
+}
