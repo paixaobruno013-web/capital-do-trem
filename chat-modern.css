@@ -40,3 +40,49 @@ body:has(#private-layout) .compose input#message{min-height:42px!important;borde
 body:has(#private-layout) .compose button{min-height:42px!important;border-radius:50%!important;background:#2d3340!important;color:#fff!important;border:0!important}
 body:has(#private-layout) .compose button#send{background:#ef4d55!important}
 @media(max-width:720px){body:has(#private-layout) #private-layout{grid-template-columns:minmax(0,1fr)!important}body:has(#private-layout) .layout:not(.chat-open) #thread-panel{display:none!important}body:has(#private-layout) .layout.chat-open #sidebar-panel{display:none!important}body:has(#private-layout) .layout.chat-open #thread-panel{display:flex!important}}
+
+/* Ajuste fino do FALA UAI à referência: cabeçalho Chats, perfis online e conversa */
+body.cdt-fala-uai-page .fala-inbox-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px 14px;color:#f7f7fa}
+body.cdt-fala-uai-page .fala-inbox-header h1{margin:0;font-size:clamp(24px,5vw,31px);font-weight:850;letter-spacing:.1px;text-transform:none;text-shadow:none}
+body.cdt-fala-uai-page .fala-profile-menu-wrap{position:relative;z-index:30}
+body.cdt-fala-uai-page .fala-profile-menu-button{width:42px;height:42px;min-height:42px;padding:0;border-radius:50%;background:linear-gradient(145deg,#343a47,#222732);color:#f5f5f7;font-size:27px;line-height:1;border:1px solid #ffffff13;box-shadow:0 5px 15px #0006}
+body.cdt-fala-uai-page .fala-profile-menu{position:absolute;right:0;top:48px;min-width:190px;padding:6px;border:1px solid #ffffff18;border-radius:14px;background:#252a35;box-shadow:0 12px 30px #0009}
+body.cdt-fala-uai-page .fala-profile-menu[hidden]{display:none!important}
+body.cdt-fala-uai-page .fala-profile-menu button{width:100%;min-height:42px;padding:9px 12px;border:0;border-radius:9px;background:transparent;color:#fff;text-align:left;font-size:13px}
+body.cdt-fala-uai-page .fala-profile-menu button:active{background:#ef4d5533}
+body.cdt-fala-uai-page #chat-profile-rail{align-items:flex-start!important;gap:10px!important;min-height:98px;padding:5px 2px 13px!important;border-bottom:1px solid #ffffff10;margin-bottom:12px}
+body.cdt-fala-uai-page #chat-online-profiles{gap:10px!important}
+body.cdt-fala-uai-page .chat-online-profile{flex:0 0 70px!important;width:70px!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:4px!important;text-decoration:none!important;color:#f4f4f7!important}
+body.cdt-fala-uai-page .chat-online-profile-avatar{width:54px!important;height:54px!important;border:2px solid #ef4d55!important;border-radius:50%!important;background:#303541!important;box-shadow:0 4px 12px #0007!important}
+body.cdt-fala-uai-page .chat-online-profile-dot{width:11px!important;height:11px!important;right:0!important;bottom:0!important;border:2px solid #20242e!important;background:#42d477!important}
+body.cdt-fala-uai-page .chat-online-profile-name{max-width:68px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-size:10px!important;color:#e7e8ec!important}
+body.cdt-fala-uai-page .chat-online-profile-status{font-size:9px!important;color:#aeb4c1!important}
+body.cdt-fala-uai-page .chat-profile-chip{flex:0 0 70px!important;width:70px!important}
+body.cdt-fala-uai-page .chat-profile-chip-avatar{width:54px!important;height:54px!important;border:2px solid #ef4d55!important;background:#252a35!important}
+body.cdt-fala-uai-page .chat-profile-chip-name{font-size:9px!important;line-height:1.1!important;color:#f4f4f7!important}
+body.cdt-fala-uai-page .chat-profile-chip-status{font-size:9px!important;color:#aeb4c1!important}
+body.cdt-fala-uai-page #capital-do-trem-room{padding:12px!important;border:1px solid #ffffff0c!important;border-radius:20px!important;background:linear-gradient(145deg,#252a35,#1a1e27)!important}
+body.cdt-fala-uai-page .fala-active-chat-header{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;padding:4px 2px 13px!important;margin:0 0 10px!important;border-bottom:1px solid #ffffff10!important}
+body.cdt-fala-uai-page .fala-active-chat-identity{display:flex!important;align-items:center!important;gap:10px!important;min-width:0}
+body.cdt-fala-uai-page .fala-active-chat-avatar{display:grid;width:42px;height:42px;flex:0 0 42px;overflow:hidden;place-items:center;border:1px solid #ffffff16;border-radius:50%;background:#303541;box-shadow:0 4px 12px #0006}
+body.cdt-fala-uai-page .fala-active-chat-avatar img{width:100%;height:100%;object-fit:cover}
+body.cdt-fala-uai-page .fala-active-chat-identity h2{margin:0!important;font-size:14px!important;line-height:1.25!important;letter-spacing:0!important;color:#f8f8fa!important;text-transform:none!important}
+body.cdt-fala-uai-page .fala-active-chat-identity small{display:block;margin-top:3px;color:#aeb4c1;font-size:10px}
+body.cdt-fala-uai-page #group-profile-tools,body.cdt-fala-uai-page #group-live-presence{display:none!important}
+body.cdt-fala-uai-page #messages{height:min(60vh,620px)!important;min-height:290px!important;display:flex!important;flex-direction:column!important;gap:10px!important;padding:13px 9px!important;border:1px solid #ffffff08!important;border-radius:15px!important;background:linear-gradient(180deg,#1d222c,#191d26)!important}
+body.cdt-fala-uai-page #messages .message{align-self:flex-start!important;max-width:84%!important;padding:9px 12px!important;border:1px solid #ffffff0d!important;border-radius:14px 14px 14px 4px!important;background:#10141c!important;color:#f4f5f7!important;box-shadow:0 4px 12px #0004!important}
+body.cdt-fala-uai-page #messages .message strong{color:#f6f6f8!important;font-size:11px!important}
+body.cdt-fala-uai-page #messages .message time{color:#aeb4c1!important;font-size:9px!important}
+body.cdt-fala-uai-page #messages .message.message-own{align-self:flex-end!important;border:0!important;border-radius:14px 14px 4px 14px!important;background:linear-gradient(135deg,#fa5a60,#e83f49)!important;color:#fff!important}
+body.cdt-fala-uai-page #messages .message-own strong,body.cdt-fala-uai-page #messages .message-own time{color:#fff!important}
+body.cdt-fala-uai-page #messages .message-head{gap:7px!important;margin-bottom:5px!important}
+body.cdt-fala-uai-page #messages .message-avatar{width:27px!important;height:27px!important;flex:0 0 27px!important;border:1px solid #ffffff22!important}
+body.cdt-fala-uai-page #messages .message-avatar img{width:100%;height:100%;object-fit:cover}
+body.cdt-fala-uai-page #composer{display:grid!important;grid-template-columns:minmax(0,1fr) 42px 54px!important;align-items:center!important;gap:7px!important;margin-top:10px!important;padding:7px!important;border:1px solid #ffffff13!important;border-radius:18px!important;background:#20242e!important}
+body.cdt-fala-uai-page #composer #emoji-tray{display:none!important}
+body.cdt-fala-uai-page #composer #message{grid-column:1!important;grid-row:1!important;width:100%!important;min-width:0!important;min-height:43px!important;padding:10px 14px!important;border:0!important;border-radius:999px!important;background:#171b24!important;color:#fff!important;font-size:13px!important}
+body.cdt-fala-uai-page #composer #camera-open{grid-column:2!important;grid-row:1!important;width:42px!important;height:42px!important;min-height:42px!important;padding:0!important;border-radius:50%!important;background:#303644!important;color:#ef646a!important;font-size:18px!important}
+body.cdt-fala-uai-page #composer #send{grid-column:3!important;grid-row:1!important;width:54px!important;height:42px!important;min-height:42px!important;padding:0 8px!important;border-radius:999px!important;background:#ef4d55!important;color:#fff!important;font-size:12px!important;font-weight:850!important}
+body.cdt-fala-uai-page #composer #attachment-name,body.cdt-fala-uai-page #composer .view-once-option,body.cdt-fala-uai-page #composer #chat-upload-progress,body.cdt-fala-uai-page #composer #message-counter{grid-column:1/-1!important}
+body.cdt-fala-uai-page #composer #attachment-name:empty{display:none}
+@media(max-width:480px){body.cdt-fala-uai-page #capital-do-trem-room{padding:9px!important}body.cdt-fala-uai-page #messages{height:57vh!important;min-height:250px!important}body.cdt-fala-uai-page #composer{grid-template-columns:minmax(0,1fr) 38px 48px!important;gap:5px!important}body.cdt-fala-uai-page #composer #camera-open{width:38px!important;height:38px!important;min-height:38px!important}body.cdt-fala-uai-page #composer #send{width:48px!important;height:38px!important;min-height:38px!important}}
