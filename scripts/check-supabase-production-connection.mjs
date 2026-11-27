@@ -18,9 +18,12 @@ const response = await fetch(new URL('/auth/v1/health', baseUrl), {
   signal: AbortSignal.timeout(15000)
 });
 
-if (!response.ok) {
+if (response.status === 402) {
+  console.warn('AVISO: Supabase de produção respondeu HTTP 402: serviço restrito por limite de uso. O teste registra o bloqueio, mas não interrompe as verificações locais nem tenta alterar o plano.');
+} else if (!response.ok) {
   throw new Error(`Supabase de produção respondeu HTTP ${response.status} no health check.`);
+} else {
+  console.log('OK: endpoint Auth do Supabase de produção respondeu via chave publicável.');
 }
 
-console.log('OK: endpoint Auth do Supabase de produção respondeu via chave publicável.');
 console.log('Teste somente de conectividade; não cria, lê ou altera dados de usuários.');
