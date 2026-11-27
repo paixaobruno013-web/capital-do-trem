@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 const html=await readFile(new URL('../rede.html',import.meta.url),'utf8');
 const js=await readFile(new URL('../rede.js',import.meta.url),'utf8');
 const nav=await readFile(new URL('../mobile-bottom-nav.js',import.meta.url),'utf8');
+const homeFeed=await readFile(new URL('../home-feed.js',import.meta.url),'utf8');
 const checks=[
 [html.includes('stat-posts')&&html.includes('stat-followers')&&html.includes('stat-following'),'Perfil mostra publicações, seguidores e seguindo'],
 [html.includes('post-file')&&html.includes('accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime"'),'Publicação aceita foto e vídeo'],
@@ -36,3 +37,6 @@ console.log('Feed direciona para o perfil público de cada autor.');
 
 if(!html.includes('profile-stat')||!html.includes('publicações')||!html.includes('seguidores')||!html.includes('seguindo')||!js.includes("placeholder='Buscar por nome ou @usuário…'")||!js.includes('pageSize=500'))throw new Error('Estatísticas compactas e pesquisa nas listas de seguidores ausentes.');
 console.log('Contadores compactos e pesquisa de seguidores/seguindo conferidos.');
+
+if(!js.includes('const feedAutoplayAllowed=()=>false;')||!homeFeed.includes('const feedAutoplayAllowed=()=>false;')||!js.includes("el.preload='none'")||!homeFeed.includes("video.preload='none';const caption="))throw new Error('Proteção de tráfego: vídeos do feed devem aguardar reprodução manual e usar preload none.');
+console.log('Proteção de tráfego: reprodução manual e carregamento sob demanda conferidos.');
