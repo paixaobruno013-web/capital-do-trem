@@ -18,6 +18,7 @@ const files = [
   'music-cover.js',
   'music-playlists.js',
   'chat-topics.js',
+  'chat-modern.css',
   'capital-futurista.css',
   'capital-modern-ui.css',
   'admin.html',
