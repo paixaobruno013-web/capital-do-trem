@@ -46,6 +46,7 @@ const checks = [
   ['menu de três pontos do perfil reúne acessos da conta e apoiadores em lista vertical', /profile-account-shortcuts/.test(await read('rede.html')) && /flex-direction:column/.test(await read('rede.html')) && /my-stories-panel/.test(await read('rede.html')) && /set-password-form/.test(await read('rede.html')) && /apoiadores\.html/.test(await read('rede.html')) && /admin-apoiadores\.html/.test(await read('rede.html'))],
   ['ferramentas verticais dos Stories reabrem expandidas ao iniciar o compositor', /home-story-tools-rail/.test(home) && /tools-collapsed','effects-collapsed/.test(await read('home-story-composer.js'))],
   ['ações inferiores dos Stories ficam limitadas a Story ou Story + Feed', /id="home-story-publish"[^>]*>Postar no Story/.test(home) && /id="home-story-feed-publish"[^>]*>Story \+ Feed/.test(home)],
+  ['ação Story + Feed cria o Story e encaminha a mesma mídia ao Feed', /async function publishToFeed\(\)/.test(await read('home-story-composer.js')) && /const storySaved = await auth\.createMyStory\(\{/.test(await read('home-story-composer.js')) && /form\.requestSubmit\(\)/.test(await read('home-story-composer.js'))],
   ['ícone do Instagram usa degradê no bloco inteiro, com símbolo branco', /\.instagram-button \.instagram-mark\{[^}]*background:linear-gradient/.test(home) && /-webkit-text-fill-color:#fff/.test(home)],
   ['locomotiva e três vagões permanecem na abertura', /opening-wagon-rear/.test(home) && /opening-wagon-dancers/.test(home) && /opening-wagon-front/.test(home) && /opening-locomotive/.test(home)]
 ];
