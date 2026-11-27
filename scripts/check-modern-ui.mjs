@@ -14,7 +14,7 @@ const sw = read('../sw.js');
 const update = read('../update.js');
 const signedRelease = read('../.github/workflows/android-signed-release.yml');
 
-assert.ok(home.includes('href="./capital-modern-ui.css?v=4"'),
+assert.ok(home.includes('href="./capital-modern-ui.css?v=5"'),
   'index.html precisa carregar a folha de modernização atualizada');
 assert.ok(chat.includes('href="./capital-modern-ui.css?v=1"'),
   'bate-papo.html precisa carregar a folha de modernização');
