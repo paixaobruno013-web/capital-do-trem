@@ -126,11 +126,14 @@ function openProfileImage(src,alt){
  }
  const image=profileImageViewer.querySelector('img');image.src=src;image.alt=alt||'Imagem do perfil';profileImageViewer.hidden=false;document.body.classList.add('profile-image-viewer-open');profileImageViewer.querySelector('button').focus();
 }
-function makeProfileImageOpenable(el,label){
+function makeProfileImageOpenable(el,label,onActivate=null){
  if(!el)return;
- el.tabIndex=0;el.setAttribute('role','button');el.setAttribute('aria-label','Ampliar '+label);el.title='Toque para ampliar';
- const open=()=>openProfileImage(el.currentSrc||el.src,label);
- el.addEventListener('click',open);el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}});
+ el.tabIndex=0;el.setAttribute('role','button');
+ const canChange=typeof onActivate==='function';
+ el.setAttribute('aria-label',canChange?'Trocar '+label+' do seu perfil':'Ampliar '+label);
+ el.title=canChange?'Toque para escolher outra imagem':'Toque para ampliar';
+ const open=()=>{if(canChange){onActivate();return;}openProfileImage(el.currentSrc||el.src,label)};
+ el.onclick=open;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}};
 }
 function openProfilePostMedia(src,type,label,buildActions){
  if(!src)return;
@@ -163,7 +166,7 @@ function buildProfileMediaActions(post,item,index,url){
   const download=add(item.media_type==='video'?'⬇️ Fazer download do vídeo':'⬇️ Fazer download da foto',async()=>{download.disabled=true;try{const ext=(item.storage_path.split('.').pop()||(item.media_type==='video'?'mp4':'jpg')).toLowerCase();await downloadPostMedia(url,'capital-do-trem-'+post.id+'-'+(index+1)+'.'+ext,item.media_type)}catch(e){notice('global-status',e.message||'Não foi possível baixar a mídia.')}finally{download.disabled=false}});
  };
 }
-function renderProfile(p,stats,own){const avatar=$('profile-avatar');if(avatar)setAvatar(avatar,p);const verifiedSeal=$('profile-verified-seal');if(verifiedSeal){verifiedSeal.hidden=true;if(p.account_type==='artist')supabase.from('artists').select('id').eq('user_id',p.user_id).eq('status','published').maybeSingle().then(({data,error})=>{verifiedSeal.hidden=!!error||!data}).catch(()=>{verifiedSeal.hidden=true})}const cover=$('profile-cover');if(cover){if(p.cover_url){cover.src=p.cover_url;cover.style.objectFit='cover'}else{cover.removeAttribute('src');cover.style.objectFit='cover'}makeProfileImageOpenable(cover,'foto de capa')}makeProfileImageOpenable(avatar,'foto de perfil');for(const [id,value] of [['profile-name',p.display_name||'Usuário Uai'],['profile-handle','@'+(p.username||'')],['profile-city',p.city||'Cidade não informada'],['profile-bio',p.bio||''],['stat-posts',stats.posts],['stat-followers',stats.followers],['stat-following',stats.following]]){const el=$(id);if(el)el.textContent=value};for(const [id,kind,label] of [['stat-followers','followers','Abrir lista de seguidores'],['stat-following','following','Abrir lista de perfis seguidos']]){const count=$(id),wrap=$(id+'-wrap');if(count&&wrap){wrap.setAttribute('role','button');wrap.setAttribute('tabindex','0');wrap.setAttribute('aria-label',label);wrap.onclick=()=>showFollowDirectory(kind,p.user_id);wrap.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();showFollowDirectory(kind,p.user_id)}}}}const editor=$('profile-edit');if(editor)editor.hidden=!own;const actions=$('profile-actions');if(actions){actions.replaceChildren();if(!own){const b=document.createElement('button');b.className='btn primary';b.textContent='Seguir';b.onclick=()=>toggleFollow(p.user_id,b);actions.append(b)}}}
+function renderProfile(p,stats,own){const avatar=$('profile-avatar');if(avatar)setAvatar(avatar,p);const verifiedSeal=$('profile-verified-seal');if(verifiedSeal){verifiedSeal.hidden=true;if(p.account_type==='artist')supabase.from('artists').select('id').eq('user_id',p.user_id).eq('status','published').maybeSingle().then(({data,error})=>{verifiedSeal.hidden=!!error||!data}).catch(()=>{verifiedSeal.hidden=true})}const cover=$('profile-cover');if(cover){if(p.cover_url){cover.src=p.cover_url;cover.style.objectFit='cover'}else{cover.removeAttribute('src');cover.style.objectFit='cover'}makeProfileImageOpenable(cover,'foto de capa',own?()=>{const input=$('edit-cover');if(input){input.dataset.directImageChange='1';input.click()}}:null)}makeProfileImageOpenable(avatar,'foto de perfil',own?()=>{const input=$('edit-avatar');if(input){input.dataset.directImageChange='1';input.click()}}:null);for(const [id,value] of [['profile-name',p.display_name||'Usuário Uai'],['profile-handle','@'+(p.username||'')],['profile-city',p.city||'Cidade não informada'],['profile-bio',p.bio||''],['stat-posts',stats.posts],['stat-followers',stats.followers],['stat-following',stats.following]]){const el=$(id);if(el)el.textContent=value};for(const [id,kind,label] of [['stat-followers','followers','Abrir lista de seguidores'],['stat-following','following','Abrir lista de perfis seguidos']]){const count=$(id),wrap=$(id+'-wrap');if(count&&wrap){wrap.setAttribute('role','button');wrap.setAttribute('tabindex','0');wrap.setAttribute('aria-label',label);wrap.onclick=()=>showFollowDirectory(kind,p.user_id);wrap.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();showFollowDirectory(kind,p.user_id)}}}}const editor=$('profile-edit');if(editor)editor.hidden=!own;const actions=$('profile-actions');if(actions){actions.replaceChildren();if(!own){const b=document.createElement('button');b.className='btn primary';b.textContent='Seguir';b.onclick=()=>toggleFollow(p.user_id,b);actions.append(b)}}}
 async function getStats(userId){
  const [posts,followers,following]=await Promise.all([
   supabase.from('posts').select('id',{count:'exact',head:true}).eq('author_id',userId).eq('status','published'),
@@ -365,6 +368,31 @@ async function toggleFollow(target,button){if(!me){notice('global-status','Entre
 const avatarPicker=$('edit-avatar'),coverPicker=$('edit-cover'),profileCoverPreview=$('profile-cover'),profileAvatarPreview=$('profile-avatar');let avatarPreviewUrl=null,coverPreviewUrl=null;
 function previewGalleryImage(input,target,kind){input?.addEventListener('change',()=>{const file=input.files?.[0];if(!file)return;if(!['image/jpeg','image/png','image/webp'].includes(file.type)){notice('profile-edit-status','Escolha uma imagem JPG, PNG ou WebP da galeria.');input.value='';return}if(kind==='avatar'&&file.size>5*1024*1024){notice('profile-edit-status','A foto de perfil deve ter até 5 MB.');input.value='';return}if(kind==='cover'&&file.size>5*1024*1024){notice('profile-edit-status','A foto de capa deve ter até 5 MB.');input.value='';return}const previous=kind==='avatar'?avatarPreviewUrl:coverPreviewUrl;if(previous)URL.revokeObjectURL(previous);const url=URL.createObjectURL(file);if(kind==='avatar')avatarPreviewUrl=url;else coverPreviewUrl=url;if(target)target.src=url;if(kind==='cover')$('cover-preset').value='';notice('profile-edit-status','Prévia carregada. Toque em “Salvar perfil” para confirmar.');});}
 previewGalleryImage(avatarPicker,profileAvatarPreview,'avatar');previewGalleryImage(coverPicker,profileCoverPreview,'cover');
+async function saveDirectProfileImage(input,kind){
+ input?.addEventListener('change',async()=>{
+  if(input.dataset.directImageChange!=='1')return;
+  input.dataset.directImageChange='0';
+  const file=input.files?.[0];if(!file)return;
+  input.disabled=true;notice('profile-edit-status','Atualizando sua '+(kind==='avatar'?'foto de perfil':'foto de capa')+'…');
+  try{
+   if(kind==='avatar'){
+    const uploaded=await api.uploadMyAvatar(file);
+    const saved=await api.saveMyAvatar({type:'photo',path:uploaded.path});
+    profile={...profile,...saved};
+   }else{
+    const saved=await api.uploadMyCover(file);
+    profile={...profile,...saved};
+   }
+   if(avatarPreviewUrl){URL.revokeObjectURL(avatarPreviewUrl);avatarPreviewUrl=null;}
+   if(coverPreviewUrl){URL.revokeObjectURL(coverPreviewUrl);coverPreviewUrl=null;}
+   await loadMyProfile();
+   notice('profile-edit-status','Imagem atualizada e salva no seu perfil!');
+  }catch(error){notice('profile-edit-status',error.message||'Não foi possível atualizar a imagem. Tente novamente.');}
+  finally{input.disabled=false;input.value='';}
+ });
+}
+saveDirectProfileImage(avatarPicker,'avatar');
+saveDirectProfileImage(coverPicker,'cover');
 $('cover-preset')?.addEventListener('change',()=>{const value=$('cover-preset').value;if(value){if(profileCoverPreview)profileCoverPreview.src=makeCoverPreset(value);if(coverPicker)coverPicker.value='';if(coverPreviewUrl){URL.revokeObjectURL(coverPreviewUrl);coverPreviewUrl=null}}});
 $('edit-username')?.addEventListener('blur',async()=>{const candidate=$('edit-username').value.trim().toLowerCase();if(!candidate||candidate===String(profile?.username||'').toLowerCase())return;try{const available=await api.isUsernameAvailable(candidate);notice('profile-edit-status',available?'Nome de usuário disponível.':'Este nome de usuário já está em uso.');}catch(error){notice('profile-edit-status',error.message||'Não foi possível verificar o nome de usuário.');}});
 $('save-profile').addEventListener('click',async()=>{const b=$('save-profile');b.disabled=true;notice('profile-edit-status','Salvando…');try{const desiredUsername=$('edit-username').value.trim().toLowerCase();if(desiredUsername&&desiredUsername!==String(profile?.username||'').toLowerCase()&&!(await api.isUsernameAvailable(desiredUsername)))throw new Error('Este nome de usuário já está em uso. Escolha outro.');const avatarFile=$('edit-avatar').files[0],coverFile=$('edit-cover').files[0],coverPreset=$('cover-preset').value;if(avatarFile){const uploaded=await api.uploadMyAvatar(avatarFile);await api.saveMyAvatar({type:'photo',path:uploaded.path});$('edit-avatar').value=''}if(coverFile){const allowed=['image/jpeg','image/png','image/webp'];if(!allowed.includes(coverFile.type)||coverFile.size<1||coverFile.size>5*1024*1024)throw new Error('A capa deve ser JPG, PNG ou WebP de até 5 MB.');const ext={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'}[coverFile.type],path=me.id+'/cover/'+crypto.randomUUID()+'.'+ext;const up=await supabase.storage.from('capital-do-trem-media').upload(path,coverFile,{contentType:coverFile.type,cacheControl:'3600',upsert:false});if(up.error)throw up.error;const {data:pub}=supabase.storage.from('capital-do-trem-media').getPublicUrl(path);const oldPath=profile.cover_path;const saved=await supabase.from('profiles').update({cover_url:pub.publicUrl,cover_path:path}).eq('user_id',me.id);if(saved.error){await supabase.storage.from('capital-do-trem-media').remove([path]);throw saved.error}if(oldPath&&oldPath.startsWith(me.id+'/cover/'))await supabase.storage.from('capital-do-trem-media').remove([oldPath]);$('edit-cover').value=''}else if(coverPreset){const oldPath=profile.cover_path;const saved=await supabase.from('profiles').update({cover_url:makeCoverPreset(coverPreset),cover_path:null}).eq('user_id',me.id);if(saved.error)throw saved.error;if(oldPath&&oldPath.startsWith(me.id+'/cover/'))await supabase.storage.from('capital-do-trem-media').remove([oldPath])}const savedProfile=await api.saveMyBasicProfile({display_name:$('edit-name').value.trim(),username:$('edit-username').value.trim()||profile.username,account_type:profile.account_type,bio:$('edit-bio').value.trim(),city:$('edit-city').value.trim(),is_public:$('edit-public').checked});profile={...profile,...savedProfile};await loadMyProfile();$('cover-preset').value='';notice('profile-edit-status','Perfil atualizado!')}catch(e){notice('profile-edit-status',e.message||'Não foi possível salvar o perfil.')}finally{b.disabled=false}});
