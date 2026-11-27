@@ -100,3 +100,11 @@ body.cdt-fala-uai-page #chat-online-profiles .chat-online-profile-avatar{width:3
 body.cdt-fala-uai-page #chat-online-profiles .chat-online-profile-name{max-width:48px!important;font-size:9px!important}
 body.cdt-fala-uai-page #chat-online-profiles .chat-online-profile-status{font-size:9px!important}
 body.cdt-fala-uai-page #chat-online-profiles .chat-online-profile-dot{width:9px!important;height:9px!important;right:0!important;bottom:0!important}
+
+
+/* FALA UAI e conversas privadas não deslocam a tela lateralmente. */
+body.cdt-fala-uai-page,body:has(#private-layout){width:100%;max-width:100%;overflow-x:clip!important;overscroll-behavior-x:none}
+body.cdt-fala-uai-page #chat-profile-rail{width:100%;max-width:100%;overflow:hidden!important;flex-wrap:wrap!important}
+body.cdt-fala-uai-page #chat-online-profiles{min-width:0;max-width:100%;flex-wrap:wrap!important;overflow:hidden!important}
+body:has(#private-layout) #private-layout,body:has(#private-layout) #sidebar-panel,body:has(#private-layout) #thread-panel{min-width:0;max-width:100%}
+body.cdt-fala-uai-page .fala-profile-menu-wrap,body.cdt-fala-uai-page .fala-profile-menu-button,body.cdt-fala-uai-page .fala-profile-menu{display:none!important}
