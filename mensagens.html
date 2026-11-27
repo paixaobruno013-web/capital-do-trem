@@ -311,6 +311,11 @@ header .actions .btn,header .actions button{min-height:36px;padding:6px 9px;font
 <script type="module">
 import {getCurrentSession,getPrivateConversationData,getOnlineUserIds,subscribeUserPresence,subscribePrivateTyping,requestPrivateConversation,decidePrivateConversation,getPrivateMessages,sendPrivateMessage,subscribePrivateMessages,blockPrivateUser,getChatMessages,sendChatMessage,uploadChatAttachment,subscribeChatMessages,getPublicBranding,joinChatGroup,leaveChatGroup,updateMyPrivateMessage,deleteMyPrivateMessage,updateMyGroupMessage,deleteMyGroupMessage,openViewOnceChatMedia} from './supabase/auth.js';
 const $=id=>document.getElementById(id);let state=null,active=null,activeGroup=false,unsubscribe=null,typingChannel=null,typingTimeout=null,typingLastSent=0,presenceUnsubscribe=null,onlineIds=new Set(),groupLogo="./marca.svg";
+let soundNotificationsReady=false,trainHornAudioContext=null;
+function unlockTrainHorn(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;if(!trainHornAudioContext)trainHornAudioContext=new C();if(trainHornAudioContext.state==='suspended')trainHornAudioContext.resume().catch(()=>{});}catch{}}
+window.addEventListener('pointerdown',unlockTrainHorn,{once:true,passive:true});
+function playTrainHorn(){try{const c=trainHornAudioContext;if(!c||c.state!=='running')return;const t=c.currentTime,g=c.createGain();g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.34,t+.06);g.gain.setValueAtTime(.34,t+1.02);g.gain.linearRampToValueAtTime(.0001,t+1.38);g.connect(c.destination);[196,246.94,293.66].forEach((f,i)=>{const o=c.createOscillator(),v=c.createGain();o.type='sawtooth';o.frequency.setValueAtTime(f,t);o.detune.value=i*4;v.gain.value=.18;o.connect(v);v.connect(g);o.start(t);o.stop(t+1.4);});}catch{}}
+
 const esc=s=>String(s||'');const fmt=v=>new Date(v).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
 const shareParams=new URLSearchParams(window.location.search);
 let sharedDraft='';
@@ -485,6 +490,7 @@ function markMessageEdited(container,message){
 }
 function drawMessage(m){
  if($('messages').querySelector('[data-id="'+m.id+'"]'))return;
+ if(soundNotificationsReady&&m.sender_id!==state.userId)playTrainHorn();
  const b=node('div','bubble'+(m.sender_id===state.userId?' mine':''));const body=node('div','message-content');appendEmojiText(body,m.content||'');b.append(body);b.dataset.id=m.id;
  if(m.view_once){const media=node('div','message-attachment');appendViewOnceAttachment(media,m,false);b.append(media);}else if(m.attachment_url&&typeof m.attachment_url==='string'&&m.attachment_url.startsWith('https://')){
   const media=node('div','message-attachment');
@@ -498,6 +504,7 @@ function drawMessage(m){
 }
 function drawGroupMessage(m){
  if($('messages').querySelector('[data-id="'+m.id+'"]'))return;
+ if(soundNotificationsReady&&m.author_id!==state.userId)playTrainHorn();
  const box=node('div','bubble'+(m.author_id===state.userId?' mine':''));const body=node('div','message-content');appendEmojiText(body,m.content||'');box.append(body);
  box.dataset.id=m.id;
  const head=node('div','group-message-head');
@@ -534,7 +541,7 @@ async function openGroupConversation(){
  $('messages').replaceChildren(node('p','empty','Carregando conversa do grupo…'));
  try{
   unsubscribe=subscribeChatMessages(m=>drawGroupMessage(m),s=>{if(s==='CHANNEL_ERROR'||s==='TIMED_OUT')$('status').textContent='Conexão do grupo instável. Atualize para reconectar.';});
-  const rows=await getChatMessages(80);$('messages').replaceChildren();rows.forEach(drawGroupMessage);
+  const rows=await getChatMessages(80);soundNotificationsReady=false;$('messages').replaceChildren();rows.forEach(drawGroupMessage);soundNotificationsReady=true;
  }catch(e){$('messages').replaceChildren(node('p','empty',e.message||'Não foi possível carregar o grupo.'));}
 }
 async function openConversation(c){
@@ -542,7 +549,7 @@ async function openConversation(c){
 
  clearSubscription();active=c;activeGroup=false;$('private-gallery-open').hidden=false;$('private-media-gallery').hidden=true;$('private-layout').classList.add('chat-open');$('chat-title').textContent=personName(partner(c));$('thread-presence').textContent=onlineIds.has(partner(c))?'● Online agora':'Conversa privada • somente vocês dois';$('message').maxLength=2000;$('message').placeholder='Escreva sua mensagem privada…';$('chat-hint').textContent='Conversa privada • somente vocês dois podem acessar';$('block').hidden=false;$('leave-group').hidden=true;$('compose').hidden=false;$('messages').replaceChildren(node('p','empty','Carregando mensagens…'));drawConversations();
  try{
-  const rows=await getPrivateMessages(c.id);$('messages').replaceChildren();rows.forEach(drawMessage);
+  const rows=await getPrivateMessages(c.id);soundNotificationsReady=false;$('messages').replaceChildren();rows.forEach(drawMessage);soundNotificationsReady=true;
   unsubscribe=await subscribePrivateMessages(c.id,m=>drawMessage(m),s=>{if(s==='CHANNEL_ERROR'||s==='TIMED_OUT')$('status').textContent='Conexão instável. Atualize a página para reconectar.';});
   typingChannel=await subscribePrivateTyping(c.id,({user_id,typing})=>{
    if(!active||active.id!==c.id)return;
@@ -626,7 +633,7 @@ $('leave-group').addEventListener('click',async()=>{
  finally{button.disabled=false;}
 });
 const theme=$('theme');try{if(localStorage.getItem('capitaldotrem_theme_v1')==='light')document.body.classList.add('light');}catch{}function updateTheme(){const light=document.body.classList.contains('light');theme.textContent=light?'🌙 Escuro':'☀️ Claro';document.querySelector('meta[name="theme-color"]').content=light?'#f5f5f5':'#050505';}updateTheme();theme.addEventListener('click',()=>{document.body.classList.toggle('light');try{localStorage.setItem('capitaldotrem_theme_v1',document.body.classList.contains('light')?'light':'dark');}catch{}updateTheme();});
-(async()=>{try{const session=await getCurrentSession();if(!session){$('gate').textContent='Entre ou crie sua conta para usar as conversas privadas.';const link=node('a','btn','Entrar / Criar conta');link.href='./conta.html';$('gate').append(document.createTextNode(' '),link);return;}$('gate').hidden=true;$('app').hidden=false;try{const branding=await getPublicBranding();if(branding.profileImageUrl&&branding.profileImageUrl.startsWith('https://'))groupLogo=branding.profileImageUrl;}catch(error){}await refresh();presenceUnsubscribe=subscribeUserPresence(next=>{onlineIds=next;drawPeople();drawConversations();updateThreadPresence();});const requestedUserId=shareParams.get('user');if(requestedUserId){const target=state.conversations.find(c=>partner(c)===requestedUserId&&c.status==='accepted');const pending=state.conversations.find(c=>partner(c)===requestedUserId&&c.status==='pending');if(target)await openConversation(target);else{await openGroupConversation();if(pending)$('status').textContent='Seu convite foi enviado. A conversa será aberta quando a pessoa aceitar.';}}else await openGroupConversation();}catch(e){$('gate').textContent=e.message||'Não foi possível conectar às conversas privadas.';}})();
+(async()=>{try{const session=await getCurrentSession();if(!session){$('gate').textContent='Entre ou crie sua conta para usar as conversas privadas.';const link=node('a','btn','Entrar / Criar conta');link.href='./conta.html';$('gate').append(document.createTextNode(' '),link);return;}$('gate').hidden=true;$('app').hidden=false;try{const branding=await getPublicBranding();if(branding.profileImageUrl&&branding.profileImageUrl.startsWith('https://'))groupLogo=branding.profileImageUrl;}catch(error){}await refresh();presenceUnsubscribe=subscribeUserPresence(next=>{onlineIds=next;drawPeople();drawConversations();updateThreadPresence();});const requestedUserId=shareParams.get('user');if(requestedUserId&&requestedUserId!==state.userId){let target=state.conversations.find(c=>partner(c)===requestedUserId&&c.status==='accepted');let pending=state.conversations.find(c=>partner(c)===requestedUserId&&c.status==='pending');if(target)await openConversation(target);else if(pending){await openGroupConversation();$('status').textContent='Seu convite já foi enviado. A conversa será aberta quando a pessoa aceitar.';}else if(state.canStartPrivate){await requestPrivateConversation(requestedUserId);await refresh();pending=state.conversations.find(c=>partner(c)===requestedUserId&&c.status==='pending');await openGroupConversation();$('status').textContent=pending?'Convite enviado! A pessoa precisa aceitar para vocês conversarem.':'Solicitação enviada. Atualize a lista em instantes.';}else{await openGroupConversation();$('status').textContent='Para iniciar uma conversa privada, participe do grupo e envie sua primeira mensagem. Depois volte ao perfil e toque em Conversar.';}}else await openGroupConversation();}catch(e){$('gate').textContent=e.message||'Não foi possível conectar às conversas privadas.';}})();
 window.setInterval(async()=>{
  if(document.hidden||!navigator.onLine||!state)return;
  try{onlineIds=await getOnlineUserIds();drawPeople();drawConversations();}catch(error){}
