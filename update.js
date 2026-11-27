@@ -96,17 +96,19 @@
   offlineTimer=window.setTimeout(()=>{alertBox.style.display='none';},13000);
  }
  function showOffline(){
-  // Se o próprio sistema operacional informou que o aparelho ficou sem rede,
-  // exibe o alerta imediatamente. Se o Wi-Fi continua conectado mas a internet
-  // falhou, usa uma confirmação curta para evitar falsos positivos.
+  // Os dois cenários (sem sinal do aparelho ou Wi-Fi sem internet) seguem
+  // a mesma regra: 13 segundos contínuos sem resposta válida.
   clearTimeout(reconnectTimer);
   if(confirmedOffline||connectionDebounceTimer)return;
-  const confirmationDelay=navigator.onLine?1500:0;
   connectionDebounceTimer=window.setTimeout(()=>{
    connectionDebounceTimer=null;
    confirmedOffline=true;
    displayOffline();
-  },confirmationDelay);
+   scheduleConnectionProbe();
+  },13000);
+  // Enquanto confirma a queda, verifica a cada segundo para cancelar
+  // imediatamente o alerta se a internet voltar antes dos 13 segundos.
+  scheduleConnectionProbe();
  }
  function showOnline(){
   // Ao detectar o retorno real da internet, avisa imediatamente, sem toque na tela.
@@ -171,8 +173,8 @@
   }catch(error){
    lastProbeAt=Date.now();
    consecutiveProbeFailures++;
-   // Uma falha isolada ou resposta lenta não deve disparar falso alerta.
-   // A primeira falha inicia a confirmação de 7 segundos; uma resposta válida cancela o aviso pendente.
+   // A primeira falha inicia a janela contínua de 13 segundos.
+   // Qualquer resposta válida nesse intervalo cancela o alerta pendente.
    if(!navigator.onLine||consecutiveProbeFailures>=1||document.documentElement.classList.contains('app-offline')){
     lastProbeOnline=false;
     showOffline();
@@ -197,7 +199,9 @@
   window.clearTimeout(connectionProbeTimer);
   connectionProbeTimer=null;
   if(document.hidden)return;
-  const delay=lowPowerMode()?45000:30000;
+  // Sondagem curta para não perder o início da queda; durante a confirmação
+  // e enquanto offline, verifica a cada segundo para detectar o retorno sem atraso.
+  const delay=(connectionDebounceTimer||confirmedOffline)?1000:(lowPowerMode()?10000:5000);
   connectionProbeTimer=window.setTimeout(async()=>{
    await verifyRealConnection();
    scheduleConnectionProbe();
