@@ -4,8 +4,6 @@ const [profile, auth, messages] = await Promise.all([
   readFile(new URL('../supabase/auth.js', import.meta.url), 'utf8'),
   readFile(new URL('../mensagens.html', import.meta.url), 'utf8'),
 ]);
-const homeVideosBlock = feed.match(/const HOME_VIDEOS = \[([\s\S]*?)\n\];/);
-const shortsBlock = feed.match(/const SHORTS = \[([\s\S]*?)\n\]\.map/);
 const checks = [
   [auth.includes('export async function getMySavedPosts') && auth.includes('export async function toggleSavedPost'), 'API de publicações salvas ausente'],
   [profile.includes('id="saved-publications-list"') && profile.includes('module.toggleSavedPost(item.id)'), 'Coleção pessoal de publicações não está ligada ao banco'],
