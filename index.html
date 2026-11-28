@@ -2084,7 +2084,7 @@ function readOfflineJson(key,fallback=[]){
   // Após falha do Storage (inclusive HTTP 402), evita repetir o download a cada abertura.
   const currentOpeningImage=opening,currentOpeningVideo=openingVideo&&!openingVideoCoolingDown()?openingVideo:'';
   if(profile){const logo=document.getElementById('site-logo');if(logo)logo.src=profile;}
-  if(!skipOpeningAfterFilePicker&&opening&&!openingVideo){
+  if(!skipOpeningAfterFilePicker&&opening&&!currentOpeningVideo){
   const intro=document.querySelector('.intro-smoke__brand img'),screen=document.getElementById('intro-smoke');
   if(intro&&screen){
    intro.style.visibility='hidden';intro.src=currentOpeningImage;
@@ -2106,7 +2106,7 @@ function readOfflineJson(key,fallback=[]){
    else{intro.addEventListener('load',()=>settleOpeningImage(false),{once:true});intro.addEventListener('error',()=>settleOpeningImage(true),{once:true});}
   }
  }
-   if(!skipOpeningAfterFilePicker&&!opening&&!openingVideo){const fallback=document.querySelector('.intro-smoke__brand img');if(fallback)fallback.style.visibility='visible';const brand=document.querySelector('.intro-smoke__brand');if(brand){brand.style.visibility='visible';brand.style.opacity='1';brand.style.animation='none';}document.documentElement.classList.remove('intro-brand-pending');}
+   if(!skipOpeningAfterFilePicker&&!opening&&!currentOpeningVideo){const fallback=document.querySelector('.intro-smoke__brand img');if(fallback)fallback.style.visibility='visible';const brand=document.querySelector('.intro-smoke__brand');if(brand){brand.style.visibility='visible';brand.style.opacity='1';brand.style.animation='none';}document.documentElement.classList.remove('intro-brand-pending');}
    const headerBgUrl=safeUrl(branding.headerBackgroundImageUrl);
   const appHeader=document.querySelector('body>header');
   if(appHeader&&headerBgUrl){
@@ -2125,7 +2125,7 @@ function readOfflineJson(key,fallback=[]){
    homeBanner.style.setProperty('--home-bg-fit',branding.homeBackgroundFit==='contain'?'contain':'cover');
    homeBanner.classList.add('has-custom-background');
   }
-   if(!skipOpeningAfterFilePicker&&openingVideo){
+   if(!skipOpeningAfterFilePicker&&currentOpeningVideo){
    const screen=document.getElementById('intro-smoke');
    if(screen){
     const brand=document.querySelector('.intro-smoke__brand');
