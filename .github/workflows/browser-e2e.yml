@@ -53,6 +53,7 @@ jobs:
         with:
           node-version: 22
       - name: Verificar conectividade do Supabase de produção (somente leitura)
+        if: github.event_name == 'workflow_dispatch'
         run: node scripts/check-supabase-production-connection.mjs
 
       - name: Verificar conexão com ambiente Supabase isolado
