@@ -8,7 +8,7 @@ const [update, html, player] = await Promise.all([
 ]);
 
 assert.match(update, /connectionDebounceTimer=window\.setTimeout\([\s\S]*?\},13000\)/, 'alerta offline deve aguardar 13 segundos contínuos');
-assert.match(update, /backendRestricted\?120000:\(connectionDebounceTimer\|\|confirmedOffline\)\?5000:\(lowPowerMode\(\)\?45000:60000\)/, 'monitoramento reduz sondagens quando o backend está restrito, em economia de bateria/dados e durante queda/recuperação');
+assert.match(update, /backendRestricted\?900000:\(connectionDebounceTimer\|\|confirmedOffline\)\?5000:\(lowPowerMode\(\)\?45000:60000\)/, 'monitoramento reduz sondagens quando o backend está restrito, em economia de bateria/dados e durante queda/recuperação');
 assert.match(update, /function showOnline\(\)[\s\S]*?displayOnline\(\);/, 'alerta online deve disparar imediatamente ao detectar o retorno');
 assert.match(update, /nativeHaptics\.vibrate\(\{duration:450\}\)[\s\S]*?navigator\.vibrate\(\[160,90,160\]\)[\s\S]*?if\(audioUnlocked\)playTrainHorn\(\)/, 'alerta online deve oferecer vibração e corneta quando o áudio estiver liberado');
 assert.match(update, /if\(confirmedOffline\|\|connectionDebounceTimer\)return/, 'eventos offline repetidos devem ser deduplicados');
