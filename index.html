@@ -1083,7 +1083,7 @@ body:not(.light) header::before,body.light header::before{background-image:linea
 <button class="active" data-page="inicio" aria-controls="inicio" aria-current="page">⌂ Feed</button>
 <a class="nav-chat" href="./bate-papo.html" aria-label="Abrir FALA UAI">💬 Chat</a>
 <button data-page="musicas" aria-controls="musicas">♫ Músicas</button>
-<button data-page="pesquisa" aria-controls="pesquisa">⌕ Pesquisa</button>
+
 <a class="nav-profile" href="./rede.html" aria-label="Abrir meu perfil">👤 Perfil</a>
 </nav>
 <section class="page active" id="inicio"><nav class="home-social-access" aria-label="Redes oficiais do Capital do Trem"><a class="home-social-access-link home-social-youtube" href="https://www.youtube.com/@capitaldotrem" target="_blank" rel="noopener"><span aria-hidden="true">▶</span><strong>YouTube</strong><small>Canal oficial</small></a><a class="home-social-access-link home-social-instagram" href="https://www.instagram.com/capital.do.trem/" target="_blank" rel="noopener"><span class="instagram-mark" aria-hidden="true">◎</span><strong>Instagram</strong><small>Perfil oficial</small></a></nav><section class="home-stories card" aria-labelledby="home-stories-title"><div class="home-stories-heading"><div><span class="eyebrow">MAQUINISTAS ONLINE</span><h2 id="home-stories-title">Stories da quebrada</h2></div><button id="home-story-add" type="button" aria-label="Criar Story" title="Criar Story">＋</button></div><div id="home-stories-list" class="home-stories-list" aria-label="Stories recentes"><p class="muted">Carregando Stories…</p></div></section>
@@ -1184,12 +1184,7 @@ body:not(.light) header::before,body.light header::before{background-image:linea
 
 
 </div></section>
-<section class="page" id="pesquisa"><div class="card home-discovery-card"><span class="eyebrow">CAPITAL DO TREM • DESCOBRIR</span><h2>🔎 Pesquisar e descobrir</h2><p class="muted">Encontre vídeos, artistas e momentos da comunidade.</p><label for="video-discovery-search">Pesquisar vídeos por legenda ou Maquinista</label><input id="video-discovery-search" type="search" placeholder="Digite o nome ou assunto…"><div class="home-section-heading"><h3>Vídeos da comunidade</h3><button class="btn alt" id="shuffle-videos" type="button">↻ Vídeos aleatórios</button></div><div id="random-video-results" class="home-video-grid"><p class="muted">Carregando vídeos…</p></div></div><section class="card home-youtube" aria-labelledby="home-youtube-title">
-<h2 id="home-youtube-title">▶ Vídeos da Capital do Trem</h2>
-<p class="muted">Os seis vídeos originais do projeto.</p>
-<p id="youtube-feed-status" class="muted" role="status" aria-live="polite">Carregando vídeos…</p>
-<div class="home-youtube-grid" aria-live="polite"></div>
-</section></section><section class="page" id="amigos"><div class="card"><h2>🤝 Fazer amigos</h2><p class="muted">A área Fazer Amigos agora fica logo abaixo do bate-papo Fala Trem, para facilitar o acesso à comunidade.</p><a class="btn" href="./bate-papo.html#fazer-amigos">Abrir Fazer Amigos no Koe Fala Tu</a></div></section>
+<section class="page" id="amigos"><div class="card"><h2>🤝 Fazer amigos</h2><p class="muted">A área Fazer Amigos agora fica logo abaixo do bate-papo Fala Trem, para facilitar o acesso à comunidade.</p><a class="btn" href="./bate-papo.html#fazer-amigos">Abrir Fazer Amigos no Koe Fala Tu</a></div></section>
 <section class="page" id="comunidade">
 <div class="card"><h2>👥 Nossa comunidade</h2><p class="muted">Um espaço para usuários Uai, artistas e todos que fazem parte do Capital do Trem. Cada pessoa escolhe se quer deixar seu perfil visível.</p><a class="btn" href="./conta.html">Criar minha conta / Meu perfil</a></div>
 <div class="card"><h3>Perfis públicos</h3><div id="community-profiles" class="list" aria-live="polite"><p class="muted">Os perfis públicos aparecerão aqui quando o banco estiver conectado.</p></div></div>
@@ -1416,7 +1411,7 @@ function go(id){
 }
 tabs.forEach(tab=>tab.addEventListener('click',()=>go(tab.dataset.page)));
 document.querySelectorAll('[data-go]').forEach(button=>button.addEventListener('click',()=>go(button.dataset.go)));
-function openPageFromHash(){const id=decodeURIComponent(location.hash.slice(1));if(['inicio','musicas','pesquisa','eventos','artistas','amigos','comunidade','social','parcerias','divulgue','duvidas'].includes(id))go(id);}
+function openPageFromHash(){const id=decodeURIComponent(location.hash.slice(1));if(['inicio','musicas','eventos','artistas','amigos','comunidade','social','parcerias','divulgue','duvidas'].includes(id))go(id);}
 if(location.hash)openPageFromHash();window.addEventListener('hashchange',openPageFromHash);
 const themeButton=document.getElementById('theme');
 const THEME_KEY='capitaldotrem_theme_v1';
@@ -2230,6 +2225,7 @@ function readOfflineJson(key,fallback=[]){
 .explore-video-card>a{display:inline-block;margin-top:9px;color:var(--fg);font-size:12px;font-weight:700}
 @media(max-width:520px){.explore-video-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.explore-video-card{padding:7px}.explore-video-stage{max-height:320px}}
 </style>
+
 <script type="module" src="./youtube-feed.js"></script>
 <script src="./update.js" defer></script>
 

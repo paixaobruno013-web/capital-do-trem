@@ -38,5 +38,5 @@ console.log('Feed direciona para o perfil público de cada autor.');
 if(!html.includes('profile-stat')||!html.includes('publicações')||!html.includes('seguidores')||!html.includes('seguindo')||!js.includes("placeholder='Buscar por nome ou @usuário…'")||!js.includes('pageSize=500'))throw new Error('Estatísticas compactas e pesquisa nas listas de seguidores ausentes.');
 console.log('Contadores compactos e pesquisa de seguidores/seguindo conferidos.');
 
-if(!js.includes('const feedAutoplayAllowed=()=>false;')||!homeFeed.includes('const feedAutoplayAllowed=()=>false;')||!js.includes("el.preload='none'")||!homeFeed.includes("video.preload='none';const caption="))throw new Error('Proteção de tráfego: vídeos do feed devem aguardar reprodução manual e usar preload none.');
+if(!js.includes('const feedAutoplayAllowed=()=>false;')||!homeFeed.includes('const feedAutoplayAllowed=()=>false;')||!js.includes("el.preload='none'")||!homeFeed.includes("video.preload='none';"))throw new Error('Proteção de tráfego: vídeos do feed devem aguardar reprodução manual e usar preload none.');
 console.log('Proteção de tráfego: reprodução manual e carregamento sob demanda conferidos.');

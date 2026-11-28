@@ -26,8 +26,9 @@ assert.match(update, /backendRestricted&&Date\.now\(\)-lastProbeAt<120000/, 'bac
 assert.match(update, /backendRestricted=!response\.ok/, 'respostas HTTP do Supabase devem ser separadas de falhas de internet');
 assert.match(update, /const delay=backendRestricted\?120000:\(connectionDebounceTimer\|\|confirmedOffline\)\?5000:\(lowPowerMode\(\)\?45000:60000\)/, 'monitor deve reduzir consultas e tratar restrição do backend separadamente');
 assert.match(update, /backendStatus=response\.status/, 'diagnóstico deve registrar o status HTTP do backend');
-assert.doesNotMatch(youtubeFeed, /loadInteractions\(article,video\)/, 'a tela inicial não deve consultar curtidas individualmente para cada vídeo');
-assert.match(youtubeFeed, /like\.setAttribute\('aria-pressed','true'\)/, 'a ação de curtir deve atualizar o estado acessível localmente');
+assert.doesNotMatch(youtubeFeed, /video_likes|video_comments|supabase/, 'biblioteca de vídeos restante não deve gerar chamadas sociais ao Supabase');
+assert.match(youtubeFeed, /image\.loading='lazy'/, 'miniaturas da biblioteca restante devem carregar sob demanda');
+assert.match(youtubeFeed, /youtube-nocookie\.com\/embed\//, 'reprodução de vídeo só deve abrir após interação');
 assert.match(update, /if\(document\.hidden\)return/, 'sondagens devem ser pausadas quando o app está em segundo plano');
 assert.match(update, /battery\.addEventListener\('levelchange'/, 'mudanças no nível da bateria devem recalibrar o monitor');
 assert.match(update, /battery\.addEventListener\('chargingchange'/, 'estado de carregamento deve recalibrar o monitor');
