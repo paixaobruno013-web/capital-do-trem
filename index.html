@@ -2150,7 +2150,7 @@ function readOfflineJson(key,fallback=[]){
     audioButton.addEventListener('click',enableOpeningAudio);
     screen.appendChild(audioButton);
     video.addEventListener('play',()=>{if(!video.muted)audioButton.remove();});
-    // Mantém somente o vídeo na abertura, sem poster ou imagem substituta.
+    // Mantém o vídeo sem poster; a marca local só aparece se a mídia remota falhar.
     video.addEventListener('playing',()=>{video.style.opacity='1';clearTimeout(fallbackTimer);beginOpeningClock();});
         const movingTrain=document.getElementById('opening-live-train');
     const startOpeningTrain=()=>{if(!movingTrain||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;movingTrain.style.setProperty('animation','none','important');void movingTrain.offsetWidth;movingTrain.style.setProperty('animation','opening-train-cross-sky 9.8s linear 1 both','important');};
@@ -2170,7 +2170,7 @@ function readOfflineJson(key,fallback=[]){
     const showOpeningFallback=()=>{
      if(finished||video.dataset.fallbackShown==='yes')return;
      video.dataset.fallbackShown='yes';clearTimeout(fallbackTimer);
-     try{video.pause();}catch{}
+     try{video.pause();video.removeAttribute('src');video.load();}catch{}
      audioButton.style.display='none';
      // Se o vídeo remoto falhar (incluindo HTTP 402), restaura uma abertura local em vez de deixar a tela preta.
      screen.classList.remove('custom-opening-screen');
@@ -2204,7 +2204,7 @@ function readOfflineJson(key,fallback=[]){
      }
     },{once:true});
     video.addEventListener('error',()=>{console.warn('Falha ao carregar o vídeo de abertura; usando a imagem de segurança.');showOpeningFallback();},{once:true});
-    // Dá até 12 segundos para o vídeo entregar o primeiro quadro; se falhar, não exibe imagem substituta.
+    // Dá até 12 segundos para o vídeo entregar o primeiro quadro; se falhar, cancela o download e exibe a marca local.
     video.addEventListener('ended',finish,{once:true});
     video.load();
     fallbackTimer=window.setTimeout(showOpeningFallback,12000);
