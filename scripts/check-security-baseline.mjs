@@ -22,6 +22,7 @@ function walk(dir) {
 const schema = read('supabase/schema.sql');
 const auth = read('supabase/auth.js');
 const installationPrivacyMigration = read('supabase/migrations/20261128120000_harden_installation_count_privacy.sql');
+const rlsOverlapMigration = read('supabase/migrations/20261128150000_remove_permissive_rls_overlaps.sql');
 const androidSetup = read('scripts/configure-android-media.py');
 
 for (const table of [
@@ -45,7 +46,9 @@ const mustContain = [
   ['mensagem privada exige remetente autenticado', /private_messages_insert_accepted_participants[\s\S]*?sender_id\s*=\s*auth\.uid\(\)/i, schema],
   ['chave publicável Supabase configurada', /sb_publishable_[A-Za-z0-9_-]+/, auth],
   ['contagem de instalações exposta somente como agregado por RPC', /get_app_installation_count[\s\S]*?security definer[\s\S]*?set search_path = ''/i, installationPrivacyMigration],
-  ['cliente usa RPC e não consulta identificadores individuais de instalação', /rpc\('get_app_installation_count'\)/i, auth]
+  ['cliente usa RPC e não consulta identificadores individuais de instalação', /rpc\('get_app_installation_count'\)/i, auth],
+  ['remove políticas RLS permissivas redundantes de chat e publicações', /drop policy if exists chat_messages_delete_admin[\s\S]*?drop policy if exists posts_edit_own_pending_or_admin/i, rlsOverlapMigration],
+  ['edição de músicas mantém a regra de status publicado para o proprietário', /drop policy if exists songs_update_own_or_admin[\s\S]*?songs_update_own_song_or_admin/i, rlsOverlapMigration]
 ];
 for (const [label, pattern, source] of mustContain) {
   if (pattern.test(source)) pass(label);
