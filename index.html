@@ -2078,10 +2078,11 @@ function readOfflineJson(key,fallback=[]){
   // Na primeira abertura, limita a espera do servidor para não atrasar a entrada no aplicativo.
   const branding=cachedBranding||await Promise.race([brandingRequest,brandingTimeout]).then(value=>value||{}).catch(()=>({}));
   const safeUrl=value=>typeof value==='string'&&value.startsWith('https://zmjxkfjzrbbxyvgkwirv.supabase.co/storage/v1/object/public/capital-do-trem-media/')?value:'';
+  const OPENING_VIDEO_RETRY_KEY='capitaldotrem_opening_video_retry_after_v1';
+  const openingVideoCoolingDown=()=>{try{const retryAfter=Number(localStorage.getItem(OPENING_VIDEO_RETRY_KEY)||0);return Number.isFinite(retryAfter)&&retryAfter>Date.now();}catch{return false;}};
   const profile=safeUrl(branding.profileImageUrl),opening=safeUrl(branding.openingImageUrl),openingVideo=safeUrl(branding.openingVideoUrl); 
-  // Uploads recebem caminhos únicos no Storage; não é necessário furar o cache a cada abertura.
-  // Manter a URL estável permite reutilizar o arquivo já baixado e reduz espera/rede móvel.
-  const currentOpeningImage=opening,currentOpeningVideo=openingVideo;
+  // Após falha do Storage (inclusive HTTP 402), evita repetir o download a cada abertura.
+  const currentOpeningImage=opening,currentOpeningVideo=openingVideo&&!openingVideoCoolingDown()?openingVideo:'';
   if(profile){const logo=document.getElementById('site-logo');if(logo)logo.src=profile;}
   if(!skipOpeningAfterFilePicker&&opening&&!openingVideo){
   const intro=document.querySelector('.intro-smoke__brand img'),screen=document.getElementById('intro-smoke');
@@ -2170,6 +2171,8 @@ function readOfflineJson(key,fallback=[]){
     const showOpeningFallback=()=>{
      if(finished||video.dataset.fallbackShown==='yes')return;
      video.dataset.fallbackShown='yes';clearTimeout(fallbackTimer);
+     // Uma falha de mídia pausa novas tentativas por 15 minutos para poupar rede e cota.
+     try{localStorage.setItem(OPENING_VIDEO_RETRY_KEY,String(Date.now()+15*60*1000));}catch{}
      try{video.pause();video.removeAttribute('src');video.load();}catch{}
      audioButton.style.display='none';
      // Se o vídeo remoto falhar (incluindo HTTP 402), restaura uma abertura local em vez de deixar a tela preta.
@@ -2187,7 +2190,7 @@ function readOfflineJson(key,fallback=[]){
      beginOpeningClock();
     };
     // O relógio de 10 segundos e o trem começam quando o vídeo realmente toca; se falhar, começam com o fallback.
-    video.addEventListener('playing',()=>{clearTimeout(fallbackTimer);if(savedOpeningSound&&!video.muted)audioButton.remove();});
+    video.addEventListener('playing',()=>{clearTimeout(fallbackTimer);try{localStorage.removeItem(OPENING_VIDEO_RETRY_KEY);}catch{}if(savedOpeningSound&&!video.muted)audioButton.remove();});
     video.addEventListener('canplay',async()=>{
      if(finished||video.dataset.fallbackShown==='yes')return;
      video.playbackRate=1;
