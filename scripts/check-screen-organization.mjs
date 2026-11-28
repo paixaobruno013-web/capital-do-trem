@@ -11,8 +11,8 @@ const musicBanner = musicArea.match(/<section class="music-section-banner"[^>]*>
 const musicCover = musicArea.match(/<section id="music-cover-area"[^>]*>[\s\S]*?<\/section>/)?.[0] || '';
 const checks = [
  ['Feed social é a página inicial e aparece na navegação', /data-page="inicio"[^>]*>⌂ Feed/.test(home) && /id="home-community-feed"/.test(home)],
- ['banner oficial de alto-falantes fica no topo de Músicas', musicArea.indexOf('class="music-section-banner"') > musicArea.indexOf('id="musicas"') && musicBanner.includes('src="./assets/banner-speakers.webp?v=375"') && musicBanner.includes('AQUI A MÚSICA NÃO PARA!')],
- ['capa personalizada de Músicas permanece temporariamente removida até receber a imagem correta', !musicCover && !musicArea.includes('id="music-cover-upload"') && !musicArea.includes('music-cover-controls') && musicBanner.includes('banner-speakers.webp')],
+ ['capa/banner removido de Músicas e catálogo permanece no topo', !musicArea.includes('music-section-banner') && musicArea.includes('id="published-song-catalog"') && musicArea.includes('Todas as músicas')],
+ ['gerenciador de capa musical removido sem afetar a biblioteca', !musicCover && !musicArea.includes('music-cover-upload') && !musicArea.includes('music-cover-controls') && musicArea.includes('music-library')],
  ['vídeos de descoberta ficam na Pesquisa, não misturados ao Feed', /home-youtube/.test(discovery) && !/<section class="card home-youtube"/.test(home.slice(home.indexOf('<section class="page active" id="inicio">'),home.indexOf('<section class="page" id="musicas">')))],
  ['grupo oficial e perfis para contatos privados ficam no Chat, sem descoberta por localização', /id="open-group-card"/.test(chat) && /id="chat-profile-rail"/.test(chat) && !/id="fazer-amigos"|id="open-friends-profile"/.test(chat) && !/class="card home-friends"/.test(home)],
  ['perfil oferece abas separadas para fotos e vídeos', /data-profile-view="photos"[^>]*aria-label="Fotos"/.test(profile) && /data-profile-view="videos"[^>]*aria-label="Vídeos"/.test(profile)],
