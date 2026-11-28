@@ -4,9 +4,8 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-// Chamadas de voz e vídeo estão temporariamente pausadas na primeira fase.
-// A função permanece publicada para que versões antigas do app recebam uma
-// resposta explícita, sem consultar o banco, emitir tokens ou acessar LiveKit.
+// Chamadas de voz e vídeo temporariamente pausadas na primeira fase.
+// Não consulta o banco, emite tokens, nem acessa o provedor de mídia.
 Deno.serve((req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   return new Response(JSON.stringify({
