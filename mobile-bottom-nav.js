@@ -18,12 +18,12 @@
   if (!document.getElementById(sharedNavStyle.id)) document.head.append(sharedNavStyle);
 
   // Na página inicial, preserva integralmente o cabeçalho no Feed.
-  // Ao entrar em Músicas ou Pesquisa, recolhe apenas o bloco superior,
+  // Ao entrar em Músicas, recolhe apenas o bloco superior,
   // sem alterar o conteúdo nem a barra inferior.
   if (isHome) {
     const homeItems = [
       ['button[data-page="inicio"]','⌂','Feed'],['a.nav-chat','💬','Chat'],
-      ['button[data-page="musicas"]','♫','Músicas'],['button[data-page="pesquisa"]','⌕','Pesquisa'],['a.nav-profile','👤','Perfil']
+      ['button[data-page="musicas"]','♫','Músicas'],['a.nav-profile','👤','Perfil']
     ];
     for (const [selector, glyph, label] of homeItems) {
       const item = document.querySelector('nav#nav '+selector);
@@ -77,7 +77,6 @@
     if (isHome) {
       const hash = location.hash.replace(/^#/, '').toLowerCase();
       if (hash === 'musicas') return 'musicas';
-      if (hash === 'pesquisa' || hash === 'pesquisas') return 'pesquisa';
       return 'feed';
     }
     return '';
@@ -91,7 +90,6 @@
     { id: 'feed', label: 'Feed', icon: '⌂', href: './index.html#inicio' },
     { id: 'chat', label: 'Chat', icon: '💬', href: './bate-papo.html' },
     { id: 'musicas', label: 'Músicas', icon: '♫', href: './index.html#musicas' },
-    { id: 'pesquisa', label: 'Pesquisa', icon: '⌕', href: './index.html#pesquisa' },
     { id: 'perfil', label: 'Perfil', icon: '👤', href: './rede.html' }
   ];
   const links = new Map();
@@ -134,7 +132,7 @@
       background:#050505!important;box-shadow:none!important;overflow:hidden!important;
     }
     nav#nav a,nav#nav button {
-      flex:1 1 20%!important;width:20%!important;max-width:20%!important;min-width:0!important;
+      flex:1 1 25%!important;width:25%!important;max-width:25%!important;min-width:0!important;
       min-height:62px!important;display:flex!important;flex-direction:column!important;
       align-items:center!important;justify-content:center!important;gap:4px!important;
       padding:4px 1px!important;border:0!important;border-radius:0!important;
