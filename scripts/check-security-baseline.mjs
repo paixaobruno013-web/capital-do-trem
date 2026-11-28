@@ -22,7 +22,7 @@ function walk(dir) {
 const schema = read('supabase/schema.sql');
 const auth = read('supabase/auth.js');
 const installationPrivacyMigration = read('supabase/migrations/20261128120000_harden_installation_count_privacy.sql');
-const rlsOverlapMigration = read('supabase/migrations/20261128150000_remove_permissive_rls_overlaps.sql');
+const rlsOverlapMigration = read('supabase/migrations/20261128093803_remove_permissive_rls_overlaps.sql');
 const androidSetup = read('scripts/configure-android-media.py');
 
 for (const table of [
