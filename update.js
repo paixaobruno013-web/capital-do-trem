@@ -164,28 +164,33 @@
  window.addEventListener('offline',showOffline);
  // navigator.onLine pode continuar true quando o Wi-Fi está conectado, mas sem internet.
  // A verificação usa um endpoint externo ao cache PWA para detectar a queda real.
- let probeRunning=false,lastProbeOnline=null,lastProbeAt=0,consecutiveProbeFailures=0;
+ let probeRunning=false,lastProbeOnline=null,lastProbeAt=0,consecutiveProbeFailures=0,backendRestricted=false,backendStatus=null;
  async function verifyRealConnection(){
-  // Evita sondagens de rede em segundo plano; a retomada verifica a conexão pelos eventos de foco/visibilidade.
+  // Evita sondagens em segundo plano e limita novas consultas quando o Supabase informa restrição de quota.
   if(probeRunning||document.hidden)return;
+  if(backendRestricted&&Date.now()-lastProbeAt<120000)return;
   probeRunning=true;
   const controller=new AbortController();
   const timeout=window.setTimeout(()=>controller.abort(),2500);
   try{
-   if(!navigator.onLine)throw new Error('Dispositivo sem rede');
+   if(!navigator.onLine){backendRestricted=false;backendStatus=null;throw new Error('Dispositivo sem rede');}
    const response=await fetch('https://zmjxkfjzrbbxyvgkwirv.supabase.co/auth/v1/health?cdt_probe='+Date.now(),{
     method:'GET',mode:'cors',cache:'no-store',credentials:'omit',redirect:'follow',
-    headers:{apikey:'sb_publishable_FLbDg6UCePQHb7s0wkywng_J9pNKlsP'},signal:controller.signal
+    headers:{apikey:'sb_publishable_FLbDg6UCePQHb7s0wkywng_J9pNKls'},signal:controller.signal
    });
-   if(!response.ok)throw new Error('A internet não respondeu ao teste de conexão');
+   // Qualquer resposta HTTP confirma que a internet funciona. HTTP 402/5xx indica
+   // indisponibilidade do backend, não falta de internet no aparelho.
+   lastProbeAt=Date.now();
+   backendStatus=response.status;
+   backendRestricted=!response.ok;
    const wasOffline=document.documentElement.classList.contains('app-offline')||lastProbeOnline===false;
-   consecutiveProbeFailures=0;lastProbeOnline=true;lastProbeAt=Date.now();
+   consecutiveProbeFailures=0;lastProbeOnline=true;
    if(wasOffline)showOnline();else{clearTimeout(connectionDebounceTimer);connectionDebounceTimer=null;markOnline();}
   }catch(error){
    lastProbeAt=Date.now();
+   backendRestricted=false;backendStatus=null;
    consecutiveProbeFailures++;
-   // A primeira falha inicia a janela contínua de 13 segundos.
-   // Qualquer resposta válida nesse intervalo cancela o alerta pendente.
+   // Só falhas de rede/timeout confirmam possível falta de internet.
    if(!navigator.onLine||consecutiveProbeFailures>=1||document.documentElement.classList.contains('app-offline')){
     lastProbeOnline=false;
     showOffline();
@@ -200,7 +205,7 @@
   simulateOffline:showOffline,
   simulateOnline:showOnline,
   check:verifyRealConnection,
-  getState:()=>({deviceOnline:navigator.onLine,verifiedOnline:lastProbeOnline,lastCheckAt:lastProbeAt})
+  getState:()=>({deviceOnline:navigator.onLine,verifiedOnline:lastProbeOnline,backendRestricted,backendStatus,lastCheckAt:lastProbeAt})
  };
  // Eventos de retomada e rede são registrados pelo monitor adaptativo abaixo, sem listeners duplicados.
  // Monitor adaptativo: pausa sondagens em segundo plano e reduz a frequência com bateria baixa/economia de dados.
@@ -212,7 +217,7 @@
   if(document.hidden)return;
   // Sondagem curta para não perder o início da queda; durante a confirmação
   // e enquanto offline, verifica a cada segundo para detectar o retorno sem atraso.
-  const delay=(connectionDebounceTimer||confirmedOffline)?1000:(lowPowerMode()?45000:30000);
+  const delay=backendRestricted?120000:(connectionDebounceTimer||confirmedOffline)?5000:(lowPowerMode()?45000:60000);
   connectionProbeTimer=window.setTimeout(async()=>{
    await verifyRealConnection();
    scheduleConnectionProbe();
