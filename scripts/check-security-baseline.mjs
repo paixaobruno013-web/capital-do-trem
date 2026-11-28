@@ -21,6 +21,7 @@ function walk(dir) {
 
 const schema = read('supabase/schema.sql');
 const auth = read('supabase/auth.js');
+const installationPrivacyMigration = read('supabase/migrations/20261128120000_harden_installation_count_privacy.sql');
 const androidSetup = read('scripts/configure-android-media.py');
 
 for (const table of [
@@ -42,7 +43,9 @@ const mustContain = [
   ['upload de áudio limitado à pasta do usuário', /audio_upload_artist_own_folder_or_admin[\s\S]*?storage\.foldername\(name\)\)\[1\]\s*=\s*\(select auth\.uid\(\)\)::text/i, schema],
   ['mensagens privadas isoladas por participantes', /private_messages_read_accepted_participants[\s\S]*?participant_one[\s\S]*?participant_two/i, schema],
   ['mensagem privada exige remetente autenticado', /private_messages_insert_accepted_participants[\s\S]*?sender_id\s*=\s*auth\.uid\(\)/i, schema],
-  ['chave publicável Supabase configurada', /sb_publishable_[A-Za-z0-9_-]+/, auth]
+  ['chave publicável Supabase configurada', /sb_publishable_[A-Za-z0-9_-]+/, auth],
+  ['contagem de instalações exposta somente como agregado por RPC', /get_app_installation_count[\\s\\S]*?security definer[\\s\\S]*?set search_path = ''/i, installationPrivacyMigration],
+  ['cliente usa RPC e não consulta identificadores individuais de instalação', /rpc\\('get_app_installation_count'\\)/i, auth]
 ];
 for (const [label, pattern, source] of mustContain) {
   if (pattern.test(source)) pass(label);
