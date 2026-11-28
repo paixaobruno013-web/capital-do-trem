@@ -5,7 +5,7 @@ const [home, profile, profileScript, chat] = await Promise.all([
  readFile(new URL('../rede.js', import.meta.url), 'utf8'),
  readFile(new URL('../bate-papo.html', import.meta.url), 'utf8')
 ]);
-const discovery = home.match(/<section class="page" id="pesquisa">[\\s\\S]*?<section class="page" id="amigos">/)?.[0] || '';
+const discovery = home.match(/<section class="page" id="pesquisa">[\s\S]*?<section class="page" id="amigos">/)?.[0] || '';
 const musicArea = home.match(/<section class="page" id="musicas">[\s\S]*?<section class="page" id="pesquisa">/)?.[0] || '';
 const musicBanner = musicArea.match(/<section class="music-section-banner"[^>]*>[\s\S]*?<\/section>/)?.[0] || '';
 const musicCover = musicArea.match(/<section id="music-cover-area"[^>]*>[\s\S]*?<\/section>/)?.[0] || '';
