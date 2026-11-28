@@ -171,34 +171,3 @@ if(root&&form){
   storyPublishButton?.addEventListener('click',()=>publishPost(true));
   (async()=>{try{const session=await getCurrentSession();currentUser=session?.user||null;if(!currentUser){status.textContent='Entre ou crie sua conta para publicar, curtir e comentar.';form.querySelector('button[type=submit]').disabled=true;if(storyPublishButton)storyPublishButton.disabled=true}}catch{}await load()})();
 }
-const searchRoot=$('random-video-results');
-if(searchRoot){
- const search=$('video-discovery-search');
- (async()=>{
-  try{
-   const posts=await getPublishedPosts(),ids=posts.map(p=>p.id);
-   if(!ids.length){searchRoot.textContent='Ainda não há vídeos públicos.';return}
-   const [mediaQ,profilesQ]=await Promise.all([
-    supabase.from('post_media').select('post_id,storage_path,media_type,bucket_id').in('post_id',ids).eq('media_type','video'),
-    supabase.from('profiles').select('user_id,display_name,username').in('user_id',[...new Set(posts.map(p=>p.author_id))])
-   ]);
-   if(mediaQ.error)throw mediaQ.error;if(profilesQ.error)throw profilesQ.error;
-   const urls=await signedMediaForDiscovery(mediaQ.data||[]);
-   const people=new Map((profilesQ.data||[]).map(p=>[p.user_id,p]));
-   const items=(mediaQ.data||[]).map(m=>({...m,url:urls.get((m.bucket_id||'capital-do-trem-social')+':'+m.storage_path),post:posts.find(p=>p.id===m.post_id)})).filter(m=>m.url);
-   const render=()=>{
-    const q=(search?.value||'').toLocaleLowerCase('pt-BR');
-    const filtered=items.filter(item=>{const author=people.get(item.post?.author_id)||{};return [item.post?.content,author.display_name,author.username].some(v=>String(v??'').toLocaleLowerCase('pt-BR').includes(q))});
-    filtered.sort(()=>Math.random()-.5);searchRoot.replaceChildren();
-    for(const item of filtered.slice(0,24)){const card=document.createElement('article');card.className='home-video-card';const video=document.createElement('video');video.src=item.url;video.controls=true;video.playsInline=true;video.preload='none';const caption=document.createElement('p');caption.textContent=item.post?.content||'Vídeo da comunidade';const author=document.createElement('small');const p=people.get(item.post?.author_id);author.textContent=p?.display_name||'Maquinista';card.append(video,caption,author);searchRoot.append(card)}
-    if(!filtered.length)searchRoot.textContent='Nenhum vídeo encontrado com essa busca.';
-   };
-   search?.addEventListener('input',render);render();
-   $('shuffle-videos')?.addEventListener('click',render);
-  }catch(error){searchRoot.textContent='Não foi possível carregar os vídeos agora.'}
- })();
-}
-async function signedMediaForDiscovery(rows){
- const map=new Map(),groups=new Map();for(const row of rows){const bucket=row.bucket_id||'capital-do-trem-social',list=groups.get(bucket)||[];list.push(row);groups.set(bucket,list)}
- await Promise.all([...groups].map(async([bucket,list])=>{const {data,error}=await supabase.storage.from(bucket).createSignedUrls(list.map(x=>x.storage_path),3600);if(error)throw error;for(const item of data||[])if(item.path&&item.signedUrl)map.set(bucket+':'+item.path,item.signedUrl)}));return map;
-}
