@@ -8,12 +8,11 @@ const [update, html, player] = await Promise.all([
 ]);
 
 assert.match(update, /connectionDebounceTimer=window\.setTimeout\([\s\S]*?\},13000\)/, 'alerta offline deve aguardar 13 segundos contínuos');
-assert.match(update, /const delay=\(connectionDebounceTimer\|\|confirmedOffline\)\?1000:\(lowPowerMode\(\)\?10000:5000\)/, 'monitoramento ativo deve verificar a cada 5 segundos e a cada segundo durante queda/recuperação');
+assert.match(update, /const delay=\(connectionDebounceTimer\|\|confirmedOffline\)\?1000:\(lowPowerMode\(\)\?45000:30000\)/, 'monitoramento reduz sondagens para 30s ou 45s em economia de bateria/dados e mantém 1s durante queda/recuperação');
 assert.match(update, /function showOnline\(\)[\s\S]*?displayOnline\(\);/, 'alerta online deve disparar imediatamente ao detectar o retorno');
 assert.match(update, /nativeHaptics\.vibrate\(\{duration:450\}\)[\s\S]*?navigator\.vibrate\(\[160,90,160\]\)[\s\S]*?if\(audioUnlocked\)playTrainHorn\(\)/, 'alerta online deve oferecer vibração e corneta quando o áudio estiver liberado');
 assert.match(update, /if\(confirmedOffline\|\|connectionDebounceTimer\)return/, 'eventos offline repetidos devem ser deduplicados');
 assert.match(update, /clearTimeout\(connectionDebounceTimer\)/, 'a recuperação rápida deve cancelar o alerta offline pendente');
-assert.match(update, /const delay=lowPowerMode\(\)\?45000:30000/, 'a conexão deve usar monitoramento adaptativo de 30s e 45s em economia de bateria/dados');
 assert.match(update, /if\(document\.hidden\)return/, 'o monitoramento deve pausar em segundo plano');
 assert.match(update, /window\.addEventListener\('focus',resumeConnectionMonitor\)/, 'a conexão deve ser verificada ao retornar ao aplicativo');
 assert.match(update, /setTimeout\(\(\)=>\{alertBox\.style\.display='none';\},13000\)/, 'alerta de retorno deve permanecer visível por 13 segundos');
