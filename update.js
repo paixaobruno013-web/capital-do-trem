@@ -212,7 +212,7 @@
   if(document.hidden)return;
   // Sondagem curta para não perder o início da queda; durante a confirmação
   // e enquanto offline, verifica a cada segundo para detectar o retorno sem atraso.
-  const delay=(connectionDebounceTimer||confirmedOffline)?1000:(lowPowerMode()?10000:5000);
+  const delay=(connectionDebounceTimer||confirmedOffline)?1000:(lowPowerMode()?45000:30000);
   connectionProbeTimer=window.setTimeout(async()=>{
    await verifyRealConnection();
    scheduleConnectionProbe();

@@ -29,6 +29,14 @@ export function initSupabase() {
       autoRefreshToken: true,
       detectSessionInUrl: true
     },
+    // Quando o serviço rejeita conexões (por exemplo, por restrição de quota),
+    // aumenta o intervalo entre tentativas para evitar uma tempestade de WebSockets.
+    realtime: {
+      reconnectAfterMs: (tries) => {
+        const delays = [10000, 30000, 60000, 120000];
+        return delays[Math.min(Math.max(tries - 1, 0), delays.length - 1)];
+      }
+    },
     // Configurações da abertura não podem vir de cache HTTP antigo.
     global: {
       fetch: (input, init = {}) => {
