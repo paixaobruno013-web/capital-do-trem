@@ -22,9 +22,9 @@ assert.match(diagnostic, /Exportar relatório/, 'diagnóstico deve permitir expo
 assert.match(diagnostic, /clearIncidents/, 'diagnóstico deve permitir limpar histórico');
 assert.match(update, /item\.kind==='javascript'\|\|item\.kind==='promise'/, 'tarefas longas e falhas de recursos não devem disparar falso alerta de instabilidade');
 assert.match(update, /duplicate\|\|recoveryShown/, 'erros repetidos em sequência devem ser deduplicados no alerta');
-assert.match(update, /backendRestricted&&Date\.now\(\)-lastProbeAt<120000/, 'backend restrito deve limitar sondagens repetidas por dois minutos');
+assert.match(update, /backendRestricted&&Date\.now\(\)-lastProbeAt<900000/, 'backend restrito deve limitar sondagens repetidas por dois minutos');
 assert.match(update, /backendRestricted=!response\.ok/, 'respostas HTTP do Supabase devem ser separadas de falhas de internet');
-assert.match(update, /const delay=backendRestricted\?120000:\(connectionDebounceTimer\|\|confirmedOffline\)\?5000:\(lowPowerMode\(\)\?45000:60000\)/, 'monitor deve reduzir consultas e tratar restrição do backend separadamente');
+assert.match(update, /const delay=backendRestricted\?900000:\(connectionDebounceTimer\|\|confirmedOffline\)\?5000:\(lowPowerMode\(\)\?45000:60000\)/, 'monitor deve reduzir consultas e tratar restrição do backend separadamente');
 assert.match(update, /backendStatus=response\.status/, 'diagnóstico deve registrar o status HTTP do backend');
 assert.doesNotMatch(youtubeFeed, /video_likes|video_comments|supabase/, 'biblioteca de vídeos restante não deve gerar chamadas sociais ao Supabase');
 assert.match(youtubeFeed, /image\.loading='lazy'/, 'miniaturas da biblioteca restante devem carregar sob demanda');

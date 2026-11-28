@@ -168,7 +168,7 @@
  async function verifyRealConnection(){
   // Evita sondagens em segundo plano e limita novas consultas quando o Supabase informa restrição de quota.
   if(probeRunning||document.hidden)return;
-  if(backendRestricted&&Date.now()-lastProbeAt<120000)return;
+  if(backendRestricted&&Date.now()-lastProbeAt<900000)return;
   probeRunning=true;
   const controller=new AbortController();
   const timeout=window.setTimeout(()=>controller.abort(),2500);
@@ -217,7 +217,7 @@
   if(document.hidden)return;
   // Sondagem curta para não perder o início da queda; durante a confirmação
   // e enquanto offline, verifica a cada segundo para detectar o retorno sem atraso.
-  const delay=backendRestricted?120000:(connectionDebounceTimer||confirmedOffline)?5000:(lowPowerMode()?45000:60000);
+  const delay=backendRestricted?900000:(connectionDebounceTimer||confirmedOffline)?5000:(lowPowerMode()?45000:60000);
   connectionProbeTimer=window.setTimeout(async()=>{
    await verifyRealConnection();
    scheduleConnectionProbe();
