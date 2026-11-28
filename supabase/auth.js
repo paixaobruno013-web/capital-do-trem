@@ -1930,8 +1930,7 @@ export async function registerAppInstallation() {
   const { error } = await supabase.from('app_installations')
     .upsert({ installation_id: installationId }, { onConflict: 'installation_id', ignoreDuplicates: true });
   if (error) throw error;
-  const { count, error: countError } = await supabase.from('app_installations')
-    .select('installation_id', { count: 'exact', head: true });
+  const { data: count, error: countError } = await supabase.rpc('get_app_installation_count');
   if (countError) throw countError;
   return Number(count || 0);
 }
