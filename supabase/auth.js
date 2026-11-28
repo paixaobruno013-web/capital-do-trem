@@ -9,6 +9,9 @@ const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_FLbDg6UCePQHb7s0wkywng_J9pNKlsP
 
 let client = null;
 let presenceLifecycleStarted = false;
+let quotaBlockedUntil = 0;
+const nativeFetch = globalThis.fetch.bind(globalThis);
+const QUOTA_COOLDOWN_MS = 15 * 60 * 1000;
 let presenceCleanup = null;
 
 export function initSupabase() {
@@ -33,20 +36,38 @@ export function initSupabase() {
     // aumenta o intervalo entre tentativas para evitar uma tempestade de WebSockets.
     realtime: {
       reconnectAfterMs: (tries) => {
-        const delays = [10000, 30000, 60000, 120000];
+        const delays = [10000, 30000, 60000, 900000];
         return delays[Math.min(Math.max(tries - 1, 0), delays.length - 1)];
       }
     },
     // Configurações da abertura não podem vir de cache HTTP antigo.
     global: {
-      fetch: (input, init = {}) => {
+      fetch: async (input, init = {}) => {
         const requestUrl = input instanceof Request ? input.url : String(input);
+        let isSupabaseRequest = false;
+        try { isSupabaseRequest = new URL(requestUrl).origin === SUPABASE_URL; } catch {}
+        // Depois de um HTTP 402, interrompe chamadas adicionais do SDK por 15 minutos.
+        // O monitor independente em update.js continua verificando a recuperação do serviço.
+        if (isSupabaseRequest && quotaBlockedUntil > Date.now()) {
+          return new Response(JSON.stringify({
+            message: 'Serviço temporariamente restrito por limite de uso. Nova tentativa automática em até 15 minutos.',
+            code: 'CDT_SUPABASE_QUOTA_COOLDOWN'
+          }), {
+            status: 402,
+            headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
+          });
+        }
+        let options = init;
         if (requestUrl.includes('/rest/v1/site_settings')) {
           const headers = new Headers(init.headers || (input instanceof Request ? input.headers : undefined));
           headers.set('Cache-Control', 'no-cache');
-          return fetch(input, { ...init, cache: 'no-store', headers });
+          options = { ...init, cache: 'no-store', headers };
         }
-        return fetch(input, init);
+        const response = await nativeFetch(input, options);
+        if (isSupabaseRequest && response.status === 402) {
+          quotaBlockedUntil = Date.now() + QUOTA_COOLDOWN_MS;
+        }
+        return response;
       }
     }
   });
