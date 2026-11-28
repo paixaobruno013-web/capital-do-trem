@@ -111,7 +111,7 @@ Deno.serve(async (req: Request) => {
       const conversationId = body.conversation_id;
       const requestedIds = Array.isArray(body.invited_user_ids) ? body.invited_user_ids : [];
 
-      if (!["audio", "video"].includes(callType)) return json({ error: "Tipo de chamada inválido." }, 400);
+      if (callType !== "audio") return json({ error: "Videochamadas estão temporariamente adiadas para priorizar a estabilidade do Capital do Trem. Chamadas de voz continuam disponíveis quando configuradas." }, 410);
       if (typeof conversationId !== "string") return json({ error: "Escolha uma conversa privada para iniciar a chamada." }, 400);
       if (requestedIds.length > 3 || requestedIds.some((id: unknown) => typeof id !== "string")) {
         return json({ error: "É permitido convidar no máximo três pessoas além de você." }, 400);
