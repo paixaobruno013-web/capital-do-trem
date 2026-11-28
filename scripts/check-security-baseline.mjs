@@ -49,7 +49,7 @@ const mustContain = [
   ['cliente usa RPC e não consulta identificadores individuais de instalação', /rpc\('get_app_installation_count'\)/i, auth],
   ['chat mantém exclusão por autor ou administrador sem regra redundante', /drop policy if exists chat_messages_delete_admin/i, rlsOverlapMigration],
   ['publicações mantêm regra restrita a pendentes e removem UPDATE amplo', /posts_edit_own_pending_or_admin[\s\S]*?drop policy if exists posts_update_own_content/i, rlsOverlapMigration],
-  ['músicas mantêm regra de status publicado e removem UPDATE amplo', /drop policy if exists songs_update_own_or_admin[\s\S]*?songs_update_own_song_or_admin/i, rlsOverlapMigration]
+  ['músicas mantêm regra de status publicado e removem UPDATE amplo', /songs_update_own_song_or_admin[\s\S]*?drop policy if exists songs_update_own_or_admin/i, rlsOverlapMigration]
 ];
 for (const [label, pattern, source] of mustContain) {
   if (pattern.test(source)) pass(label);
