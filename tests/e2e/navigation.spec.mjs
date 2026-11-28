@@ -4,10 +4,39 @@ import { test, expect } from '@playwright/test';
 // Arquivos de mídia do Storage não devem ser baixados pelo Chromium de CI: isso
 // consome a franquia de egress de produção sem testar a reprodução no aparelho.
 test.beforeEach(async ({ page }) => {
-  await page.route('**/storage/v1/object/**', async route => {
-    if (route.request().method() === 'GET') return route.abort();
+  // A navegação visual não deve gerar tráfego no Supabase de produção.
+  // A conectividade real é verificada separadamente por um health check leve.
+  await page.route(/https:\/\/[^/]+\.supabase\.co\//, async route => {
+    const url = route.request().url();
+    const method = route.request().method();
+    const cors = {
+      'access-control-allow-origin': '*',
+      'access-control-allow-methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD',
+      'access-control-allow-headers': '*'
+    };
+
+    if (method === 'OPTIONS') {
+      return route.fulfill({ status: 204, headers: cors });
+    }
+    if (url.includes('/auth/v1/health')) {
+      return route.fulfill({ status: 200, headers: { ...cors, 'content-type': 'application/json' }, body: '{}' });
+    }
+    if (url.includes('/auth/v1/')) {
+      return route.fulfill({ status: 401, headers: { ...cors, 'content-type': 'application/json' }, body: '{"message":"Sessão de teste não autenticada"}' });
+    }
+    if (url.includes('/storage/v1/')) {
+      if (method === 'GET' || method === 'HEAD') return route.abort();
+      return route.fulfill({ status: 200, headers: { ...cors, 'content-type': 'application/json' }, body: '[]' });
+    }
+    if (url.includes('/rest/v1/')) {
+      if (method === 'HEAD') return route.fulfill({ status: 200, headers: cors, body: '' });
+      return route.fulfill({ status: 200, headers: { ...cors, 'content-type': 'application/json' }, body: '[]' });
+    }
     return route.continue();
   });
+
+  // Não abre WebSockets reais durante testes de interface.
+  await page.routeWebSocket(/\/realtime\/v1\/websocket/, socket => socket.close());
 });
 
 test('abre a página inicial e navega para Música e volta ao Feed', async ({ page }) => {
