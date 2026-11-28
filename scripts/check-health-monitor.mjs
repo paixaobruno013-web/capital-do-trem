@@ -18,7 +18,7 @@ assert.match(diagnostic, /Exportar relatório/, 'diagnóstico deve permitir expo
 assert.match(diagnostic, /clearIncidents/, 'diagnóstico deve permitir limpar histórico');
 assert.match(update, /item\.kind==='javascript'\|\|item\.kind==='promise'/, 'tarefas longas e falhas de recursos não devem disparar falso alerta de instabilidade');
 assert.match(update, /duplicate\|\|recoveryShown/, 'erros repetidos em sequência devem ser deduplicados no alerta');
-assert.match(update, /\(connectionDebounceTimer\|\|confirmedOffline\)\?1000:\(lowPowerMode\(\)\?10000:5000\)/, 'monitor deve verificar a cada segundo durante queda/retorno e reduzir a frequência em economia de bateria/dados');
+assert.match(update, /\(connectionDebounceTimer\|\|confirmedOffline\)\?1000:\(lowPowerMode\(\)\?45000:30000\)/, 'monitor deve verificar a cada segundo durante queda/retorno e reduzir a frequência em economia de bateria/dados');
 assert.match(update, /if\(document\.hidden\)return/, 'sondagens devem ser pausadas quando o app está em segundo plano');
 assert.match(update, /battery\.addEventListener\('levelchange'/, 'mudanças no nível da bateria devem recalibrar o monitor');
 assert.match(update, /battery\.addEventListener\('chargingchange'/, 'estado de carregamento deve recalibrar o monitor');
