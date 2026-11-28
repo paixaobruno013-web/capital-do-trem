@@ -2172,7 +2172,18 @@ function readOfflineJson(key,fallback=[]){
      video.dataset.fallbackShown='yes';clearTimeout(fallbackTimer);
      try{video.pause();}catch{}
      audioButton.style.display='none';
-     // Sem imagem substituta: mantém a abertura limpa, conforme preferência do usuário.
+     // Se o vídeo remoto falhar (incluindo HTTP 402), restaura uma abertura local em vez de deixar a tela preta.
+     screen.classList.remove('custom-opening-screen');
+     video.style.display='none';
+     const fallbackBrand=screen.querySelector('.intro-smoke__brand');
+     if(fallbackBrand){
+      fallbackBrand.style.display='flex';
+      fallbackBrand.style.visibility='visible';
+      fallbackBrand.style.opacity='1';
+      fallbackBrand.style.animation='none';
+      const fallbackImage=fallbackBrand.querySelector('img');
+      if(fallbackImage){fallbackImage.src='./marca.svg';fallbackImage.style.visibility='visible';fallbackImage.style.objectFit='contain';}
+     }
      beginOpeningClock();
     };
     // O relógio de 10 segundos e o trem começam quando o vídeo realmente toca; se falhar, começam com o fallback.
