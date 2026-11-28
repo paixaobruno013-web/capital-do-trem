@@ -3,7 +3,10 @@ import assert from 'node:assert/strict';
 
 const update = await readFile('update.js', 'utf8');
 const diagnostic = await readFile('diagnostico.html', 'utf8');
+const auth = await readFile('supabase/auth.js', 'utf8');
 
+assert.match(auth, /reconnectAfterMs:\s*\(tries\)\s*=>/, 'Realtime deve usar retentativa adaptativa');
+assert.match(auth, /\[10000, 30000, 60000, 120000\]/, 'falhas persistentes devem espaçar as reconexões até 2 minutos');
 assert.match(update, /window\.CapitalDoTremHealth\s*=/, 'API de saúde deve estar exposta');
 assert.match(update, /unhandledrejection/, 'promises rejeitadas devem ser detectadas');
 assert.match(update, /addEventListener\('error'/, 'erros de execução e recursos devem ser detectados');
