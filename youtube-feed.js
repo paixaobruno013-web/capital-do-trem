@@ -4,8 +4,6 @@ const FEED_ENDPOINT = 'https://zmjxkfjzrbbxyvgkwirv.supabase.co/functions/v1/you
 const PUBLIC_KEY = 'sb_publishable_FLbDg6UCePQHb7s0wkywng_J9pNKlsP';
 const grid = document.querySelector('.home-youtube-grid');
 const status = document.getElementById('youtube-feed-status');
-let initialSessionPromise;
-function getInitialSession(){if(!initialSessionPromise)initialSessionPromise=getCurrentSession().catch(()=>null);return initialSessionPromise;}
 
 // Biblioteca de vídeos enviada pelo usuário: 20 Shorts anteriores + 5 Shorts novos + 2 Reels.
 const SHORTS = [
@@ -49,27 +47,8 @@ function createPlayer(id,title){
 }
 async function requireSession(){
   const session=await getCurrentSession();
-  if(session?.user)initialSessionPromise=Promise.resolve(session);
   if(!session?.user){setStatus('Entre na sua conta para curtir ou comentar.');return null;}
   return session;
-}
-async function loadInteractions(card,video){
-  try{
-    const client=initSupabase();
-    const [{count,error:likeError},{data:ownLike,error:ownError}]=await Promise.all([
-      client.from('video_likes').select('id',{count:'exact',head:true}).eq('youtube_video_id',video.id),
-      getInitialSession().then(session=>session?.user?client.from('video_likes').select('id').eq('youtube_video_id',video.id).eq('user_id',session.user.id).maybeSingle():{data:null,error:null})
-    ]);
-    if(likeError)throw likeError;
-    if(ownError)throw ownError;
-    const like=card.querySelector('[data-action="like"]');
-    like.textContent='♥ Curtir ('+(count||0)+')';
-    like.setAttribute('aria-pressed',String(Boolean(ownLike)));
-
-  }catch(error){
-    console.warn('Interações dos vídeos ainda não estão disponíveis:',error);
-    setStatus('Não foi possível carregar as curtidas agora. Tente novamente em instantes.');
-  }
 }
 async function loadComments(card,video){
   const list=card.querySelector('.home-youtube-comment-list');
@@ -99,15 +78,14 @@ function makeCard(video,index){
   cover.addEventListener('click',()=>cover.replaceWith(createPlayer(video.id,title.textContent)),{once:true});
   frame.append(cover);
   const actions=document.createElement('div');actions.className='home-youtube-actions';
-  const like=document.createElement('button');like.type='button';like.dataset.action='like';like.textContent='♥ Curtir';like.addEventListener('click',async()=>{
+  const like=document.createElement('button');like.type='button';like.dataset.action='like';like.textContent='♥ Curtir';like.setAttribute('aria-pressed','false');like.addEventListener('click',async()=>{
     try{
       const session=await requireSession();if(!session)return;
       const client=initSupabase();
       const {data:own,error}=await client.from('video_likes').select('id').eq('youtube_video_id',video.id).eq('user_id',session.user.id).maybeSingle();
       if(error)throw error;
-      if(own){const removed=await client.from('video_likes').delete().eq('id',own.id);if(removed.error)throw removed.error;}
-      else{const added=await client.from('video_likes').insert({youtube_video_id:video.id,user_id:session.user.id});if(added.error)throw added.error;}
-      await loadInteractions(article,video);
+      if(own){const removed=await client.from('video_likes').delete().eq('id',own.id);if(removed.error)throw removed.error;like.textContent='♥ Curtir';like.setAttribute('aria-pressed','false');}
+      else{const added=await client.from('video_likes').insert({youtube_video_id:video.id,user_id:session.user.id});if(added.error)throw added.error;like.textContent='♥ Curtido';like.setAttribute('aria-pressed','true');}
     }catch(error){setStatus(error?.message||'Não foi possível registrar sua curtida.');}
   });
   const commentToggle=document.createElement('button');commentToggle.type='button';commentToggle.textContent='💬 Comentar';
@@ -133,7 +111,6 @@ function makeCard(video,index){
   panel.append(form,list);
   commentToggle.addEventListener('click',()=>{panel.hidden=!panel.hidden;if(!panel.hidden)loadComments(article,video);});
   article.append(title,frame,actions,panel);
-  loadInteractions(article,video);
   return article;
 }
 
