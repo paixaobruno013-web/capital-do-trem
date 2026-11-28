@@ -36,7 +36,6 @@ const files = [
   'home-story-composer.js',
   'capital-ai.js',
   'mobile-bottom-nav.js',
-  'event-social-composer.js',
   'account-stories.js',
   'admin-stories.js',
   'avatar.html',
