@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 const update = await readFile('update.js', 'utf8');
 const diagnostic = await readFile('diagnostico.html', 'utf8');
 const auth = await readFile('supabase/auth.js', 'utf8');
+const youtubeFeed = await readFile('youtube-feed.js', 'utf8');
 
 assert.match(auth, /reconnectAfterMs:\s*\(tries\)\s*=>/, 'Realtime deve usar retentativa adaptativa');
 assert.match(auth, /\[10000, 30000, 60000, 120000\]/, 'falhas persistentes devem espaçar as reconexões até 2 minutos');
@@ -21,7 +22,12 @@ assert.match(diagnostic, /Exportar relatório/, 'diagnóstico deve permitir expo
 assert.match(diagnostic, /clearIncidents/, 'diagnóstico deve permitir limpar histórico');
 assert.match(update, /item\.kind==='javascript'\|\|item\.kind==='promise'/, 'tarefas longas e falhas de recursos não devem disparar falso alerta de instabilidade');
 assert.match(update, /duplicate\|\|recoveryShown/, 'erros repetidos em sequência devem ser deduplicados no alerta');
-assert.match(update, /\(connectionDebounceTimer\|\|confirmedOffline\)\?1000:\(lowPowerMode\(\)\?45000:30000\)/, 'monitor deve verificar a cada segundo durante queda/retorno e reduzir a frequência em economia de bateria/dados');
+assert.match(update, /backendRestricted&&Date\.now\(\)-lastProbeAt<120000/, 'backend restrito deve limitar sondagens repetidas por dois minutos');
+assert.match(update, /backendRestricted=!response\.ok/, 'respostas HTTP do Supabase devem ser separadas de falhas de internet');
+assert.match(update, /const delay=backendRestricted\?120000:\(connectionDebounceTimer\|\|confirmedOffline\)\?5000:\(lowPowerMode\(\)\?45000:60000\)/, 'monitor deve reduzir consultas e tratar restrição do backend separadamente');
+assert.match(update, /backendStatus=response\.status/, 'diagnóstico deve registrar o status HTTP do backend');
+assert.doesNotMatch(youtubeFeed, /loadInteractions\(article,video\)/, 'a tela inicial não deve consultar curtidas individualmente para cada vídeo');
+assert.match(youtubeFeed, /like\.setAttribute\('aria-pressed','true'\)/, 'a ação de curtir deve atualizar o estado acessível localmente');
 assert.match(update, /if\(document\.hidden\)return/, 'sondagens devem ser pausadas quando o app está em segundo plano');
 assert.match(update, /battery\.addEventListener\('levelchange'/, 'mudanças no nível da bateria devem recalibrar o monitor');
 assert.match(update, /battery\.addEventListener\('chargingchange'/, 'estado de carregamento deve recalibrar o monitor');
