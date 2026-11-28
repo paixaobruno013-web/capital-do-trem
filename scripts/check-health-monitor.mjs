@@ -11,7 +11,7 @@ assert.match(auth, /\[10000, 30000, 60000, 900000\]/, 'falhas persistentes devem
 assert.match(auth, /let quotaBlockedUntil = 0/);
 assert.match(auth, /quotaBlockedUntil > Date\.now\(\)/, 'o circuito deve interromper chamadas do SDK durante a cota bloqueada');
 assert.match(auth, /response\.status === 402/);
-assert.match(auth, /quotaBlockedUntil = Date\.now\(\) \\+ QUOTA_COOLDOWN_MS/);
+assert.match(auth, /quotaBlockedUntil = Date\.now\(\) \+ QUOTA_COOLDOWN_MS/);
 assert.match(auth, /status: 402/, 'o circuito deve devolver erro compatível sem repetir a chamada de rede');
 assert.match(update, /window\.CapitalDoTremHealth\s*=/, 'API de saúde deve estar exposta');
 assert.match(update, /unhandledrejection/, 'promises rejeitadas devem ser detectadas');
@@ -27,7 +27,7 @@ assert.match(diagnostic, /Exportar relatório/, 'diagnóstico deve permitir expo
 assert.match(diagnostic, /clearIncidents/, 'diagnóstico deve permitir limpar histórico');
 assert.match(update, /item\.kind==='javascript'\|\|item\.kind==='promise'/, 'tarefas longas e falhas de recursos não devem disparar falso alerta de instabilidade');
 assert.match(update, /duplicate\|\|recoveryShown/, 'erros repetidos em sequência devem ser deduplicados no alerta');
-assert.match(update, /backendRestricted&&Date\.now\(\)-lastProbeAt<900000/, 'backend restrito deve limitar sondagens repetidas por dois minutos');
+assert.match(update, /backendRestricted&&Date\.now\(\)-lastProbeAt<900000/, 'backend restrito deve limitar sondagens repetidas por quinze minutos');
 assert.match(update, /backendRestricted=!response\.ok/, 'respostas HTTP do Supabase devem ser separadas de falhas de internet');
 assert.match(update, /const delay=backendRestricted\?900000:\(connectionDebounceTimer\|\|confirmedOffline\)\?5000:\(lowPowerMode\(\)\?45000:60000\)/, 'monitor deve reduzir consultas e tratar restrição do backend separadamente');
 assert.match(update, /backendStatus=response\.status/, 'diagnóstico deve registrar o status HTTP do backend');
