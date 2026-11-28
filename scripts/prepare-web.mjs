@@ -15,7 +15,6 @@ const files = [
   'home-feed.js',
   'post-music.js',
   'music-upload.js',
-  'music-cover.js',
   'music-playlists.js',
   'chat-topics.js',
   'chat-modern.css',
