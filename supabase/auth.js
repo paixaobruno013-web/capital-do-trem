@@ -44,7 +44,8 @@ export function initSupabase() {
     global: {
       fetch: async (input, init = {}) => {
         const requestUrl = input instanceof Request ? input.url : String(input);
-        const isSupabaseRequest = requestUrl.startsWith(SUPABASE_URL);
+        let isSupabaseRequest = false;
+        try { isSupabaseRequest = new URL(requestUrl).origin === SUPABASE_URL; } catch {}
         // Depois de um HTTP 402, interrompe chamadas adicionais do SDK por 15 minutos.
         // O monitor independente em update.js continua verificando a recuperação do serviço.
         if (isSupabaseRequest && quotaBlockedUntil > Date.now()) {
