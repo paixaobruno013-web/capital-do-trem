@@ -1,32 +1,22 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-const migration = await readFile(new URL("../supabase/migrations/20261124130954_live_broadcasts.sql", import.meta.url), "utf8");
-const api = await readFile(new URL("../supabase/functions/lives-api/index.ts", import.meta.url), "utf8");
+
+const calls = await readFile(new URL("../supabase/functions/calls-api/index.ts", import.meta.url), "utf8");
+const lives = await readFile(new URL("../supabase/functions/lives-api/index.ts", import.meta.url), "utf8");
 const webhook = await readFile(new URL("../supabase/functions/lives-webhook/index.ts", import.meta.url), "utf8");
-const lifecycle = await readFile(new URL("../supabase/migrations/20261124130957_live_recording_lifecycle.sql", import.meta.url), "utf8");
-const guide = await readFile(new URL("../supabase/functions/lives-api/README.md", import.meta.url), "utf8");
-const storage = await readFile(new URL("../supabase/migrations/20261124130956_private_live_recordings_bucket.sql", import.meta.url), "utf8");
-assert.match(migration, /enable row level security/i);
-assert.match(migration, /revoke all privileges.*anon, authenticated/is);
-assert.match(migration, /live_broadcasts_one_active_per_host/);
-assert.match(storage, /live-recordings/);
-assert.match(storage, /public = false/);
-assert.match(storage, /service_role/);
-assert.match(api, /auth\.getUser\(\)/);
-assert.match(api, /canPublish: true/);
-assert.match(api, /canPublish: false/);
-assert.match(api, /action === "list"/);
-assert.match(api, /\.limit\(30\)/);
-assert.match(api, /host_user_id !== user\.id/);
-assert.match(api, /recording_status: "not_configured"/);
-assert.match(webhook, /WebhookReceiver/);
-assert.match(webhook, /receiver\.receive\(rawBody, authorization\)/);
-assert.match(webhook, /recording_status: failed \? "failed" : "processing"/);
-assert.match(lifecycle, /recording_egress_id/);
-assert.match(lifecycle, /recording_ready_at/);
-assert.match(guide, /Gravação automática ainda não está habilitada/);
-const deno = await readFile(new URL("../supabase/functions/lives-api/deno.json", import.meta.url), "utf8");
-assert.match(deno, /nodeModulesDir/);
-assert.match(deno, /livekit-server-sdk/);
-assert.match(guide, /Não cadastrar cartão, fazer upgrade ou ativar cobrança sem autorização expressa/);
-console.log("Infraestrutura de Live: verificações estáticas aprovadas; gravação continua explicitamente desativada.");
+const guide = await readFile(new URL("../docs/chamadas-voz-video-arquitetura.md", import.meta.url), "utf8");
+
+assert.match(calls, /status:\s*410/, "Chamadas de voz e vídeo devem continuar pausadas.");
+assert.match(calls, /available:\s*false/, "A API deve informar que chamadas não estão disponíveis.");
+assert.doesNotMatch(calls, /createClient\(|issueToken\(|AccessToken|RoomServiceClient/, "A API pausada não pode acessar o banco nem emitir tokens.");
+
+assert.match(lives, /available:\s*false/);
+assert.match(lives, /410/);
+assert.doesNotMatch(lives, /createRoom\(|new AccessToken\(|RoomServiceClient|AccessToken/, "A API pausada não pode criar salas nem emitir tokens.");
+
+assert.match(webhook, /ignored:\s*true/);
+assert.doesNotMatch(webhook, /WebhookReceiver|egress_started|egress_ended|createClient\(/, "O webhook pausado não pode processar nem persistir gravações.");
+
+assert.match(guide, /chamadas de voz, videochamadas, transmissões ao vivo e gravações estão temporariamente pausadas/);
+assert.match(guide, /Nenhum conteúdo foi apagado/);
+console.log("Chamadas, lives e gravações pausadas; sem emissão de tokens, criação de salas ou processamento de gravações.");
