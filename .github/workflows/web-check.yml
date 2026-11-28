@@ -79,6 +79,8 @@ jobs:
           node scripts/check-post-social.mjs
       - name: Verificar rede social, perfis e mídias privadas
         run: node scripts/check-rede-social.mjs
+      - name: Verificar encerramento seguro das interações legadas da Pesquisa
+        run: node scripts/check-retired-video-interactions.mjs
       - name: Verificar navegação fluida e desempenho entre áreas
         run: node scripts/check-navigation-performance.mjs
       - name: Verificar imagens oficiais, participantes e galerias do FALA UAI
